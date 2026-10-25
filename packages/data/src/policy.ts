@@ -16,6 +16,8 @@ import {
   type AddOnSubscription,
   type AuditEvent,
   type Client,
+  OWNER_KEYS,
+  isAssignmentActive,
   type EffectivePermission,
   type Evidence,
   type EvidenceSubmission,
@@ -658,18 +660,22 @@ async function putSubmission(
     const assignments = await call.all<RoleAssignment>('roleAssignments');
     const roles = await call.all<Role>('roles');
     const users = await call.all<UserAccount>('users');
-    const clientUsers = new Set(
-      users.filter((u) => u.clientId === base.clientId && u.side === 'client').map((u) => u.id),
+    const activeUsers = new Set(
+      users
+        .filter((u) => u.clientId === base.clientId && u.side === 'client' && u.status === 'active')
+        .map((u) => u.id),
     );
+    const now = new Date(actor.ctx.now);
     const activeAdmins = new Set(
-      assignments.filter((a) => a.status === 'active' && clientUsers.has(a.userId)).map((a) => a.userId),
+      assignments.filter((a) => activeUsers.has(a.userId) && isAssignmentActive(a, now)).map((a) => a.userId),
     );
     const isAccountOwner = assignments.some(
       (a) =>
         a.userId === actor.user.id &&
+        isAssignmentActive(a, now) &&
         a.roleIds.some((id) => {
           const r = roles.find((x) => x.id === id);
-          return r?.system === true && r.name === 'Account Owner';
+          return r?.system === true && r.systemKey === OWNER_KEYS.client;
         }),
     );
     const result = canApproveEvidence(

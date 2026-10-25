@@ -244,6 +244,7 @@ export async function buildWorld(admin: DemoAdmin) {
       colour: '#336699',
       permissionIds: compileClientRole(t.levels, t.allows),
       system: true,
+      systemKey: 'accountOwner',
       version: 1,
       clientLevels: t.levels,
       clientAllows: t.allows,
