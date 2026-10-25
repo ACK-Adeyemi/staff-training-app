@@ -7,7 +7,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { vi } from 'vitest';
 import { createMemoryStore } from '@sta/data';
 import type { ActorContext, StoreHandle } from '@sta/data';
-import { createRng, fixedClock } from '@sta/domain';
+import { createRng, fixedClock, type OutboxMessage } from '@sta/domain';
 import { load, type SeedKeys } from '@sta/seed';
 import { createT, languages } from '@sta/content';
 import { AppProviders } from '../app/providers';
@@ -45,6 +45,7 @@ export function makeDemo(side: Side, keys: SeedKeys) {
     fastForward: vi.fn(),
     backToToday: vi.fn(),
     setIndustry: vi.fn(),
+    listOutbox: () => Promise.resolve([] as OutboxMessage[]),
   };
 }
 

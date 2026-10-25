@@ -40,3 +40,4 @@ docs/brief/
 docs/build-pack/
 .sources-cache/
 .pnpm-store/
+.vitest

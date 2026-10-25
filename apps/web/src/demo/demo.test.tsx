@@ -42,8 +42,7 @@ const openTitles = () =>
     return (id ? document.getElementById(id)?.textContent : d.getAttribute('aria-label')) ?? '';
   });
 const badge = () => screen.getByTestId('demo-badge');
-const shiftAltP = () =>
-  fireEvent.keyDown(document.body, { key: 'P', code: 'KeyP', shiftKey: true, altKey: true });
+const shiftAltP = () => fireEvent.keyDown(document.body, { key: 'P', code: 'KeyP', shiftKey: true, altKey: true });
 
 async function openMenu() {
   await userEvent.click(badge());
@@ -271,9 +270,21 @@ describe('D1 landing', () => {
     expect((await screen.findByRole('link', { name: 'Client tour' })).getAttribute('href')).toBe('#/client');
     expect(screen.getByRole('link', { name: 'Provider tour' }).getAttribute('href')).toBe('#/provider');
     const explore = screen.getByRole('region', { name: 'Explore freely' });
-    expect(within(explore).getByRole('link', { name: /Staff app/ }).getAttribute('href')).toBe('#/staff');
-    expect(within(explore).getByRole('link', { name: /Client admin/ }).getAttribute('href')).toBe('#/client');
-    expect(within(explore).getByRole('link', { name: /Provider admin/ }).getAttribute('href')).toBe('#/provider');
+    expect(
+      within(explore)
+        .getByRole('link', { name: /Staff app/ })
+        .getAttribute('href'),
+    ).toBe('#/staff');
+    expect(
+      within(explore)
+        .getByRole('link', { name: /Client admin/ })
+        .getAttribute('href'),
+    ).toBe('#/client');
+    expect(
+      within(explore)
+        .getByRole('link', { name: /Provider admin/ })
+        .getAttribute('href'),
+    ).toBe('#/provider');
   });
 });
 
@@ -282,9 +293,7 @@ describe('D3 outbox', () => {
     await renderRoute('/demo/outbox', 'staff');
     expect(await screen.findByRole('heading', { level: 1, name: 'Outbox' })).toBeTruthy();
     expect(
-      await screen.findByText(
-        'Nothing has been sent yet. In the demo, messages are shown here instead of being sent.',
-      ),
+      await screen.findByText('Nothing has been sent yet. In the demo, messages are shown here instead of being sent.'),
     ).toBeTruthy();
   });
 

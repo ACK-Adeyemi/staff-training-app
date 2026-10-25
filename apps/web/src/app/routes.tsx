@@ -1,6 +1,9 @@
 import type { RouteObject } from 'react-router';
 import type { MessageKey } from '@sta/content';
-import { Landing, NotFound, Outbox, Placeholder } from '../pages/pages';
+import { NotFound, Placeholder } from '../pages/pages';
+import { Landing } from '../demo/pages/Landing';
+import { Outbox } from '../demo/pages/Outbox';
+import { RootLayout } from '../demo/RootLayout';
 import { RouteError } from './RouteError';
 
 const page = (path: string, title: MessageKey, body: MessageKey): RouteObject => ({
@@ -10,6 +13,7 @@ const page = (path: string, title: MessageKey, body: MessageKey): RouteObject =>
 
 export const routes: RouteObject[] = [
   {
+    element: <RootLayout />,
     errorElement: <RouteError />,
     children: [
       { path: '/', element: <Landing /> },

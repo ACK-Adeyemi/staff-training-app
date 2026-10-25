@@ -12,3 +12,4 @@ docs/build-pack.md
 # Prose and workflow files are written by hand and reviewed by the user; Prettier does not reflow them.
 *.md
 .github
+.vitest

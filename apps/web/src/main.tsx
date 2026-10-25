@@ -4,6 +4,7 @@ import { createT, languages } from '@sta/content';
 import { Button } from '@sta/ui';
 import { App } from './App';
 import { bootstrap } from './demo/bootstrap';
+import { listenEarly } from './demo/earlyShortcut';
 import './styles/app.css';
 
 const t = createT(languages['en-GB'].messages);
@@ -11,6 +12,7 @@ const container = document.getElementById('root');
 if (!container) throw new Error('Missing #root');
 const root = createRoot(container);
 
+listenEarly();
 bootstrap(window.location.search).then(
   (booted) => {
     root.render(

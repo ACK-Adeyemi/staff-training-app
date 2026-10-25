@@ -154,3 +154,11 @@ Choices made by the test-writer where build pack section 6 left things open, acc
 - The CSP meta tag is added by editing the HTML string, because Vite's tag descriptors escape quotes to `&#39;`.
 - The staff shell renders one navigation (bottom bar on phones, sidebar from 48rem); client and provider shells render both with CSS, so the More items are always in the DOM. Plain `#/` links are routed through the router by a click handler on the shell.
 - D1, D3 and the Demo badge are minimal in this chunk; chunk 12 completes them.
+
+## M0 chunk 12
+- The Demo badge is rendered once by a root layout route (`apps/web/src/demo/RootLayout.tsx`) in a strip above every screen, not in each shell header. The Demo menu and presenter panel live there too. The route error screen sits outside it.
+- Reset demo rebuilds the data in place, clears the offset and invalidates loaded queries, with no page reload. A reload raced with the end-to-end test, which opens the panel straight after confirming.
+- A Shift+Alt+P press that lands before the app has mounted (IndexedDB is still opening) is remembered by `demo/earlyShortcut.ts` and opens the panel on mount.
+- The root layout renders the badge once; a shell header that has a `DemoBadgeSlot` receives it through a portal (the navigation e2e test expects the badge inside the banner), other screens get a strip. Reset demo no longer reloads (see above).
+- Dialog content renders only while the dialog is open, so closed dialogs add nothing to the page (and the build constants are only read when the menu is open).
+- `demo.outboxEmpty` and `demo.resetConfirmTitle` text changed to what the tests require. No test was changed.

@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 import type { ActorContext, DataStore } from '@sta/data';
-import type { Clock, DemoState } from '@sta/domain';
+import type { Clock, DemoState, OutboxMessage } from '@sta/domain';
 import type { TFunction } from '@sta/content';
 
 export type DemoApi = {
@@ -8,6 +8,7 @@ export type DemoApi = {
   reset: () => void | Promise<void>;
   fastForward: (days: number) => void | Promise<void>;
   backToToday: () => void | Promise<void>;
+  listOutbox: () => Promise<OutboxMessage[]>;
   setIndustry: (industry: DemoState['industry']) => void | Promise<void>;
 };
 

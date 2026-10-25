@@ -5,7 +5,14 @@ import { expect, test, type Page } from '@playwright/test';
 const badge = (page: Page) => page.getByTestId('demo-badge');
 const panel = (page: Page) => page.getByRole('dialog', { name: 'Presenter panel' });
 const menu = (page: Page) => page.getByRole('dialog', { name: 'Demo menu' });
-const dateText = async (page: Page) => (await panel(page).getByText(/^Demo date:/).innerText()).replace('Demo date:', '').trim();
+const dateText = async (page: Page) =>
+  (
+    await panel(page)
+      .getByText(/^Demo date:/)
+      .innerText()
+  )
+    .replace('Demo date:', '')
+    .trim();
 
 /** Parses "Monday 19 October 2026", "19 October 2026" and similar into a UTC day number. */
 function dayNumber(text: string): number {
@@ -66,7 +73,9 @@ test.describe('Demo badge and menu', () => {
     });
   }
 
-  test('tapping the badge opens the Demo menu with a version and a build date, and Escape closes it', async ({ page }) => {
+  test('tapping the badge opens the Demo menu with a version and a build date, and Escape closes it', async ({
+    page,
+  }) => {
     await page.goto('./#/staff');
     await badge(page).click();
     await expect(menu(page)).toBeVisible();
@@ -110,11 +119,15 @@ test.describe('Presenter panel (D2)', () => {
     await expect(menu(page)).toBeHidden();
   });
 
-  test('Fast-forward 30 days moves the date by 30 days, survives a reload, and Back to today restores it', async ({ page }) => {
+  test('Fast-forward 30 days moves the date by 30 days, survives a reload, and Back to today restores it', async ({
+    page,
+  }) => {
     await page.goto('./#/staff');
     await page.keyboard.press('Shift+Alt+KeyP');
     const today = dayNumber(await dateText(page));
-    await panel(page).getByRole('button', { name: /^Fast-forward 30 days?$/ }).click();
+    await panel(page)
+      .getByRole('button', { name: /^Fast-forward 30 days?$/ })
+      .click();
     await expect.poll(async () => dayNumber(await dateText(page))).toBe(today + 30);
 
     await page.reload();
@@ -129,9 +142,13 @@ test.describe('Presenter panel (D2)', () => {
     await page.goto('./#/staff');
     await page.keyboard.press('Shift+Alt+KeyP');
     const today = dayNumber(await dateText(page));
-    await panel(page).getByRole('button', { name: /^Fast-forward 1 days?$/ }).click();
+    await panel(page)
+      .getByRole('button', { name: /^Fast-forward 1 days?$/ })
+      .click();
     await expect.poll(async () => dayNumber(await dateText(page))).toBe(today + 1);
-    await panel(page).getByRole('button', { name: /^Fast-forward 7 days?$/ }).click();
+    await panel(page)
+      .getByRole('button', { name: /^Fast-forward 7 days?$/ })
+      .click();
     await expect.poll(async () => dayNumber(await dateText(page))).toBe(today + 8);
   });
 
@@ -139,7 +156,9 @@ test.describe('Presenter panel (D2)', () => {
     await page.goto('./#/staff');
     await page.keyboard.press('Shift+Alt+KeyP');
     const today = dayNumber(await dateText(page));
-    await panel(page).getByRole('button', { name: /^Fast-forward 7 days?$/ }).click();
+    await panel(page)
+      .getByRole('button', { name: /^Fast-forward 7 days?$/ })
+      .click();
     await expect.poll(async () => dayNumber(await dateText(page))).toBe(today + 7);
 
     await panel(page).getByRole('button', { name: 'Reset demo' }).click();
@@ -199,7 +218,9 @@ test.describe('?reset=1', () => {
     await page.goto('./#/staff');
     await page.keyboard.press('Shift+Alt+KeyP');
     const today = dayNumber(await dateText(page));
-    await panel(page).getByRole('button', { name: /^Fast-forward 30 days?$/ }).click();
+    await panel(page)
+      .getByRole('button', { name: /^Fast-forward 30 days?$/ })
+      .click();
     await expect.poll(async () => dayNumber(await dateText(page))).toBe(today + 30);
 
     await page.goto('./?reset=1#/staff');
@@ -213,7 +234,9 @@ test.describe('?reset=1', () => {
     await page.goto('./#/staff');
     await page.keyboard.press('Shift+Alt+KeyP');
     const today = dayNumber(await dateText(page));
-    await panel(page).getByRole('button', { name: /^Fast-forward 7 days?$/ }).click();
+    await panel(page)
+      .getByRole('button', { name: /^Fast-forward 7 days?$/ })
+      .click();
     await expect.poll(async () => dayNumber(await dateText(page))).toBe(today + 7);
     await page.goto('./?reset=0&clear=1#/staff');
     await page.keyboard.press('Shift+Alt+KeyP');

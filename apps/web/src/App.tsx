@@ -45,10 +45,10 @@ function Inner({ booted }: { booted: Booted }) {
       reset: async () => {
         await reset(handle.admin);
         await save({ ...state, clockOffsetMs: 0 });
-        window.location.reload();
       },
       fastForward: (days) => save({ ...state, clockOffsetMs: state.clockOffsetMs + days * DAY_MS }),
       backToToday: () => save({ ...state, clockOffsetMs: 0 }),
+      listOutbox: () => handle.admin.listOutbox(),
       setIndustry: (industry) => save({ ...state, industry }),
     };
   }, [handle, setOffset, state]);

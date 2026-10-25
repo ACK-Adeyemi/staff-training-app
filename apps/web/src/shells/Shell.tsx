@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router';
 import { Badge, BottomTabBar, Icon, MoreSheet, SideNav, focusClasses, type NavItem } from '@sta/ui';
 import { useCurrentUser, useT } from '../app/hooks';
 import { useDesktop } from '../app/useDesktop';
-import { DemoBadge } from '../demo/DemoBadge';
+import { DemoBadgeSlot } from '../demo/RootLayout';
 
 export type ShellConfig = {
   side: 'staff' | 'client' | 'provider';
@@ -68,7 +68,7 @@ export function Shell({ config }: { config: ShellConfig }) {
           <span className="font-semibold">{user.data?.displayName ?? t('shell.loading')}</span>
           <div className="flex flex-wrap items-center gap-2">
             {config.side === 'provider' ? <Badge tone="simulated">{t('demo.simulatedData')}</Badge> : null}
-            <DemoBadge />
+            <DemoBadgeSlot />
             {config.headerLinks.map((item) => (
               <a
                 key={item.id}
