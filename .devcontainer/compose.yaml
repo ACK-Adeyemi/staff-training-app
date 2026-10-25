@@ -1,0 +1,71 @@
+# Containers for this app. Start them with scripts/agent, which sets the project name
+# (so each app gets its own containers and volumes) and the token file location.
+# Relative paths are relative to this file.
+
+x-proxy: &proxy
+  # Squid on the VM. Containers can only reach the internet through it.
+  HTTP_PROXY: http://10.200.0.1:3128
+  HTTPS_PROXY: http://10.200.0.1:3128
+  http_proxy: http://10.200.0.1:3128
+  https_proxy: http://10.200.0.1:3128
+
+services:
+  dev:
+    build:
+      context: .
+      args:
+        <<: *proxy
+        NO_PROXY: localhost,127.0.0.1
+    init: true
+    working_dir: /workspace
+    volumes:
+      - ..:/workspace
+      - claude-config:/root/.claude
+    secrets:
+      - claude_token
+    environment:
+      <<: *proxy
+      NO_PROXY: localhost,127.0.0.1,db
+      no_proxy: localhost,127.0.0.1,db
+      DATABASE_URL: postgresql://app:app@db:5432/app
+      CLAUDE_CONFIG_DIR: /root/.claude
+      DISABLE_AUTOUPDATER: "1"
+      DISABLE_TELEMETRY: "1"
+      DISABLE_ERROR_REPORTING: "1"
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+      ENABLE_CLAUDEAI_MCP_SERVERS: "false"
+      # Lets the /build workflow wait for each subagent before starting the next.
+      CLAUDE_CODE_FORK_SUBAGENT: "0"
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 2048
+    mem_limit: 6g
+    depends_on:
+      db:
+        condition: service_healthy
+    # To view the app from Windows: uncomment, run `scripts/agent up`, then use an SSH tunnel (see README).
+    # ports:
+    #   - "127.0.0.1:3000:3000"
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app # local development only; this database publishes no ports
+      POSTGRES_DB: app
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 1g
+
+secrets:
+  claude_token:
+    file: ${AGENT_TOKEN_FILE:?start the containers with scripts/agent}
+
+volumes:
+  claude-config:
+  pgdata:

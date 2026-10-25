@@ -1,0 +1,164 @@
+#!/usr/bin/env bash
+# agent: run this app's Claude agent team inside its dev container.
+# Run on the VM as the `agent` user. Works from anywhere inside the project.
+#
+#   scripts/agent token          save your Claude subscription token (once per VM)
+#   scripts/agent up             build and start this app's containers
+#   scripts/agent claude         interactive Claude session (say "build ...")
+#   scripts/agent task "<what>"  background run of the /build workflow on a new branch
+#   scripts/agent logs           follow the latest background run
+#   scripts/agent status         containers, current branch, running task
+#   scripts/agent sync           update local main from GitHub after you merge a PR
+#   scripts/agent shell          bash inside the dev container
+#   scripts/agent doctor         check token, containers, proxy and Claude Code
+#   scripts/agent down           stop the containers (data volumes are kept)
+#   scripts/agent reset          stop and delete this app's database and Claude history
+set -euo pipefail
+
+ROOT="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
+APP="$(basename "$ROOT")"
+PROJECT="$(printf '%s' "$APP" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9_-]/-/g')"
+export AGENT_TOKEN_FILE="${AGENT_TOKEN_FILE:-$HOME/.config/agent-vm/claude-oauth-token}"
+export DOCKER_HOST="${DOCKER_HOST:-unix:///run/user/$(id -u)/docker.sock}"
+COMPOSE=(docker compose -p "$PROJECT" -f "$ROOT/.devcontainer/compose.yaml")
+LOG_DIR="$ROOT/.agent-logs"
+PID_FILE="$LOG_DIR/running.pid"
+CLAUDE_FLAGS=(--permission-mode auto --model sonnet)
+
+die() { echo "agent: $*" >&2; exit 1; }
+
+need_token() {
+  [ -s "$AGENT_TOKEN_FILE" ] || die "no Claude token saved. Run: claude setup-token, then: scripts/agent token"
+}
+
+is_up() {
+  [ -n "$("${COMPOSE[@]}" ps -q --status running dev 2>/dev/null)" ]
+}
+
+ensure_up() {
+  need_token
+  is_up || "${COMPOSE[@]}" up -d --build --wait
+}
+
+task_running() {
+  [ -f "$PID_FILE" ] && is_up && "${COMPOSE[@]}" exec -T dev sh -c 'kill -0 "$(cat /workspace/.agent-logs/running.pid)"' 2>/dev/null
+}
+
+sync_main() {
+  [ -z "$(git -C "$ROOT" status --porcelain)" ] || die "uncommitted changes in $ROOT. Commit or discard them first."
+  git -C "$ROOT" fetch -q origin
+  git -C "$ROOT" switch -q main
+  git -C "$ROOT" merge -q --ff-only origin/main || die "local main has commits that aren't on GitHub. Ship them as a branch instead."
+  echo "main is up to date with GitHub."
+}
+
+cmd="${1:-help}"
+shift || true
+
+case "$cmd" in
+  token)
+    mkdir -p "$(dirname "$AGENT_TOKEN_FILE")"
+    chmod 700 "$(dirname "$AGENT_TOKEN_FILE")"
+    read -rsp "Paste the token from 'claude setup-token', then press Enter: " tok; echo
+    [ -n "$tok" ] || die "no token entered."
+    (umask 077; printf '%s\n' "$tok" > "$AGENT_TOKEN_FILE")
+    echo "Saved to $AGENT_TOKEN_FILE"
+    ;;
+
+  up)
+    need_token
+    "${COMPOSE[@]}" up -d --build --wait
+    echo "Containers for '$APP' are running."
+    ;;
+
+  down)
+    "${COMPOSE[@]}" down
+    ;;
+
+  reset)
+    read -rp "Delete this app's database and Claude history volumes? Type the app name ($APP) to confirm: " answer
+    [ "$answer" = "$APP" ] || die "not confirmed; nothing deleted."
+    "${COMPOSE[@]}" down -v
+    ;;
+
+  shell)
+    ensure_up
+    "${COMPOSE[@]}" exec dev bash
+    ;;
+
+  claude)
+    ensure_up
+    if task_running; then echo "Warning: a background task is running in this repo; edits may collide." >&2; fi
+    "${COMPOSE[@]}" exec dev claude-agent "${CLAUDE_FLAGS[@]}" "$@"
+    ;;
+
+  task)
+    desc="$*"
+    [ -n "$desc" ] || die 'usage: scripts/agent task "<what to build>"'
+    ensure_up
+    if task_running; then die "a task is already running here. Watch it with: scripts/agent logs"; fi
+    sync_main
+    slug="$(printf '%s' "$desc" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]\+/-/g; s/^-//; s/-$//' | cut -c1-40 | sed 's/-$//')"
+    branch="agent/$(date +%Y%m%d-%H%M)-${slug:-task}"
+    git -C "$ROOT" switch -q -c "$branch"
+    mkdir -p "$LOG_DIR"
+    log=".agent-logs/${branch//\//_}.log"
+    # Arguments are passed as positional parameters, so the description is never parsed as shell code.
+    "${COMPOSE[@]}" exec -d -T -e AGENT_TASK=1 dev bash -c '
+      cd /workspace
+      echo $$ > .agent-logs/running.pid
+      { echo "== Task: $2"; echo "== Branch: $1"; echo "== Started: $(date -Is)"; echo; } > "$3"
+      claude-agent -p "/build $2" '"${CLAUDE_FLAGS[*]}"' >> "$3" 2>&1
+      code=$?
+      { echo; echo "== Finished: $(date -Is) (exit $code)"; } >> "$3"
+      rm -f .agent-logs/running.pid
+    ' _ "$branch" "$desc" "$log"
+    echo "Started on branch $branch"
+    echo "Follow it:  scripts/agent logs"
+    echo "When done, as your admin user:  ship $APP $branch"
+    ;;
+
+  logs)
+    latest="$(ls -t "$LOG_DIR"/*.log 2>/dev/null | head -n1 || true)"
+    [ -n "$latest" ] || die "no task logs yet."
+    echo "== $latest (Ctrl+C to stop following)"
+    tail -n 50 -f "$latest"
+    ;;
+
+  status)
+    "${COMPOSE[@]}" ps
+    echo
+    echo "Branch: $(git -C "$ROOT" branch --show-current)"
+    if task_running; then echo "Background task: running"; else echo "Background task: none"; fi
+    echo "Agent branches:"
+    git -C "$ROOT" branch --list 'agent/*' --format='  %(refname:short)'
+    ;;
+
+  sync)
+    sync_main
+    ;;
+
+  doctor)
+    ok=1
+    check() { if eval "$2" >/dev/null 2>&1; then echo "  ok    $1"; else echo "  FAIL  $1"; ok=0; fi; }
+    echo "Checking '$APP':"
+    check "token file exists ($AGENT_TOKEN_FILE)" "[ -s '$AGENT_TOKEN_FILE' ]"
+    check "rootless Docker reachable" "docker info"
+    check "containers running" "is_up"
+    if is_up; then
+      check "container reaches Anthropic via proxy" "${COMPOSE[*]} exec -T dev curl -sS -o /dev/null -m 15 https://api.anthropic.com"
+      check "container is blocked from other sites" "! ${COMPOSE[*]} exec -T dev curl -sS -o /dev/null -m 10 https://example.com"
+      check "database is ready" "${COMPOSE[*]} exec -T dev pg_isready -h db -U app"
+      check "Claude Code installed" "${COMPOSE[*]} exec -T dev claude --version"
+    fi
+    [ "$ok" = 1 ] && echo "All good." || { echo "Some checks failed."; exit 1; }
+    ;;
+
+  help|-h|--help)
+    sed -n '2,15p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    ;;
+
+  *)
+    die "unknown command '$cmd'. Run: scripts/agent help"
+    ;;
+esac

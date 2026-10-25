@@ -1,0 +1,9 @@
+#!/bin/sh
+# Starts Claude Code with the subscription token from the mounted secret.
+# The token never lives in the container's environment config or in process arguments.
+set -e
+if [ -z "${CLAUDE_CODE_OAUTH_TOKEN:-}" ] && [ -r /run/secrets/claude_token ]; then
+  CLAUDE_CODE_OAUTH_TOKEN="$(cat /run/secrets/claude_token)"
+  export CLAUDE_CODE_OAUTH_TOKEN
+fi
+exec claude "$@"
