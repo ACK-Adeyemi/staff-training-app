@@ -142,17 +142,17 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const ctx = client(fx.ids.users.priya, fx.ids.clients.a);
         const foreignSite = fx.ids.sites.willow;
         for (const call of [
-          store.people.get(ctx, fx.ids.people.beth),
-          store.sites.get(ctx, foreignSite),
-          store.evidence.get(ctx, fx.ids.evidence.bob),
-          store.evidenceSubmissions.get(ctx, fx.ids.submissions.bob),
-          store.subscriptions.get(ctx, fx.ids.clients.b),
-          store.roleAssignments.get(ctx, fx.ids.assignments.bBeth),
-          store.roles.get(ctx, fx.ids.roles.bOwner),
-          store.clients.get(ctx, fx.ids.clients.b),
-          store.users.get(ctx, fx.ids.users.beth),
+          () => store.people.get(ctx, fx.ids.people.beth),
+          () => store.sites.get(ctx, foreignSite),
+          () => store.evidence.get(ctx, fx.ids.evidence.bob),
+          () => store.evidenceSubmissions.get(ctx, fx.ids.submissions.bob),
+          () => store.subscriptions.get(ctx, fx.ids.clients.b),
+          () => store.roleAssignments.get(ctx, fx.ids.assignments.bBeth),
+          () => store.roles.get(ctx, fx.ids.roles.bOwner),
+          () => store.clients.get(ctx, fx.ids.clients.b),
+          () => store.users.get(ctx, fx.ids.users.beth),
         ]) {
-          expect(await refusal(call)).toBeInstanceOf(NotFoundError);
+          expect(await refusal(call())).toBeInstanceOf(NotFoundError);
         }
       });
 
@@ -449,36 +449,36 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
 
     describe('unknown actors', () => {
       const attempts = (store: DataStore, ctx: ActorContext) => [
-        store.people.list(ctx),
-        store.clients.list(ctx),
-        store.sites.get(ctx, id0),
-        store.evidence.list(ctx),
-        store.audit.list(ctx),
+        () => store.people.list(ctx),
+        () => store.clients.list(ctx),
+        () => store.sites.get(ctx, id0),
+        () => store.evidence.list(ctx),
+        () => store.audit.list(ctx),
       ];
       const id0 = freshId(50);
 
       it('refuses every call from a user id that does not exist', async () => {
         const { store, fx } = await setup();
         const ctx = client(freshId(99), fx.ids.clients.a);
-        for (const call of attempts(store, ctx)) expect(await forbiddenReason(call)).toBe('unknownActor');
+        for (const call of attempts(store, ctx)) expect(await forbiddenReason(call())).toBe('unknownActor');
       });
 
       it('refuses a known user acting on the wrong side', async () => {
         const { store, fx } = await setup();
         const ctx: ActorContext = { userId: fx.ids.users.priya, side: 'staff', clientId: fx.ids.clients.a, now: TODAY };
-        for (const call of attempts(store, ctx)) expect(await forbiddenReason(call)).toBe('unknownActor');
+        for (const call of attempts(store, ctx)) expect(await forbiddenReason(call())).toBe('unknownActor');
       });
 
       it('refuses a known user claiming another clientId', async () => {
         const { store, fx } = await setup();
         const ctx = client(fx.ids.users.priya, fx.ids.clients.b);
-        for (const call of attempts(store, ctx)) expect(await forbiddenReason(call)).toBe('unknownActor');
+        for (const call of attempts(store, ctx)) expect(await forbiddenReason(call())).toBe('unknownActor');
       });
 
       it('refuses a suspended user', async () => {
         const { store, fx } = await setup();
         const ctx = client(fx.ids.users.sue, fx.ids.clients.a);
-        for (const call of attempts(store, ctx)) expect(await forbiddenReason(call)).toBe('unknownActor');
+        for (const call of attempts(store, ctx)) expect(await forbiddenReason(call())).toBe('unknownActor');
       });
 
       it('refuses a client user claiming to be a provider', async () => {

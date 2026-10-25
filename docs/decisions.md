@@ -129,3 +129,11 @@ Choices made by the test-writer where build pack section 6 left things open, acc
 - **Oak Tree and Willow Lane evidence** is thinned per site to the stated compliance level (95, 80 and 55 per cent; Willow Lane 85) with the `evidence` stream; Little Acorns evidence is exact (7.3).
 - **Contract suite.** The hand-built fixture is gone. `contract/world.ts` loads the seed, then adds test-only records through DemoAdmin: a second Little Acorns setting (Annexe) and Mia, Rory (team.manageRoles but no billing), a Billing viewer role, Tim (assignment expiring the next day), Sue (suspended), three extra submissions (by Daniel, about Daniel, at the Annexe), an Oak Tree Account Owner, one test add-on, and owner and staff people for the Read-only, Closed and Paused seed clients plus a Deleted client. `@sta/data` has `@sta/seed` and `@sta/content` as dev dependencies; `@sta/seed` only imports types from `@sta/data`, so there is no runtime cycle.
 - **Test corrections.** `fastForward.test.ts` used `U` in an id (not a Crockford character) and compared `offsetClock` (exact milliseconds) with `addDays` (London wall time) across the 25 October clock change; both fixed.
+
+## M0 chunk 9: IndexedDB adapter
+
+- **Signature differs from the plan; the tests' version is kept.** The plan said `createIndexedDbStore(dbName)`. The tests need `createIndexedDbBackend(dbName)` and `createIndexedDbStore(options, dbName)`, both with `close()`. Plan text fixed.
+- **Keys.** Object stores use out-of-line string keys from `keyOf`, so the composite key for add-on subscriptions is the string `clientId:addOnId` (not an array key). One `clientId` index on every store whose records carry it.
+- **Atomic apply.** Store names are checked before the transaction opens, then all puts and deletes run in one readwrite transaction that is aborted on any error.
+- **Contract suite fix.** Two tests built an array of promises up front and awaited them one by one. With a truly async backend the later ones rejected before being awaited, giving unhandled rejections. They now build thunks and call them in turn. Assertions unchanged.
+- **Test typing.** persistence.test.ts needed type-only fixes for strict lint and typecheck (node types for packages/data, domain types instead of any, guards instead of non-null assertions). Assertions unchanged.

@@ -6,7 +6,7 @@ import 'fake-indexeddb/auto';
 import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { createRng, fixedClock, offsetClock, personRequirementStatus } from '@sta/domain';
-import type { Evidence, EvidenceSubmission, Person, Requirement } from '@sta/domain';
+import type { Client, Site, Evidence, EvidenceSubmission, Person, Requirement } from '@sta/domain';
 import { load, reset } from '@sta/seed';
 import { createMemoryStore } from '../memory/index';
 import { storeNames } from '../types';
@@ -18,7 +18,8 @@ const options = () => ({ clock: fixedClock(TODAY), rng: createRng(1) });
 let n = 0;
 const dbName = () => `persist-${String(n++)}`;
 
-type Dump = Record<string, any[]>;
+type Rec = { id: string; clientId: string; primarySiteId: string; settings: { amberWindowDays: number } };
+type Dump = Record<string, Rec[]>;
 
 const canonical = (value: unknown): unknown => {
   if (Array.isArray(value)) return value.map(canonical);
@@ -191,12 +192,12 @@ describe('indexeddb adapter reset and determinism (BP-4)', () => {
     const handle = await createIndexedDbStore(options(), dbName());
     await load(handle.admin, SEED);
     const dump = (await handle.admin.dumpAll()) as Dump;
-    const stray = { ...dump['people'][0], id: 'Z'.repeat(26) };
+    const stray = { ...dump['people']?.[0], id: 'Z'.repeat(26) };
     await handle.admin.bulkPut('people', [stray]);
     await reset(handle.admin);
     const after = (await handle.admin.dumpAll()) as Dump;
-    expect(after['people'].some((p) => p.id === stray.id)).toBe(false);
-    expect(after['people']).toHaveLength(dump['people'].length);
+    expect((after['people'] ?? []).some((p) => p.id === stray.id)).toBe(false);
+    expect(after['people']).toHaveLength(dump['people']?.length ?? -1);
     handle.close();
   });
 
@@ -224,17 +225,23 @@ describe('indexeddb adapter fast-forward (BP-5)', () => {
     await load(reopened.admin, SEED);
     const dump = (await reopened.admin.dumpAll()) as Dump;
     const personId = keys.personas['hannah'];
-    const person = (dump['people'] as Person[]).find((p) => p.id === personId)!;
-    const req = (dump['requirements'] as Requirement[]).find((r) => r.name.toLowerCase().includes('safeguarding'))!;
-    const site = dump['sites'].find((s) => s.id === person.primarySiteId);
-    const client = dump['clients'].find((c) => c.id === person.clientId);
+    const person = (dump['people'] as unknown as Person[]).find((p) => p.id === personId);
+    if (!person) throw new Error('Hannah missing');
+    const req = (dump['requirements'] as unknown as Requirement[]).find((r) =>
+      r.name.toLowerCase().includes('safeguarding'),
+    );
+    if (!req) throw new Error('Safeguarding requirement missing');
+    const site = (dump['sites'] as unknown as Site[]).find((s) => s.id === person.primarySiteId);
+    if (!site) throw new Error('Site missing');
+    const client = (dump['clients'] as unknown as Client[]).find((c) => c.id === person.clientId);
+    if (!client) throw new Error('Client missing');
     const status = (now: Date) =>
       personRequirementStatus(
         req,
         person,
         site,
-        (dump['evidence'] as Evidence[]).filter((e) => e.personId === personId),
-        (dump['evidenceSubmissions'] as EvidenceSubmission[]).filter((s) => s.personId === personId),
+        (dump['evidence'] as unknown as Evidence[]).filter((e) => e.personId === personId),
+        (dump['evidenceSubmissions'] as unknown as EvidenceSubmission[]).filter((s) => s.personId === personId),
         now,
         client.settings.amberWindowDays,
       ).status;
