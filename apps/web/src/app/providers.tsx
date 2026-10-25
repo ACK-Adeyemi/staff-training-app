@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createT, languages } from '@sta/content';
-import type { ActorContext, DataStore } from '@sta/data';
+import type { ActorContext, DataStore, StoreHandle } from '@sta/data';
 import type { Clock } from '@sta/domain';
 import { ActorCtx, ClockContext, DataStoreContext, DemoContext, I18nContext, type DemoApi } from './context';
 
@@ -18,6 +18,8 @@ export function AppProviders({
   clock: Clock;
   actor: ActorContext;
   demo: DemoApi;
+  /** The store handle's change feed; when given, queries refresh after writes (M1 chunk 8). */
+  subscribe?: StoreHandle['subscribe'];
   children: ReactNode;
 }) {
   const [queryClient] = useState(() => new QueryClient({ defaultOptions: { queries: { retry: false } } }));
