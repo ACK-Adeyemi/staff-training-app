@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M0
 Milestone base commit: 4fa6d3fdf9c044a7e3eaf4ebde1a00c330bc0689
-Next step: M0 chunk 11 (web app and shells): test-writer then implementer. check.sh build+e2e fail until chunk 11 lands (expected). Nursery renewal periods still VERIFY.
+Next step: M0 chunk 12 (Demo shell: D1, Demo badge and menu, D2 skeleton, D3, ?reset=1, shortcut and long-press): test-writer then implementer. check.sh is fully green. Nursery renewal periods still VERIFY.
 
 ## Milestones
 - [ ] M0 Foundations
@@ -28,7 +28,7 @@ Next step: M0 chunk 11 (web app and shells): test-writer then implementer. check
 - [x] 8 Seed generator
 - [x] 9 IndexedDB adapter
 - [x] 10 UI tokens and base components
-- [ ] 11 Web app and shells
+- [x] 11 Web app and shells
 - [ ] 12 Demo shell
 - [ ] 13 Deploy and docs
 
@@ -42,3 +42,4 @@ Next step: M0 chunk 11 (web app and shells): test-writer then implementer. check
 - 2026-10-25: M0 chunk 8 seed generator landed (cf69643).
 - 2026-10-25: M0 chunk 9 IndexedDB adapter landed (5bfbdb0).
 - 2026-10-25: M0 chunk 10 UI tokens and base components landed (adb4330).
+- 2026-10-25: M0 chunk 11 web app and shells landed (0816660); check.sh fully green.
