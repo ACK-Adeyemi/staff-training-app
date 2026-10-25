@@ -92,3 +92,13 @@ Choices made by the test-writer where build pack section 6 left things open, acc
 - A trial with no nextStateAt never ends. Trial end-path days (14 read-only, 30 closed) are fixed constants from brief 24.3, not part of DunningPolicy.
 - requirementStatus filters evidence and submissions by requirementId only; callers pass one person's records. The amber window is measured in London calendar days (addDays), so DST does not move the boundary.
 - entitled() treats a flag name as true, and never reads the `flags` key itself as a feature.
+
+## M0 chunk 6: content package
+
+- **Renewal periods stay VERIFY.** Safeguarding 24 months, paediatric first aid 36 months and food hygiene 36 months are placeholders. No official source was fetched in this session (no fetch tool), so each is marked `VERIFY` in `packs/nursery.ts` and should be checked against the EYFS statutory framework, DfE and HSE/FSA pages.
+- **Stable content ids.** `packs/contentId.ts` builds fixed ULID-shaped ids (`01M0C0N7` plus a zero-padded number) so packs, modules, packages and add-ons keep the same ids across runs. Ranges: packs 1xx, modules 2xx, packages 3xx, add-ons 4xx, job roles 5xx, requirements 6xx.
+- **Entitlement values not in the brief.** `customClientRoles` is 0 (Essentials), 3 (Standard, Core) and unlimited (Group); `perSiteThemes` is true for Group only; response targets are 48, 24 and 4 hours (Group "same working day") as targets, not guarantees. All placeholders.
+- **Add-ons use flags.** Each add-on adds a named flag (for example `aiAssistant`, `translation`) read through `entitled()`. AI Assistant and reminders are usage-priced; the others are flat. Prices are placeholders in pence.
+- **Strict mode in `createT`** defaults to on unless Vite's `MODE` is `production`, read through a cast of `import.meta` so packages/content needs no Vite types.
+- **Tooling.** packages/content tsconfig now includes `node` types because the chunk 6 tests read files with `node:fs`.
+- **Test edit (not a weakening):** `i18n.test.ts` called `createT(enGB as never)`, which lint rejects as an unnecessary assertion because the real file already matches `Messages`. The cast was removed; the assertion is unchanged. The other `as never` casts are on test messages and remain.
