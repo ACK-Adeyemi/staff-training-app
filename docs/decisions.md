@@ -116,7 +116,7 @@ Choices made by the test-writer where build pack section 6 left things open, acc
 - **Approval.** Moving a submission to `approved` runs `canApproveEvidence` on the stored submission's identity fields, then writes the submission (reviewer and time from the context), the Evidence (`approvedBy`, `approvedAt` from `ctx.now`) and an `evidence.approved` audit event in one batch. `adminCount` is the number of client-side users with an active assignment.
 - **Audit ordering.** Lists are sorted by id, except audit, which is sorted by `at` then id so ULID randomness within one millisecond cannot reorder events.
 - **No `settings` repository on DataStore.** The `settings` store holds SeedMeta and DemoState and is reachable only through `DemoAdmin`; it appears in `dumpAll`.
-- **Direct Evidence puts** need `evidence.approve` (client) and are refused for staff and provider; module-completion evidence written by staff arrives with M2 and will add an explicit rule.
+- **Direct Evidence puts** are refused for every side (superseded by M0 security fixes below): Evidence is written only by the approval flow and by seed loading through `DemoAdmin.bulkPut`. Module-completion evidence written by staff arrives with M2 and will add its own explicit rule.
 - **Lint.** `no-non-null-assertion` is off for `packages/data/src/contract/**` (test code in non-`.test` files so adapters can import it).
 
 ## M0 chunk 8: seed generator
@@ -167,3 +167,13 @@ Choices made by the test-writer where build pack section 6 left things open, acc
 - Local deploy check: `pnpm build && pnpm preview --host 0.0.0.0` (25 October 2026). `/staff-training-app/` returned 200 with index.html whose script and stylesheet URLs start with `/staff-training-app/assets/`; the hashed JS asset returned 200 as `text/javascript`; `/` redirected (302) to the base path. Routing is hash based (`#/staff` and so on), so the server needs no fallback rules. The preview server was stopped afterwards.
 - deploy.yml uses `actions/configure-pages@v6`, `actions/upload-pages-artifact@v5` and `actions/deploy-pages@v5`, with checkout and setup-node at v7 as in ci.yml. VERIFY: the sandbox cannot reach the actions' releases pages, so these major tags come from the plan and are unconfirmed. Dependabot (github-actions, now also npm) will propose corrections. Listed in docs/review-checklist.md.
 - `.env.example` already carried `BASE_PATH` from an earlier chunk.
+
+## M0 security fixes
+
+- **Evidence is approval-only.** `store.evidence.put` is `ForbiddenError('permission')` for client, staff and provider alike (a client Owner included), so `canApproveEvidence` and the audit event cannot be skipped. There is no evidence remove. Seed writes through `DemoAdmin.bulkPut` are unaffected. M2 module-completion evidence will get its own explicit rule.
+- **Submission writes tightened.** An approved submission can never be changed. Scope is checked against the stored site and the new site. Staff may only create their own submission (awaitingCheck, no reviewer, decision or evidence fields) or move their own awaitingCheck submission to withdrawn with nothing else changed. Any other status change (rejected, needsBetterCopy, withdrawn by an admin) needs `evidence.approve`, takes `reviewerId` and `reviewedAt` from the context, and writes an audit event (`evidence.<status>`). Changing decision fields without `evidence.approve` is refused; `uploadForOthers` can only create waiting submissions.
+- **User sides.** The user schema refuses side `provider` with a clientId. Client-side user writes are refused if the record is, or becomes, a provider user, or if the side changes.
+- **Slim evidence audit.** Evidence approval and decision events store only `{ submissionId, status, evidenceId }`, never personId, fileAttachmentId or decisionNote, so the provider's audit view exposes no submission content.
+- **Audit time.** `audit.append` sets `at` to the context time for non-provider actors; only providers may supply their own.
+- **Protected names override.** `scripts/protected-names.mjs` honours `PROTECTED_NAMES_FILE` only when `NODE_ENV=test`.
+- **CSP limits.** The meta-tag Content-Security-Policy cannot set `frame-ancestors` (browsers ignore it in a meta tag) and keeps `style-src 'unsafe-inline'`. Real framing protection needs a response header on the host, which GitHub Pages does not allow; noted for the live review.

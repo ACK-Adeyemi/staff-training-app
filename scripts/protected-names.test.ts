@@ -20,6 +20,7 @@ let repo: string;
 const env = (): NodeJS.ProcessEnv => {
   const e = { ...process.env };
   delete e.PROTECTED_NAMES_FILE;
+  delete e.NODE_ENV;
   return e;
 };
 
@@ -171,6 +172,25 @@ describe('protected-names hook', () => {
     expect(output(r)).toContain('protected-names: no .protected-names file, check skipped');
   });
 
+  it('ignores PROTECTED_NAMES_FILE unless NODE_ENV is test', () => {
+    rmSync(join(repo, '.protected-names'));
+    const alt = join(repo, '..', `alt-ignored-${Date.now().toString(36)}.txt`);
+    writeFileSync(alt, 'Zzyzx Placeholder\n');
+    try {
+      write('a.txt', 'zzyzx placeholder\n');
+      expect(git('add', 'a.txt').status).toBe(0);
+      const r = spawnSync('node', [script, 'pre-commit'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: { ...env(), PROTECTED_NAMES_FILE: alt },
+      });
+      expect(r.status, output(r)).toBe(0);
+      expect(output(r)).toContain('no .protected-names file');
+    } finally {
+      rmSync(alt, { force: true });
+    }
+  });
+
   it('reads PROTECTED_NAMES_FILE when set', () => {
     rmSync(join(repo, '.protected-names'));
     const alt = join(repo, '..', `alt-names-${Date.now().toString(36)}.txt`);
@@ -181,7 +201,7 @@ describe('protected-names hook', () => {
       const r = spawnSync('node', [script, 'pre-commit'], {
         cwd: repo,
         encoding: 'utf8',
-        env: { ...env(), PROTECTED_NAMES_FILE: alt },
+        env: { ...env(), NODE_ENV: 'test', PROTECTED_NAMES_FILE: alt },
       });
       expect(r.status).toBe(1);
       expect(output(r)).toContain('protected-names: blocked');

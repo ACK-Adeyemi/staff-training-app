@@ -371,6 +371,12 @@ describe('client-owned entities need a clientId', () => {
     expect(issuePaths(personSchema, { ...person, clientId: 'not-an-id' })).toContain('clientId');
   });
 
+  it('refuses a provider user account that carries a clientId', () => {
+    const r = userAccountSchema.safeParse({ ...userAccount, side: 'provider' });
+    expect(r.success).toBe(false);
+    expect(issuePaths(userAccountSchema, { ...userAccount, side: 'provider' })).toContain('clientId');
+  });
+
   it('lets a provider user account omit clientId but not a client user', () => {
     const provider = without({ ...userAccount, side: 'provider' }, 'clientId');
     expect(userAccountSchema.safeParse(provider).success).toBe(true);

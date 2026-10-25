@@ -11,7 +11,9 @@ const git = (args) => execFileSync('git', args, { maxBuffer: 256 * 1024 * 1024 }
 const mode = process.argv[2];
 const topLevel = () => git(['rev-parse', '--show-toplevel']).toString('utf8').trim();
 
-const namesPath = process.env.PROTECTED_NAMES_FILE || join(topLevel(), '.protected-names');
+// PROTECTED_NAMES_FILE is honoured only under NODE_ENV=test, so a stray variable cannot redirect the check.
+const override = process.env.NODE_ENV === 'test' ? process.env.PROTECTED_NAMES_FILE : undefined;
+const namesPath = override || join(topLevel(), '.protected-names');
 if (!existsSync(namesPath)) {
   console.log('protected-names: no .protected-names file, check skipped');
   process.exit(0);

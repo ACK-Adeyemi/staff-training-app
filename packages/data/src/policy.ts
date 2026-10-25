@@ -368,6 +368,8 @@ function checkAccountState(call: Call, isCreate: boolean): void {
   }
 }
 
+const sortedKeys = (o: object): unknown => Object.fromEntries(Object.entries(o).sort(([a], [b]) => (a < b ? -1 : 1)));
+
 const sameJson = (a: unknown, b: unknown): boolean => JSON.stringify(a) === JSON.stringify(b);
 
 function audit(
@@ -410,6 +412,8 @@ export async function authorizePut(
   if (store === 'roleAssignments') {
     return putAssignment(call, rec as unknown as RoleAssignment, existing as RoleAssignment | undefined);
   }
+  // Evidence is written only by the approval flow (and seed loading through DemoAdmin.bulkPut).
+  if (store === 'evidence') return forbid('permission');
   if (store === 'evidenceSubmissions') {
     return putSubmission(call, rec as unknown as EvidenceSubmission, existing as EvidenceSubmission | undefined);
   }
@@ -423,7 +427,7 @@ export async function authorizePut(
     }
     return { record: rec, extra: [] };
   }
-  if (call.side === 'staff' || (call.side === 'provider' && store === 'evidence')) return forbid('permission');
+  if (call.side === 'staff') return forbid('permission');
 
   let ids: string[] | undefined;
   if (call.side === 'provider' && store === 'users') {
@@ -437,6 +441,12 @@ export async function authorizePut(
   if (existing)
     requireWrite(call, store, await sitesOf(call, store, existing), await tenantOf(call, store, existing), ids);
 
+  if (store === 'users' && call.side !== 'provider') {
+    const u = rec as unknown as UserAccount;
+    if (u.side === 'provider' || (existing && (existing as unknown as UserAccount).side !== u.side)) {
+      forbid('permission');
+    }
+  }
   if (call.side !== 'provider') {
     checkAccountState(call, isCreate && (store === 'people' || store === 'users'));
   }
@@ -445,6 +455,7 @@ export async function authorizePut(
 
 export async function authorizeRemove(call: Call, store: StoreName, existing: Rec): Promise<WriteResult> {
   const tenant = await tenantOf(call, store, existing);
+  if (store === 'evidence') return forbid('permission');
   if (store === 'roles') return removeRole(call, existing as unknown as Role);
   if (store === 'roleAssignments') return removeAssignment(call, existing as unknown as RoleAssignment);
   if (call.side === 'staff') return forbid('permission');
@@ -706,27 +717,70 @@ async function putSubmission(
           base.clientId,
           'evidence.approved',
           `evidenceSubmission:${base.id}`,
-          existing,
-          stored,
+          { submissionId: base.id, status: base.status },
+          { submissionId: base.id, status: 'approved', evidenceId },
           result.selfApproved ? 'selfApproved' : undefined,
         ),
       ],
     };
   }
 
+  // An approved submission is immutable: its evidence already exists.
+  if (existing?.status === 'approved') forbid('permission');
+
+  const decisionFields = ['reviewerId', 'reviewedAt', 'decisionNote', 'rejectionReason', 'evidenceId'] as const;
+  const decisionsUnchanged = decisionFields.every((f) => sameJson(sub[f], existing?.[f]));
+
   if (call.side === 'staff') {
     const ownPerson = actor.user.personId;
-    const ok =
-      ownPerson !== undefined &&
-      sub.personId === ownPerson &&
-      sub.uploadedBy === actor.user.id &&
-      (existing === undefined || (existing.personId === ownPerson && existing.uploadedBy === actor.user.id)) &&
-      (sub.status === 'awaitingCheck' || sub.status === 'withdrawn');
-    if (!ok) forbid('permission');
-  } else {
-    const target: Target = { clientId: sub.clientId, siteIds: [sub.siteId] };
-    if (!canAny(call, ['evidence.approve', 'evidence.uploadForOthers'], target, 'write')) forbid('permission');
+    const own = ownPerson !== undefined && sub.personId === ownPerson && sub.uploadedBy === actor.user.id;
+    if (!own) forbid('permission');
+    if (existing === undefined) {
+      // Staff create only their own, waiting for a check, with no decision fields.
+      if (sub.status !== 'awaitingCheck' || !decisionsUnchanged) forbid('permission');
+    } else {
+      const ownExisting = existing.personId === ownPerson && existing.uploadedBy === actor.user.id;
+      const withdrawing =
+        existing.status === 'awaitingCheck' &&
+        sub.status === 'withdrawn' &&
+        sameJson(sortedKeys({ ...existing, status: 'withdrawn' }), sortedKeys(sub));
+      if (!ownExisting || !withdrawing) forbid('permission');
+    }
+    checkAccountState(call, false);
+    return { record: sub, extra: [] };
   }
+
+  const scopes = (siteId: string): Target => ({ clientId: sub.clientId, siteIds: [siteId] });
+  const siteIds = existing ? [existing.siteId, sub.siteId] : [sub.siteId];
+  const allowed = (ids: string[]) => siteIds.every((siteId) => canAny(call, ids, scopes(siteId), 'write'));
+  if (existing && (existing.clientId !== sub.clientId || existing.personId !== sub.personId)) forbid('permission');
+
+  const statusChange = existing ? sub.status !== existing.status : sub.status !== 'awaitingCheck';
+  if (statusChange) {
+    // Rejecting, asking for a better copy or withdrawing is a decision: it needs evidence.approve and is audited.
+    if (!allowed(['evidence.approve'])) forbid('permission');
+    checkAccountState(call, false);
+    const stored: EvidenceSubmission = {
+      ...sub,
+      reviewerId: actor.user.id,
+      reviewedAt: actor.ctx.now,
+    };
+    return {
+      record: stored,
+      extra: [
+        audit(
+          call,
+          sub.clientId,
+          `evidence.${sub.status}`,
+          `evidenceSubmission:${sub.id}`,
+          existing ? { submissionId: sub.id, status: existing.status } : undefined,
+          { submissionId: sub.id, status: sub.status },
+        ),
+      ],
+    };
+  }
+  if (!allowed(['evidence.approve', 'evidence.uploadForOthers'])) forbid('permission');
+  if (!decisionsUnchanged && !allowed(['evidence.approve'])) forbid('permission');
   checkAccountState(call, false);
   return { record: sub, extra: [] };
 }

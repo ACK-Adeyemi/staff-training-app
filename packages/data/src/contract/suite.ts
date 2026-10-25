@@ -775,6 +775,146 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
       });
     });
 
+    describe('M0 security fixes', () => {
+      it('refuses a direct evidence put or remove for every side', async () => {
+        const { store, fx } = await setup();
+        const owner = client(fx.ids.users.priya, fx.ids.clients.a);
+        const existing = await store.evidence.get(owner, fx.ids.evidence.jade);
+        expect(await forbiddenReason(store.evidence.put(owner, { ...existing, completedAt: TODAY }))).toBe(
+          'permission',
+        );
+        expect(
+          await forbiddenReason(store.evidence.put(owner, { ...existing, id: freshId(70), submissionId: undefined })),
+        ).toBe('permission');
+        expect('remove' in store.evidence).toBe(false);
+        const jade = staff(fx.ids.users.jade, fx.ids.clients.a);
+        expect(await forbiddenReason(store.evidence.put(jade, { ...existing, id: freshId(71) }))).toBe('permission');
+        const prov = provider(fx.ids.users.provOwner);
+        expect(await forbiddenReason(store.evidence.put(prov, { ...existing, id: freshId(72) }))).toBe('permission');
+      });
+
+      it('refuses any change to an approved submission', async () => {
+        const { store, fx } = await setup();
+        const daniel = client(fx.ids.users.daniel, fx.ids.clients.a);
+        const pending = await store.evidenceSubmissions.get(daniel, fx.ids.submissions.ben);
+        const approved = await store.evidenceSubmissions.put(daniel, { ...pending, status: 'approved' });
+        const priya = client(fx.ids.users.priya, fx.ids.clients.a);
+        expect(await forbiddenReason(store.evidenceSubmissions.put(priya, { ...approved, status: 'rejected' }))).toBe(
+          'permission',
+        );
+        expect(
+          await forbiddenReason(store.evidenceSubmissions.put(priya, { ...approved, providerName: 'Changed Ltd' })),
+        ).toBe('permission');
+      });
+
+      it('checks scope against the stored site as well as the new one', async () => {
+        const { store, fx } = await setup();
+        const priya = client(fx.ids.users.priya, fx.ids.clients.a);
+        const other = await store.evidenceSubmissions.get(priya, fx.ids.submissions.otherSite);
+        const daniel = client(fx.ids.users.daniel, fx.ids.clients.a);
+        // Move the out-of-scope submission into Daniel's site while keeping it waiting.
+        const error = await refusal(store.evidenceSubmissions.put(daniel, { ...other, siteId: fx.ids.sites.main }));
+        expect(error).toBeInstanceOf(ForbiddenError);
+        const stored = await store.evidenceSubmissions.get(priya, other.id);
+        expect(stored.siteId).toBe(other.siteId);
+      });
+
+      it('lets staff create their own and withdraw their own waiting submission, and nothing else', async () => {
+        const { store, fx } = await setup();
+        const ben = staff(fx.ids.users.ben, fx.ids.clients.a);
+        const own = await store.evidenceSubmissions.get(ben, fx.ids.submissions.ben);
+        // Cannot set reviewer fields or a decision.
+        expect(
+          await forbiddenReason(store.evidenceSubmissions.put(ben, { ...own, reviewerId: fx.ids.users.ben })),
+        ).toBe('permission');
+        expect(
+          await forbiddenReason(
+            store.evidenceSubmissions.put(ben, { ...own, status: 'withdrawn', decisionNote: 'ok' }),
+          ),
+        ).toBe('permission');
+        expect(await forbiddenReason(store.evidenceSubmissions.put(ben, { ...own, status: 'rejected' }))).toBe(
+          'permission',
+        );
+        const fresh = { ...own, id: freshId(73), reviewedAt: TODAY };
+        expect(await forbiddenReason(store.evidenceSubmissions.put(ben, fresh))).toBe('permission');
+        const created = await store.evidenceSubmissions.put(ben, { ...own, id: freshId(74) });
+        expect(created.status).toBe('awaitingCheck');
+        const withdrawn = await store.evidenceSubmissions.put(ben, { ...own, status: 'withdrawn' });
+        expect(withdrawn.status).toBe('withdrawn');
+        // A withdrawn submission cannot be revived.
+        expect(await forbiddenReason(store.evidenceSubmissions.put(ben, { ...own, status: 'awaitingCheck' }))).toBe(
+          'permission',
+        );
+      });
+
+      it('audits a rejection with the reviewer and time from the context, and refuses it without evidence.approve', async () => {
+        const { store, admin, fx } = await setup();
+        const daniel = client(fx.ids.users.daniel, fx.ids.clients.a);
+        const pending = await store.evidenceSubmissions.get(daniel, fx.ids.submissions.ben);
+        const rejected = await store.evidenceSubmissions.put(daniel, {
+          ...pending,
+          status: 'rejected',
+          reviewerId: fx.ids.users.priya,
+          rejectionReason: 'Unreadable',
+        });
+        expect(rejected).toMatchObject({ status: 'rejected', reviewerId: fx.ids.users.daniel, reviewedAt: TODAY });
+        const dump = (await admin.dumpAll()) as Record<string, { action?: string }[]>;
+        expect(dump['audit']!.filter((e) => e.action === 'evidence.rejected')).toHaveLength(1);
+      });
+
+      it('refuses a provider user account with a clientId and a client writing provider or side-changing users', async () => {
+        const { store, fx } = await setup();
+        const priya = client(fx.ids.users.priya, fx.ids.clients.a);
+        const prov = provider(fx.ids.users.provOwner);
+        const support = await store.users.get(prov, fx.ids.users.support);
+        expect(await refusal(store.users.put(prov, { ...support, clientId: fx.ids.clients.a }))).toBeInstanceOf(
+          ValidationError,
+        );
+        expect(await forbiddenReason(store.users.put(priya, { ...support, clientId: undefined }))).toBeDefined();
+        const daniel = await store.users.get(priya, fx.ids.users.daniel);
+        expect(await refusal(store.users.put(priya, { ...daniel, side: 'provider' } as never))).toBeInstanceOf(
+          ValidationError,
+        );
+        const asProvider = { ...daniel, side: 'provider', clientId: undefined } as never;
+        expect(await forbiddenReason(store.users.put(priya, asProvider))).toBeDefined();
+        expect(await forbiddenReason(store.users.put(priya, { ...daniel, side: 'staff' }))).toBe('permission');
+      });
+
+      it('stores only ids and statuses in evidence audit events, and shows no submission fields to the provider', async () => {
+        const { store, admin, fx } = await setup();
+        const daniel = client(fx.ids.users.daniel, fx.ids.clients.a);
+        const pending = await store.evidenceSubmissions.get(daniel, fx.ids.submissions.ben);
+        await store.evidenceSubmissions.put(daniel, { ...pending, status: 'approved', decisionNote: 'Looks fine' });
+        const dump = (await admin.dumpAll()) as Record<string, object[]>;
+        const text = JSON.stringify(dump['audit']);
+        for (const field of ['personId', 'fileAttachmentId', 'decisionNote', 'providerName', 'Looks fine']) {
+          expect(text).not.toContain(field);
+        }
+        const seen = await store.audit.list(provider(fx.ids.users.provOwner));
+        const providerText = JSON.stringify(seen);
+        expect(seen.some((e) => e.action === 'evidence.approved')).toBe(true);
+        for (const field of ['personId', 'fileAttachmentId', 'decisionNote']) {
+          expect(providerText).not.toContain(field);
+        }
+      });
+
+      it('forces the audit time to the context time for non-provider actors', async () => {
+        const { store, admin, fx } = await setup();
+        const ctx = client(fx.ids.users.priya, fx.ids.clients.a);
+        await store.audit.append(ctx, {
+          id: freshId(75),
+          actorId: fx.ids.users.priya,
+          actorSide: 'client',
+          clientId: fx.ids.clients.a,
+          action: 'note.added',
+          target: 'thing:1',
+          at: '2020-01-01T00:00:00.000Z',
+        });
+        const events = ((await admin.dumpAll()) as Record<string, { id: string; at: string }[]>)['audit']!;
+        expect(events.find((e) => e.id === freshId(75))!.at).toBe(TODAY);
+      });
+    });
+
     describe('validation, account state and entitlements', () => {
       it('refuses an invalid record with a ValidationError that lists the issues', async () => {
         const { store, fx } = await setup();

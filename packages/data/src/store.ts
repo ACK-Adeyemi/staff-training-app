@@ -98,6 +98,8 @@ function appendOnly(backend: RawBackend, options: StoreOptions, store: 'audit' |
       }
       if (rec['actorId'] !== ctx.userId || rec['actorSide'] !== ctx.side) throw new ForbiddenError('permission');
     }
+    // Non-provider actors cannot back-date or forward-date an audit event: time comes from the context.
+    if (store === 'audit' && call.side !== 'provider') rec['at'] = ctx.now;
     const key = keyOf(store, rec);
     if ((await backend.get(store, key)) !== undefined) throw new ValidationError([`id: ${key} already exists`]);
     await backend.apply([{ type: 'put', store, key, record: rec }]);

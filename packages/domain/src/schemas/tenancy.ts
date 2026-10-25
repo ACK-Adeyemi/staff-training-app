@@ -154,6 +154,9 @@ export const userAccountSchema = z
     if (user.side !== 'provider' && user.clientId === undefined) {
       ctx.addIssue({ code: 'custom', path: ['clientId'], message: 'A client or staff user needs a clientId' });
     }
+    if (user.side === 'provider' && user.clientId !== undefined) {
+      ctx.addIssue({ code: 'custom', path: ['clientId'], message: 'A provider user must not have a clientId' });
+    }
   });
 export type UserAccount = z.infer<typeof userAccountSchema>;
 
