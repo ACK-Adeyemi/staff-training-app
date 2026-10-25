@@ -199,6 +199,88 @@
       "invalidPeople": "Some of those people cannot be chosen."
     }
   },
+  "client": {
+    "status": {
+      "overdue": "Overdue",
+      "expiringSoon": "Expiring soon",
+      "awaitingCheck": "Waiting for a check",
+      "notStarted": "Not started",
+      "current": "Current"
+    },
+    "loadError": "We could not load this page. Please try again.",
+    "loading": "Loading.",
+    "dashboard": {
+      "needs": "Needs attention",
+      "needsEmpty": "Nobody needs attention right now.",
+      "overdueBy": "{count} days overdue",
+      "overdueByOne": "1 day overdue",
+      "daysLeft": "{count} days left",
+      "daysLeftOne": "1 day left",
+      "dueToday": "Due today",
+      "waiting": "Waiting for a check",
+      "waitingEmpty": "Nothing is waiting for a check.",
+      "compliance": "Compliance",
+      "ringValue": "{done} of {total}",
+      "ringDescription": "{done} of {total} staff fully compliant",
+      "ringLabel": "staff fully compliant",
+      "complete": "All compliant",
+      "recent": "Recently completed",
+      "recentEmpty": "Nothing completed in the last 14 days.",
+      "completedOn": "Completed {date}",
+      "assigned": "Assigned training",
+      "assignedEmpty": "No training is waiting to be done.",
+      "dueOn": "Due {date}",
+      "assignAction": "Assign training"
+    },
+    "people": {
+      "title": "People",
+      "search": "Search",
+      "searchHint": "Search by name",
+      "empty": "No people match.",
+      "statusLabel": "Status",
+      "view": "View {name}"
+    },
+    "person": {
+      "requirements": "Requirements",
+      "noRequirements": "No requirements apply to this person.",
+      "backToPeople": "Back to people",
+      "site": "Site: {site}",
+      "daysLeft": "{count} days left",
+      "daysLeftOne": "1 day left",
+      "overdueBy": "{count} days overdue",
+      "overdueByOne": "1 day overdue",
+      "notFound": "We could not find that person.",
+      "expires": "Expires {date}"
+    },
+    "assign": {
+      "title": "Assign training",
+      "module": "Module",
+      "chooseModule": "Choose a module",
+      "people": "People",
+      "dueDate": "Due date",
+      "preview": "{count} people will be assigned",
+      "previewOne": "1 person will be assigned",
+      "previewNone": "Choose a module, at least one person and a due date.",
+      "submit": "Assign",
+      "assigned": "{count} assigned",
+      "skipped": "{count} skipped",
+      "alreadyHas": "{name} already has this training.",
+      "noPermission": "You do not have permission to assign training. Ask your manager.",
+      "noPeople": "There is nobody you can assign training to.",
+      "errors": {
+        "dueInPast": "The due date must be today or later.",
+        "tooMany": "You can assign to at most 500 people at once.",
+        "invalidPeople": "Some of the people you chose cannot be assigned training. Please check the list and try again.",
+        "moduleNotPublished": "That module is not available to assign yet.",
+        "forbidden": "You do not have permission to assign training to these people. Ask your manager.",
+        "readOnly": "This account is read-only, so training cannot be assigned right now.",
+        "accountState": "Training cannot be assigned while the account is in its current state. Ask your manager.",
+        "validation": "Please check the module, the people and the due date, then try again.",
+        "generic": "Training could not be assigned. Please try again."
+      },
+      "previewSkipped": "{count} already have this training and will be skipped."
+    }
+  },
   "staff": {
     "signin": {
       "title": "Sign in",

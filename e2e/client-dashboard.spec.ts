@@ -58,7 +58,7 @@ test('Priya sees the dashboard in order, assigns Safeguarding to three people, a
 
   // Same browser, new persona: Lucy has one notification for the assignment.
   await signInAs(page, /Lucy/);
-  await expect(page.getByRole('link', { name: /Notifications.*1|1.*notification/i })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Notifications, 1 unread' })).toBeVisible();
   await page.goto('./#/staff/notifications');
   await expect(page.getByText(/Safeguarding and whistleblowing/)).toBeVisible();
 });
@@ -80,8 +80,10 @@ test('C1 updates in one tab when Jade passes the refresher in another tab, witho
   await pinClock(b);
   await signInAs(b, /Jade/);
   await b.goto(`./#/staff/module/${moduleId}`);
+  await expect(b.getByRole('heading', { level: 1, name: bank.title })).toBeVisible();
   for (let i = 0; i < bank.lessons.length; i++) {
     await b.getByRole('link', { name: i === 0 ? /^Start/ : /^Resume/ }).click();
+    await expect(b.getByText(/^Step 1 of \d+$/)).toBeVisible();
     for (;;) {
       const ack = b.getByRole('checkbox');
       if (await ack.count()) await ack.check();
@@ -92,10 +94,12 @@ test('C1 updates in one tab when Jade passes the refresher in another tab, witho
       }
       await b.getByRole('button', { name: 'Next' }).click();
     }
+    await expect(b.getByRole('heading', { level: 1, name: bank.title })).toBeVisible();
   }
   await b.getByRole('link', { name: 'Start quiz' }).click();
   await b.getByRole('button', { name: 'Start quiz' }).click();
-  for (;;) {
+  for (let n = 1; ; n++) {
+    await expect(b.getByText(`Question ${n} of 10`)).toBeVisible();
     const prompt = ((await b.getByTestId('question-prompt').textContent()) ?? '').trim();
     const q = bank.questions.find((x) => x.prompt === prompt);
     if (!q) throw new Error(`prompt not in the bank: ${prompt}`);
@@ -118,9 +122,9 @@ test('C1 updates in one tab when Jade passes the refresher in another tab, witho
       await b.getByRole('radio', { name: opt.text }).check();
       await b.getByRole('button', { name: 'Submit answer' }).click();
     }
-    const finish = b.getByRole('button', { name: 'Finish quiz' });
-    if (await finish.count()) {
-      await finish.click();
+    await expect(b.getByRole('region', { name: 'Feedback' })).toBeVisible();
+    if (n === 10) {
+      await b.getByRole('button', { name: 'Finish quiz' }).click();
       break;
     }
     await b.getByRole('button', { name: 'Next question' }).click();
@@ -128,8 +132,9 @@ test('C1 updates in one tab when Jade passes the refresher in another tab, witho
   await expect(b.getByText('You passed')).toBeVisible();
 
   const recent = page.getByRole('region', { name: 'Recently completed' });
-  await expect(recent).toContainText('Jade Mills', { timeout: 5_000 });
-  await expect(recent).toContainText('Current');
+  // Jade's September update (seed) is listed already; the new row is her Safeguarding refresher.
+  const row = recent.getByRole('listitem').filter({ hasText: 'Jade Mills' }).filter({ hasText: 'Safeguarding' });
+  await expect(row).toContainText('Current', { timeout: 5_000 });
   await expect(assigned).not.toContainText('Jade Mills');
   expect(await page.evaluate(() => (window as unknown as { __marker?: string }).__marker)).toBe('same-page');
 });

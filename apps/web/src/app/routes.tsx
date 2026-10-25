@@ -5,6 +5,10 @@ import { Landing } from '../demo/pages/Landing';
 import { Outbox } from '../demo/pages/Outbox';
 import { RootLayout } from '../demo/RootLayout';
 import { OrgDoc } from '../pages/doc/OrgDoc';
+import { Assign } from '../pages/client/Assign';
+import { Dashboard } from '../pages/client/Dashboard';
+import { People } from '../pages/client/People';
+import { PersonRecord } from '../pages/client/Person';
 import { Certificate } from '../pages/staff/Certificate';
 import { Home } from '../pages/staff/Home';
 import { LessonPlayer } from '../pages/staff/LessonPlayer';
@@ -54,11 +58,10 @@ export const routes: RouteObject[] = [
         path: '/client',
         lazy: async () => ({ Component: (await import('../shells/shells')).ClientShell }),
         children: [
-          {
-            index: true,
-            element: <Placeholder titleKey="nav.client.dashboard" bodyKey="placeholder.client.dashboard" />,
-          },
-          page('people', 'nav.client.people', 'placeholder.client.people'),
+          { index: true, element: <Dashboard /> },
+          { path: 'people', element: <People /> },
+          { path: 'people/:personId', element: <PersonRecord /> },
+          { path: 'assign', element: <Assign /> },
           page('modules', 'nav.client.training', 'placeholder.client.training'),
           page('competitions', 'nav.client.engage', 'placeholder.client.engage'),
           page('reports', 'nav.client.reports', 'placeholder.client.reports'),

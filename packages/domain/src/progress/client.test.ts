@@ -16,7 +16,15 @@
 //        evidence completed within `days` days up to now, active and on-leave people only.
 import { describe, expect, it } from 'vitest';
 import { addDays } from '../dates';
-import { complianceByRequirement, needsAttention, orgCompliance, recentlyCompleted, waitingForCheck } from './client';
+import {
+  complianceByRequirement,
+  needsAttention,
+  orgCompliance,
+  overallStatus,
+  personRequirementRows,
+  recentlyCompleted,
+  waitingForCheck,
+} from './client';
 import { AMBER, NOW, evidenceExpiring, person, requirement, site, submissionWaiting } from './testFixtures';
 
 const sg = requirement('Safeguarding', { renewEveryMonths: 24 });
@@ -239,5 +247,34 @@ describe('recentlyCompleted', () => {
   it('leaves out archived people and evidence for unknown people', () => {
     const out = recentlyCompleted([ev(olivia, -1), ev(person('Zed', 'Young'), -1)], [olivia, jade], NOW);
     expect(out).toEqual([]);
+  });
+});
+
+describe('personRequirementRows and overallStatus', () => {
+  const withEvidence = {
+    ...view([mark, lucy, amira, ben, olivia]),
+    requirements: [sg, aid],
+    evidence: [evidenceExpiring(mark, aid, -3), evidenceExpiring(lucy, sg, 15), evidenceExpiring(mark, sg, 500)],
+    submissions: [submissionWaiting(ben, sg)],
+  };
+
+  it('lists only applicable requirements with their status', () => {
+    const rows = personRequirementRows(withEvidence, mark);
+    expect(rows.map((r) => [r.requirement.name, r.status])).toEqual([
+      ['Safeguarding', 'current'],
+      ['Paediatric first aid', 'overdue'],
+    ]);
+    expect(personRequirementRows(withEvidence, lucy).map((r) => r.requirement.name)).toEqual(['Safeguarding']);
+  });
+
+  it('gives the worst status for each person', () => {
+    expect(overallStatus(withEvidence, mark)).toBe('overdue');
+    expect(overallStatus(withEvidence, lucy)).toBe('expiringSoon');
+    expect(overallStatus(withEvidence, ben)).toBe('awaitingCheck');
+    expect(overallStatus(withEvidence, amira)).toBe('notStarted');
+  });
+
+  it('is current when nothing applies', () => {
+    expect(overallStatus({ ...withEvidence, requirements: [] }, mark)).toBe('current');
   });
 });

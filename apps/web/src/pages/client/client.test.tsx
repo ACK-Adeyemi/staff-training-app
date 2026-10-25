@@ -113,8 +113,12 @@ describe('C1 Dashboard', () => {
     const assigned = await screen.findByRole('region', { name: 'Assigned training' });
     expect(within(assigned).getByText(/Jade Mills/)).toBeTruthy();
     expect(assigned.textContent).toContain('Safeguarding and whistleblowing');
+    // Jade did the September update 8 days ago (M0 seed), so she can be listed; the Safeguarding refresher is not done yet.
     const recent = screen.getByRole('region', { name: 'Recently completed' });
-    expect(recent.textContent).not.toContain('Jade Mills');
+    const jadeRows = within(recent)
+      .queryAllByRole('listitem')
+      .filter((li) => li.textContent.includes('Jade Mills'));
+    expect(jadeRows.every((li) => !li.textContent.includes('Safeguarding'))).toBe(true);
   });
 
   it('moves Jade to Recently completed with a Current badge when she passes, with no reload', async () => {
@@ -130,8 +134,10 @@ describe('C1 Dashboard', () => {
 
     await waitFor(() => {
       const recent = screen.getByRole('region', { name: 'Recently completed' });
-      expect(within(recent).getByText(/Jade Mills/)).toBeTruthy();
-      expect(recent.textContent).toContain('Current');
+      const row = within(recent)
+        .getAllByRole('listitem')
+        .find((li) => li.textContent.includes('Jade Mills') && li.textContent.includes('Safeguarding'));
+      expect(row?.textContent).toContain('Current');
     });
     expect(screen.getByRole('region', { name: 'Assigned training' }).textContent).not.toContain('Jade Mills');
     expect(document.body.getAttribute('data-marker')).toBe('same-page');

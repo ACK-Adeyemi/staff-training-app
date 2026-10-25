@@ -142,3 +142,45 @@ export function recentlyCompleted(
   }
   return out.sort((a, b) => new Date(b.evidence.completedAt).getTime() - new Date(a.evidence.completedAt).getTime());
 }
+
+export type PersonRequirementRow = {
+  requirement: Requirement;
+  status: Exclude<RequirementStatusName, 'notAssigned'>;
+  daysLeft?: number;
+  expiresAt?: string;
+};
+
+/** Worst first. Used for the one status word shown against a person in the people list. */
+const WORST_FIRST = ['overdue', 'notStarted', 'awaitingCheck', 'expiringSoon', 'current'] as const;
+export type PersonOverallStatus = (typeof WORST_FIRST)[number];
+
+/** Each applicable requirement for one person, in the order the requirements were given. */
+export function personRequirementRows(view: ClientView, person: Person): PersonRequirementRow[] {
+  const site = view.sites.find((s) => s.id === person.primarySiteId);
+  if (!site) return [];
+  const ev = view.evidence.filter((e) => e.personId === person.id);
+  const subs = view.submissions.filter((s) => s.personId === person.id);
+  const rows: PersonRequirementRow[] = [];
+  for (const requirement of view.requirements) {
+    const s = personRequirementStatus(requirement, person, site, ev, subs, view.now, view.amberWindowDays);
+    if (s.status === 'notAssigned') continue;
+    rows.push({
+      requirement,
+      status: s.status,
+      ...(s.daysLeft !== undefined ? { daysLeft: s.daysLeft } : {}),
+      ...(s.expiresAt ? { expiresAt: s.expiresAt } : {}),
+    });
+  }
+  return rows;
+}
+
+/** The worst status among a person's requirements. A new starter's not-started items are ignored; nothing left is current. */
+export function overallStatus(view: ClientView, person: Person): PersonOverallStatus {
+  const starter = isNewStarter(person, view.now);
+  const present = new Set(
+    personRequirementRows(view, person)
+      .filter((r) => !(starter && r.status === 'notStarted'))
+      .map((r) => r.status),
+  );
+  return WORST_FIRST.find((s) => present.has(s)) ?? 'current';
+}

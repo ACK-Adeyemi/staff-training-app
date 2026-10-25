@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useLayoutEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Outlet } from 'react-router';
 import { DemoBadge } from './DemoBadge';
@@ -21,6 +21,14 @@ type Open = 'none' | 'menu' | 'panel';
 export function RootLayout() {
   const [open, setOpen] = useState<Open>(() => (takeEarlyShortcut() ? 'panel' : 'none'));
   const [slot, setSlot] = useState<HTMLElement | null>(null);
+  const [top, setTop] = useState<HTMLElement | null>(null);
+  // The badge lives in one element that is moved between the layout's top row and a shell's slot, so it is never
+  // torn down and rebuilt when a shell appears or changes.
+  const [host] = useState(() => document.createElement('div'));
+  useLayoutEffect(() => {
+    const parent = slot ?? top;
+    if (parent && host.parentNode !== parent) parent.appendChild(host);
+  }, [slot, top, host]);
   useShortcut('Shift+Alt+KeyP', () => {
     setOpen('panel');
   });
@@ -36,8 +44,8 @@ export function RootLayout() {
   );
   return (
     <>
-      {slot ? null : <div className="flex justify-end px-4 pt-2">{badge}</div>}
-      {slot ? createPortal(badge, slot) : null}
+      {slot ? null : <div ref={setTop} className="flex justify-end px-4 pt-2" />}
+      {createPortal(badge, host)}
       <SlotContext value={setSlot}>
         <Outlet />
       </SlotContext>
