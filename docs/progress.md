@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M0
 Milestone base commit: 4fa6d3fdf9c044a7e3eaf4ebde1a00c330bc0689
-Next step: M0 chunk 9 (IndexedDB adapter): test-writer then implementer. check.sh build+e2e fail until chunk 11 (expected). Nursery renewal periods still VERIFY.
+Next step: M0 chunk 10 (UI tokens and base components): test-writer then implementer. check.sh build+e2e fail until chunk 11 (expected). Nursery renewal periods still VERIFY.
 
 ## Milestones
 - [ ] M0 Foundations
@@ -26,7 +26,7 @@ Next step: M0 chunk 9 (IndexedDB adapter): test-writer then implementer. check.s
 - [x] 6 Content scaffold
 - [x] 7 Data layer and memory adapter
 - [x] 8 Seed generator
-- [ ] 9 IndexedDB adapter
+- [x] 9 IndexedDB adapter
 - [ ] 10 UI tokens and base components
 - [ ] 11 Web app and shells
 - [ ] 12 Demo shell
@@ -40,3 +40,4 @@ Next step: M0 chunk 9 (IndexedDB adapter): test-writer then implementer. check.s
 - 2026-10-25: session started, created progress.md, M0 planning.
 - 2026-10-25: M0 plan committed (250adaa); starting chunk 1.
 - 2026-10-25: M0 chunk 8 seed generator landed (cf69643).
+- 2026-10-25: M0 chunk 9 IndexedDB adapter landed (5bfbdb0).
