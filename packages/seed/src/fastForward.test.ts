@@ -46,7 +46,7 @@ async function addTestPerson(world: Awaited<ReturnType<typeof seeded>>, expiresI
   await admin.bulkPut('people', [{ ...template, id: TEST_PERSON_ID, firstName: 'Testa', lastName: 'Fastforward' }]);
   await admin.bulkPut('evidence', [
     {
-      id: 'U'.repeat(26),
+      id: 'V'.repeat(26),
       clientId: template.clientId,
       personId: TEST_PERSON_ID,
       requirementId: req.id,
@@ -90,7 +90,7 @@ describe('fast-forward over seeded data (BP-5)', () => {
     await admin.setDemoState({ clockOffsetMs: 0, industry: 'nursery', persona });
     expect(await statusOf(admin, hannah, 'Safeguarding', await at())).toBe('expiringSoon');
     await admin.setDemoState({ clockOffsetMs: 30 * DAY, industry: 'nursery', persona });
-    expect((await at()).toISOString()).toBe(addDays(new Date(TODAY), 30).toISOString());
+    expect((await at()).toISOString()).toBe(new Date(new Date(TODAY).getTime() + 30 * DAY).toISOString());
     expect(await statusOf(admin, hannah, 'Safeguarding', await at())).toBe('overdue');
     await admin.setDemoState({ clockOffsetMs: 0, industry: 'nursery', persona });
     expect(await statusOf(admin, hannah, 'Safeguarding', await at())).toBe('expiringSoon');
