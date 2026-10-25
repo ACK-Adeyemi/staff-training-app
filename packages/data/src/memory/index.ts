@@ -32,6 +32,6 @@ export function createMemoryBackend(): RawBackend {
   };
 }
 
-export function createMemoryStore(options: StoreOptions): Promise<StoreHandle> {
-  return Promise.resolve(createStore(createMemoryBackend(), options));
+export function createMemoryStore(options: StoreOptions): StoreHandle {
+  return createStore(createMemoryBackend(), options);
 }
