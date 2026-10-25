@@ -57,3 +57,17 @@ All pinned exactly (no ^ or ~), names checked against the plan's list. pnpm 12.1
 - In this container, corepack's pnpm shim needs `NODE_USE_ENV_PROXY=1` to reach the registry through the proxy (otherwise `pnpm` fails with EAI_AGAIN).
 - Type-aware ESLint uses the TypeScript project service. The lint-rules test lints virtual files, so `eslint.config.js` lists the virtual test paths (those that do not yet exist on disk) under `allowDefaultProject`. A new virtual file name used in that test must be added to `virtualNames` there.
 - Prettier ignores `*.md` and `.github` (hand-written, user-reviewed) and protected files.
+
+### M0 chunk 3: domain core and schema choices
+
+Choices made by the test-writer where build pack section 6 left things open, accepted by the implementer:
+
+- **PaymentAttempt gains `id` and `clientId`.** Build pack 6 has only `invoiceId`; the data layer needs a key and the tenant.
+- **Ids** are upper-case Crockford base32, 26 characters (the output of `ulid()`): no I, L, O or U, no lower case.
+- **`isoDateSchema`** needs a full date-time with `Z` or an offset, and a real calendar day.
+- **ClientSettings** fields all have defaults, so `clientSettingsSchema.parse({})` works (amberWindowDays 60, allowSelfApproval false, defaultLanguage en-GB, battles all on with maxRoomSize 20; reminder and retention values are placeholders).
+- **`clientId` is required** on Site, Team, Person, Evidence, EvidenceSubmission, Subscription, AddOnSubscription and PaymentAttempt. UserAccount needs it unless side is `provider`.
+- **IndustryPack** `defaultCategoryIds`, `defaultRules`, `faqIds` and `supportFeatureIds` default to `[]`; `defaultRules` is an opaque record list until auto-assign rules arrive.
+- **Dates**: `addDays` and `addMonths` keep London wall-clock time; months clamp; `daysBetween` compares London calendar dates; in the repeated 01:xx hour the earlier instant is used.
+- **RNG**: sfc32 seeded from a string hash of the lineage (`seed:<n>` then `/<labelLength>:<label>` per fork), so a fork depends only on seed and labels.
+- **Test edit (not a weakening):** `ids.test.ts` used `[...prefix]` on a string, which `@typescript-eslint/no-misused-spread` rejects; changed to `Array.from(prefix)`, same behaviour and assertion.
