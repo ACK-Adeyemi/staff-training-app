@@ -55,17 +55,23 @@ export function makeDemo(side: Side, keys: SeedKeys, handle?: StoreHandle) {
 export async function renderRoute(
   path: string,
   side: Side,
-  opts: { prepare?: (ctx: { handle: StoreHandle; keys: SeedKeys }) => Promise<void> } = {},
+  opts: {
+    prepare?: (ctx: { handle: StoreHandle; keys: SeedKeys }) => Promise<void>;
+    /** Run as someone other than the side's default persona (chunk 10: client users other than Priya). */
+    actor?: (keys: SeedKeys) => ActorContext;
+  } = {},
 ) {
   const { handle, keys } = await seededStore();
   if (opts.prepare) await opts.prepare({ handle, keys });
   const router = createMemoryRouter(routes, { initialEntries: [path] });
+  const actor = opts.actor ? opts.actor(keys) : actorFor(side, keys);
   const demo = makeDemo(side, keys, handle);
+  demo.state.persona.userId = actor.userId;
   const view = render(
     <AppProviders
       store={handle.store}
       clock={fixedClock(TODAY)}
-      actor={actorFor(side, keys)}
+      actor={actor}
       demo={demo}
       subscribe={(l) => handle.subscribe(l)}
     >
