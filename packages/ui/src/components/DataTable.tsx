@@ -7,6 +7,8 @@ export interface DataTableColumn {
 export interface DataTableRow {
   id: string;
   cells: Record<string, ReactNode>;
+  /** A group heading row: one cell spanning every column (for example a team name). `cells` is ignored. */
+  heading?: ReactNode;
 }
 export interface DataTableProps {
   caption: string;
@@ -40,21 +42,32 @@ export function DataTable({ caption, columns, rows, rowHeader, stickyFirstColumn
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) => (
-            <tr key={r.id}>
-              {columns.map((c, i) =>
-                i === 0 && rowHeader ? (
-                  <th key={c.key} scope="row" className={cell(true) + ' font-semibold'}>
-                    {r.cells[c.key]}
-                  </th>
-                ) : (
-                  <td key={c.key} className={cell(i === 0)}>
-                    {r.cells[c.key]}
-                  </td>
-                ),
-              )}
-            </tr>
-          ))}
+          {rows.map((r) =>
+            r.heading !== undefined ? (
+              <tr key={r.id}>
+                <td
+                  colSpan={columns.length}
+                  className="border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-start font-bold"
+                >
+                  {r.heading}
+                </td>
+              </tr>
+            ) : (
+              <tr key={r.id}>
+                {columns.map((c, i) =>
+                  i === 0 && rowHeader ? (
+                    <th key={c.key} scope="row" className={cell(true) + ' font-semibold'}>
+                      {r.cells[c.key]}
+                    </th>
+                  ) : (
+                    <td key={c.key} className={cell(i === 0)}>
+                      {r.cells[c.key]}
+                    </td>
+                  ),
+                )}
+              </tr>
+            ),
+          )}
         </tbody>
       </table>
     </div>

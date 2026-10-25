@@ -7,6 +7,9 @@ import { RootLayout } from '../demo/RootLayout';
 import { OrgDoc } from '../pages/doc/OrgDoc';
 import { Assign } from '../pages/client/Assign';
 import { Dashboard } from '../pages/client/Dashboard';
+import { Matrix } from '../pages/client/Matrix';
+import { ModuleStats } from '../pages/client/ModuleStats';
+import { Reports } from '../pages/client/Reports';
 import { People } from '../pages/client/People';
 import { PersonRecord } from '../pages/client/Person';
 import { Certificate } from '../pages/staff/Certificate';
@@ -64,7 +67,9 @@ export const routes: RouteObject[] = [
           { path: 'assign', element: <Assign /> },
           page('modules', 'nav.client.training', 'placeholder.client.training'),
           page('competitions', 'nav.client.engage', 'placeholder.client.engage'),
-          page('reports', 'nav.client.reports', 'placeholder.client.reports'),
+          { path: 'reports', element: <Reports /> },
+          { path: 'reports/matrix', element: <Matrix /> },
+          { path: 'modules/:moduleId/stats', element: <ModuleStats /> },
           page('settings', 'nav.client.settings', 'placeholder.client.settings'),
           page('help', 'nav.client.help', 'placeholder.client.help'),
         ],

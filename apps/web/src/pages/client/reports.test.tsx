@@ -123,11 +123,14 @@ describe('C15 Training matrix', () => {
   });
 
   it('lists the 14 active and on-leave people as row headers, grouped by team, and never Olivia', async () => {
-    const { handle } = await renderRoute('/client/reports/matrix', 'client');
+    const { handle, keys } = await renderRoute('/client/reports/matrix', 'client');
     const table = await matrixTable();
     expect(within(table).getAllByRole('rowheader').length).toBeGreaterThanOrEqual(14);
     const dump = await handle.admin.dumpAll();
-    const listed = (dump['people'] as Person[]).filter((p) => p.status === 'active' || p.status === 'onLeave');
+    // dumpAll returns every client's people; the matrix lists only Little Acorns.
+    const listed = (dump['people'] as Person[]).filter(
+      (p) => p.clientId === keys.clients['littleAcorns'] && (p.status === 'active' || p.status === 'onLeave'),
+    );
     expect(listed).toHaveLength(14);
     for (const p of listed) {
       expect(within(table).getByRole('rowheader', { name: `${p.firstName} ${p.lastName}` })).toBeTruthy();

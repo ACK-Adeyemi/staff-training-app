@@ -279,6 +279,49 @@
         "generic": "Training could not be assigned. Please try again."
       },
       "previewSkipped": "{count} already have this training and will be skipped."
+    },
+    "reports": {
+      "noPermission": "You do not have permission to see reports. Ask your manager.",
+      "indexIntro": "Reports you can print or download.",
+      "matrixLink": "Training matrix",
+      "matrixLinkHint": "Every person and every training requirement on one page, ready to show an inspector.",
+      "matrix": {
+        "title": "Training matrix",
+        "auditTerm": "Inspector-ready training matrix",
+        "generated": "Generated {when}",
+        "personalData": "Contains personal data. Keep it safe.",
+        "keyTitle": "Key",
+        "caption": "Training matrix for {client}",
+        "name": "Name",
+        "print": "Print",
+        "download": "Download CSV",
+        "fileName": "training-matrix.csv",
+        "back": "Back to reports"
+      }
+    },
+    "moduleStats": {
+      "noPermission": "You do not have permission to see training results. Ask your manager.",
+      "notFound": "We could not find that training.",
+      "headline": "Headline numbers",
+      "assigned": "Assigned",
+      "started": "Started",
+      "completed": "Completed",
+      "completionRate": "Completion rate",
+      "overdue": "Overdue",
+      "averageScore": "Average score",
+      "passRate": "Pass rate",
+      "noScores": "No scores yet",
+      "questions": "Question results",
+      "questionsCaption": "Questions, hardest first",
+      "question": "Question",
+      "answered": "Answered",
+      "percentCorrect": "Percent correct",
+      "source": "Source",
+      "learnMoreOpened": "Learn more opened",
+      "noAnswers": "No answers yet",
+      "noSource": "None given",
+      "viewResults": "Results for {title}",
+      "back": "Back to the dashboard"
     }
   },
   "staff": {

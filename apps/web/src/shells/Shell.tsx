@@ -60,13 +60,13 @@ export function Shell({ config }: { config: ShellConfig }) {
     <div onClick={onClick} className="min-h-screen md:flex">
       {sidebar ? (
         <aside
-          className={`border-[var(--color-border)] p-3 md:w-60 md:shrink-0 md:border-r-2 ${staff ? '' : 'hidden md:block'}`}
+          className={`border-[var(--color-border)] p-3 print:hidden md:w-60 md:shrink-0 md:border-r-2 ${staff ? '' : 'hidden md:block'}`}
         >
           <SideNav label={t('shell.mainNavigation')} items={staff ? config.bar : all} currentId={current} />
         </aside>
       ) : null}
       <div className="min-w-0 flex-1">
-        <header className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-[var(--color-border)] px-4 py-2">
+        <header className="flex flex-wrap items-center justify-between gap-2 print:hidden border-b-2 border-[var(--color-border)] px-4 py-2">
           <span className="font-semibold">{user.data?.displayName ?? t('shell.loading')}</span>
           <div className="flex flex-wrap items-center gap-2">
             {config.side === 'provider' ? <Badge tone="simulated">{t('demo.simulatedData')}</Badge> : null}
@@ -92,12 +92,12 @@ export function Shell({ config }: { config: ShellConfig }) {
             })}
           </div>
         </header>
-        <main className="px-4 pb-28 md:pb-6">
+        <main className="px-4 pb-28 print:p-0 md:pb-6">
           <Outlet />
         </main>
       </div>
       {bottom ? (
-        <div className={staff ? '' : 'md:hidden'}>
+        <div className={staff ? 'print:hidden' : 'print:hidden md:hidden'}>
           <BottomTabBar
             label={t('shell.mainNavigation')}
             items={config.bar}

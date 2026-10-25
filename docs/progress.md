@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M1
 Milestone base commit: 5619f46
-Next step: M1 chunk 11 (C15 matrix and basic C8) per docs/plans/m1.md. Nursery renewal periods still VERIFY.
+Next step: M1 chunk 12 (Track A test and docs) per docs/plans/m1.md. Nursery renewal periods still VERIFY.
 
 ## Milestones
 - [x] M0 Foundations
@@ -28,7 +28,7 @@ Next step: M1 chunk 11 (C15 matrix and basic C8) per docs/plans/m1.md. Nursery r
 - [x] 8 Staff screens S1-S3, S8
 - [x] 9 Staff learning flow S4-S7
 - [x] 10 Client screens C1-C4
-- [ ] 11 C15 matrix and C8 stats
+- [x] 11 C15 matrix and C8 stats
 - [ ] 12 Track A test and docs
 
 ## Acceptance criteria results
@@ -55,3 +55,4 @@ M0 (final commit f7d32fd, scripts/check.sh fully green): BP-1..BP-8 and F-1..F-1
 - 2026-10-25: M1 chunk 8 staff screens landed.
 - 2026-10-25: M1 chunk 9 staff learning flow landed.
 - 2026-10-25: M1 chunk 10 client screens landed.
+- 2026-10-25: M1 chunk 11 C15 matrix and basic C8 landed. Visual review of test-results/matrix-print.png and matrix.pdf (A4 landscape, 2 pages): header, key, status words with icons and dates, team rows and repeating column headings are all readable; nav, Demo badge and buttons are hidden; no clipped columns. No problems found. Also fixed a test bug: the matrix people test compared against every client's people (now Little Acorns only).

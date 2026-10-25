@@ -43,7 +43,7 @@ export function Dashboard() {
   const q = useClientData();
   const perms = usePermissions();
   if (q.isError) return <p role="alert">{t('client.loadError')}</p>;
-  if (!q.data) return <p>{t('shell.loading')}</p>;
+  if (!q.data || !perms.data) return <p>{t('shell.loading')}</p>;
   const { view, assignments, modules } = q.data;
 
   const attention = needsAttention(view);
@@ -65,7 +65,10 @@ export function Dashboard() {
     }
     return '';
   };
-  const canAssign = can(perms.data ?? [], 'assign.manage', actor.clientId ? { clientId: actor.clientId } : {});
+  const resultsFor = can(perms.data, 'reports.view', actor.clientId ? { clientId: actor.clientId } : {})
+    ? modules.filter((m) => m.status === 'published')
+    : [];
+  const canAssign = can(perms.data, 'assign.manage', actor.clientId ? { clientId: actor.clientId } : {});
 
   return (
     <>
@@ -124,6 +127,20 @@ export function Dashboard() {
               size={140}
             />
             <p className="m-0 text-center">{t('client.dashboard.ringLabel')}</p>
+            {resultsFor.length > 0 ? (
+              <ul className="m-0 flex list-none flex-col gap-1 p-0">
+                {resultsFor.map((m) => (
+                  <li key={m.id}>
+                    <a
+                      href={`#/client/modules/${m.id}/stats`}
+                      className={`inline-flex min-h-[var(--target-min)] items-center font-semibold underline ${focusLink}`}
+                    >
+                      {t('client.moduleStats.viewResults', { title: m.title })}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         </Section>
         <Section id="c1-recent" title={t('client.dashboard.recent')}>
