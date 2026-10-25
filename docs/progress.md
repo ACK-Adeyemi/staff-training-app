@@ -3,7 +3,7 @@ Status: IN PROGRESS
 Mode: unattended
 Branch: agent/poc-build
 Current milestone: M1
-Milestone base commit: (set at M1 start)
+Milestone base commit: 5619f46
 Next step: start M1: record base commit, then delegate docs/plans/m1.md to planner (build pack docs/build-pack/10-02-m1-client-story-core.md). Nursery renewal periods still VERIFY.
 
 ## Milestones
