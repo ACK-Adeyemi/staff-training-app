@@ -84,3 +84,11 @@ Choices made by the test-writer where build pack section 6 left things open, acc
 - **Change shapes** for `lastOwnerGuard`: `removeAssignment`, `removeRole`, `suspend`, `setExpiry` (with `expiresAt`) and `deleteUser`, each with the ids shown in the tests.
 - **`canApproveEvidence` reasons.** `outOfScope` when the actor holds `evidence.approve` somewhere but not for this client or site, `noPermission` when they never hold it; `ownUpload` is checked before `aboutSelf`.
 - **Test edit (not a weakening):** the `id()` helper in `engine.test.ts` built ids from readable tags such as `CLIENT1` and `RIVERSIDE`, which contain I, L, O or U and fail the chunk 3 Crockford id schema. It now maps those letters to valid ones (I and L to 1, O to 0, U to V). No assertion changed.
+
+## M0 chunk 5: entitlements, account states, packs, requirement status
+
+- **stateSince for stored limited, readOnly and closed states is the start of that state, not dunning day 0.** Only pastDue uses stateSince as day 0. For the others the dunning day is the first day of that state (graceDays+1, limitedUntilDay+1, readOnlyUntilDay+1) plus London days since stateSince. Reason: build pack 6 names the field "since", the UI shows "Limited since ...", and a state entered by an admin or provider action has no pastDue day 0 to point at. Covered by accountStateSince.test.ts.
+- Grace extension only applies to a stored pastDue state. At or after graceExtendedUntil the normal day boundaries apply.
+- A trial with no nextStateAt never ends. Trial end-path days (14 read-only, 30 closed) are fixed constants from brief 24.3, not part of DunningPolicy.
+- requirementStatus filters evidence and submissions by requirementId only; callers pass one person's records. The amber window is measured in London calendar days (addDays), so DST does not move the boundary.
+- entitled() treats a flag name as true, and never reads the `flags` key itself as a feature.

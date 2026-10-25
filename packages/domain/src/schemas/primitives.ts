@@ -39,3 +39,4 @@ export const accountStateSchema = z.enum([
 ]);
 
 export const sideSchema = z.enum(['staff', 'client', 'provider']);
+export type AccountState = z.infer<typeof accountStateSchema>;
