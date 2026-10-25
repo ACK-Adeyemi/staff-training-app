@@ -14,7 +14,16 @@ import { describe, expect, it } from 'vitest';
 import { addDays } from '../dates';
 import { staffSummary } from './staff';
 import {
-  AMBER, NOW, assignment, evidenceExpiring, moduleFor, nextId, person, requirement, site, submissionWaiting,
+  AMBER,
+  NOW,
+  assignment,
+  evidenceExpiring,
+  moduleFor,
+  nextId,
+  person,
+  requirement,
+  site,
+  submissionWaiting,
 } from './testFixtures';
 
 const base = { site: site(), now: NOW, amberWindowDays: AMBER };
@@ -31,8 +40,13 @@ describe('staffSummary', () => {
     const jade = person('Jade', 'Mills');
     const a = assignment(jade, safeguardingModule.id, 14);
     const s = staffSummary({
-      ...base, person: jade, requirements: [safeguarding], modules: [safeguardingModule], submissions: [],
-      evidence: [evidenceExpiring(jade, safeguarding, 180)], assignments: [a],
+      ...base,
+      person: jade,
+      requirements: [safeguarding],
+      modules: [safeguardingModule],
+      submissions: [],
+      evidence: [evidenceExpiring(jade, safeguarding, 180)],
+      assignments: [a],
     });
     expect(s.toDo).toBe(1);
     expect(s.waiting).toBe(0);
@@ -44,8 +58,13 @@ describe('staffSummary', () => {
     const jade = person('Jade', 'Mills');
     const a = assignment(jade, safeguardingModule.id, 14, { status: 'done' });
     const s = staffSummary({
-      ...base, person: jade, requirements: [safeguarding], modules: [safeguardingModule], submissions: [],
-      evidence: [evidenceExpiring(jade, safeguarding, 730)], assignments: [a],
+      ...base,
+      person: jade,
+      requirements: [safeguarding],
+      modules: [safeguardingModule],
+      submissions: [],
+      evidence: [evidenceExpiring(jade, safeguarding, 730)],
+      assignments: [a],
     });
     expect(s.toDo).toBe(0);
     expect(s.complete).toBe(true);
@@ -55,8 +74,13 @@ describe('staffSummary', () => {
   it('does not double count an assignment whose module satisfies a requirement already counted', () => {
     const maureen = person('Maureen', 'Clarke');
     const s = staffSummary({
-      ...base, person: maureen, requirements: [food], modules: [foodModule], submissions: [],
-      evidence: [evidenceExpiring(maureen, food, 20)], assignments: [assignment(maureen, foodModule.id, 10)],
+      ...base,
+      person: maureen,
+      requirements: [food],
+      modules: [foodModule],
+      submissions: [],
+      evidence: [evidenceExpiring(maureen, food, 20)],
+      assignments: [assignment(maureen, foodModule.id, 10)],
     });
     expect(s.toDo).toBe(1);
   });
@@ -64,8 +88,13 @@ describe('staffSummary', () => {
   it('counts expiring soon (Maureen food hygiene in 20 days) as to do', () => {
     const maureen = person('Maureen', 'Clarke');
     const s = staffSummary({
-      ...base, person: maureen, requirements: [food], modules: [foodModule], submissions: [],
-      evidence: [evidenceExpiring(maureen, food, 20)], assignments: [],
+      ...base,
+      person: maureen,
+      requirements: [food],
+      modules: [foodModule],
+      submissions: [],
+      evidence: [evidenceExpiring(maureen, food, 20)],
+      assignments: [],
     });
     expect(s.toDo).toBe(1);
     expect(s.complete).toBe(false);
@@ -75,8 +104,13 @@ describe('staffSummary', () => {
   it('counts overdue and not started as to do', () => {
     const p = person('Mark', 'Taylor');
     const s = staffSummary({
-      ...base, person: p, requirements: [aid, later], modules: [], submissions: [],
-      evidence: [evidenceExpiring(p, aid, -8)], assignments: [],
+      ...base,
+      person: p,
+      requirements: [aid, later],
+      modules: [],
+      submissions: [],
+      evidence: [evidenceExpiring(p, aid, -8)],
+      assignments: [],
     });
     expect(s.toDo).toBe(2);
     expect(s.rows.map((r) => r.status)).toEqual(['overdue', 'notStarted']);
@@ -85,8 +119,13 @@ describe('staffSummary', () => {
   it('shows awaiting check as waiting, not as to do (Ben)', () => {
     const ben = person('Ben', 'Carter');
     const s = staffSummary({
-      ...base, person: ben, requirements: [safeguarding], modules: [], evidence: [],
-      submissions: [submissionWaiting(ben, safeguarding)], assignments: [],
+      ...base,
+      person: ben,
+      requirements: [safeguarding],
+      modules: [],
+      evidence: [],
+      submissions: [submissionWaiting(ben, safeguarding)],
+      assignments: [],
     });
     expect(s.waiting).toBe(1);
     expect(s.toDo).toBe(0);
@@ -97,7 +136,13 @@ describe('staffSummary', () => {
     const p = person('Ellie', 'Brown');
     const cooksOnly = requirement('Cooks only', { appliesTo: { jobRoleIds: [nextId()] } });
     const s = staffSummary({
-      ...base, person: p, requirements: [cooksOnly, safeguarding], modules: [], evidence: [], submissions: [], assignments: [],
+      ...base,
+      person: p,
+      requirements: [cooksOnly, safeguarding],
+      modules: [],
+      evidence: [],
+      submissions: [],
+      assignments: [],
     });
     expect(s.rows.map((r) => r.requirement.id)).toEqual([safeguarding.id]);
   });
@@ -106,10 +151,19 @@ describe('staffSummary', () => {
     const p = person('Priya', 'Shah');
     const e = evidenceExpiring(p, safeguarding, 200);
     const s = staffSummary({
-      ...base, person: p, requirements: [safeguarding], modules: [], evidence: [e], submissions: [], assignments: [],
+      ...base,
+      person: p,
+      requirements: [safeguarding],
+      modules: [],
+      evidence: [e],
+      submissions: [],
+      assignments: [],
     });
     expect(s.rows[0]).toMatchObject({
-      status: 'current', lastDoneAt: e.completedAt, nextRenewalAt: e.expiresAt, cadenceMonths: 24,
+      status: 'current',
+      lastDoneAt: e.completedAt,
+      nextRenewalAt: e.expiresAt,
+      cadenceMonths: 24,
     });
   });
 
@@ -117,7 +171,13 @@ describe('staffSummary', () => {
     const p = person('Priya', 'Shah');
     const draft = moduleFor({ id: nextId(), status: 'draft', requirementIds: [food.id] });
     const s = staffSummary({
-      ...base, person: p, requirements: [food], modules: [draft], evidence: [], submissions: [], assignments: [],
+      ...base,
+      person: p,
+      requirements: [food],
+      modules: [draft],
+      evidence: [],
+      submissions: [],
+      assignments: [],
     });
     expect(s.rows[0]?.moduleId).toBeUndefined();
   });
@@ -127,7 +187,12 @@ describe('staffSummary', () => {
     const late = assignment(p, foodModule.id, 20);
     const soon = assignment(p, safeguardingModule.id, 5);
     const s = staffSummary({
-      ...base, person: p, requirements: [], modules: [foodModule, safeguardingModule], evidence: [], submissions: [],
+      ...base,
+      person: p,
+      requirements: [],
+      modules: [foodModule, safeguardingModule],
+      evidence: [],
+      submissions: [],
       assignments: [late, soon, assignment(p, foodModule.id, 1, { status: 'cancelled' })],
     });
     expect(s.nextUp).toEqual({ kind: 'assignment', assignment: soon });
@@ -137,8 +202,13 @@ describe('staffSummary', () => {
     const p = person('Mark', 'Taylor');
     const aidModule = moduleFor({ id: nextId(), requirementIds: [aid.id] });
     const s = staffSummary({
-      ...base, person: p, requirements: [later, food, aid], modules: [aidModule, foodModule, moduleFor({ id: nextId(), requirementIds: [later.id] })],
-      evidence: [evidenceExpiring(p, aid, -8), evidenceExpiring(p, food, 20)], submissions: [], assignments: [],
+      ...base,
+      person: p,
+      requirements: [later, food, aid],
+      modules: [aidModule, foodModule, moduleFor({ id: nextId(), requirementIds: [later.id] })],
+      evidence: [evidenceExpiring(p, aid, -8), evidenceExpiring(p, food, 20)],
+      submissions: [],
+      assignments: [],
     });
     expect(s.nextUp).toEqual({ kind: 'requirement', requirementId: aid.id, moduleId: aidModule.id });
   });
@@ -146,8 +216,13 @@ describe('staffSummary', () => {
   it('Next up skips requirements that no published module satisfies, then says all caught up', () => {
     const p = person('Mark', 'Taylor');
     const s = staffSummary({
-      ...base, person: p, requirements: [aid], modules: [], evidence: [evidenceExpiring(p, aid, -8)],
-      submissions: [], assignments: [],
+      ...base,
+      person: p,
+      requirements: [aid],
+      modules: [],
+      evidence: [evidenceExpiring(p, aid, -8)],
+      submissions: [],
+      assignments: [],
     });
     expect(s.nextUp).toEqual({ kind: 'allCaughtUp' });
   });
@@ -160,15 +235,24 @@ describe('staffSummary', () => {
     const far = requirement('Far', { renewEveryMonths: 12 });
     const a = assignment(jade, safeguardingModule.id, 14);
     const s = staffSummary({
-      ...base, person: jade, requirements: [far, r3, r2, r1, safeguarding], modules: [safeguardingModule],
+      ...base,
+      person: jade,
+      requirements: [far, r3, r2, r1, safeguarding],
+      modules: [safeguardingModule],
       evidence: [
-        evidenceExpiring(jade, r1, 40), evidenceExpiring(jade, r2, 70), evidenceExpiring(jade, r3, 85),
-        evidenceExpiring(jade, far, 120), evidenceExpiring(jade, safeguarding, 180),
+        evidenceExpiring(jade, r1, 40),
+        evidenceExpiring(jade, r2, 70),
+        evidenceExpiring(jade, r3, 85),
+        evidenceExpiring(jade, far, 120),
+        evidenceExpiring(jade, safeguarding, 180),
       ],
-      submissions: [], assignments: [a],
+      submissions: [],
+      assignments: [a],
     });
     expect(s.comingUp.map((c) => c.at)).toEqual([
-      addDays(NOW, 14).toISOString(), addDays(NOW, 40).toISOString(), addDays(NOW, 70).toISOString(),
+      addDays(NOW, 14).toISOString(),
+      addDays(NOW, 40).toISOString(),
+      addDays(NOW, 70).toISOString(),
     ]);
     expect(s.comingUp[0]?.kind).toBe('assignmentDue');
     expect(s.comingUp[1]?.kind).toBe('requirementExpiry');

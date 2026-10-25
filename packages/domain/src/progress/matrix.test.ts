@@ -16,9 +16,7 @@
 //     `t` is the translation function (key => text); the header uses requirement names as given.
 import { describe, expect, it } from 'vitest';
 import { matrixCsv, trainingMatrix } from './matrix';
-import {
-  AMBER, NOW, SITE_2_ID, evidenceExpiring, person, requirement, site, team,
-} from './testFixtures';
+import { AMBER, NOW, SITE_2_ID, evidenceExpiring, person, requirement, site, team } from './testFixtures';
 
 const babies = team('01HZX00000000000000000T001', 'Baby room');
 const toddlers = team('01HZX00000000000000000T002', 'Toddler room');
@@ -37,8 +35,14 @@ const grace = person('Grace', 'Lee', { status: 'onLeave', teamIds: [toddlers.id]
 const people = [jade, olivia, maureen, hannah, floater, grace, ana];
 const evidence = [evidenceExpiring(maureen, food, 20), evidenceExpiring(jade, sg, 200)];
 const input = {
-  people, requirements: [sg, food, never], evidence, submissions: [], teams: [babies, toddlers],
-  sites: [site(), site({ id: SITE_2_ID, name: 'Second site' })], now: NOW, amberWindowDays: AMBER,
+  people,
+  requirements: [sg, food, never],
+  evidence,
+  submissions: [],
+  teams: [babies, toddlers],
+  sites: [site(), site({ id: SITE_2_ID, name: 'Second site' })],
+  now: NOW,
+  amberWindowDays: AMBER,
 };
 
 describe('trainingMatrix', () => {
@@ -93,15 +97,27 @@ function parseCsv(text: string): string[][] {
   for (let i = 0; i < text.length; i++) {
     const c = text[i]!;
     if (quoted) {
-      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
-      else if (c === '"') quoted = false;
+      if (c === '"' && text[i + 1] === '"') {
+        field += '"';
+        i++;
+      } else if (c === '"') quoted = false;
       else field += c;
     } else if (c === '"') quoted = true;
-    else if (c === ',') { row.push(field); field = ''; }
-    else if (c === '\r' && text[i + 1] === '\n') { row.push(field); rows.push(row); row = []; field = ''; i++; }
-    else field += c;
+    else if (c === ',') {
+      row.push(field);
+      field = '';
+    } else if (c === '\r' && text[i + 1] === '\n') {
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = '';
+      i++;
+    } else field += c;
   }
-  if (field !== '' || row.length) { row.push(field); rows.push(row); }
+  if (field !== '' || row.length) {
+    row.push(field);
+    rows.push(row);
+  }
   return rows;
 }
 

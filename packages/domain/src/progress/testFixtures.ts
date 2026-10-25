@@ -74,7 +74,12 @@ export const requirement = (name: string, over: Partial<Requirement> = {}): Requ
 });
 
 /** Evidence for a person that expires `inDays` days after NOW (negative is already expired). */
-export const evidenceExpiring = (p: Person, r: Requirement, inDays: number, over: Partial<Evidence> = {}): Evidence => ({
+export const evidenceExpiring = (
+  p: Person,
+  r: Requirement,
+  inDays: number,
+  over: Partial<Evidence> = {},
+): Evidence => ({
   id: nextId(),
   clientId: p.clientId,
   personId: p.id,

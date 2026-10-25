@@ -108,3 +108,14 @@ export const mondayOfWeek = (date: Date, tz: string = LONDON): Date => {
     tz,
   );
 };
+
+/** The instant at which London's clock shows the given wall time. */
+export const fromLondonWall = (w: {
+  y: number;
+  m: number;
+  d: number;
+  h: number;
+  mi: number;
+  s: number;
+  ms: number;
+}): Date => fromWall(w, LONDON);

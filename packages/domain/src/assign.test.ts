@@ -34,7 +34,12 @@ describe('planAssignment', () => {
   });
 
   it('does not let a done or cancelled assignment block a new one', () => {
-    expect(plan([jade.id], [assignment(jade, MOD, 10, { status: 'done' }), assignment(jade, MOD, 10, { status: 'cancelled' })]).toCreate).toEqual([jade.id]);
+    expect(
+      plan(
+        [jade.id],
+        [assignment(jade, MOD, 10, { status: 'done' }), assignment(jade, MOD, 10, { status: 'cancelled' })],
+      ).toCreate,
+    ).toEqual([jade.id]);
   });
 
   it('does not let an open assignment for a different module block', () => {

@@ -28,13 +28,30 @@ const b = person('Bea', 'Retry');
 const c = person('Cal', 'Late');
 
 const attempt = (p: typeof a, daysAgo: number, score: number, passed: boolean): Attempt => ({
-  id: nextId(), clientId: CLIENT, siteId: SITE_ID, personId: p.id, moduleId: mod.id, moduleVersion: 1, mode: 'open',
-  questionIds: ['q1', 'q2', 'q3'], startedAt: addDays(NOW, -daysAgo).toISOString(),
-  finishedAt: addDays(NOW, -daysAgo).toISOString(), score, passed,
+  id: nextId(),
+  clientId: CLIENT,
+  siteId: SITE_ID,
+  personId: p.id,
+  moduleId: mod.id,
+  moduleVersion: 1,
+  mode: 'open',
+  questionIds: ['q1', 'q2', 'q3'],
+  startedAt: addDays(NOW, -daysAgo).toISOString(),
+  finishedAt: addDays(NOW, -daysAgo).toISOString(),
+  score,
+  passed,
 });
 const event = (p: typeof a, type: LearningEvent['type'], questionId: string, correct?: boolean): LearningEvent => ({
-  id: nextId(), clientId: CLIENT, siteId: SITE_ID, personId: p.id, at: NOW.toISOString(), type, moduleId: mod.id,
-  moduleVersion: 1, questionId, ...(correct === undefined ? {} : { correct }),
+  id: nextId(),
+  clientId: CLIENT,
+  siteId: SITE_ID,
+  personId: p.id,
+  at: NOW.toISOString(),
+  type,
+  moduleId: mod.id,
+  moduleVersion: 1,
+  questionId,
+  ...(correct === undefined ? {} : { correct }),
 });
 
 const assignments = [
@@ -46,10 +63,18 @@ const assignments = [
 ];
 const attempts = [attempt(a, 6, 90, true), attempt(b, 8, 60, false), attempt(b, 6, 90, true)];
 const events = [
-  event(a, 'questionAnswered', 'q1', true), event(b, 'questionAnswered', 'q1', true), event(b, 'questionAnswered', 'q1', true),
-  event(a, 'questionAnswered', 'q2', true), event(b, 'questionAnswered', 'q2', false), event(b, 'questionAnswered', 'q2', false),
-  event(a, 'questionAnswered', 'q3', false), event(b, 'questionAnswered', 'q3', true), event(b, 'questionAnswered', 'q3', false),
-  event(c, 'learnMoreOpened', 'q2'), event(a, 'learnMoreOpened', 'q2'), event(b, 'learnMoreOpened', 'q3'),
+  event(a, 'questionAnswered', 'q1', true),
+  event(b, 'questionAnswered', 'q1', true),
+  event(b, 'questionAnswered', 'q1', true),
+  event(a, 'questionAnswered', 'q2', true),
+  event(b, 'questionAnswered', 'q2', false),
+  event(b, 'questionAnswered', 'q2', false),
+  event(a, 'questionAnswered', 'q3', false),
+  event(b, 'questionAnswered', 'q3', true),
+  event(b, 'questionAnswered', 'q3', false),
+  event(c, 'learnMoreOpened', 'q2'),
+  event(a, 'learnMoreOpened', 'q2'),
+  event(b, 'learnMoreOpened', 'q3'),
 ];
 
 describe('moduleStats', () => {

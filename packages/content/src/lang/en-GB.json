@@ -127,6 +127,12 @@
       "teamSecurity": "Team and security settings will be here soon."
     }
   },
+  "matrix": {
+    "csv": {
+      "name": "Name",
+      "team": "Team"
+    }
+  },
   "status": {
     "current": "Up to date",
     "expiringSoon": "Due soon",

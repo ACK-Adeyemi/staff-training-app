@@ -3,8 +3,15 @@
 // Uses the progress/client.ts API described in packages/domain/src/progress/client.test.ts.
 import { describe, expect, it } from 'vitest';
 import {
-  complianceByRequirement, needsAttention, orgCompliance, recentlyCompleted, waitingForCheck,
-  type Evidence, type EvidenceSubmission, type Person, type Requirement,
+  complianceByRequirement,
+  needsAttention,
+  orgCompliance,
+  recentlyCompleted,
+  waitingForCheck,
+  type Evidence,
+  type EvidenceSubmission,
+  type Person,
+  type Requirement,
 } from '@sta/domain';
 import { seeded, TODAY } from './testing';
 

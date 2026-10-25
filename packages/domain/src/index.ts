@@ -12,3 +12,8 @@ export * from './quiz/draw';
 export * from './quiz/score';
 export { displayDomain, visibleLearnMore } from './quiz/learnMore';
 export type { VisibleLearnMoreInput } from './quiz/learnMore';
+export * from './progress/staff';
+export * from './progress/client';
+export * from './progress/matrix';
+export * from './progress/moduleStats';
+export * from './assign';

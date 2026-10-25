@@ -34,19 +34,30 @@ const olivia = person('Olivia', 'Grant', { status: 'archived' });
 const jade = person('Jade', 'Mills');
 
 const view = (people = [mark, lucy, hannah, maureen, amira, ben, grace, olivia, jade]) => ({
-  people, sites: [site()], requirements: [sg], evidence: [] as ReturnType<typeof evidenceExpiring>[],
-  submissions: [] as ReturnType<typeof submissionWaiting>[], now: NOW, amberWindowDays: AMBER,
+  people,
+  sites: [site()],
+  requirements: [sg],
+  evidence: [] as ReturnType<typeof evidenceExpiring>[],
+  submissions: [] as ReturnType<typeof submissionWaiting>[],
+  now: NOW,
+  amberWindowDays: AMBER,
 });
 
 describe('needsAttention', () => {
   it('lists a mixed team in the agreed order: overdue, expiring by date, then not started', () => {
     const items = needsAttention({
-      ...view(), requirements: [sg, aid, food],
+      ...view(),
+      requirements: [sg, aid, food],
       evidence: [
-        evidenceExpiring(mark, aid, -8), evidenceExpiring(mark, sg, 300),
-        evidenceExpiring(lucy, sg, 15), evidenceExpiring(hannah, sg, 16),
-        evidenceExpiring(maureen, food, 20), evidenceExpiring(maureen, sg, 300),
-        evidenceExpiring(jade, sg, 180), evidenceExpiring(grace, sg, 300), evidenceExpiring(olivia, sg, -200),
+        evidenceExpiring(mark, aid, -8),
+        evidenceExpiring(mark, sg, 300),
+        evidenceExpiring(lucy, sg, 15),
+        evidenceExpiring(hannah, sg, 16),
+        evidenceExpiring(maureen, food, 20),
+        evidenceExpiring(maureen, sg, 300),
+        evidenceExpiring(jade, sg, 180),
+        evidenceExpiring(grace, sg, 300),
+        evidenceExpiring(olivia, sg, -200),
       ],
       submissions: [submissionWaiting(ben, sg)],
     });
@@ -64,12 +75,15 @@ describe('needsAttention', () => {
     const later = person('Later', 'Person');
     const soon = person('Soon', 'Person');
     const items = needsAttention({
-      ...view([soon, later, late]), requirements: [sg],
+      ...view([soon, later, late]),
+      requirements: [sg],
       evidence: [evidenceExpiring(soon, sg, 3), evidenceExpiring(later, sg, -2), evidenceExpiring(late, sg, -30)],
       submissions: [],
     });
     expect(items.map((i) => [i.person.firstName, i.status])).toEqual([
-      ['Late', 'overdue'], ['Later', 'overdue'], ['Soon', 'expiringSoon'],
+      ['Late', 'overdue'],
+      ['Later', 'overdue'],
+      ['Soon', 'expiringSoon'],
     ]);
   });
 
@@ -83,31 +97,60 @@ describe('needsAttention', () => {
   });
 
   it('never lists archived people, and includes people on leave', () => {
-    const items = needsAttention({ ...view([olivia, grace]), requirements: [sg], evidence: [evidenceExpiring(olivia, sg, -200)], submissions: [] });
+    const items = needsAttention({
+      ...view([olivia, grace]),
+      requirements: [sg],
+      evidence: [evidenceExpiring(olivia, sg, -200), evidenceExpiring(grace, sg, 300)],
+      submissions: [],
+    });
     expect(items).toEqual([]);
-    const leave = needsAttention({ ...view([grace]), requirements: [sg], evidence: [evidenceExpiring(grace, sg, 10)], submissions: [] });
+    const leave = needsAttention({
+      ...view([grace]),
+      requirements: [sg],
+      evidence: [evidenceExpiring(grace, sg, 10)],
+      submissions: [],
+    });
     expect(leave.map((i) => i.person.id)).toEqual([grace.id]);
   });
 
   it('does not list awaiting check, current, or not-applicable requirements', () => {
     const cook = requirement('Cooks only', { appliesTo: { jobRoleIds: ['someone-else'] } });
     const items = needsAttention({
-      ...view([ben, jade]), requirements: [sg, cook],
-      evidence: [evidenceExpiring(jade, sg, 180)], submissions: [submissionWaiting(ben, sg)],
+      ...view([ben, jade]),
+      requirements: [sg, cook],
+      evidence: [evidenceExpiring(jade, sg, 180)],
+      submissions: [submissionWaiting(ben, sg)],
     });
     expect(items).toEqual([]);
   });
 
   it('carries days left and expiry date for expiring items', () => {
-    const [item] = needsAttention({ ...view([maureen]), requirements: [food], evidence: [evidenceExpiring(maureen, food, 20)], submissions: [] });
+    const [item] = needsAttention({
+      ...view([maureen]),
+      requirements: [food],
+      evidence: [evidenceExpiring(maureen, food, 20)],
+      submissions: [],
+    });
     expect(item).toMatchObject({ status: 'expiringSoon', daysLeft: 20 });
     expect(item?.requirement.id).toBe(food.id);
   });
 });
 
+describe('new starters', () => {
+  const sam = person('Sam', 'Okafor', { startDate: addDays(NOW, -10).toISOString() });
+  it('are not listed as not started, or non-compliant, in their first 14 days', () => {
+    expect(needsAttention({ ...view([sam]), evidence: [], submissions: [] })).toEqual([]);
+    expect(orgCompliance({ ...view([sam]), evidence: [], submissions: [] })).toEqual({ compliant: 1, total: 1 });
+  });
+  it('are listed once the 14 days are over', () => {
+    const later = person('Sam', 'Okafor', { startDate: addDays(NOW, -15).toISOString() });
+    expect(needsAttention({ ...view([later]), evidence: [], submissions: [] })).toHaveLength(1);
+  });
+});
+
 describe('waitingForCheck', () => {
   it('lists people with an awaiting submission and no other state (Ben)', () => {
-    const w = waitingForCheck({ ...view([ben, jade]), requirements: [sg] });
+    const w = waitingForCheck({ ...view([ben, jade]), requirements: [sg], submissions: [submissionWaiting(ben, sg)] });
     expect(w.map((x) => [x.person.firstName, x.requirement.id])).toEqual([['Ben', sg.id]]);
   });
 
@@ -121,10 +164,15 @@ describe('orgCompliance', () => {
   it('counts current and expiring soon as compliant, and Grace on leave, but not Olivia', () => {
     const people = [mark, lucy, hannah, maureen, amira, ben, grace, olivia, jade];
     const r = orgCompliance({
-      ...view(people), requirements: [sg],
+      ...view(people),
+      requirements: [sg],
       evidence: [
-        evidenceExpiring(mark, sg, 300), evidenceExpiring(lucy, sg, 15), evidenceExpiring(hannah, sg, 16),
-        evidenceExpiring(maureen, sg, 300), evidenceExpiring(grace, sg, 300), evidenceExpiring(jade, sg, 300),
+        evidenceExpiring(mark, sg, 300),
+        evidenceExpiring(lucy, sg, 15),
+        evidenceExpiring(hannah, sg, 16),
+        evidenceExpiring(maureen, sg, 300),
+        evidenceExpiring(grace, sg, 300),
+        evidenceExpiring(jade, sg, 300),
         evidenceExpiring(olivia, sg, -300),
       ],
       submissions: [submissionWaiting(ben, sg)],
@@ -135,22 +183,28 @@ describe('orgCompliance', () => {
 
   it('counts a person overdue on any requirement as not compliant', () => {
     const r = orgCompliance({
-      ...view([mark]), requirements: [sg, aid],
-      evidence: [evidenceExpiring(mark, sg, 300), evidenceExpiring(mark, aid, -1)], submissions: [],
+      ...view([mark]),
+      requirements: [sg, aid],
+      evidence: [evidenceExpiring(mark, sg, 300), evidenceExpiring(mark, aid, -1)],
+      submissions: [],
     });
     expect(r).toEqual({ compliant: 0, total: 1 });
   });
 
   it('counts a person with no applicable requirements as compliant', () => {
     const none = requirement('Nobody', { appliesTo: { jobRoleIds: ['x'] } });
-    expect(orgCompliance({ ...view([jade]), requirements: [none], evidence: [], submissions: [] })).toEqual({ compliant: 1, total: 1 });
+    expect(orgCompliance({ ...view([jade]), requirements: [none], evidence: [], submissions: [] })).toEqual({
+      compliant: 1,
+      total: 1,
+    });
   });
 });
 
 describe('complianceByRequirement', () => {
   it('counts people per status for each requirement and skips people it does not apply to', () => {
     const rows = complianceByRequirement({
-      ...view([mark, lucy, amira, ben, olivia]), requirements: [sg],
+      ...view([mark, lucy, amira, ben, olivia]),
+      requirements: [sg],
       evidence: [evidenceExpiring(mark, sg, -3), evidenceExpiring(lucy, sg, 15), evidenceExpiring(olivia, sg, 300)],
       submissions: [submissionWaiting(ben, sg)],
     });
