@@ -137,3 +137,10 @@ Choices made by the test-writer where build pack section 6 left things open, acc
 - **Atomic apply.** Store names are checked before the transaction opens, then all puts and deletes run in one readwrite transaction that is aborted on any error.
 - **Contract suite fix.** Two tests built an array of promises up front and awaited them one by one. With a truly async backend the later ones rejected before being awaited, giving unhandled rejections. They now build thunks and call them in turn. Assertions unchanged.
 - **Test typing.** persistence.test.ts needed type-only fixes for strict lint and typecheck (node types for packages/data, domain types instead of any, guards instead of non-null assertions). Assertions unchanged.
+
+## M0 chunk 10
+- tokens.test.ts reads tokens.css with `new URL(import.meta.url)`, which fails under the jsdom project (non-file URL). Added a `// @vitest-environment node` docblock to that file only; assertions unchanged.
+- Dialog handles Escape in both a keydown handler and the native `cancel` event (both call onClose; the parent controls `open`). It focuses the first focusable child on open, because jsdom's showModal stand-in does not move focus, and restores focus to the opener when `open` becomes false.
+- StatusBadge covers six statuses with five status colours: notStarted shares the overdue colour but has its own icon (x-circle) and label.
+- Dark values are duplicated in `[data-colour-mode='dark']` and in the `:root:not([data-colour-mode])` media rule so the explicit attribute always wins.
+- Remaining small components (Card, Badge, VisuallyHidden, PageHeader, SideNav, MoreSheet) are in components/Layout.tsx. tailwind.css is not imported by any test; the web app will import it in chunk 11.

@@ -1,0 +1,79 @@
+/* Design tokens. One soft accent on a high-contrast base. System fonts only. */
+:root {
+  --color-bg: #ffffff;
+  --color-surface: #f4f6f8;
+  --color-text: #14202b;
+  --color-text-muted: #4a5864;
+  --color-border: #8a97a3;
+  --color-accent: #0b5c7a;
+  --color-on-accent: #ffffff;
+  --color-focus: #0b5c7a;
+  --status-current: #1a6b3a;
+  --status-expiring: #8a5300;
+  --status-overdue: #b3261e;
+  --status-not-assigned: #4a5864;
+  --status-awaiting: #5b3fa0;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --target-min: 44px;
+  --focus-ring: 3px solid var(--color-focus);
+  color-scheme: light;
+}
+
+[data-colour-mode='light'] {
+  color-scheme: light;
+}
+
+[data-colour-mode='dark'] {
+  --color-bg: #0f1820;
+  --color-surface: #1a2631;
+  --color-text: #f1f5f8;
+  --color-text-muted: #b7c3cd;
+  --color-border: #6f7f8c;
+  --color-accent: #7cc6e4;
+  --color-on-accent: #0f1820;
+  --color-focus: #9fd8ee;
+  --status-current: #6fd194;
+  --status-expiring: #f2b45a;
+  --status-overdue: #ff9a92;
+  --status-not-assigned: #b7c3cd;
+  --status-awaiting: #c3b0f2;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-colour-mode]) {
+    --color-bg: #0f1820;
+    --color-surface: #1a2631;
+    --color-text: #f1f5f8;
+    --color-text-muted: #b7c3cd;
+    --color-border: #6f7f8c;
+    --color-accent: #7cc6e4;
+    --color-on-accent: #0f1820;
+    --color-focus: #9fd8ee;
+    --status-current: #6fd194;
+    --status-expiring: #f2b45a;
+    --status-overdue: #ff9a92;
+    --status-not-assigned: #b7c3cd;
+    --status-awaiting: #c3b0f2;
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}

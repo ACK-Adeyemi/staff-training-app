@@ -9,7 +9,9 @@ import { BottomTabBar, Button, Dialog, IconButton, StatusBadge } from '../index'
 beforeAll(() => {
   const proto = HTMLDialogElement.prototype as HTMLDialogElement & { showModal?: () => void };
   if (typeof proto.showModal !== 'function') {
-    proto.showModal = function (this: HTMLDialogElement) { this.setAttribute('open', ''); };
+    proto.showModal = function (this: HTMLDialogElement) {
+      this.setAttribute('open', '');
+    };
   }
   if (typeof proto.close !== 'function') {
     proto.close = function (this: HTMLDialogElement) {
@@ -102,8 +104,23 @@ function Harness({ onClose }: { onClose?: () => void }) {
   const ref = useRef<HTMLButtonElement>(null);
   return (
     <>
-      <button ref={ref} type="button" onClick={() => setOpen(true)}>Open it</button>
-      <Dialog open={open} title="Reset demo" onClose={() => { setOpen(false); onClose?.(); }}>
+      <button
+        ref={ref}
+        type="button"
+        onClick={() => {
+          setOpen(true);
+        }}
+      >
+        Open it
+      </button>
+      <Dialog
+        open={open}
+        title="Reset demo"
+        onClose={() => {
+          setOpen(false);
+          onClose?.();
+        }}
+      >
         <button type="button">Inside</button>
       </Dialog>
     </>

@@ -1,3 +1,4 @@
+// @vitest-environment node
 /// <reference types="node" />
 // Chunk 10: tokens.css carries the variables, light/dark selectors and reduced motion rule from the M0 plan.
 import { readFileSync } from 'node:fs';
@@ -7,10 +8,21 @@ const css = readFileSync(new URL('./tokens.css', import.meta.url), 'utf8');
 
 describe('tokens.css', () => {
   it.each([
-    '--color-bg', '--color-surface', '--color-text', '--color-text-muted', '--color-border',
-    '--color-accent', '--color-on-accent', '--color-focus',
-    '--status-current', '--status-expiring', '--status-overdue', '--status-not-assigned', '--status-awaiting',
-    '--font-sans', '--focus-ring',
+    '--color-bg',
+    '--color-surface',
+    '--color-text',
+    '--color-text-muted',
+    '--color-border',
+    '--color-accent',
+    '--color-on-accent',
+    '--color-focus',
+    '--status-current',
+    '--status-expiring',
+    '--status-overdue',
+    '--status-not-assigned',
+    '--status-awaiting',
+    '--font-sans',
+    '--focus-ring',
   ])('defines %s', (name) => {
     expect(css).toMatch(new RegExp(`${name}\\s*:\\s*[^;]+;`));
   });
@@ -41,7 +53,9 @@ describe('tokens.css', () => {
   it('lets the explicit attribute win over the media query', () => {
     // The OS-dark rule must not apply when the user chose light explicitly.
     const media = css.slice(css.search(/@media\s*\(prefers-color-scheme:\s*dark\)/));
-    expect(media).toMatch(/:root:not\(\[data-colour-mode\]\)|:not\(\[data-colour-mode=['"]?light['"]?\]\)|:not\(\[data-colour-mode\]\)/);
+    expect(media).toMatch(
+      /:root:not\(\[data-colour-mode\]\)|:not\(\[data-colour-mode=['"]?light['"]?\]\)|:not\(\[data-colour-mode\]\)/,
+    );
   });
 
   it('turns transitions off for prefers-reduced-motion', () => {
