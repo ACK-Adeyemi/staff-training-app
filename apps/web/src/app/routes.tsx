@@ -4,6 +4,11 @@ import { NotFound, Placeholder } from '../pages/pages';
 import { Landing } from '../demo/pages/Landing';
 import { Outbox } from '../demo/pages/Outbox';
 import { RootLayout } from '../demo/RootLayout';
+import { Home } from '../pages/staff/Home';
+import { Learn } from '../pages/staff/Learn';
+import { Notifications } from '../pages/staff/Notifications';
+import { Progress } from '../pages/staff/Progress';
+import { SignIn } from '../pages/staff/SignIn';
 import { RouteError } from './RouteError';
 
 const page = (path: string, title: MessageKey, body: MessageKey): RouteObject => ({
@@ -18,16 +23,17 @@ export const routes: RouteObject[] = [
     children: [
       { path: '/', element: <Landing /> },
       { path: '/demo/outbox', element: <Outbox /> },
+      { path: '/staff/signin', element: <SignIn /> },
       {
         path: '/staff',
         lazy: async () => ({ Component: (await import('../shells/shells')).StaffShell }),
         children: [
-          { index: true, element: <Placeholder titleKey="nav.staff.home" bodyKey="placeholder.staff.home" /> },
-          page('learn', 'nav.staff.learn', 'placeholder.staff.learn'),
-          page('progress', 'nav.staff.progress', 'placeholder.staff.progress'),
+          { index: true, element: <Home /> },
+          { path: 'learn', element: <Learn /> },
+          { path: 'progress', element: <Progress /> },
           page('compete', 'nav.staff.compete', 'placeholder.staff.compete'),
           page('me', 'nav.staff.me', 'placeholder.staff.me'),
-          page('notifications', 'shell.notifications', 'placeholder.staff.notifications'),
+          { path: 'notifications', element: <Notifications /> },
           page('help', 'shell.help', 'placeholder.staff.help'),
         ],
       },

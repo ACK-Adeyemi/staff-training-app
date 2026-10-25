@@ -185,5 +185,83 @@
     "unknown": "Something went wrong. Please try again.",
     "storage": "This device could not save the demo data. Try again, or reset the demo.",
     "reload": "Try again"
+  },
+  "staff": {
+    "signin": {
+      "title": "Sign in",
+      "who": "Who is signing in?",
+      "pinLabel": "PIN",
+      "pinHint": "In the demo the PIN is 1234.",
+      "submit": "Sign in",
+      "wrongPin": "That PIN is not right. In the demo the PIN is 1234.",
+      "choosePerson": "Choose who you are first.",
+      "loadError": "We could not load the list of people. Please try again.",
+      "signInError": "We could not sign you in. Please try again."
+    },
+    "home": {
+      "greeting": "Hello, {name}",
+      "toDo": "{count} to do",
+      "compliant": "You're compliant",
+      "ringDescription": "{count} left before you are fully compliant.",
+      "ringDescriptionDone": "Nothing is left. You are fully compliant.",
+      "waiting": "{count} waiting for a check",
+      "nextUp": "Next up",
+      "comingUp": "Coming up",
+      "start": "Start training",
+      "dueOn": "Due {date}",
+      "allCaughtUp": "You're all caught up",
+      "nothingComing": "Nothing is due in the next 90 days.",
+      "assignmentDue": "{title} is due",
+      "requirementExpiry": "{name} needs renewing",
+      "loadError": "We could not load your home screen. Please try again."
+    },
+    "learn": {
+      "title": "Learn",
+      "search": "Search",
+      "required": "Required",
+      "optional": "Optional",
+      "minutes": "{count} minutes",
+      "noResults": "Nothing matches your search.",
+      "empty": "There is no training available yet.",
+      "loadError": "We could not load your training. Please try again."
+    },
+    "progress": {
+      "title": "Progress",
+      "tabs": "Progress views",
+      "myCompliance": "My compliance",
+      "completed": "Completed",
+      "requirement": "Requirement",
+      "status": "Status",
+      "lastDone": "Last done",
+      "nextRenewal": "Next renewal",
+      "cadence": "How often",
+      "everyMonths": "Every {count} months",
+      "action": "Action",
+      "startTraining": "Start training",
+      "never": "Not yet",
+      "none": "None",
+      "completedOn": "Completed on",
+      "noCompleted": "You have not completed anything yet.",
+      "noRows": "Nothing is needed from you right now.",
+      "loadError": "We could not load your progress. Please try again.",
+      "statusWord": {
+        "current": "Current",
+        "expiringSoon": "Expiring soon",
+        "overdue": "Overdue",
+        "notStarted": "Not started",
+        "awaitingCheck": "Waiting for a check",
+        "notAssigned": "Not needed"
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "empty": "You have no notifications.",
+      "markRead": "Mark as read",
+      "read": "Read",
+      "trainingAssigned": "You have been asked to do {moduleTitle} by {dueDate}.",
+      "other": "You have a new message.",
+      "loadError": "We could not load your notifications. Please try again.",
+      "bellWithCount": "Notifications, {count} unread"
+    }
   }
 }

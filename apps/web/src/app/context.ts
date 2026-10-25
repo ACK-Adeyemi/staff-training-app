@@ -9,6 +9,10 @@ export type DemoApi = {
   fastForward: (days: number) => void | Promise<void>;
   backToToday: () => void | Promise<void>;
   listOutbox: () => Promise<OutboxMessage[]>;
+  /** Active staff of one client, for the sign-in screen's user switch. */
+  listStaffUsers: (clientId: string) => Promise<{ userId: string; displayName: string; personId: string }[]>;
+  /** Switches the demo persona to this staff user. */
+  signInAs: (userId: string) => void | Promise<void>;
   setIndustry: (industry: DemoState['industry']) => void | Promise<void>;
 };
 

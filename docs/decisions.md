@@ -222,3 +222,6 @@ M1 chunk 4: Safeguarding content
 - The module is a folder (module.json plus lesson-N.md). `nurseryModules` in packages/content/src/packs/nursery/modules/index.ts parses lessons with `parseLesson` and validates the result with `moduleSchema` at load. It imports lessons with Vite's `?raw`, so it works in Vite and Vitest only (chunk 5 should load it from the app or seed through Vite/Vitest, or copy the parsed result).
 - Scenario choices that are not best also lead to the next step, so a learner who picks a weaker choice still sees the whole scenario. Link titles are descriptive; EYFS links carry the paragraph and page in `locator`.
 - Scenario names (Maya, Leo, Alfie) are fictional first names only.
+
+## 2026-10-25: Coming up fills past 90 days (M1 chunk 8)
+Plan M1 Assumption 4 limits Coming up to dates within 90 days, but the seeded Jade has only one date inside that window (her refresher due in 14 days; her other expiries are 6 months or more away) while plan F-4 and the committed tests expect three. Brief 16.2 says the strip shows "the next three dates", so the domain now returns the next three future dates, soonest first. Dates inside 90 days always come first (the list is date ordered); later dates only fill the strip when fewer than three are inside the window. Seed data is unchanged.

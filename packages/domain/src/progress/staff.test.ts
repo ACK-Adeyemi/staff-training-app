@@ -257,4 +257,28 @@ describe('staffSummary', () => {
     expect(s.comingUp[0]?.kind).toBe('assignmentDue');
     expect(s.comingUp[1]?.kind).toBe('requirementExpiry');
   });
+
+  it('Coming up fills with later dates when fewer than three fall inside 90 days', () => {
+    const jade = person('Jade', 'Mills');
+    const r1 = requirement('R1', { renewEveryMonths: 12 });
+    const far = requirement('Far', { renewEveryMonths: 12 });
+    const s = staffSummary({
+      ...base,
+      person: jade,
+      requirements: [far, r1, safeguarding],
+      modules: [safeguardingModule],
+      evidence: [
+        evidenceExpiring(jade, r1, 200),
+        evidenceExpiring(jade, far, 400),
+        evidenceExpiring(jade, safeguarding, 180),
+      ],
+      submissions: [],
+      assignments: [assignment(jade, safeguardingModule.id, 14)],
+    });
+    expect(s.comingUp.map((c) => c.at)).toEqual([
+      addDays(NOW, 14).toISOString(),
+      addDays(NOW, 180).toISOString(),
+      addDays(NOW, 200).toISOString(),
+    ]);
+  });
 });

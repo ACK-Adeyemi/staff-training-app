@@ -1,5 +1,4 @@
 // Staff summary: what one person has to do, is waiting on, and what comes next. Plan Assumptions 3 and 4.
-import { addDays, daysBetween } from '../dates';
 import { personRequirementStatus, type RequirementStatusName } from '../requirements';
 import type { Evidence, EvidenceSubmission } from '../schemas/evidence';
 import type { Assignment, Module } from '../schemas/learning';
@@ -48,7 +47,6 @@ export type StaffSummaryInput = {
   amberWindowDays: number;
 };
 
-const COMING_UP_DAYS = 90;
 const COMING_UP_MAX = 3;
 
 /** The first published module that satisfies the requirement. */
@@ -122,20 +120,30 @@ export function staffSummary(input: StaffSummaryInput): StaffSummary {
     if (pick?.moduleId) nextUp = { kind: 'requirement', requirementId: pick.requirement.id, moduleId: pick.moduleId };
   }
 
-  const limit = addDays(now, COMING_UP_DAYS).getTime();
+  // The strip shows the next three future dates. Anything inside 90 days always comes first because the list is
+  // sorted by date; later dates only fill the strip when fewer than three fall inside that window (decisions.md).
   const upcoming: ComingUpItem[] = [];
   for (const a of open) {
-    if (time(a.dueAt) > now.getTime() && time(a.dueAt) <= limit) {
-      upcoming.push({ kind: 'assignmentDue', at: a.dueAt, assignmentId: a.id });
-    }
+    if (time(a.dueAt) > now.getTime()) upcoming.push({ kind: 'assignmentDue', at: a.dueAt, assignmentId: a.id });
   }
   for (const r of rows) {
     const at = r.nextRenewalAt;
-    if (at && time(at) > now.getTime() && time(at) <= limit && daysBetween(now, new Date(at)) >= 0) {
+    if (at && time(at) > now.getTime())
       upcoming.push({ kind: 'requirementExpiry', at, requirementId: r.requirement.id });
-    }
   }
   upcoming.sort((a, b) => time(a.at) - time(b.at));
 
   return { rows, toDo, waiting, complete: toDo === 0, nextUp, comingUp: upcoming.slice(0, COMING_UP_MAX) };
+}
+
+/** How full the Home ring is, 0 to 100. Only 100 when nothing is left to do. */
+export function staffRingPercent(summary: Pick<StaffSummary, 'rows' | 'toDo' | 'complete'>): number {
+  if (summary.complete) return 100;
+  const total = summary.rows.length + Math.max(0, summary.toDo - summary.rows.filter(needsAction).length);
+  if (total <= 0) return 0;
+  return Math.min(99, Math.max(0, Math.round((100 * (total - summary.toDo)) / total)));
+}
+
+function needsAction(r: StaffRow): boolean {
+  return r.status === 'overdue' || r.status === 'notStarted' || r.status === 'expiringSoon';
 }

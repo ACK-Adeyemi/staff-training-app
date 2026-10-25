@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router';
 import { Badge, BottomTabBar, Icon, MoreSheet, SideNav, focusClasses, type NavItem } from '@sta/ui';
 import { useCurrentUser, useT } from '../app/hooks';
 import { useDesktop } from '../app/useDesktop';
+import { useUnreadCount } from '../pages/staff/queries';
 import { DemoBadgeSlot } from '../demo/RootLayout';
 
 export type ShellConfig = {
@@ -39,6 +40,7 @@ export function Shell({ config }: { config: ShellConfig }) {
   const all = [...config.bar, ...config.more];
   const current = currentId([...all, ...config.headerLinks], pathname);
   const staff = config.more.length === 0;
+  const unread = useUnreadCount(config.side === 'staff');
 
   // Route plain hash links through the router, so navigation works with any router type.
   const onClick = (e: MouseEvent<HTMLElement>) => {
@@ -69,17 +71,25 @@ export function Shell({ config }: { config: ShellConfig }) {
           <div className="flex flex-wrap items-center gap-2">
             {config.side === 'provider' ? <Badge tone="simulated">{t('demo.simulatedData')}</Badge> : null}
             <DemoBadgeSlot />
-            {config.headerLinks.map((item) => (
-              <a
-                key={item.id}
-                href={item.href}
-                aria-label={item.label}
-                aria-current={item.id === current ? 'page' : undefined}
-                className={`inline-flex min-h-[var(--target-min)] min-w-[var(--target-min)] items-center justify-center rounded-[var(--radius-md)] aria-[current=page]:bg-[var(--color-surface)] ${focusClasses}`}
-              >
-                <Icon name={item.icon} />
-              </a>
-            ))}
+            {config.headerLinks.map((item) => {
+              const count = item.id === '/staff/notifications' ? unread : 0;
+              return (
+                <a
+                  key={item.id}
+                  href={item.href}
+                  aria-label={count > 0 ? t('staff.notifications.bellWithCount', { count }) : item.label}
+                  aria-current={item.id === current ? 'page' : undefined}
+                  className={`inline-flex min-h-[var(--target-min)] min-w-[var(--target-min)] items-center justify-center px-1 rounded-[var(--radius-md)] aria-[current=page]:bg-[var(--color-surface)] ${focusClasses}`}
+                >
+                  <Icon name={item.icon} />
+                  {count > 0 ? (
+                    <span aria-hidden="true" className="ms-1 text-sm font-bold">
+                      {count}
+                    </span>
+                  ) : null}
+                </a>
+              );
+            })}
           </div>
         </header>
         <main className="px-4 pb-28 md:pb-6">
