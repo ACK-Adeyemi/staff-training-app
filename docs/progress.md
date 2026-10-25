@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M0
 Milestone base commit: 4fa6d3fdf9c044a7e3eaf4ebde1a00c330bc0689
-Next step: M0 chunk 7 (data layer and memory adapter): test-writer then implementer. check.sh build+e2e fail until chunk 11 (expected). Nursery renewal periods still VERIFY (no fetch tool in implementer; coordinator may verify).
+Next step: M0 chunk 8 (seed generator): test-writer then implementer. check.sh build+e2e fail until chunk 11 (expected). Nursery renewal periods still VERIFY.
 
 ## Milestones
 - [ ] M0 Foundations
@@ -24,7 +24,7 @@ Next step: M0 chunk 7 (data layer and memory adapter): test-writer then implemen
 - [x] 4 Permission engine
 - [x] 5 Entitlements, account states, packs, requirement status
 - [x] 6 Content scaffold
-- [ ] 7 Data layer and memory adapter
+- [x] 7 Data layer and memory adapter
 - [ ] 8 Seed generator
 - [ ] 9 IndexedDB adapter
 - [ ] 10 UI tokens and base components
