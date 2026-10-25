@@ -144,3 +144,13 @@ Choices made by the test-writer where build pack section 6 left things open, acc
 - StatusBadge covers six statuses with five status colours: notStarted shares the overdue colour but has its own icon (x-circle) and label.
 - Dark values are duplicated in `[data-colour-mode='dark']` and in the `:root:not([data-colour-mode])` media rule so the explicit attribute always wins.
 - Remaining small components (Card, Badge, VisuallyHidden, PageHeader, SideNav, MoreSheet) are in components/Layout.tsx. tailwind.css is not imported by any test; the web app will import it in chunk 11.
+
+## M0 chunk 11
+
+- Seed user `displayName` is now the full name (for example "Jade Mills"). It was the first name only; the shell tests and the plan ("Jade Mills (staff), Priya Shah (client)") need the full name.
+- `PageHeader` in packages/ui renders a `div`, not `header`, so a page heading inside `main` is not a second banner landmark.
+- `BottomTabBar` gained an optional `more` prop (the More button as the last item) and tab labels wrap inside narrow tabs, so five tabs fit at 390 px with 200% text.
+- `@sta/ui` lists `tailwindcss` as a devDependency (same pinned version) so `tailwind.css` can resolve `@import 'tailwindcss'`.
+- The CSP meta tag is added by editing the HTML string, because Vite's tag descriptors escape quotes to `&#39;`.
+- The staff shell renders one navigation (bottom bar on phones, sidebar from 48rem); client and provider shells render both with CSS, so the More items are always in the DOM. Plain `#/` links are routed through the router by a click handler on the shell.
+- D1, D3 and the Demo badge are minimal in this chunk; chunk 12 completes them.

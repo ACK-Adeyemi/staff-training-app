@@ -779,7 +779,7 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
         clientId,
         personId,
         email: `${slug(p.first)}.${slug(p.last)}@${domain}`,
-        displayName: p.first,
+        displayName: `${p.first} ${p.last}`,
         status: 'active',
         login: p.admin ? { method: 'emailPassword', pinSet: false } : { method: 'pin', pinSet: true },
         lastActiveAt: iso(ago(rng.int(0, 5))),

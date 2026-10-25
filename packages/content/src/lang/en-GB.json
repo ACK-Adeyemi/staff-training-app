@@ -19,7 +19,11 @@
     "chooseIndustry": "Choose an industry",
     "surfaceStaff": "Staff app",
     "surfaceClient": "Client admin",
-    "surfaceProvider": "Provider admin"
+    "surfaceProvider": "Provider admin",
+    "surfaceStaffHint": "See the app as a member of staff.",
+    "surfaceClientHint": "See the app as a manager at a client.",
+    "surfaceProviderHint": "See the app as the team that runs the service.",
+    "landingIntro": "This is a demo with made-up people and data. Pick where to start."
   },
   "shell": {
     "skipToContent": "Skip to main content",
@@ -31,7 +35,10 @@
     "more": "More",
     "closeMenu": "Close menu",
     "notFoundTitle": "We could not find that page",
-    "notFoundBody": "Check the address, or go back to the start."
+    "notFoundBody": "Check the address, or go back to the start.",
+    "backToStart": "Back to the start",
+    "personaLabel": "Signed in as",
+    "errorTitle": "We hit a problem"
   },
   "nav": {
     "staff": {
@@ -66,7 +73,9 @@
       "learn": "Your training will be here soon.",
       "progress": "Your progress will be here soon.",
       "compete": "Competitions will be here soon.",
-      "me": "Your settings will be here soon."
+      "me": "Your settings will be here soon.",
+      "notifications": "Your notifications will be here soon.",
+      "help": "Help will be here soon."
     },
     "client": {
       "dashboard": "The dashboard will be here soon.",
@@ -132,6 +141,12 @@
     "notAllowed": "You do not have access to do that.",
     "notIncluded": "That is not included in your current set-up.",
     "readOnly": "This account is read-only, so that change could not be saved.",
-    "invalid": "Please check what you entered and try again."
+    "invalid": "Please check what you entered and try again.",
+    "forbidden": "You don't have access to this. Ask your manager.",
+    "accountState": "This isn't available while the account is in its current state. Ask your manager.",
+    "validation": "Please check what you entered and try again.",
+    "unknown": "Something went wrong. Please try again.",
+    "storage": "This device could not save the demo data. Try again, or reset the demo.",
+    "reload": "Try again"
   }
 }
