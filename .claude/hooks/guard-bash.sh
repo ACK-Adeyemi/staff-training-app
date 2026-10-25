@@ -26,15 +26,28 @@ has "${GIT}push([[:space:]]|$)" &&
 has "${GIT}remote[[:space:]]+(add|set-url|remove|rm|rename)([[:space:]]|$)" &&
   deny "Don't change git remotes."
 
-if has "${GIT}config([[:space:]]|$)" && ! has "${GIT}config[[:space:]]+(--get|--get-all|--list|-l)([[:space:]]|$)"; then
-  deny "Don't change git configuration."
+if has "${GIT}config([[:space:]]|$)" \
+  && ! has "${GIT}config[[:space:]]+(--get|--get-all|--list|-l)([[:space:]]|$)" \
+  && ! has "${GIT}config[[:space:]]+(--local[[:space:]]+)?core\.hooksPath[[:space:]]+[^[:space:];&|]+[[:space:]]*$"; then
+  deny "Don't change git configuration. (Setting core.hooksPath for the project's own hooks is allowed, as a command on its own.)"
 fi
+
+# The user merges this branch into main from time to time, so its history must never be rewritten.
+has "${GIT}rebase([[:space:]]|$)" &&
+  deny "Don't rebase: the user ships this branch as it is. To pick up changes from main, use: git fetch origin && git merge --no-edit origin/main"
+has "${GIT}commit[^;&|]*--amend" &&
+  deny "Don't amend commits; make a new commit instead."
+has "${GIT}(branch[[:space:]]+(-D|-d|--delete|-m|-M)|checkout[[:space:]]+-B|switch[[:space:]]+(-C|--force-create))" &&
+  deny "Don't delete, rename or reset branches."
 
 has '(^|[[:space:];&|(`])gh([[:space:]]|$)' &&
   deny "The GitHub CLI isn't available to agents. The human opens pull requests."
 
 has '(curl|wget)[^|]*\|[[:space:]]*(sudo[[:space:]]+)?(ba|z|da)?sh([[:space:]]|$)' &&
   deny "Don't pipe downloads into a shell. Add dependencies through the package manager and lockfile."
+
+{ has "${GIT}[a-z-]+[^;&|]*--no-verify" || has "${GIT}commit[^;&|]*[[:space:]]-n([[:space:]]|$)"; } &&
+  deny "Don't bypass git hooks (--no-verify). Fix what the hook reports instead."
 
 has '(dangerously-skip-permissions|bypassPermissions)' &&
   deny "Don't start agents that skip permission checks."

@@ -21,15 +21,25 @@ step() {
 
 has_npm_script() { jq -e --arg s "$1" '.scripts[$s] // empty' package.json >/dev/null 2>&1; }
 
-# ---- Node / TypeScript ----
+# ---- Node / TypeScript (pnpm or npm) ----
 if [ -f package.json ]; then
-  if [ "$install" = 1 ] || [ ! -d node_modules ]; then
-    if [ -f package-lock.json ]; then step "npm ci" npm ci; else step "npm install" npm install; fi
+  if [ -f pnpm-lock.yaml ] || jq -e '(.packageManager // "") | startswith("pnpm")' package.json >/dev/null 2>&1; then
+    PM=pnpm
+  else
+    PM=npm
   fi
-  for s in lint typecheck test; do
-    if has_npm_script "$s"; then step "npm run $s" npm run -s "$s"; fi
+  if [ "$install" = 1 ] || [ ! -d node_modules ]; then
+    if [ "$PM" = pnpm ]; then
+      if [ -f pnpm-lock.yaml ]; then step "pnpm install --frozen-lockfile" pnpm install --frozen-lockfile
+      else step "pnpm install" pnpm install; fi
+    elif [ -f package-lock.json ]; then step "npm ci" npm ci
+    else step "npm install" npm install; fi
+  fi
+  # Order matters: e2e usually runs against the production build.
+  for s in lint typecheck test build e2e; do
+    if has_npm_script "$s"; then step "$PM run $s" "$PM" run "$s"; fi
   done
-  step "npm audit (high and critical)" npm audit --audit-level=high
+  step "$PM audit (high and critical)" "$PM" audit --audit-level high
 fi
 
 # ---- Python ----

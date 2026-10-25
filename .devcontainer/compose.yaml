@@ -21,6 +21,7 @@ services:
     volumes:
       - ..:/workspace
       - claude-config:/root/.claude
+      - ms-playwright:/ms-playwright
     secrets:
       - claude_token
     environment:
@@ -28,6 +29,8 @@ services:
       NO_PROXY: localhost,127.0.0.1,db
       no_proxy: localhost,127.0.0.1,db
       DATABASE_URL: postgresql://app:app@db:5432/app
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
       CLAUDE_CONFIG_DIR: /root/.claude
       DISABLE_AUTOUPDATER: "1"
       DISABLE_TELEMETRY: "1"
@@ -38,14 +41,18 @@ services:
       CLAUDE_CODE_FORK_SUBAGENT: "0"
     security_opt:
       - no-new-privileges:true
-    pids_limit: 2048
-    mem_limit: 6g
+    pids_limit: 4096
+    mem_limit: 8g
+    shm_size: 1g # Chromium needs more shared memory than Docker's 64 MB default
     depends_on:
       db:
         condition: service_healthy
-    # To view the app from Windows: uncomment, run `scripts/agent up`, then use an SSH tunnel (see README).
-    # ports:
-    #   - "127.0.0.1:3000:3000"
+    # Vite dev server and preview, bound to the VM's localhost only.
+    # View from Windows with: ssh -L 5173:localhost:5173 -L 4173:localhost:4173 iamgroot@<vm-ip>
+    # (only one app can publish these ports at a time).
+    ports:
+      - "127.0.0.1:5173:5173"
+      - "127.0.0.1:4173:4173"
 
   db:
     image: postgres:17
@@ -69,3 +76,4 @@ secrets:
 volumes:
   claude-config:
   pgdata:
+  ms-playwright:

@@ -20,10 +20,9 @@ deny() {
   exit 0
 }
 
-# Scratch files are fine.
-case "$abs" in /tmp/*) exit 0 ;; esac
-
 if [ "$abs" != "$root" ] && [ "${abs#"$root"/}" = "$abs" ]; then
+  # Outside the project: only scratch files under /tmp are fine.
+  case "$abs" in /tmp/*) exit 0 ;; esac
   deny "Only files inside the project ($root) may be edited."
 fi
 
@@ -31,10 +30,18 @@ rel="${abs#"$root"/}"
 case "$rel" in
   .git|.git/*)
     deny "Don't edit .git directly; use git commands." ;;
-  .claude/agent-memory/*|.claude/agent-memory-local/*)
+  .claude/agent-memory/*|.claude/agent-memory-local/*|.claude/rules/*)
     exit 0 ;;
-  .github/*|.devcontainer/*|.claude/*|scripts/agent)
-    deny "$rel is protected (CI, container or agent configuration). Don't change it. Describe the change you need under 'Needs a human' in your final report." ;;
+  .github/*)
+    # This app's build plan has the agents write CI and the Pages deploy workflow.
+    # The human reviews every .github change when shipping (ship flags these files).
+    exit 0 ;;
+  .devcontainer/*|.claude/*|scripts/agent|scripts/run-build.sh|scripts/BUILD_PROMPT.md)
+    deny "$rel is protected (container, agent configuration or build loop). Don't change it. Describe the change you need in docs/questions-for-user.md." ;;
+  docs/brief.md|docs/build-pack.md)
+    deny "$rel is a source document owned by the user. Don't edit it; log conflicts or gaps in docs/decisions.md." ;;
+  .protected-names)
+    deny "Don't edit, print or commit .protected-names." ;;
   .env.example)
     exit 0 ;;
   .env|.env.*|*/.env|*/.env.*)
