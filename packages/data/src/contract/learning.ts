@@ -193,9 +193,9 @@ export async function addLearningFixture(admin: DemoAdmin, fx: World): Promise<L
     questions: ['r1', 'r2', 'r3'].map((q) => mcq(q)),
     quiz: { ...module.quiz, drawCount: 2, passMark: 100, maxRetakes: 1, shuffleQuestions: false },
   };
-  await admin.bulkPut('modules' as never, [module, draft, retake]);
+  await admin.bulkPut('modules', [module, draft, retake]);
 
-  await admin.bulkPut('attachments' as never, [
+  await admin.bulkPut('attachments', [
     {
       id: f.attachmentId,
       clientId: a,
@@ -205,7 +205,7 @@ export async function addLearningFixture(admin: DemoAdmin, fx: World): Promise<L
       createdAt: TODAY,
     },
   ]);
-  await admin.bulkPut('clientLinkOverlays' as never, [
+  await admin.bulkPut('clientLinkOverlays', [
     {
       id: f.overlayId,
       clientId: a,
@@ -244,7 +244,7 @@ export async function addLearningFixture(admin: DemoAdmin, fx: World): Promise<L
     createdAt: '2026-10-16T09:00:00.000Z',
     status,
   });
-  await admin.bulkPut('assignments' as never, [
+  await admin.bulkPut('assignments', [
     assignment(f.assignments.jade, a, p['jade'], f.moduleId, 'open'),
     assignment(f.assignments.lucy, a, p['lucy'], f.retakeId, 'open'),
     assignment(f.assignments.oak, fx.ids.clients.ot, fx.ids.people.otRiver, f.moduleId, 'open'),
@@ -258,7 +258,7 @@ export async function addLearningFixture(admin: DemoAdmin, fx: World): Promise<L
     params: { moduleTitle: module.title, dueDate: '2026-11-02' },
     createdAt: '2026-10-16T09:00:00.000Z',
   });
-  await admin.bulkPut('notifications' as never, [
+  await admin.bulkPut('notifications', [
     note(f.notifications.jade, u['jade']),
     note(f.notifications.hannah, u['hannah']),
   ]);
@@ -278,7 +278,7 @@ export async function addLearningFixture(admin: DemoAdmin, fx: World): Promise<L
     type,
     ...(type === 'login' ? {} : { moduleId: f.moduleId, lessonId: 'l-one' }),
   });
-  await admin.bulkPut('learningEvents' as never, [
+  await admin.bulkPut('learningEvents', [
     event(f.events.hannah, a, main, p['hannah'], 'lessonCompleted'),
     event(f.events.river, fx.ids.clients.ot, fx.ids.sites.river, fx.ids.people.otRiver, 'lessonCompleted'),
     event(f.events.hillside, fx.ids.clients.ot, fx.ids.sites.hillside, fx.ids.people.otHillside, 'lessonCompleted'),
@@ -303,7 +303,7 @@ export async function addLearningFixture(admin: DemoAdmin, fx: World): Promise<L
     startedAt: '2026-10-10T09:00:00.000Z',
     ...extra,
   });
-  await admin.bulkPut('attempts' as never, [
+  await admin.bulkPut('attempts', [
     attempt(f.hannahAttemptId, a, main, p['hannah'], {}),
     attempt(f.jadeOldAttemptId, a, main, p['jade'], {
       finishedAt: '2026-10-10T09:10:00.000Z',

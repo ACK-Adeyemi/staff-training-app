@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M1
 Milestone base commit: 5619f46
-Next step: M1 chunk 5 (data layer) per docs/plans/m1.md. Nursery renewal periods still VERIFY.
+Next step: M1 chunk 6 (seed) per docs/plans/m1.md. Nursery renewal periods still VERIFY.
 
 ## Milestones
 - [x] M0 Foundations
@@ -22,7 +22,7 @@ Next step: M1 chunk 5 (data layer) per docs/plans/m1.md. Nursery renewal periods
 - [x] 2 Learning schemas and quiz engine
 - [x] 3 Domain views
 - [x] 4 Safeguarding content
-- [ ] 5 Data layer
+- [x] 5 Data layer
 - [ ] 6 Seed
 - [ ] 7 UI components
 - [ ] 8 Staff screens S1-S3, S8

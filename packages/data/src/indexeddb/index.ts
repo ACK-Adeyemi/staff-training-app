@@ -3,7 +3,7 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { RawBackend, WriteOp } from '../backend';
 import { createStore } from '../store';
 import { storeNames, type StoreHandle, type StoreName, type StoreOptions } from '../types';
-import { DB_VERSION, upgradeToV1 } from './schema';
+import { DB_VERSION, upgradeToV1, upgradeToV2 } from './schema';
 
 const known: ReadonlySet<string> = new Set(storeNames);
 
@@ -11,6 +11,7 @@ export async function createIndexedDbBackend(dbName = 'sta-demo'): Promise<RawBa
   const db: IDBPDatabase = await openDB(dbName, DB_VERSION, {
     upgrade(database, oldVersion) {
       if (oldVersion < 1) upgradeToV1(database);
+      if (oldVersion < 2) upgradeToV2(database);
     },
   });
   const check = (store: string): StoreName => {

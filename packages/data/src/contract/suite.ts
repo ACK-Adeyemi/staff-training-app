@@ -48,6 +48,13 @@ const ALL_STORES: StoreName[] = [
   'audit',
   'outbox',
   'settings',
+  'modules',
+  'attachments',
+  'assignments',
+  'learningEvents',
+  'attempts',
+  'notifications',
+  'clientLinkOverlays',
 ];
 
 type Setup = { store: DataStore; admin: StoreHandle['admin']; fx: Fixture; options: StoreOptions };

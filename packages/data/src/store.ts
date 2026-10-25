@@ -1,6 +1,14 @@
 // createStore: builds a DataStore and DemoAdmin on top of any RawBackend. Both adapters use it, so the
 // policy (validation, tenancy, permissions, audit, account state, entitlements) is identical.
-import { demoStateSchema, seedMetaSchema, type DemoState, type OutboxMessage, type SeedMeta } from '@sta/domain';
+import {
+  demoStateSchema,
+  seedMetaSchema,
+  type DemoState,
+  type OutboxMessage,
+  type SeedMeta,
+  type UserAccount,
+} from '@sta/domain';
+import { createOperations } from './ops';
 import { keyOf, validate, type RawBackend, type SettingsRecord, type WriteOp } from './backend';
 import {
   authorizePut,
@@ -20,6 +28,7 @@ import {
   type ActorContext,
   type DataStore,
   type DemoAdmin,
+  type ChangeListener,
   type Filter,
   type StoreHandle,
   type StoreName,
@@ -152,10 +161,59 @@ function demoAdmin(backend: RawBackend): DemoAdmin {
     async listOutbox() {
       return ((await backend.getAll('outbox')) as OutboxMessage[]).sort(byKey('outbox'));
     },
+    async listStaffUsers(clientId) {
+      return ((await backend.getAll('users')) as UserAccount[])
+        .filter(
+          (u) => u.side === 'staff' && u.clientId === clientId && u.status === 'active' && u.personId !== undefined,
+        )
+        .map((u) => ({ userId: u.id, displayName: u.displayName, personId: u.personId as string }))
+        .sort((a, b) => (a.displayName < b.displayName ? -1 : a.displayName > b.displayName ? 1 : 0));
+    },
   };
 }
 
-export function createStore(backend: RawBackend, options: StoreOptions): StoreHandle {
+/** Wraps a backend so every successful batch tells the listeners which stores changed (names only, no data). */
+function notifying(inner: RawBackend): { backend: RawBackend; subscribe: StoreHandle['subscribe'] } {
+  const listeners = new Set<ChangeListener>();
+  const tell = (stores: StoreName[]): void => {
+    if (stores.length === 0) return;
+    for (const listener of [...listeners]) {
+      try {
+        listener([...stores]);
+      } catch {
+        // A broken listener must not break a write that already succeeded.
+      }
+    }
+  };
+  return {
+    backend: {
+      getAll: (store) => inner.getAll(store),
+      get: (store, key) => inner.get(store, key),
+      async apply(ops) {
+        await inner.apply(ops);
+        tell([...new Set(ops.map((op) => op.store))]);
+      },
+      async clear() {
+        await inner.clear();
+        tell([...storeNames]);
+      },
+    },
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => {
+        listeners.delete(listener);
+      };
+    },
+  };
+}
+
+export function createStore(rawBackend: RawBackend, options: StoreOptions): StoreHandle {
+  const { backend, subscribe } = notifying(rawBackend);
+  const ops = createOperations(backend, options);
+  const readOnly = (name: StoreName) => {
+    const full = repo(backend, options, name);
+    return { get: full.get, list: full.list };
+  };
   const r = (name: StoreName) => repo(backend, options, name);
   const withoutRemove = (name: StoreName) => {
     const full = r(name);
@@ -181,6 +239,14 @@ export function createStore(backend: RawBackend, options: StoreOptions): StoreHa
     paymentAttempts: withoutRemove('paymentAttempts'),
     audit: { get: audit.get, list: audit.list, append: appendOnly(backend, options, 'audit') },
     outbox: { append: appendOnly(backend, options, 'outbox') },
+    modules: readOnly('modules'),
+    attachments: readOnly('attachments'),
+    clientLinkOverlays: readOnly('clientLinkOverlays'),
+    assignments: { ...readOnly('assignments'), assign: ops.assign },
+    learningEvents: readOnly('learningEvents'),
+    attempts: readOnly('attempts'),
+    notifications: { ...readOnly('notifications'), markRead: ops.markRead },
+    learning: ops.learning,
   };
-  return { store: store as unknown as DataStore, admin: demoAdmin(backend) };
+  return { store: store as unknown as DataStore, admin: demoAdmin(backend), subscribe };
 }

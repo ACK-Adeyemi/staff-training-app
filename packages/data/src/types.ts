@@ -3,13 +3,20 @@ import type {
   AccountState,
   AddOn,
   AddOnSubscription,
+  Assignment,
+  Attachment,
+  Attempt,
   AuditEvent,
   Client,
+  ClientLinkOverlay,
   Clock,
   DemoState,
   Evidence,
   EvidenceSubmission,
   JobRole,
+  LearningEvent,
+  Module,
+  Notification,
   OutboxMessage,
   Package,
   PaymentAttempt,
@@ -47,6 +54,13 @@ export const storeNames = [
   'audit',
   'outbox',
   'settings',
+  'modules',
+  'attachments',
+  'assignments',
+  'learningEvents',
+  'attempts',
+  'notifications',
+  'clientLinkOverlays',
 ] as const;
 export type StoreName = (typeof storeNames)[number];
 
@@ -121,6 +135,28 @@ export class ValidationError extends DataError {
   }
 }
 
+export type RuleName =
+  | 'lessonsIncomplete'
+  | 'noRetakesLeft'
+  | 'attemptFinished'
+  | 'alreadyAnswered'
+  | 'notInAttempt'
+  | 'notAllAnswered'
+  | 'moduleNotPublished'
+  | 'invalidAnswer'
+  | 'dueInPast'
+  | 'tooMany'
+  | 'invalidPeople';
+
+/** A business rule said no (for example "finish every lesson first"). The web app maps `rule` to `errors.rule.<rule>`. */
+export class RuleError extends DataError {
+  readonly rule: RuleName;
+  constructor(rule: RuleName) {
+    super('rule', `Rule: ${rule}`);
+    this.rule = rule;
+  }
+}
+
 /** Equality filter on top-level fields. */
 export type Filter = Record<string, unknown>;
 
@@ -139,6 +175,31 @@ export interface RemovableRepo<T> extends WriteRepo<T> {
 /** Audit events and outbox messages can only be added. There is no put or remove. */
 export interface AppendRepo<T> {
   append(ctx: ActorContext, record: T): Promise<T>;
+}
+
+export type FinishResult = {
+  attempt: Attempt;
+  passed: boolean;
+  score: number;
+  missedQuestionIds: string[];
+  evidence: Evidence[];
+};
+
+export interface LearningService {
+  recordLesson(
+    ctx: ActorContext,
+    input: { moduleId: Id; lessonId: string; kind: 'viewed' | 'completed' },
+  ): Promise<LearningEvent>;
+  startAttempt(ctx: ActorContext, moduleId: Id): Promise<Attempt>;
+  answer(
+    ctx: ActorContext,
+    input: { attemptId: Id; questionId: string; optionId?: string; choiceIds?: string[] },
+  ): Promise<{ correct: boolean; outcome?: 'best' | 'ok' | 'poor' }>;
+  finishAttempt(ctx: ActorContext, attemptId: Id): Promise<FinishResult>;
+  learnMoreOpened(
+    ctx: ActorContext,
+    input: { moduleId: Id; questionId?: string; lessonId?: string; linkId: string; attemptId?: Id },
+  ): Promise<LearningEvent>;
 }
 
 export interface DataStore {
@@ -163,6 +224,21 @@ export interface DataStore {
   audit: ReadRepo<AuditEvent> & AppendRepo<AuditEvent>;
   /** Write-only for actors. The demo outbox is read through DemoAdmin. */
   outbox: AppendRepo<OutboxMessage>;
+  /** The learning stores below are read-only for actors; writes go through the operations. */
+  modules: ReadRepo<Module>;
+  attachments: ReadRepo<Attachment>;
+  clientLinkOverlays: ReadRepo<ClientLinkOverlay>;
+  assignments: ReadRepo<Assignment> & {
+    /** All or nothing. People who already have an open assignment for the module are skipped and reported. */
+    assign(
+      ctx: ActorContext,
+      input: { moduleId: Id; personIds: Id[]; dueAt: string },
+    ): Promise<{ created: Assignment[]; skipped: { personId: Id; reason: 'alreadyAssigned' }[] }>;
+  };
+  learningEvents: ReadRepo<LearningEvent>;
+  attempts: ReadRepo<Attempt>;
+  notifications: ReadRepo<Notification> & { markRead(ctx: ActorContext, ids: Id[]): Promise<void> };
+  learning: LearningService;
 }
 
 /** For the seed, the demo shell and tests. Never reachable through an ActorContext. */
@@ -176,6 +252,16 @@ export interface DemoAdmin {
   getSeedMeta(): Promise<SeedMeta | undefined>;
   setSeedMeta(meta: SeedMeta): Promise<void>;
   listOutbox(): Promise<OutboxMessage[]>;
+  /** Active staff users of one client, sorted by display name. For the demo shell's user switch. */
+  listStaffUsers(clientId: Id): Promise<{ userId: Id; displayName: string; personId: Id }[]>;
 }
 
-export type StoreHandle = { store: DataStore; admin: DemoAdmin };
+/** Called after every successful write with the names of the stores written. Never carries data. */
+export type ChangeListener = (stores: StoreName[]) => void;
+
+export type StoreHandle = {
+  store: DataStore;
+  admin: DemoAdmin;
+  /** Returns an unsubscribe function. */
+  subscribe(listener: ChangeListener): () => void;
+};

@@ -10,7 +10,7 @@
 //   wording: it is how "unknown" and "archived" can be told apart. Duplicate ids in personIds count once.
 //   dueAtFromLondonDate('YYYY-MM-DD') => ISO UTC string for 23:59:00.000 on that London day; throws on a bad date string.
 import { describe, expect, it } from 'vitest';
-import { dueAtFromLondonDate, planAssignment } from './assign';
+import { dueAtFromLondonDate, isDueInPast, planAssignment } from './assign';
 import { NOW, assignment, nextId, person } from './progress/testFixtures';
 
 const MOD = nextId();
@@ -81,5 +81,16 @@ describe('dueAtFromLondonDate', () => {
 
   it.each(['2026-13-01', '2026-02-30', '02/11/2026', '', '2026-11-02T10:00:00Z'])('rejects %j', (bad) => {
     expect(() => dueAtFromLondonDate(bad)).toThrow();
+  });
+});
+
+describe('isDueInPast', () => {
+  const now = new Date('2026-10-19T09:00:00.000Z');
+  it('accepts the end of today and later days', () => {
+    expect(isDueInPast(dueAtFromLondonDate('2026-10-19'), now)).toBe(false);
+    expect(isDueInPast(dueAtFromLondonDate('2026-11-02'), now)).toBe(false);
+  });
+  it('rejects an earlier day', () => {
+    expect(isDueInPast(dueAtFromLondonDate('2026-10-18'), now)).toBe(true);
   });
 });

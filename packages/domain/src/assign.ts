@@ -1,5 +1,5 @@
 // Planning an assignment action and working out due dates. Plan Assumption 14.
-import { fromLondonWall } from './dates';
+import { fromLondonWall, startOfLondonDay } from './dates';
 import type { Assignment } from './schemas/learning';
 import type { Person } from './schemas/tenancy';
 
@@ -46,4 +46,9 @@ export function dueAtFromLondonDate(day: string): string {
     throw new Error('That date does not exist');
   }
   return fromLondonWall({ y, m: mo, d, h: 23, mi: 59, s: 0, ms: 0 }).toISOString();
+}
+
+/** True when the due date falls on an earlier London day than today. The end of today is still fine. */
+export function isDueInPast(dueAt: string, now: Date): boolean {
+  return new Date(dueAt).getTime() < startOfLondonDay(now).getTime();
 }

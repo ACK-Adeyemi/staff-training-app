@@ -2,12 +2,19 @@
 // copies) lives in createStore, so the memory and IndexedDB adapters enforce exactly the same rules.
 import {
   addOnSchema,
+  assignmentSchema,
+  attachmentSchema,
+  attemptSchema,
   addOnSubscriptionSchema,
   auditEventSchema,
+  clientLinkOverlaySchema,
   clientSchema,
   evidenceSchema,
   evidenceSubmissionSchema,
   jobRoleSchema,
+  learningEventSchema,
+  moduleSchema,
+  notificationSchema,
   outboxMessageSchema,
   packageSchema,
   paymentAttemptSchema,
@@ -74,6 +81,13 @@ const parsers: Record<StoreName, Parser> = {
   audit: auditEventSchema,
   outbox: outboxMessageSchema,
   settings: settingsParser,
+  modules: moduleSchema,
+  attachments: attachmentSchema,
+  assignments: assignmentSchema,
+  learningEvents: learningEventSchema,
+  attempts: attemptSchema,
+  notifications: notificationSchema,
+  clientLinkOverlays: clientLinkOverlaySchema,
 };
 
 /** Parses with the domain schema; throws ValidationError listing every issue. Returns the cleaned record. */

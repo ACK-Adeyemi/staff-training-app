@@ -119,3 +119,9 @@ export const fromLondonWall = (w: {
   s: number;
   ms: number;
 }): Date => fromWall(w, LONDON);
+
+/** The London calendar day of an instant, as YYYY-MM-DD. */
+export const londonDateString = (date: Date): string => {
+  const w = wallOf(date, LONDON);
+  return `${String(w.y).padStart(4, '0')}-${String(w.m).padStart(2, '0')}-${String(w.d).padStart(2, '0')}`;
+};

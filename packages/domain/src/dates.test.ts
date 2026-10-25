@@ -6,7 +6,7 @@
 //    (signed integer). Time of day is ignored.
 //  - startOfLondonDay and mondayOfWeek return a Date at 00:00 London time.
 import { describe, expect, it } from 'vitest';
-import { addDays, addMonths, daysBetween, mondayOfWeek, startOfLondonDay } from './dates';
+import { addDays, addMonths, daysBetween, londonDateString, mondayOfWeek, startOfLondonDay } from './dates';
 
 const d = (iso: string): Date => new Date(iso);
 const iso = (date: Date): string => date.toISOString();
@@ -158,5 +158,13 @@ describe('mondayOfWeek', () => {
   it('defaults to Europe/London', () => {
     const date = d('2026-10-19T02:00:00Z');
     expect(iso(mondayOfWeek(date))).toBe(iso(mondayOfWeek(date, 'Europe/London')));
+  });
+});
+
+describe('londonDateString', () => {
+  it('gives the London calendar day, not the UTC day', () => {
+    expect(londonDateString(d('2026-10-24T23:30:00Z'))).toBe('2026-10-25');
+    expect(londonDateString(d('2026-10-25T23:30:00Z'))).toBe('2026-10-25');
+    expect(londonDateString(d('2026-01-05T00:00:00Z'))).toBe('2026-01-05');
   });
 });
