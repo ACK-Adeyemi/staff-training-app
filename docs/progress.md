@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M0
 Milestone base commit: 4fa6d3fdf9c044a7e3eaf4ebde1a00c330bc0689
-Next step: M0 chunk 5 (entitlements, account states, packs, requirement status): test-writer then implementer. check.sh build+e2e fail until chunk 11 (expected).
+Next step: M0 chunk 6 (content scaffold): test-writer then implementer. check.sh build+e2e fail until chunk 11 (expected).
 
 ## Milestones
 - [ ] M0 Foundations
@@ -22,7 +22,7 @@ Next step: M0 chunk 5 (entitlements, account states, packs, requirement status):
 - [x] 2 Protected names hook
 - [x] 3 Domain basics
 - [x] 4 Permission engine
-- [ ] 5 Entitlements, account states, packs, requirement status
+- [x] 5 Entitlements, account states, packs, requirement status
 - [ ] 6 Content scaffold
 - [ ] 7 Data layer and memory adapter
 - [ ] 8 Seed generator
