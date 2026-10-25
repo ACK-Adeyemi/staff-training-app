@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M1
 Milestone base commit: 5619f46
-Next step: M1 chunk 4 (safeguarding content, lessonParser, module folder and loader) per docs/plans/m1.md. Nursery renewal periods still VERIFY.
+Next step: M1 chunk 5 (data layer) per docs/plans/m1.md. Nursery renewal periods still VERIFY.
 
 ## Milestones
 - [x] M0 Foundations
@@ -21,7 +21,7 @@ Next step: M1 chunk 4 (safeguarding content, lessonParser, module folder and loa
 - [x] 1 M0 known issues and decisions
 - [x] 2 Learning schemas and quiz engine
 - [x] 3 Domain views
-- [ ] 4 Safeguarding content
+- [x] 4 Safeguarding content
 - [ ] 5 Data layer
 - [ ] 6 Seed
 - [ ] 7 UI components
@@ -49,3 +49,4 @@ M0 (final commit f7d32fd, scripts/check.sh fully green): BP-1..BP-8 and F-1..F-1
 - 2026-10-25: M1 base 5619f46, plan docs/plans/m1.md written.
 - 2026-10-25: M1 chunk 2 learning schemas and quiz engine landed.
 - 2026-10-25: M1 chunk 3 domain views landed.
+- 2026-10-25: M1 chunk 4 Safeguarding content landed.
