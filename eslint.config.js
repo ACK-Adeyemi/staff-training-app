@@ -159,4 +159,9 @@ export default tseslint.config(
     files: ['**/*.test.{ts,tsx}', 'e2e/**', 'scripts/**'],
     rules: { 'no-restricted-globals': 'off' },
   },
+  // The shared contract suite and its fixture are test code that happens to live in a non-.test file so adapters can import it.
+  {
+    files: ['packages/data/src/contract/**'],
+    rules: { '@typescript-eslint/no-non-null-assertion': 'off' },
+  },
 );
