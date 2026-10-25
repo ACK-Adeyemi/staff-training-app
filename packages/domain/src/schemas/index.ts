@@ -5,3 +5,4 @@ export * from './evidence';
 export * from './access';
 export * from './commercial';
 export * from './system';
+export * from './learning';

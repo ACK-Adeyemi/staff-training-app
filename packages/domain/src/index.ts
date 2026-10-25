@@ -8,3 +8,7 @@ export * from './entitlements';
 export * from './accountState';
 export * from './packs';
 export * from './requirements';
+export * from './quiz/draw';
+export * from './quiz/score';
+export { displayDomain, visibleLearnMore } from './quiz/learnMore';
+export type { VisibleLearnMoreInput } from './quiz/learnMore';
