@@ -184,7 +184,7 @@ Assumptions
 1. Jade starts with Safeguarding evidence 18 months old plus an open assignment (due in 14 days), so her ring turns green on passing.
 2. C1 needs-attention lists active and on-leave people only: overdue, then expiring soon, then not started; awaiting check is a separate section (Ben).
 3. Compliant means current or expiringSoon; staff "to do" counts overdue, not started, expiring soon and open assignments not already counted.
-4. Next up is the earliest open assignment, else the most urgent requirement with a published module; Coming up shows the next three dates within 90 days.
+4. Next up is the earliest open assignment, else the most urgent requirement with a published module; Coming up shows the next three dates within 90 days (superseded in part: see "2026-10-25: Coming up fills past 90 days" below, which fills from later dates when fewer than three fall inside the window).
 5. Quiz unlocks once every lesson of the current version is completed; maxRetakes null is unlimited; an unfinished attempt is resumed.
 6. Scenario is correct only if every choice on the path is best; outcome is the worst on the path; score is percent correct rounded down.
 7. Draw rules: mcq, scenario and mix pools, mixScenarioShare, shortfall fills from the other type, shuffle flags; true or false options never shuffled.
@@ -225,3 +225,11 @@ M1 chunk 4: Safeguarding content
 
 ## 2026-10-25: Coming up fills past 90 days (M1 chunk 8)
 Plan M1 Assumption 4 limits Coming up to dates within 90 days, but the seeded Jade has only one date inside that window (her refresher due in 14 days; her other expiries are 6 months or more away) while plan F-4 and the committed tests expect three. Brief 16.2 says the strip shows "the next three dates", so the domain now returns the next three future dates, soonest first. Dates inside 90 days always come first (the list is date ordered); later dates only fill the strip when fewer than three are inside the window. Seed data is unchanged.
+
+## 2026-10-25: M1 review decisions
+- axe-core 4.14.0 is a devDependency of packages/ui so component tests can run axe directly. The package name and version were checked against the npm registry; it was already in pnpm-lock.yaml through @axe-core/playwright. Pinned exactly.
+- `attachments` is organisation-documents-only in M1 (policies such as the Little Acorns Safeguarding policy, readable by every person in the client). Before any per-person evidence file is stored in it (M2 or M3), add per-person record rules (owner, site manager and permission checks) and contract tests; do not reuse the current client-wide read rule for personal files.
+- The static app ships the module banks to the browser, so a staff member can read answer keys in dev tools. This is accepted for the demo; the production item is in docs/review-checklist.md.
+- NEW_STARTER_DAYS (14) is a default chosen without being told; it is pinned by a boundary test (day 14 is still induction, day 15 is not) and listed as VERIFY in docs/review-checklist.md.
+- The CSV formula guard also covers a leading tab or carriage return.
+- e2e needs pdftotext and pdfinfo (poppler-utils) for the matrix PDF checks. CI installs it before check.sh.

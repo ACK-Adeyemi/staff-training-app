@@ -5,6 +5,8 @@
 import { readFileSync } from 'node:fs';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
+import { readStore } from './helpers/idb';
+import { answerQuestion } from './helpers/quiz';
 
 type Link = { id: string; title: string; url?: string; locator?: string };
 type Choice = { id: string; text: string; outcome: 'best' | 'ok' | 'poor'; next?: string };
@@ -43,57 +45,11 @@ async function axeClean(page: Page, label: string) {
   ).toEqual([]);
 }
 
-/** Reads one object store straight from IndexedDB (the app's own database), as the demo admin dump would. */
-async function readStore(page: Page, store: string): Promise<Record<string, unknown>[]> {
-  return page.evaluate(
-    (name) =>
-      new Promise<Record<string, unknown>[]>((resolve, reject) => {
-        const open = indexedDB.open('sta-demo');
-        open.onerror = () => {
-          reject(new Error('cannot open sta-demo'));
-        };
-        open.onsuccess = () => {
-          const req = open.result.transaction(name, 'readonly').objectStore(name).getAll();
-          req.onsuccess = () => {
-            resolve(req.result as Record<string, unknown>[]);
-          };
-          req.onerror = () => {
-            reject(new Error('read failed'));
-          };
-        };
-      }),
-    store,
-  );
-}
-
 async function currentQuestion(page: Page): Promise<Question> {
   const prompt = ((await page.getByTestId('question-prompt').textContent()) ?? '').trim();
   const q = bank.questions.find((x) => x.prompt === prompt);
   if (!q) throw new Error(`prompt not in the bank: ${prompt}`);
   return q;
-}
-
-/** Answers the question on screen. Scenarios go through every step with Continue. */
-async function answer(page: Page, q: Question, right: boolean) {
-  if (q.type === 'scenario') {
-    let step = q.scenario?.steps[0];
-    while (step) {
-      const choice = step.choices.find((c) => (right ? c.outcome === 'best' : c.outcome === 'poor')) ?? step.choices[0];
-      if (!choice) break;
-      await page.getByRole('radio', { name: choice.text }).check();
-      await page.getByRole('button', { name: 'Submit answer' }).click();
-      if (choice.next) {
-        await page.getByRole('button', { name: 'Continue' }).click();
-        const nextId = choice.next;
-        step = q.scenario?.steps.find((s) => s.id === nextId);
-      } else step = undefined;
-    }
-  } else {
-    const opt = q.options?.find((o) => o.correct === right);
-    if (!opt) throw new Error('no option');
-    await page.getByRole('radio', { name: opt.text }).check();
-    await page.getByRole('button', { name: 'Submit answer' }).click();
-  }
 }
 
 test('Jade completes the Safeguarding refresher, sees links for a wrong answer, and becomes compliant', async ({
@@ -151,7 +107,7 @@ test('Jade completes the Safeguarding refresher, sees links for a wrong answer, 
     const makeWrong = !wrong && q.type !== 'scenario';
     if (q.type === 'scenario') sawScenario = true;
     if (makeWrong) wrong = q;
-    await answer(page, q, !makeWrong);
+    await answerQuestion(page, q, !makeWrong);
     const fb = page.getByRole('region', { name: 'Feedback' });
     await expect(fb.getByText(makeWrong ? 'Not quite' : 'Correct', { exact: true })).toBeVisible();
     await expect(fb.getByText(q.explanation)).toBeVisible();

@@ -39,3 +39,6 @@ Things only the user can check, by milestone.
 
 - [ ] Safeguarding and whistleblowing module still carries the Draft content label until you have reviewed it (see Awaiting content review above).
 - [ ] NSPCC whistleblowing advice line link: VERIFY (not fetchable from the build environment).
+- [ ] VERIFY: NEW_STARTER_DAYS (14). New starters are not flagged as "not started" for this many days after their start date. Confirm the length with the first client.
+- [ ] Production: staff can read answer keys in the static app (modules ship with their answers). Serve questions without answer keys in production, and mark answers on the server.
+- [ ] .github/workflows/ci.yml now has an apt-get step that installs poppler-utils (needed by the matrix PDF e2e tests). Review the .github change before it reaches GitHub.

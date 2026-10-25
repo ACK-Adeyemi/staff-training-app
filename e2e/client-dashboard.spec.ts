@@ -4,6 +4,7 @@
 // BroadcastChannel('sta-data'), so page A (client dashboard) must update without navigating.
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
+import { answerQuestion } from './helpers/quiz';
 
 type Choice = { id: string; text: string; outcome: 'best' | 'ok' | 'poor'; next?: string };
 type Question = {
@@ -103,25 +104,7 @@ test('C1 updates in one tab when Jade passes the refresher in another tab, witho
     const prompt = ((await b.getByTestId('question-prompt').textContent()) ?? '').trim();
     const q = bank.questions.find((x) => x.prompt === prompt);
     if (!q) throw new Error(`prompt not in the bank: ${prompt}`);
-    if (q.type === 'scenario') {
-      let step = q.scenario?.steps[0];
-      while (step) {
-        const choice = step.choices.find((c) => c.outcome === 'best') ?? step.choices[0];
-        if (!choice) break;
-        await b.getByRole('radio', { name: choice.text }).check();
-        await b.getByRole('button', { name: 'Submit answer' }).click();
-        if (choice.next) {
-          await b.getByRole('button', { name: 'Continue' }).click();
-          const nextId = choice.next;
-          step = q.scenario?.steps.find((s) => s.id === nextId);
-        } else step = undefined;
-      }
-    } else {
-      const opt = q.options?.find((o) => o.correct);
-      if (!opt) throw new Error('no option');
-      await b.getByRole('radio', { name: opt.text }).check();
-      await b.getByRole('button', { name: 'Submit answer' }).click();
-    }
+    await answerQuestion(b, q, true);
     await expect(b.getByRole('region', { name: 'Feedback' })).toBeVisible();
     if (n === 10) {
       await b.getByRole('button', { name: 'Finish quiz' }).click();

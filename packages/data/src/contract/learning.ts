@@ -923,7 +923,7 @@ export function runLearningContract(name: string, makeStore: (options: StoreOpti
     describe('learnMoreOpened with an attempt', () => {
       const withAttempt = async (s: S, extra: Partial<Attempt>) => {
         const base = await s.store.attempts.get(jade(s), s.lf.jadeOldAttemptId);
-        const copy = { ...base, id: freshId(40), ...extra } as Attempt;
+        const copy = { ...base, id: freshId(40), ...extra };
         await s.admin.bulkPut('attempts', [copy]);
         return copy.id;
       };

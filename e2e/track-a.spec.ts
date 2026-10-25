@@ -1,11 +1,13 @@
 // M1 chunk 12 (BP-7, F-9): demo-script Track A steps 1, 3 and the matrix part of 5 as one automated test.
 // Desktop project only. Priya (client admin) uses the desktop page; Jade (staff) uses a second page sized 390 by 844.
 // Both pages share one browser context, so they share IndexedDB and talk over BroadcastChannel like two tabs.
+// Needs poppler-utils (pdftotext, pdfinfo) on the machine to read the matrix PDF.
 // The clock is fixed at PINNED before the first load, so the store RNG and the quiz draw are reproducible.
 import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { answerQuestion } from './helpers/quiz';
 
 type Link = { id: string; title: string; url?: string };
 type Choice = { id: string; text: string; outcome: 'best' | 'ok' | 'poor'; next?: string };
@@ -33,28 +35,6 @@ const overlayIds = new Set(
 );
 
 test.skip(({ isMobile }) => isMobile, 'desktop project only');
-
-async function answer(page: Page, q: Question, right: boolean) {
-  if (q.type === 'scenario') {
-    let step = q.scenario?.steps[0];
-    while (step) {
-      const choice = step.choices.find((c) => (right ? c.outcome === 'best' : c.outcome === 'poor')) ?? step.choices[0];
-      if (!choice) break;
-      await page.getByRole('radio', { name: choice.text }).check();
-      await page.getByRole('button', { name: 'Submit answer' }).click();
-      if (choice.next) {
-        await page.getByRole('button', { name: 'Continue' }).click();
-        const nextId = choice.next;
-        step = q.scenario?.steps.find((s) => s.id === nextId);
-      } else step = undefined;
-    }
-  } else {
-    const opt = q.options?.find((o) => o.correct === right);
-    if (!opt) throw new Error('no option');
-    await page.getByRole('radio', { name: opt.text }).check();
-    await page.getByRole('button', { name: 'Submit answer' }).click();
-  }
-}
 
 test('Track A: Priya sees the dashboard, Jade completes her refresher on a phone, Priya prints the matrix', async ({
   page: priya,
@@ -130,7 +110,7 @@ test('Track A: Priya sees the dashboard, Jade completes her refresher on a phone
     if (!q) throw new Error(`prompt not in the bank: ${prompt}`);
     const makeWrong = !overlayQuestion && overlayIds.has(q.id) && q.type !== 'scenario';
     if (makeWrong) overlayQuestion = q;
-    await answer(jade, q, !makeWrong);
+    await answerQuestion(jade, q, !makeWrong);
     const fb = jade.getByRole('region', { name: 'Feedback' });
     await expect(fb).toBeVisible();
     if (makeWrong) {
