@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M0
 Milestone base commit: 4fa6d3fdf9c044a7e3eaf4ebde1a00c330bc0689
-Next step: M0 chunk 2 (protected names hook): test-writer then implementer, per docs/plans/m0.md. Note: check.sh build+e2e fail until chunk 11 (expected).
+Next step: M0 chunk 3 (domain basics): test-writer then implementer, per docs/plans/m0.md. Note: check.sh build+e2e fail until chunk 11 (expected).
 
 ## Milestones
 - [ ] M0 Foundations
@@ -19,7 +19,7 @@ Next step: M0 chunk 2 (protected names hook): test-writer then implementer, per 
 ## Current milestone chunks
 (from docs/plans/m0.md, ticked as they land)
 - [x] 1 Workspace and tooling
-- [ ] 2 Protected names hook
+- [x] 2 Protected names hook
 - [ ] 3 Domain basics
 - [ ] 4 Permission engine
 - [ ] 5 Entitlements, account states, packs, requirement status
