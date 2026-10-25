@@ -26,3 +26,16 @@ Things only the user can check, by milestone.
 - [ ] Safeguarding and whistleblowing module (nursery, Draft content): four lessons, 12 questions and 7 scenarios drafted from EYFS section 3 (September 2026 PDF). Check wording, the list in `packages/content/src/packs/nursery/modules/safeguarding/module.json` under `verify`, and the Open Government Licence line.
 - [ ] Open the NSPCC whistleblowing advice line link used in the question bank; it could not be fetched from the build environment.
 - [ ] Lesson 2 "Noticing" is general guidance rather than EYFS text; confirm it suits you.
+
+### Phone and live checks
+
+- [ ] On your phone, sign in as Jade (PIN 1234) and do the Safeguarding refresher end to end: Home shows Next up and Coming up, lessons read well, the quiz works with a thumb, scenarios branch, and Home then says "You're compliant".
+- [ ] Answer one question wrongly: the Learn more links open in a new tab, say what they are and where they go, and "From your organisation" shows the Little Acorns Safeguarding policy, which opens on its own page.
+- [ ] With the client dashboard open on a laptop and Jade finishing on your phone (same browser profile only; two devices do not share data), C1 updates without a reload.
+- [ ] As Priya, open Reports, Training matrix and use Print or Save as PDF: A4 landscape, every person and column present, no navigation or Demo badge.
+- [ ] Dark mode and 200% text on the staff Home, quiz, matrix and C1.
+
+### Awaiting review (M1)
+
+- [ ] Safeguarding and whistleblowing module still carries the Draft content label until you have reviewed it (see Awaiting content review above).
+- [ ] NSPCC whistleblowing advice line link: VERIFY (not fetchable from the build environment).
