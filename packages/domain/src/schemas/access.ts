@@ -37,6 +37,8 @@ export const scopeSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('own') }),
 ]);
 
+export type Scope = z.infer<typeof scopeSchema>;
+
 export const roleAssignmentSchema = z.object({
   id: idSchema,
   userId: idSchema,
