@@ -179,7 +179,7 @@ describe('ChoiceList', () => {
     render(<Single />);
     await userEvent.click(screen.getByRole('radio', { name: 'Tell the safeguarding lead' }));
     await userEvent.keyboard('{ArrowDown}');
-    expect((screen.getByRole('radio', { name: 'Wait and see' }) as HTMLInputElement).checked).toBe(true);
+    expect(screen.getByRole<HTMLInputElement>('radio', { name: 'Wait and see' }).checked).toBe(true);
   });
 
   it('toggles a checkbox option with Space and adds to existing selections', async () => {
@@ -296,7 +296,7 @@ describe('LearnMoreLink', () => {
 
   it('has an accessible name that starts with the label and ends with the new tab note', () => {
     render(<LearnMoreLink {...base} />);
-    const name = screen.getByRole('link').textContent ?? '';
+    const name = screen.getByRole('link').textContent;
     expect(name.startsWith('Learn more: Keeping children safe in education')).toBe(true);
     expect(name.trim().endsWith('(opens in a new tab)')).toBe(true);
     expect(screen.getByRole('link', { name: /\(opens in a new tab\)$/ })).toBeTruthy();
@@ -321,7 +321,9 @@ describe('LearnMoreLink', () => {
     const onOpen = vi.fn();
     render(<LearnMoreLink {...base} onOpen={onOpen} />);
     const a = screen.getByRole('link');
-    a.addEventListener('click', (e) => e.preventDefault()); // stop jsdom navigating
+    a.addEventListener('click', (e) => {
+      e.preventDefault(); // stop jsdom navigating
+    });
     await userEvent.click(a);
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
@@ -335,7 +337,9 @@ describe('LearnMoreLink', () => {
 
   it('runs onOpen before the browser default navigation could be cancelled by later handlers', () => {
     const order: string[] = [];
-    render(<LearnMoreLink {...base} onOpen={() => order.push('open')} />);
+    render(<LearnMoreLink {...base} onOpen={() => {
+      order.push('open');
+    }} />);
     const a = screen.getByRole('link');
     a.addEventListener('click', (e) => {
       order.push('bubble');
