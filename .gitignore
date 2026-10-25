@@ -25,3 +25,12 @@ coverage/
 Thumbs.db
 .idea/
 .vscode/
+
+# Staff Training App build
+.protected-names
+logs/
+playwright-report/
+test-results/
+blob-report/
+*.tsbuildinfo
+.vite/

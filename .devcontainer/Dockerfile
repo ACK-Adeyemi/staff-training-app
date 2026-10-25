@@ -3,7 +3,7 @@
 # Dev container for this app: the toolchain plus Claude Code.
 # Built and started by scripts/agent. Trim or extend it once the app's stack is chosen.
 
-FROM node:26
+FROM node:24
 
 ARG CLAUDE_CODE_VERSION=latest
 ENV DEBIAN_FRONTEND=noninteractive
@@ -21,6 +21,16 @@ RUN set -eux; \
 
 # Dependency vulnerability scanner for Python projects (npm has `npm audit` built in).
 RUN python3 -m pip install --break-system-packages --no-cache-dir pip-audit
+
+# pnpm through corepack. The exact pnpm version comes from the "packageManager" field in package.json.
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN npm install -g corepack@latest && corepack enable && npm cache clean --force
+
+# System libraries Chromium needs for Playwright. The browser itself is installed by the project
+# (pnpm exec playwright install chromium) into a volume, so it always matches the project's Playwright version.
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+RUN npx -y playwright@latest install-deps chromium \
+ && rm -rf /var/lib/apt/lists/* /root/.npm
 
 # Claude Code. Pin a version with --build-arg CLAUDE_CODE_VERSION=x.y.z if you want repeatable builds.
 RUN npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" && npm cache clean --force
