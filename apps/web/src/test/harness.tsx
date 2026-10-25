@@ -52,8 +52,13 @@ export function makeDemo(side: Side, keys: SeedKeys, handle?: StoreHandle) {
   };
 }
 
-export async function renderRoute(path: string, side: Side) {
+export async function renderRoute(
+  path: string,
+  side: Side,
+  opts: { prepare?: (ctx: { handle: StoreHandle; keys: SeedKeys }) => Promise<void> } = {},
+) {
   const { handle, keys } = await seededStore();
+  if (opts.prepare) await opts.prepare({ handle, keys });
   const router = createMemoryRouter(routes, { initialEntries: [path] });
   const demo = makeDemo(side, keys, handle);
   const view = render(
