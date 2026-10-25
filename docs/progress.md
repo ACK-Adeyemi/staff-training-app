@@ -2,13 +2,13 @@
 Status: IN PROGRESS
 Mode: unattended
 Branch: agent/poc-build
-Current milestone: M1
-Milestone base commit: 5619f46
-Next step: M1 reviews (security-reviewer, code-reviewer), then mark M1 done.
+Current milestone: M2
+Milestone base commit: (set at M2 start)
+Next step: start M2: record base commit, then delegate docs/plans/m2.md to planner (build pack docs/build-pack/10-03-m2-engagement.md). Plan should schedule the other nursery modules (see M1 plan Risks). Nursery renewal periods still VERIFY.
 
 ## Milestones
 - [x] M0 Foundations
-- [ ] M1 Client story core
+- [x] M1 Client story core
 - [ ] M2 Engagement
 - [ ] M3 Client admin depth
 - [ ] M4 Provider story
@@ -17,7 +17,7 @@ Next step: M1 reviews (security-reviewer, code-reviewer), then mark M1 done.
 - [ ] M7 Battle Room
 
 ## Current milestone chunks
-(from docs/plans/m1.md, ticked as they land)
+(M1 complete; M2 chunks will appear after planning)
 - [x] 1 M0 known issues and decisions
 - [x] 2 Learning schemas and quiz engine
 - [x] 3 Domain views
@@ -33,6 +33,8 @@ Next step: M1 reviews (security-reviewer, code-reviewer), then mark M1 done.
 
 ## Acceptance criteria results
 M0 (final commit f7d32fd, scripts/check.sh fully green): BP-1..BP-8 and F-1..F-10 each proven by the tests listed in docs/plans/m0.md (unit, contract on both adapters, seed, component, Playwright incl. axe, no-network, text-scale, demo-shell). Pass, except deploy parts of BP-1: verified locally (build + preview, base path, hash routing), live check deferred to user in docs/review-checklist.md. Security review: FAIL on first pass (1 High, 3 Medium), all fixed in 1e22e2c; code review: APPROVE.
+
+M1 (final commit 5b87b6d, scripts/check.sh fully green): BP-1 refresher on 390x844 with branching scenario and evidence with version+site (safeguarding-refresher e2e, contract tests); BP-2 wrong-answer explanation, Learn more links (new tab, icon, domain), results list, learnMoreOpened with no XP (component + e2e); BP-3 draw modes and shuffle (domain tests); BP-4 C1 order and live update (client-dashboard e2e, seed test); BP-5 C4 assigns 3 people with notifications (component + e2e); BP-6 matrix print-to-PDF in Chromium plus visual review of the PNG/PDF (training-matrix e2e); BP-7 Track A steps 1, 3, 5 (matrix part) in track-a.spec.ts. K-1, K-2 fixed. Security review PASS (1 Medium and 2 Low fixed, 1 Low documented); code review CHANGES REQUESTED then all Must/Should fixed in one round (F-9 axe coverage on all new routes). Deferred to user: phone checks in docs/review-checklist.md; CI poppler-utils step in .github/workflows/ci.yml needs the user's review.
 
 ## Known issues
 - Action versions in deploy.yml unconfirmed (VERIFY, in review checklist). Commit b6146c5 touched protected files (docs/questions-for-user.md).
@@ -57,3 +59,4 @@ M0 (final commit f7d32fd, scripts/check.sh fully green): BP-1..BP-8 and F-1..F-1
 - 2026-10-25: M1 chunk 10 client screens landed.
 - 2026-10-25: M1 chunk 11 C15 matrix and basic C8 landed. Visual review of test-results/matrix-print.png and matrix.pdf (A4 landscape, 2 pages): header, key, status words with icons and dates, team rows and repeating column headings are all readable; nav, Demo badge and buttons are hidden; no clipped columns. No problems found. Also fixed a test bug: the matrix people test compared against every client's people (now Little Acorns only).
 - 2026-10-25: M1 chunk 12 Track A spec, demo script and checklist landed.
+- 2026-10-25: M1 complete (chunks 1-12, reviews, fixes). Final commit 5b87b6d.
