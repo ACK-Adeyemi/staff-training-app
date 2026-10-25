@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M1
 Milestone base commit: 5619f46
-Next step: M1 chunk 7 (UI components) per docs/plans/m1.md. Nursery renewal periods still VERIFY.
+Next step: M1 chunk 8 (staff screens S1-S3, S8) per docs/plans/m1.md. Nursery renewal periods still VERIFY.
 
 ## Milestones
 - [x] M0 Foundations
@@ -24,7 +24,7 @@ Next step: M1 chunk 7 (UI components) per docs/plans/m1.md. Nursery renewal peri
 - [x] 4 Safeguarding content
 - [x] 5 Data layer
 - [x] 6 Seed
-- [ ] 7 UI components
+- [x] 7 UI components
 - [ ] 8 Staff screens S1-S3, S8
 - [ ] 9 Staff learning flow S4-S7
 - [ ] 10 Client screens C1-C4
@@ -51,3 +51,4 @@ M0 (final commit f7d32fd, scripts/check.sh fully green): BP-1..BP-8 and F-1..F-1
 - 2026-10-25: M1 chunk 3 domain views landed.
 - 2026-10-25: M1 chunk 4 Safeguarding content landed.
 - 2026-10-25: M1 chunk 6 seed landed.
+- 2026-10-25: M1 chunk 7 UI components landed.

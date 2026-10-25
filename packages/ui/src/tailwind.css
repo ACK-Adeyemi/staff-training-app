@@ -26,3 +26,23 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans);
 }
+
+@media print {
+  table[data-print='friendly'] {
+    color: #000;
+    background: #fff;
+    font-size: 11pt;
+  }
+  table[data-print='friendly'] th,
+  table[data-print='friendly'] td {
+    border: 1px solid #000;
+    background: #fff !important;
+    position: static !important;
+  }
+  table[data-print='friendly'] thead {
+    display: table-header-group;
+  }
+  table[data-print='friendly'] tr {
+    break-inside: avoid;
+  }
+}

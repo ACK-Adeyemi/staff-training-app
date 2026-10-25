@@ -10,7 +10,9 @@ import { ChoiceList, DataTable, LearnMoreLink, Markdown, ProgressRing, Stepper }
 afterEach(cleanup);
 
 async function expectNoAxeViolations(container: HTMLElement) {
-  const results = await axe.run(container, { rules: { 'color-contrast': { enabled: false }, region: { enabled: false } } });
+  const results = await axe.run(container, {
+    rules: { 'color-contrast': { enabled: false }, region: { enabled: false } },
+  });
   expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
 }
 
@@ -41,7 +43,9 @@ describe('Markdown', () => {
   });
 
   it('does not turn Markdown links or images into anchors or images', () => {
-    const { container } = render(<Markdown source={'[click](javascript:alert(1)) and ![pic](https://example.com/a.png)'} />);
+    const { container } = render(
+      <Markdown source={'[click](javascript:alert(1)) and ![pic](https://example.com/a.png)'} />,
+    );
     expect(container.querySelector('a')).toBeNull();
     expect(container.querySelector('img')).toBeNull();
     expect(container.textContent).toContain('click');
@@ -161,7 +165,15 @@ describe('ChoiceList', () => {
 
   it('renders multiple choice as checkboxes', () => {
     render(
-      <ChoiceList name="q2" legend="Pick all" type="multiple" options={options} value={[]} onChange={() => {}} stateLabels={stateLabels} />,
+      <ChoiceList
+        name="q2"
+        legend="Pick all"
+        type="multiple"
+        options={options}
+        value={[]}
+        onChange={() => {}}
+        stateLabels={stateLabels}
+      />,
     );
     expect(screen.getAllByRole('checkbox')).toHaveLength(3);
   });
@@ -169,7 +181,15 @@ describe('ChoiceList', () => {
   it('reports the chosen id when an option is clicked', async () => {
     const onChange = vi.fn();
     render(
-      <ChoiceList name="q1" legend="L" type="single" options={options} value={[]} onChange={onChange} stateLabels={stateLabels} />,
+      <ChoiceList
+        name="q1"
+        legend="L"
+        type="single"
+        options={options}
+        value={[]}
+        onChange={onChange}
+        stateLabels={stateLabels}
+      />,
     );
     await userEvent.click(screen.getByRole('radio', { name: 'Wait and see' }));
     expect(onChange).toHaveBeenCalledWith(['b']);
@@ -185,7 +205,15 @@ describe('ChoiceList', () => {
   it('toggles a checkbox option with Space and adds to existing selections', async () => {
     const onChange = vi.fn();
     render(
-      <ChoiceList name="q2" legend="Pick all" type="multiple" options={options} value={['a']} onChange={onChange} stateLabels={stateLabels} />,
+      <ChoiceList
+        name="q2"
+        legend="Pick all"
+        type="multiple"
+        options={options}
+        value={['a']}
+        onChange={onChange}
+        stateLabels={stateLabels}
+      />,
     );
     screen.getByRole('checkbox', { name: 'Wait and see' }).focus();
     await userEvent.keyboard(' ');
@@ -195,7 +223,15 @@ describe('ChoiceList', () => {
   it('removes an id when a selected checkbox is toggled off', async () => {
     const onChange = vi.fn();
     render(
-      <ChoiceList name="q2" legend="Pick all" type="multiple" options={options} value={['a', 'b']} onChange={onChange} stateLabels={stateLabels} />,
+      <ChoiceList
+        name="q2"
+        legend="Pick all"
+        type="multiple"
+        options={options}
+        value={['a', 'b']}
+        onChange={onChange}
+        stateLabels={stateLabels}
+      />,
     );
     await userEvent.click(screen.getByRole('checkbox', { name: 'Tell the safeguarding lead' }));
     expect(onChange).toHaveBeenCalledWith(['b']);
@@ -260,7 +296,16 @@ describe('ChoiceList', () => {
   it('stops accepting changes after submit', async () => {
     const onChange = vi.fn();
     render(
-      <ChoiceList name="q1" legend="L" type="single" options={options} value={['b']} onChange={onChange} result={{ correctIds: ['a'] }} stateLabels={stateLabels} />,
+      <ChoiceList
+        name="q1"
+        legend="L"
+        type="single"
+        options={options}
+        value={['b']}
+        onChange={onChange}
+        result={{ correctIds: ['a'] }}
+        stateLabels={stateLabels}
+      />,
     );
     await userEvent.click(screen.getByRole('radio', { name: /Ask the parent first/ }));
     expect(onChange).not.toHaveBeenCalled();
@@ -270,7 +315,16 @@ describe('ChoiceList', () => {
     const { container, rerender } = render(<Single />);
     await expectNoAxeViolations(container);
     rerender(
-      <ChoiceList name="q1" legend="L" type="single" options={options} value={['b']} onChange={() => {}} result={{ correctIds: ['a'] }} stateLabels={stateLabels} />,
+      <ChoiceList
+        name="q1"
+        legend="L"
+        type="single"
+        options={options}
+        value={['b']}
+        onChange={() => {}}
+        result={{ correctIds: ['a'] }}
+        stateLabels={stateLabels}
+      />,
     );
     await expectNoAxeViolations(container);
   });
@@ -337,9 +391,14 @@ describe('LearnMoreLink', () => {
 
   it('runs onOpen before the browser default navigation could be cancelled by later handlers', () => {
     const order: string[] = [];
-    render(<LearnMoreLink {...base} onOpen={() => {
-      order.push('open');
-    }} />);
+    render(
+      <LearnMoreLink
+        {...base}
+        onOpen={() => {
+          order.push('open');
+        }}
+      />,
+    );
     const a = screen.getByRole('link');
     a.addEventListener('click', (e) => {
       order.push('bubble');
@@ -349,15 +408,18 @@ describe('LearnMoreLink', () => {
     expect(order[0]).toBe('open');
   });
 
-  it.each(['http://www.gov.uk/page', 'javascript:alert(1)', 'data:text/html,hi', 'https://user:pw@example.com/x', 'not a url'])(
-    'renders no anchor for the unsafe url %s',
-    (url) => {
-      const onOpen = vi.fn();
-      render(<LearnMoreLink {...base} url={url} onOpen={onOpen} />);
-      expect(screen.queryByRole('link')).toBeNull();
-      expect(screen.getByText('Learn more: Keeping children safe in education')).toBeTruthy();
-    },
-  );
+  it.each([
+    'http://www.gov.uk/page',
+    'javascript:alert(1)',
+    'data:text/html,hi',
+    'https://user:pw@example.com/x',
+    'not a url',
+  ])('renders no anchor for the unsafe url %s', (url) => {
+    const onOpen = vi.fn();
+    render(<LearnMoreLink {...base} url={url} onOpen={onOpen} />);
+    expect(screen.queryByRole('link')).toBeNull();
+    expect(screen.getByText('Learn more: Keeping children safe in education')).toBeTruthy();
+  });
 
   it('has no axe violations', async () => {
     const { container } = render(<LearnMoreLink {...base} />);
@@ -418,7 +480,11 @@ describe('DataTable', () => {
 
   it('renders cell content that is a React node', () => {
     render(
-      <DataTable caption="T" columns={columns} rows={[{ id: 'x', cells: { name: 'Al', status: <strong>Late</strong> } }]} />,
+      <DataTable
+        caption="T"
+        columns={columns}
+        rows={[{ id: 'x', cells: { name: 'Al', status: <strong>Late</strong> } }]}
+      />,
     );
     expect(screen.getByText('Late').tagName).toBe('STRONG');
   });
