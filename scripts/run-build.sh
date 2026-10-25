@@ -71,7 +71,7 @@ while :; do
     claude-agent -p "$(cat "$PROMPT_FILE")" \
       --permission-mode auto --model "$MODEL" \
       --output-format stream-json --verbose \
-    > "$LOG_DIR/session-$ts.jsonl" 2> "$LOG_DIR/session-$ts.err"
+    < /dev/null > "$LOG_DIR/session-$ts.jsonl" 2> "$LOG_DIR/session-$ts.err"
   code=$?
 
   if [ "$code" -eq 0 ]; then
