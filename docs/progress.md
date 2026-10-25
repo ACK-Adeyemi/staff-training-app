@@ -3,7 +3,7 @@ Status: IN PROGRESS
 Mode: unattended
 Branch: agent/poc-build
 Current milestone: M2
-Milestone base commit: (set at M2 start)
+Milestone base commit: 7c4064d
 Next step: start M2: record base commit, then delegate docs/plans/m2.md to planner (build pack docs/build-pack/10-03-m2-engagement.md). Plan should schedule the other nursery modules (see M1 plan Risks). Nursery renewal periods still VERIFY.
 
 ## Milestones
