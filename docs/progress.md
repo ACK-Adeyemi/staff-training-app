@@ -18,7 +18,7 @@ Next step: M1 chunk 1 (test-writer then implementer) per docs/plans/m1.md. Nurse
 
 ## Current milestone chunks
 (from docs/plans/m1.md, ticked as they land)
-- [ ] 1 M0 known issues and decisions
+- [x] 1 M0 known issues and decisions
 - [ ] 2 Learning schemas and quiz engine
 - [ ] 3 Domain views
 - [ ] 4 Safeguarding content
@@ -35,7 +35,6 @@ Next step: M1 chunk 1 (test-writer then implementer) per docs/plans/m1.md. Nurse
 M0 (final commit f7d32fd, scripts/check.sh fully green): BP-1..BP-8 and F-1..F-10 each proven by the tests listed in docs/plans/m0.md (unit, contract on both adapters, seed, component, Playwright incl. axe, no-network, text-scale, demo-shell). Pass, except deploy parts of BP-1: verified locally (build + preview, base path, hash routing), live check deferred to user in docs/review-checklist.md. Security review: FAIL on first pass (1 High, 3 Medium), all fixed in 1e22e2c; code review: APPROVE.
 
 ## Known issues
-- Code review Should fix: policy.ts self-approval finds Account Owner by role name; use a stable system role key from domain. Also add a contract test for adminCount with a suspended/expired second admin. Do both early in M1.
 - Action versions in deploy.yml unconfirmed (VERIFY, in review checklist). Commit b6146c5 touched protected files (docs/questions-for-user.md).
 
 ## Session log

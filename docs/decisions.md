@@ -177,3 +177,38 @@ Choices made by the test-writer where build pack section 6 left things open, acc
 - **Audit time.** `audit.append` sets `at` to the context time for non-provider actors; only providers may supply their own.
 - **Protected names override.** `scripts/protected-names.mjs` honours `PROTECTED_NAMES_FILE` only when `NODE_ENV=test`.
 - **CSP limits.** The meta-tag Content-Security-Policy cannot set `frame-ancestors` (browsers ignore it in a meta tag) and keeps `style-src 'unsafe-inline'`. Real framing protection needs a response header on the host, which GitHub Pages does not allow; noted for the live review.
+
+## M1 assumptions (from docs/plans/m1.md)
+
+Assumptions
+1. Jade starts with Safeguarding evidence 18 months old plus an open assignment (due in 14 days), so her ring turns green on passing.
+2. C1 needs-attention lists active and on-leave people only: overdue, then expiring soon, then not started; awaiting check is a separate section (Ben).
+3. Compliant means current or expiringSoon; staff "to do" counts overdue, not started, expiring soon and open assignments not already counted.
+4. Next up is the earliest open assignment, else the most urgent requirement with a published module; Coming up shows the next three dates within 90 days.
+5. Quiz unlocks once every lesson of the current version is completed; maxRetakes null is unlimited; an unfinished attempt is resumed.
+6. Scenario is correct only if every choice on the path is best; outcome is the worst on the path; score is percent correct rounded down.
+7. Draw rules: mcq, scenario and mix pools, mixScenarioShare, shortfall fills from the other type, shuffle flags; true or false options never shuffled.
+8. Learn more shows all links after a wrong answer, only all-showFor links on a right answer when learnMoreFor is all; official first, then organisation; closed-book hides until results.
+9. Link display domain: gov.uk for .gov.uk, last three labels for two-part UK suffixes, else last two; organisation documents show the client name.
+10. The organisation policy is an Attachment with a short fictional Markdown body at `#/doc/:attachmentId`, not a real PDF (real uploads are M3).
+11. Every published provider module is visible to every client in M1; pack-based visibility arrives in M6 (known gap).
+12. Lesson, block, question, option, step and choice ids are module-local keys (`^[a-z0-9][a-z0-9-]{0,39}$`), not ULIDs.
+13. Notifications store kind plus params and carry clientId, replacing build pack 6's literal title and body.
+14. Assigning is one all-or-nothing batch; duplicates are skipped; due date is end of London day, today or later; at most 500 people; one Notification each; no Outbox.
+15. Passing writes module Evidence per applicable requirement, marks assignments done and appends events and a slim audit in one batch; failing writes only the attempt and event.
+16. Live update: the store emits store-name-only change notices; the web app invalidates queries and relays on BroadcastChannel('sta-data').
+17. S1 lists active staff users via `DemoAdmin.listStaffUsers`; demo PIN is 1234.
+18. Modules carry optional `draftContent`; Safeguarding ships as draft with a "Draft content" badge.
+19. SeedMeta gains `seedVersion` (2); an older stored seed reloads with the same seed and today; IndexedDB schema goes to version 2.
+20. Client admins with reports.view read learning events and attempts in scope; staff read only their own; provider reads none in M1.
+21. Safeguarding quiz settings are placeholders: mix, share 0.4, draw 10, shuffle on, pass mark 80, unlimited retakes, feedback on.
+22. Renewal periods stay VERIFY; Safeguarding refresher keeps the placeholder 24 months.
+
+Conflicts and resolutions
+1. Module-completion evidence arrives in M1, not M2: `learning.finishAttempt` is the only staff path writing Evidence; direct `evidence.put` stays forbidden.
+2. Section 7.3 has Jade current but Track A needs a visible change: resolved by Assumption 1.
+3. Track A celebration and "You're 2nd of 13" are out of scope (M2): M1 shows a plain "You passed" panel and the ring change.
+4. Build pack 6 Notification lacks clientId and stores literal text: Assumption 13.
+5. Section 7.4 "fictional PDF" becomes an Attachment: Assumption 10. Also: pack 6 `Id` typing for question and option ids becomes module-local keys (Assumption 12); C1 versus Ben's awaiting-check status (Assumption 2); module files live under `packages/content/src/packs/nursery/modules/<key>/`; random draws use the injected, forked RNG with a pinned browser clock in e2e.
+
+M0 known issues fixed in M1 chunk 1: owner roles are recognised by a `systemKey` on system roles (never by name), `isAssignmentActive` is shared by the engine and policy, and the single-admin count now counts only active users with an active, unexpired assignment (contract tests cover suspended and expired second admins).
