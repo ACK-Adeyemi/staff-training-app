@@ -920,6 +920,59 @@ export function runLearningContract(name: string, makeStore: (options: StoreOpti
       });
     });
 
+    describe('learnMoreOpened with an attempt', () => {
+      const withAttempt = async (s: S, extra: Partial<Attempt>) => {
+        const base = await s.store.attempts.get(jade(s), s.lf.jadeOldAttemptId);
+        const copy = { ...base, id: freshId(40), ...extra } as Attempt;
+        await s.admin.bulkPut('attempts', [copy]);
+        return copy.id;
+      };
+
+      it('accepts an attempt for this module that drew the question', async () => {
+        const s = await setup();
+        const attemptId = await withAttempt(s, {});
+        const event = await s.store.learning.learnMoreOpened(jade(s), {
+          moduleId: s.lf.moduleId,
+          questionId: 'q1',
+          linkId: 'gov-guide',
+          attemptId,
+        });
+        expect(event.attemptId).toBe(attemptId);
+      });
+
+      it('refuses an attempt for another module, and writes nothing', async () => {
+        const s = await setup();
+        const attemptId = await withAttempt(s, { moduleId: s.lf.retakeId });
+        const before = await snapshot(s.admin);
+        expect(
+          await errorName(
+            s.store.learning.learnMoreOpened(jade(s), {
+              moduleId: s.lf.moduleId,
+              questionId: 'q1',
+              linkId: 'gov-guide',
+              attemptId,
+            }),
+          ),
+        ).toBe('ValidationError');
+        expect(changedStores(before, await snapshot(s.admin))).toEqual([]);
+      });
+
+      it('refuses a question link when the attempt did not draw that question', async () => {
+        const s = await setup();
+        const attemptId = await withAttempt(s, { questionIds: ['q2'] });
+        expect(
+          await errorName(
+            s.store.learning.learnMoreOpened(jade(s), {
+              moduleId: s.lf.moduleId,
+              questionId: 'q1',
+              linkId: 'gov-guide',
+              attemptId,
+            }),
+          ),
+        ).toBe('ValidationError');
+      });
+    });
+
     describe('assignments.assign', () => {
       const lucy = (s: S) => s.fx.keys.personas['lucy'];
       const hannahP = (s: S) => s.fx.keys.personas['hannah'];

@@ -1,4 +1,5 @@
 // Module statistics for the client admin. Plan "Domain package".
+import { percentOf } from './client';
 import type { Evidence } from '../schemas/evidence';
 import type { Assignment, Attempt, LearningEvent, Module } from '../schemas/learning';
 
@@ -6,6 +7,7 @@ export type ModuleStats = {
   headline: {
     assigned: number;
     completed: number;
+    completionRate: number;
     notStarted: number;
     overdue: number;
     firstTimePassPercent: number | null;
@@ -31,6 +33,7 @@ export function moduleStats({ module, assignments, attempts, events, now }: Modu
   const started = new Set(myAttempts.map((a) => a.personId));
   const open = mine.filter((a) => a.status === 'open');
 
+  const completed = mine.filter((a) => a.status === 'done').length;
   const finished = myAttempts
     .filter((a) => a.finishedAt !== undefined && a.score !== undefined)
     .sort((a, b) => new Date(a.finishedAt ?? 0).getTime() - new Date(b.finishedAt ?? 0).getTime());
@@ -61,7 +64,8 @@ export function moduleStats({ module, assignments, attempts, events, now }: Modu
   return {
     headline: {
       assigned: mine.length,
-      completed: mine.filter((a) => a.status === 'done').length,
+      completed,
+      completionRate: percentOf(completed, mine.length),
       notStarted: open.filter((a) => !started.has(a.personId)).length,
       overdue: open.filter((a) => new Date(a.dueAt).getTime() < now.getTime()).length,
       firstTimePassPercent: firstByPerson.size > 0 ? Math.floor((firstPassed * 100) / firstByPerson.size) : null,

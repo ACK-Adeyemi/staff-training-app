@@ -3,6 +3,8 @@ import { Badge, Card, LinkButton, PageHeader, ProgressRing, StatusBadge } from '
 import {
   can,
   needsAttention,
+  openAssignmentsForActivePeople,
+  percentOf,
   orgCompliance,
   recentlyCompleted,
   waitingForCheck,
@@ -51,9 +53,7 @@ export function Dashboard() {
   const org = orgCompliance(view);
   const recent = recentlyCompleted(view.evidence, view.people, view.now);
   const names = new Map(view.people.map((p) => [p.id, p]));
-  const open = assignments
-    .filter((a) => a.status === 'open' && names.get(a.personId)?.status !== 'archived' && names.has(a.personId))
-    .sort((a, b) => a.dueAt.localeCompare(b.dueAt));
+  const open = openAssignmentsForActivePeople(assignments, view.people);
 
   const detail = (item: AttentionItem): string => {
     const n = Math.abs(item.daysLeft ?? 0);
@@ -120,7 +120,7 @@ export function Dashboard() {
         <Section id="c1-compliance" title={t('client.dashboard.compliance')}>
           <div className="flex flex-col items-center gap-2">
             <ProgressRing
-              percent={org.total === 0 ? 0 : Math.round((org.compliant / org.total) * 100)}
+              percent={percentOf(org.compliant, org.total)}
               valueText={t('client.dashboard.ringValue', { done: org.compliant, total: org.total })}
               description={t('client.dashboard.ringDescription', { done: org.compliant, total: org.total })}
               completeLabel={t('client.dashboard.complete')}

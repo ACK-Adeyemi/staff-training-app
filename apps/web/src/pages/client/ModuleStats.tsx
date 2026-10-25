@@ -35,14 +35,13 @@ function StatsBody({ moduleId }: { moduleId: string | undefined }) {
   });
   const h = stats.headline;
   const started = h.assigned - h.notStarted;
-  const rate = h.assigned === 0 ? 0 : Math.round((h.completed * 100) / h.assigned);
   const pct = (n: number | null) => (n === null ? t('client.moduleStats.noScores') : `${String(n)}%`);
 
   const numbers: [string, string][] = [
     [t('client.moduleStats.assigned'), String(h.assigned)],
     [t('client.moduleStats.started'), String(started)],
     [t('client.moduleStats.completed'), String(h.completed)],
-    [t('client.moduleStats.completionRate'), `${String(rate)}%`],
+    [t('client.moduleStats.completionRate'), `${String(h.completionRate)}%`],
     [t('client.moduleStats.overdue'), String(h.overdue)],
     [t('client.moduleStats.averageScore'), pct(h.averageScore)],
     [t('client.moduleStats.passRate'), pct(h.firstTimePassPercent)],

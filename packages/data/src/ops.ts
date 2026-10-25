@@ -320,7 +320,13 @@ export function createOperations(backend: RawBackend, options: StoreOptions): Op
         );
         const found = [...own, ...overlays.flatMap((o) => o.links)].some((l) => l.id === input.linkId);
         if (!found) throw new ValidationError([`linkId: ${input.linkId} is not a link for this item`]);
-        if (input.attemptId !== undefined) await ownAttempt(call, person, input.attemptId);
+        if (input.attemptId !== undefined) {
+          const attempt = await ownAttempt(call, person, input.attemptId);
+          if (attempt.moduleId !== module.id) throw new ValidationError(['attemptId: not an attempt for this module']);
+          if (question && !attempt.questionIds.includes(question.id)) {
+            throw new ValidationError(['attemptId: this attempt did not include that question']);
+          }
+        }
         const event = eventFor(call, person, 'learnMoreOpened', {
           moduleId: module.id,
           moduleVersion: module.version,

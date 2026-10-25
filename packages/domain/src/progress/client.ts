@@ -1,6 +1,7 @@
 // Client dashboard views over a whole organisation. Plan Assumptions 2 and 3.
 import { addDays } from '../dates';
 import { personRequirementStatus, type RequirementStatusName } from '../requirements';
+import type { Assignment } from '../schemas/learning';
 import type { Evidence, EvidenceSubmission } from '../schemas/evidence';
 import type { Requirement } from '../schemas/packs';
 import type { Person, Site } from '../schemas/tenancy';
@@ -183,4 +184,17 @@ export function overallStatus(view: ClientView, person: Person): PersonOverallSt
       .map((r) => r.status),
   );
   return WORST_FIRST.find((s) => present.has(s)) ?? 'current';
+}
+
+/** A whole-number percentage, rounded; 0 when there is nothing to count. */
+export function percentOf(part: number, total: number): number {
+  return total === 0 ? 0 : Math.round((part * 100) / total);
+}
+
+/** Open assignments for people who are in the list and not archived, soonest due first. */
+export function openAssignmentsForActivePeople(assignments: Assignment[], people: Person[]): Assignment[] {
+  const byId = new Map(people.map((p) => [p.id, p]));
+  return assignments
+    .filter((a) => a.status === 'open' && byId.has(a.personId) && byId.get(a.personId)?.status !== 'archived')
+    .sort((a, b) => a.dueAt.localeCompare(b.dueAt));
 }

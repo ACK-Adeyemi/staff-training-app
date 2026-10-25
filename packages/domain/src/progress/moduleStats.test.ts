@@ -84,6 +84,12 @@ describe('moduleStats', () => {
     expect(s.headline).toMatchObject({ assigned: 3, completed: 2, notStarted: 1, overdue: 1 });
   });
 
+  it('works out the completion rate as a whole percentage, 0 when nothing is assigned', () => {
+    expect(s.headline.completionRate).toBe(67);
+    const none = moduleStats({ module: mod, assignments: [], attempts: [], events: [], evidence: [], now: NOW });
+    expect(none.headline.completionRate).toBe(0);
+  });
+
   it('works out first-time pass rate over people who finished and the average score', () => {
     expect(s.headline.firstTimePassPercent).toBe(50);
     expect(s.headline.averageScore).toBe(80);

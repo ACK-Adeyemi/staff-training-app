@@ -154,6 +154,18 @@ describe('matrixCsv', () => {
     }
   });
 
+  it('also guards cells that start with a tab or a carriage return', () => {
+    for (const [lead, shown] of [
+      ['\t', '\t'],
+      ['\r', '\r'],
+    ] as const) {
+      const bad = person(`${lead}CMD`, 'Evil', { teamIds: [babies.id] });
+      const csv = matrixCsv(trainingMatrix({ ...input, people: [bad] }), t);
+      expect(csv).toContain(`'${shown}CMD Evil`);
+      expect(csv).not.toMatch(new RegExp(`(^|,|\\n)${lead === '\t' ? '\\t' : '\\r'}CMD`));
+    }
+  });
+
   it('guards a team name that starts with a formula character', () => {
     const odd = team('01HZX00000000000000000T009', '=SUM(A1)');
     const p = person('Ok', 'Person', { teamIds: [odd.id] });

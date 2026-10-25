@@ -17,7 +17,10 @@
 import { describe, expect, it } from 'vitest';
 import { addDays } from '../dates';
 import {
+  NEW_STARTER_DAYS,
   complianceByRequirement,
+  openAssignmentsForActivePeople,
+  percentOf,
   needsAttention,
   orgCompliance,
   overallStatus,
@@ -25,7 +28,7 @@ import {
   recentlyCompleted,
   waitingForCheck,
 } from './client';
-import { AMBER, NOW, evidenceExpiring, person, requirement, site, submissionWaiting } from './testFixtures';
+import { AMBER, NOW, assignment, evidenceExpiring, person, requirement, site, submissionWaiting } from './testFixtures';
 
 const sg = requirement('Safeguarding', { renewEveryMonths: 24 });
 const aid = requirement('Paediatric first aid', { renewEveryMonths: 36, appliesTo: { jobRoleIds: ['role-aid'] } });
@@ -153,6 +156,37 @@ describe('new starters', () => {
   it('are listed once the 14 days are over', () => {
     const later = person('Sam', 'Okafor', { startDate: addDays(NOW, -15).toISOString() });
     expect(needsAttention({ ...view([later]), evidence: [], submissions: [] })).toHaveLength(1);
+  });
+});
+
+describe('NEW_STARTER_DAYS boundary', () => {
+  it('treats day 14 as still in induction and day 15 as over', () => {
+    expect(NEW_STARTER_DAYS).toBe(14);
+    const on14 = person('Sam', 'Okafor', { startDate: addDays(NOW, -14).toISOString() });
+    const on15 = person('Sam', 'Okafor', { startDate: addDays(NOW, -15).toISOString() });
+    expect(needsAttention({ ...view([on14]), evidence: [], submissions: [] })).toEqual([]);
+    expect(needsAttention({ ...view([on15]), evidence: [], submissions: [] })).toHaveLength(1);
+  });
+});
+
+describe('percentOf', () => {
+  it('rounds to a whole number and gives 0 for an empty total', () => {
+    expect(percentOf(2, 3)).toBe(67);
+    expect(percentOf(1, 3)).toBe(33);
+    expect(percentOf(0, 0)).toBe(0);
+    expect(percentOf(5, 5)).toBe(100);
+  });
+});
+
+describe('openAssignmentsForActivePeople', () => {
+  it('keeps open assignments for people in the list who are not archived, soonest due first', () => {
+    const later = assignment(jade, 'm1', 9);
+    const sooner = assignment(mark, 'm1', 2);
+    const done = assignment(jade, 'm2', 1, { status: 'done' });
+    const gone = assignment(olivia, 'm1', 1);
+    const stranger = assignment(person('Zed', 'Nobody'), 'm1', 1);
+    const r = openAssignmentsForActivePeople([later, done, gone, stranger, sooner], [jade, mark, olivia]);
+    expect(r.map((a) => a.id)).toEqual([sooner.id, later.id]);
   });
 });
 

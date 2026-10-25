@@ -70,7 +70,7 @@ export function trainingMatrix(input: MatrixInput): Matrix {
 }
 
 /** Stop spreadsheets running a cell as a formula. */
-const guard = (s: string): string => (/^[=+\-@]/.test(s) ? `'${s}` : s);
+const guard = (s: string): string => (/^[=+\-@\t\r]/.test(s) ? `'${s}` : s);
 const quote = (s: string): string => (/[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s);
 const field = (s: string): string => quote(guard(s));
 
