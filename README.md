@@ -70,6 +70,10 @@ ship <app> agent/<branch>     # review the summary, push, open a PR
 
 Review the PR on GitHub (start with the plan in `docs/plans/`, then the tests, then the code), wait for CI, and merge. Finally run `scripts/agent sync` as `agent`.
 
+## Protected-names hook
+
+A pre-commit and commit-msg hook blocks any name listed in the git-ignored `.protected-names` file (one per line; `#` comments allowed). Matching ignores case and accents. It checks staged content, file paths and the commit message, and never prints the name. Install it once per clone, as its own command: `git config core.hooksPath .githooks`. Without a `.protected-names` file the check is skipped.
+
 ## Viewing the running app from Windows
 
 1. Uncomment the `ports` block in `.devcontainer/compose.yaml` (e.g. `127.0.0.1:3000:3000`) and run `scripts/agent up`.
