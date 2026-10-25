@@ -153,7 +153,7 @@ test('Jade completes the Safeguarding refresher, sees links for a wrong answer, 
     if (makeWrong) wrong = q;
     await answer(page, q, !makeWrong);
     const fb = page.getByRole('region', { name: 'Feedback' });
-    await expect(fb.getByText(makeWrong ? 'Not quite' : 'Correct')).toBeVisible();
+    await expect(fb.getByText(makeWrong ? 'Not quite' : 'Correct', { exact: true })).toBeVisible();
     await expect(fb.getByText(q.explanation)).toBeVisible();
     if (makeWrong) {
       await axeClean(page, 'S6 wrong-answer feedback');

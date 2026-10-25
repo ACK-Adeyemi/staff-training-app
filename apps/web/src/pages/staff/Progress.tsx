@@ -69,7 +69,7 @@ export function Progress() {
                       : t('staff.progress.none'),
                   action: r.moduleId ? (
                     <a
-                      href={`#/staff/learn/${r.moduleId}`}
+                      href={`#/staff/module/${r.moduleId}`}
                       aria-label={`${t('staff.progress.startTraining')}: ${r.requirement.name}`}
                       className={`inline-flex min-h-[var(--target-min)] items-center underline ${focusLink}`}
                     >

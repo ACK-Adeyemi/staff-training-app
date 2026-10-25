@@ -4,7 +4,13 @@ import { NotFound, Placeholder } from '../pages/pages';
 import { Landing } from '../demo/pages/Landing';
 import { Outbox } from '../demo/pages/Outbox';
 import { RootLayout } from '../demo/RootLayout';
+import { OrgDoc } from '../pages/doc/OrgDoc';
+import { Certificate } from '../pages/staff/Certificate';
 import { Home } from '../pages/staff/Home';
+import { LessonPlayer } from '../pages/staff/LessonPlayer';
+import { ModuleOverview } from '../pages/staff/ModuleOverview';
+import { Quiz } from '../pages/staff/Quiz';
+import { Results } from '../pages/staff/Results';
 import { Learn } from '../pages/staff/Learn';
 import { Notifications } from '../pages/staff/Notifications';
 import { Progress } from '../pages/staff/Progress';
@@ -24,12 +30,19 @@ export const routes: RouteObject[] = [
       { path: '/', element: <Landing /> },
       { path: '/demo/outbox', element: <Outbox /> },
       { path: '/staff/signin', element: <SignIn /> },
+      // Outside the staff chrome: a certificate prints cleanly and an organisation document opens in its own tab.
+      { path: '/staff/module/:moduleId/certificate', element: <Certificate /> },
+      { path: '/doc/:attachmentId', element: <OrgDoc /> },
       {
         path: '/staff',
         lazy: async () => ({ Component: (await import('../shells/shells')).StaffShell }),
         children: [
           { index: true, element: <Home /> },
           { path: 'learn', element: <Learn /> },
+          { path: 'module/:moduleId', element: <ModuleOverview /> },
+          { path: 'module/:moduleId/lesson/:lessonId', element: <LessonPlayer /> },
+          { path: 'module/:moduleId/quiz', element: <Quiz /> },
+          { path: 'module/:moduleId/done', element: <Results /> },
           { path: 'progress', element: <Progress /> },
           page('compete', 'nav.staff.compete', 'placeholder.staff.compete'),
           page('me', 'nav.staff.me', 'placeholder.staff.me'),

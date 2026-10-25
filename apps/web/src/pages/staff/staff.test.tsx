@@ -152,7 +152,7 @@ describe('S3 Learn', () => {
     const row = title.closest('li, tr, article') as HTMLElement;
     expect(row).toBeTruthy();
     expect(within(row).getByText('Required')).toBeTruthy();
-    expect(within(row).getByRole('link').getAttribute('href')).toMatch(/\/staff\/learn\/.+/);
+    expect(within(row).getByRole('link').getAttribute('href')).toMatch(/\/staff\/module\/.+/);
     oneH1();
   });
 

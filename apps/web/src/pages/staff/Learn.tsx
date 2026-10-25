@@ -41,7 +41,7 @@ export function Learn() {
             <Card>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <a
-                  href={`#/staff/learn/${m.id}`}
+                  href={`#/staff/module/${m.id}`}
                   className="inline-flex min-h-[var(--target-min)] items-center text-lg font-semibold underline focus-visible:outline-[length:3px] focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
                 >
                   {m.title}

@@ -379,7 +379,8 @@ describe('S6 quiz', () => {
     const fb = feedbackRegion();
     expect(within(fb).getByText('Not quite')).toBeTruthy();
     expect(within(fb).getByText(q.explanation)).toBeTruthy();
-    expect(linksIn(fb).length).toBe(q.learnMore.length + 1);
+    // The seed adds organisation links only to q-dsl-role and q-wb-outside, so this scenario shows its own links.
+    expect(linksIn(fb).length).toBe(q.learnMore.length);
     const answered = await events(r.handle, 'questionAnswered');
     expect(answered).toHaveLength(1);
     expect(answered[0]).toMatchObject({ correct: false, scenarioOutcome: 'poor' });

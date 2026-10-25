@@ -34,7 +34,7 @@ function NextUp({ summary, modules }: { summary: StaffSummary; modules: Module[]
       <p className="m-0 text-lg font-semibold">{title}</p>
       {dueAt ? <p className="m-0">{t('staff.home.dueOn', { date: formatLondonDate(dueAt) })}</p> : null}
       {moduleId ? (
-        <LinkButton href={`#/staff/learn/${moduleId}`} aria-label={`${t('staff.home.start')}: ${title}`}>
+        <LinkButton href={`#/staff/module/${moduleId}`} aria-label={`${t('staff.home.start')}: ${title}`}>
           {t('staff.home.start')}
         </LinkButton>
       ) : null}
