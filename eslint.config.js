@@ -159,9 +159,26 @@ export default tseslint.config(
     files: ['**/*.test.{ts,tsx}', 'e2e/**', 'scripts/**'],
     rules: { 'no-restricted-globals': 'off' },
   },
-  // The shared contract suite and its fixture are test code that happens to live in a non-.test file so adapters can import it.
+  // The shared contract suite and its world are test code that happens to live in a non-.test file so adapters can import it.
   {
     files: ['packages/data/src/contract/**'],
     rules: { '@typescript-eslint/no-non-null-assertion': 'off' },
+  },
+  // The seed tests read the dumped stores as loosely typed JSON and look people up by key. The package tsconfig turns off
+  // noUncheckedIndexedAccess for them, so their non-null assertions are redundant to the type checker.
+  {
+    files: ['packages/seed/src/**/*.test.ts', 'packages/seed/src/testing.ts'],
+    rules: {
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/require-await': 'off',
+      '@typescript-eslint/restrict-plus-operands': 'off',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+    },
   },
 );

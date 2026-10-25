@@ -266,6 +266,13 @@ importers:
       idb:
         specifier: 8.0.4
         version: 8.0.4
+    devDependencies:
+      '@sta/content':
+        specifier: workspace:*
+        version: link:../content
+      '@sta/seed':
+        specifier: workspace:*
+        version: link:../seed
 
   packages/domain:
     dependencies:

@@ -2,4 +2,4 @@
 import { createMemoryStore } from '../memory/index';
 import { runContractSuite } from './suite';
 
-runContractSuite('memory adapter', async (options) => createMemoryStore(options));
+runContractSuite('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));

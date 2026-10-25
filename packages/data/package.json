@@ -5,11 +5,14 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./contract": "./src/contract/suite.ts",
-    "./contract/fixture": "./src/contract/fixture.ts"
+    "./contract": "./src/contract/suite.ts"
   },
   "dependencies": {
     "@sta/domain": "workspace:*",
     "idb": "8.0.4"
+  },
+  "devDependencies": {
+    "@sta/content": "workspace:*",
+    "@sta/seed": "workspace:*"
   }
 }

@@ -83,8 +83,8 @@ describe('fast-forward over seeded data (BP-5)', () => {
     const world = await seeded();
     const { admin, keys } = world;
     const base = fixedClock(TODAY);
-    const persona = { side: 'client' as const, userId: keys.users['priya']! };
-    const hannah = keys.personas['hannah']!;
+    const persona = { side: 'client' as const, userId: keys.users['priya'] };
+    const hannah = keys.personas['hannah'];
     const at = async () => offsetClock(base, (await admin.getDemoState())!.clockOffsetMs).now();
 
     await admin.setDemoState({ clockOffsetMs: 0, industry: 'nursery', persona });
@@ -110,9 +110,9 @@ describe('fast-forward over seeded data (BP-5)', () => {
   it('at +30 days Mark is still overdue, Priya is still current and Maureen food hygiene is overdue', async () => {
     const world = await seeded();
     const later = addDays(new Date(TODAY), 30);
-    expect(await statusOf(world.admin, world.keys.personas['mark']!, 'Paediatric first aid', later)).toBe('overdue');
-    expect(await statusOf(world.admin, world.keys.personas['priya']!, 'Safeguarding', later)).toBe('current');
-    expect(await statusOf(world.admin, world.keys.personas['maureen']!, 'Food hygiene', later)).toBe('overdue');
+    expect(await statusOf(world.admin, world.keys.personas['mark'], 'Paediatric first aid', later)).toBe('overdue');
+    expect(await statusOf(world.admin, world.keys.personas['priya'], 'Safeguarding', later)).toBe('current');
+    expect(await statusOf(world.admin, world.keys.personas['maureen'], 'Food hygiene', later)).toBe('overdue');
   });
 
   it('reset restores the data the fast-forward test changed', async () => {

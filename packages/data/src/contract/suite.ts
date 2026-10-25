@@ -26,7 +26,7 @@ import {
   type StoreName,
   type StoreOptions,
 } from '../types';
-import { buildFixture, freshId, TODAY, type Fixture, type FixtureStoreName } from './fixture';
+import { buildWorld, freshId, TODAY, type World as Fixture } from './world';
 
 const ALL_STORES: StoreName[] = [
   'clients',
@@ -50,7 +50,7 @@ const ALL_STORES: StoreName[] = [
   'settings',
 ];
 
-type World = { store: DataStore; admin: StoreHandle['admin']; fx: Fixture; options: StoreOptions };
+type Setup = { store: DataStore; admin: StoreHandle['admin']; fx: Fixture; options: StoreOptions };
 
 async function refusal(promise: Promise<unknown>): Promise<unknown> {
   try {
@@ -70,13 +70,10 @@ async function forbiddenReason(promise: Promise<unknown>): Promise<string> {
 const idsOf = (rows: { id: string }[]): string[] => rows.map((r) => r.id);
 
 export function runContractSuite(name: string, makeStore: (options: StoreOptions) => Promise<StoreHandle>): void {
-  async function setup(clockIso: string = TODAY): Promise<World> {
+  async function setup(clockIso: string = TODAY): Promise<Setup> {
     const options: StoreOptions = { clock: fixedClock(clockIso), rng: createRng(7) };
     const { store, admin } = await makeStore(options);
-    const fx = buildFixture();
-    for (const [storeName, records] of Object.entries(fx.data)) {
-      await admin.bulkPut(storeName as StoreName, records);
-    }
+    const fx = await buildWorld(admin);
     return { store, admin, fx, options };
   }
 
@@ -117,8 +114,8 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         }[];
         expect(listed.length).toBeGreaterThan(0);
         // Subscriptions and add-on subscriptions are keyed by clientId rather than id.
-        const foreign = (fx.data[storeName as FixtureStoreName] as Record<string, unknown>[]).filter(
-          (r) => fx.tenantOf(storeName as FixtureStoreName, r) !== fx.ids.clients.a,
+        const foreign = (fx.data[storeName] as Record<string, unknown>[]).filter(
+          (r) => fx.tenantOf(storeName, r) !== fx.ids.clients.a,
         );
         const foreignKeys = new Set(foreign.map((r) => (r['id'] ?? r['clientId']) as string));
         for (const row of listed) {
@@ -143,7 +140,7 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
       it('gives NotFound, not Forbidden, when getting another client record', async () => {
         const { store, fx } = await setup();
         const ctx = client(fx.ids.users.priya, fx.ids.clients.a);
-        const foreignSite = fx.ids.sites.hillside;
+        const foreignSite = fx.ids.sites.willow;
         for (const call of [
           store.people.get(ctx, fx.ids.people.beth),
           store.sites.get(ctx, foreignSite),
@@ -167,7 +164,7 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
           ...template,
           id: freshId(1),
           clientId: fx.ids.clients.b,
-          primarySiteId: fx.ids.sites.hillside,
+          primarySiteId: fx.ids.sites.willow,
         };
         expect(await forbiddenReason(store.people.put(ctx, foreign))).toBe('tenant');
         expect((await store.people.list(client(fx.ids.users.beth, fx.ids.clients.b))).map((p) => p.id)).not.toContain(
@@ -228,56 +225,57 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
     });
 
     describe('site scope', () => {
+      // Oak Tree: Riverside, Hillside and Meadow, a bank practitioner on Riverside and Meadow, a Group Admin.
       const peopleAt = (fx: Fixture, siteId: string) =>
         fx.data.people
           .filter(
-            (p) =>
-              p.clientId === fx.ids.clients.a && (p.primarySiteId === siteId || p.additionalSiteIds.includes(siteId)),
+            (p: Person) =>
+              p.clientId === fx.ids.clients.ot && (p.primarySiteId === siteId || p.additionalSiteIds.includes(siteId)),
           )
-          .map((p) => p.id)
+          .map((p: Person) => p.id)
           .sort();
 
       it('shows a Riverside manager only Riverside people, including the bank practitioner', async () => {
         const { store, fx } = await setup();
-        const listed = await store.people.list(client(fx.ids.users.riverMgr, fx.ids.clients.a));
+        const listed = await store.people.list(client(fx.ids.users.riverMgr, fx.ids.clients.ot));
         expect(idsOf(listed)).toEqual(peopleAt(fx, fx.ids.sites.river));
         expect(idsOf(listed)).toContain(fx.ids.people.bank);
-        expect(idsOf(listed)).not.toContain(fx.ids.people.mia);
+        expect(idsOf(listed)).not.toContain(fx.ids.people.otHillside);
       });
 
       it('shows a Meadow manager only Meadow people, including the bank practitioner', async () => {
         const { store, fx } = await setup();
-        const listed = await store.people.list(client(fx.ids.users.meadowMgr, fx.ids.clients.a));
+        const listed = await store.people.list(client(fx.ids.users.meadowMgr, fx.ids.clients.ot));
         expect(idsOf(listed)).toEqual(peopleAt(fx, fx.ids.sites.meadow));
         expect(idsOf(listed)).toContain(fx.ids.people.bank);
-        expect(idsOf(listed)).not.toContain(fx.ids.people.hannah);
+        expect(idsOf(listed)).not.toContain(fx.ids.people.otRiver);
       });
 
       it('gives NotFound when a manager gets a person at another site', async () => {
         const { store, fx } = await setup();
-        const ctx = client(fx.ids.users.riverMgr, fx.ids.clients.a);
-        expect(await refusal(store.people.get(ctx, fx.ids.people.mia))).toBeInstanceOf(NotFoundError);
+        const ctx = client(fx.ids.users.riverMgr, fx.ids.clients.ot);
+        expect(await refusal(store.people.get(ctx, fx.ids.people.otHillside))).toBeInstanceOf(NotFoundError);
       });
 
       it('lists only the sites a manager covers', async () => {
         const { store, fx } = await setup();
-        const listed = await store.sites.list(client(fx.ids.users.riverMgr, fx.ids.clients.a));
+        const listed = await store.sites.list(client(fx.ids.users.riverMgr, fx.ids.clients.ot));
         expect(idsOf(listed)).toEqual([fx.ids.sites.river]);
       });
 
       it('lets a manager update a single-site person but not the person on two sites', async () => {
         const { store, fx } = await setup();
-        const ctx = client(fx.ids.users.riverMgr, fx.ids.clients.a);
-        const hannah = await store.people.get(ctx, fx.ids.people.hannah);
-        const updated = await store.people.put(ctx, { ...hannah, nickname: 'Han' });
-        expect(updated.nickname).toBe('Han');
+        const ctx = client(fx.ids.users.riverMgr, fx.ids.clients.ot);
+        const colleague = await store.people.get(ctx, fx.ids.people.otRiver);
+        const updated = await store.people.put(ctx, { ...colleague, nickname: 'Oz' });
+        expect(updated.nickname).toBe('Oz');
         const bank = await store.people.get(ctx, fx.ids.people.bank);
         expect(await forbiddenReason(store.people.put(ctx, { ...bank, nickname: 'Floater' }))).toBe('permission');
       });
 
       it('lets the Group Admin update the person on two sites', async () => {
         const { store, fx } = await setup();
-        const ctx = client(fx.ids.users.gina, fx.ids.clients.a);
+        const ctx = client(fx.ids.users.gina, fx.ids.clients.ot);
         const bank = await store.people.get(ctx, fx.ids.people.bank);
         const updated = await store.people.put(ctx, { ...bank, nickname: 'Floater' });
         expect(updated.nickname).toBe('Floater');
@@ -294,7 +292,11 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
       it('shows a staff user their own evidence and not a colleague evidence', async () => {
         const { store, fx } = await setup();
         const ctx = staff(fx.ids.users.jade, fx.ids.clients.a);
-        expect(idsOf(await store.evidence.list(ctx))).toEqual([fx.ids.evidence.jade]);
+        const mine = fx.data.evidence
+          .filter((e: Evidence) => e.personId === fx.ids.people.jade)
+          .map((e: Evidence) => e.id);
+        expect(mine.length).toBeGreaterThan(0);
+        expect(idsOf(await store.evidence.list(ctx))).toEqual([...mine].sort());
         expect((await store.evidence.get(ctx, fx.ids.evidence.jade)).personId).toBe(fx.ids.people.jade);
         expect(await refusal(store.evidence.get(ctx, fx.ids.evidence.hannah))).toBeInstanceOf(NotFoundError);
       });
@@ -311,7 +313,7 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const { store, fx } = await setup();
         const ctx = staff(fx.ids.users.jade, fx.ids.clients.a);
         expect(idsOf(await store.clients.list(ctx))).toEqual([fx.ids.clients.a]);
-        expect(idsOf(await store.sites.list(ctx))).toEqual([fx.ids.sites.river, fx.ids.sites.meadow].sort());
+        expect(idsOf(await store.sites.list(ctx))).toEqual([fx.ids.sites.main, fx.ids.sites.annexe].sort());
         expect(await forbiddenReason(store.subscriptions.list(ctx))).toBe('permission');
         expect(await forbiddenReason(store.audit.list(ctx))).toBe('permission');
       });
@@ -341,7 +343,8 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
       it('lets the Owner list every client', async () => {
         const { store, fx } = await setup();
         const listed = await store.clients.list(provider(fx.ids.users.provOwner));
-        expect(idsOf(listed)).toEqual(Object.values(fx.ids.clients).sort());
+        expect(idsOf(listed)).toEqual(fx.data.clients.map((c: { id: string }) => c.id).sort());
+        expect(listed).toHaveLength(14); // the 13 seeded clients plus the Deleted client this suite adds
       });
 
       it('lets the Owner read people across clients', async () => {
@@ -364,7 +367,7 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
       it('lets Support read clients but not people', async () => {
         const { store, fx } = await setup();
         const ctx = provider(fx.ids.users.support);
-        expect((await store.clients.list(ctx)).length).toBe(6);
+        expect((await store.clients.list(ctx)).length).toBe(14);
         expect(await forbiddenReason(store.people.list(ctx))).toBe('permission');
         expect(await refusal(store.people.get(ctx, fx.ids.people.priya))).toBeInstanceOf(NotFoundError);
       });
@@ -586,7 +589,7 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
           id: freshId(5),
           userId: fx.ids.users.jade,
           roleIds: [fx.ids.roles.supervisor],
-          scope: { type: 'sites', ids: [fx.ids.sites.river] },
+          scope: { type: 'sites', ids: [fx.ids.sites.main] },
           grants: [],
           denies: [],
           status: 'active',
@@ -639,7 +642,9 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         expect(approved.status).toBe('approved');
         expect(approved.evidenceId).toBeDefined();
 
-        const [created] = await store.evidence.list(ctx, { personId: fx.ids.people.ben });
+        const created = (await store.evidence.list(ctx, { personId: fx.ids.people.ben })).find(
+          (e) => e.submissionId === pending.id,
+        );
         expect(created).toBeDefined();
         expect(created).toMatchObject({
           id: approved.evidenceId,
@@ -650,7 +655,7 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
           submissionId: pending.id,
           approvedBy: fx.ids.users.daniel,
           approvedAt: TODAY,
-          siteIdAtTime: fx.ids.sites.river,
+          siteIdAtTime: fx.ids.sites.main,
           completedAt: pending.completedAt,
           expiresAt: pending.expiresAt,
         });
@@ -745,7 +750,9 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
           reviewerId: fx.ids.users.daniel,
           reviewedAt: later,
         });
-        const [created] = await store.evidence.list(ctx, { personId: fx.ids.people.ben });
+        const created = (await store.evidence.list(ctx, { personId: fx.ids.people.ben })).find(
+          (e) => e.submissionId === pending.id,
+        );
         expect((created as Evidence).approvedAt).toBe(later);
         const audit = ((await admin.dumpAll()) as Record<string, { at: string }[]>)['audit']!;
         expect(audit.map((e) => e.at)).toEqual([later]);
@@ -917,12 +924,12 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
 
       it('does not limit a package with unlimited custom roles', async () => {
         const { store, fx } = await setup();
-        const ctx = client(fx.ids.users.priya, fx.ids.clients.a);
-        for (const n of [15, 16, 17]) {
+        const ctx = client(fx.ids.users.otOwner, fx.ids.clients.ot);
+        for (const n of [15, 16, 17, 18, 19]) {
           await store.roles.put(ctx, {
             ...newRole(fx, n),
-            owner: { clientId: fx.ids.clients.a },
-            updatedBy: fx.ids.users.priya,
+            owner: { clientId: fx.ids.clients.ot },
+            updatedBy: fx.ids.users.otOwner,
           });
         }
         expect((await store.roles.list(ctx)).filter((r) => !r.system).length).toBeGreaterThanOrEqual(5);
@@ -1022,11 +1029,11 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         for (const rows of Object.values(dump)) expect(Array.isArray(rows)).toBe(true);
       });
 
-      it('loads the fixture with bulkPut and dumps the same records', async () => {
+      it('loads the seed world and dumps the same records', async () => {
         const { admin, fx } = await setup();
         const dump = (await admin.dumpAll()) as Record<string, { id?: string }[]>;
         expect(dump['people']).toHaveLength(fx.data.people.length);
-        expect(dump['clients']).toHaveLength(6);
+        expect(dump['clients']).toHaveLength(14);
       });
 
       it('validates bulkPut and writes nothing when a record is invalid', async () => {
@@ -1060,6 +1067,9 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
 
       it('returns undefined seed meta until set, then round-trips it', async () => {
         const { admin } = await setup();
+        // The seed has already stored its own seed value and today.
+        expect(await admin.getSeedMeta()).toEqual({ seedValue: 20261019, today: TODAY });
+        await admin.clearAll();
         expect(await admin.getSeedMeta()).toBeUndefined();
         await admin.setSeedMeta({ seedValue: 20261019, today: TODAY });
         expect(await admin.getSeedMeta()).toEqual({ seedValue: 20261019, today: TODAY });
@@ -1071,7 +1081,7 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const { admin } = await setup();
         expect(await refusal(admin.setSeedMeta({ seedValue: 1.5, today: TODAY }))).toBeInstanceOf(ValidationError);
         expect(await refusal(admin.setSeedMeta({ seedValue: 1, today: 'yesterday' }))).toBeInstanceOf(ValidationError);
-        expect(await admin.getSeedMeta()).toBeUndefined();
+        expect(await admin.getSeedMeta()).toEqual({ seedValue: 20261019, today: TODAY });
       });
 
       it('round-trips the demo state and validates it', async () => {

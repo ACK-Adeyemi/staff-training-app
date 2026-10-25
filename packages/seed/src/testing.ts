@@ -8,6 +8,7 @@ import { load, type SeedKeys } from './index';
 export const TODAY = '2026-10-19T09:00:00.000Z';
 export const SEED = { seedValue: 20261019, today: TODAY } as const;
 
+/** The dumped stores as loosely typed JSON (indexing is unchecked here, see the package tsconfig). */
 export type Dump = Record<string, any[]>;
 
 export function freshStore(): StoreHandle {

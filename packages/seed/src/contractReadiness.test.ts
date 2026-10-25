@@ -18,7 +18,7 @@ async function world() {
   const staff = (userKey: string): ActorContext => ({
     userId: keys.users[userKey]!,
     side: 'staff',
-    clientId: keys.clients['littleAcorns']!,
+    clientId: keys.clients['littleAcorns'],
     now: TODAY,
   });
   const provider = (userKey: string): ActorContext => ({ userId: keys.users[userKey]!, side: 'provider', now: TODAY });
@@ -45,11 +45,11 @@ describe('seed as the contract suite world', () => {
   it('Priya gets NotFound for an Oak Tree person and site, and Forbidden tenant for a put into Oak Tree', async () => {
     const w = await world();
     const ctx = w.client('priya');
-    expect(await refusal(w.store.people.get(ctx, w.keys.personas['bankPractitioner']!))).toBeInstanceOf(NotFoundError);
-    expect(await refusal(w.store.sites.get(ctx, w.keys.sites['riverside']!))).toBeInstanceOf(NotFoundError);
-    const jade = await w.store.people.get(ctx, w.keys.personas['jade']!);
+    expect(await refusal(w.store.people.get(ctx, w.keys.personas['bankPractitioner']))).toBeInstanceOf(NotFoundError);
+    expect(await refusal(w.store.sites.get(ctx, w.keys.sites['riverside']))).toBeInstanceOf(NotFoundError);
+    const jade = await w.store.people.get(ctx, w.keys.personas['jade']);
     const err = await refusal(
-      w.store.people.put(ctx, { ...jade, id: 'Y'.repeat(26), clientId: w.keys.clients['oakTree']! }),
+      w.store.people.put(ctx, { ...jade, id: 'Y'.repeat(26), clientId: w.keys.clients['oakTree'] }),
     );
     expect(err).toBeInstanceOf(ForbiddenError);
     expect((err as ForbiddenError).reason).toBe('tenant');
@@ -59,15 +59,14 @@ describe('seed as the contract suite world', () => {
     const w = await world();
     const riverside = await w.store.people.list(w.client('riversideManager', 'oakTree'));
     const meadow = await w.store.people.list(w.client('meadowManager', 'oakTree'));
-    const bank = w.keys.personas['bankPractitioner']!;
+    const bank = w.keys.personas['bankPractitioner'];
     expect(riverside).toHaveLength(6);
     expect(riverside.map((p) => p.id)).toContain(bank);
     expect(meadow).toHaveLength(5);
     expect(meadow.map((p) => p.id)).toContain(bank);
     expect(
       riverside.every(
-        (p) =>
-          p.primarySiteId === w.keys.sites['riverside'] || p.additionalSiteIds.includes(w.keys.sites['riverside']!),
+        (p) => p.primarySiteId === w.keys.sites['riverside'] || p.additionalSiteIds.includes(w.keys.sites['riverside']),
       ),
     ).toBe(true);
   });
@@ -109,7 +108,7 @@ describe('seed as the contract suite world', () => {
   it('Daniel can see Ben submission, approve it, and Ben safeguarding becomes current', async () => {
     const w = await world();
     const ctx = w.client('daniel');
-    const sub = await w.store.evidenceSubmissions.get(ctx, w.keys.submissions['ben']!);
+    const sub = await w.store.evidenceSubmissions.get(ctx, w.keys.submissions['ben']);
     expect(sub.status).toBe('awaitingCheck');
     expect(sub.uploadedBy).not.toBe(w.keys.users['daniel']);
     const done = await w.store.evidenceSubmissions.put(ctx, { ...sub, status: 'approved' });

@@ -80,7 +80,7 @@ describe('reset demo (BP-4)', () => {
     await admin.setDemoState({
       clockOffsetMs: 30 * 86_400_000,
       industry: 'luxuryRetail',
-      persona: { side: 'client', userId: keys.users['priya']! },
+      persona: { side: 'client', userId: keys.users['priya'] },
     });
     await reset(admin);
     const state = await admin.getDemoState();

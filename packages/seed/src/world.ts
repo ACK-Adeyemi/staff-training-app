@@ -36,13 +36,63 @@ import {
   type UserAccount,
 } from '@sta/domain';
 
+/** Well-known keys are declared properties, so reading one gives a string; any other key is looked up by index. */
+type KeyMap<K extends string> = Record<K, string> & Record<string, string>;
+
+type LittleAcornsKey =
+  | 'priya'
+  | 'daniel'
+  | 'jade'
+  | 'maureen'
+  | 'sam'
+  | 'ellie'
+  | 'hannah'
+  | 'chris'
+  | 'lucy'
+  | 'mark'
+  | 'kasia'
+  | 'grace'
+  | 'ben'
+  | 'amira'
+  | 'olivia';
+
 export type SeedKeys = {
-  clients: Record<string, string>;
-  sites: Record<string, string>;
-  personas: Record<string, string>;
-  users: Record<string, string>;
-  requirements: Record<string, string>;
-  submissions: Record<string, string>;
+  clients: KeyMap<
+    | 'littleAcorns'
+    | 'oakTree'
+    | 'willowLane'
+    | 'maisonElvaro'
+    | 'brookfield'
+    | 'rosewood'
+    | 'harbourCafe'
+    | 'atelierVasquine'
+    | 'summitBuilders'
+    | 'sunnyDays'
+    | 'littleStars'
+    | 'meadowview'
+    | 'pebbles'
+  >;
+  sites: KeyMap<'littleAcorns' | 'riverside' | 'hillside' | 'meadow' | 'willowLane'>;
+  personas: KeyMap<
+    LittleAcornsKey | 'bankPractitioner' | 'oscarFrost' | 'maeveDoyle' | 'tobyAshby' | 'gemmaHolt' | 'joeBarlow'
+  >;
+  users: KeyMap<
+    | LittleAcornsKey
+    | 'providerOwner'
+    | 'sophie'
+    | 'raj'
+    | 'megan'
+    | 'tom'
+    | 'oakTreeGroupAdmin'
+    | 'riversideManager'
+    | 'hillsideManager'
+    | 'meadowManager'
+    | 'willowLaneOwner'
+    | 'joeBarlow'
+  >;
+  requirements: KeyMap<'safeguarding' | 'paediatricFirstAid' | 'foodHygiene' | 'whatChanged' | 'newStarterInduction'>;
+  submissions: KeyMap<'ben'>;
+  /** `${clientKey}.${roleKey}`, for example `littleAcorns.accountOwner`, and `provider.owner`. */
   roles: Record<string, string>;
 };
 
@@ -131,43 +181,175 @@ const CLIENTS: {
   sinceDaysAgo: number;
   trialEndsInDays?: number;
 }[] = [
-  { key: 'littleAcorns', name: 'Little Acorns Nursery', pack: nurseryPack.name, pkg: packageIds.standard, state: 'active', sinceDaysAgo: 200 },
-  { key: 'oakTree', name: 'Oak Tree Nurseries', pack: nurseryPack.name, pkg: packageIds.group, state: 'active', sinceDaysAgo: 300 },
-  { key: 'willowLane', name: 'Willow Lane Nursery', pack: nurseryPack.name, pkg: packageIds.essentials, state: 'pastDue', sinceDaysAgo: 10 },
-  { key: 'maisonElvaro', name: 'Maison Elvaro', pack: 'Luxury retail', pkg: packageIds.group, state: 'active', sinceDaysAgo: 120 },
-  { key: 'brookfield', name: 'Brookfield Primary School', pack: 'Schools', pkg: packageIds.standard, state: 'active', sinceDaysAgo: 250 },
-  { key: 'rosewood', name: 'Rosewood Care Home', pack: 'Social care', pkg: packageIds.standard, state: 'trial', sinceDaysAgo: 12, trialEndsInDays: 18 },
-  { key: 'harbourCafe', name: 'Harbour Cafe Group', pack: 'Hospitality', pkg: packageIds.group, state: 'active', sinceDaysAgo: 400 },
-  { key: 'atelierVasquine', name: 'Atelier Vasquine', pack: 'Luxury retail', pkg: packageIds.standard, state: 'trial', sinceDaysAgo: 5, trialEndsInDays: 25 },
-  { key: 'summitBuilders', name: 'Summit Builders', pack: 'Construction', pkg: packageIds.essentials, state: 'active', sinceDaysAgo: 150 },
-  { key: 'sunnyDays', name: 'Sunny Days Pre-school', pack: nurseryPack.name, pkg: packageIds.essentials, state: 'limited', sinceDaysAgo: 5 },
-  { key: 'littleStars', name: 'Little Stars Day Nursery', pack: nurseryPack.name, pkg: packageIds.essentials, state: 'readOnly', sinceDaysAgo: 9 },
-  { key: 'meadowview', name: 'Meadowview Nursery', pack: nurseryPack.name, pkg: packageIds.essentials, state: 'closed', sinceDaysAgo: 50 },
-  { key: 'pebbles', name: 'Pebbles Childcare', pack: nurseryPack.name, pkg: packageIds.standard, state: 'paused', sinceDaysAgo: 20 },
+  {
+    key: 'littleAcorns',
+    name: 'Little Acorns Nursery',
+    pack: nurseryPack.name,
+    pkg: packageIds.standard,
+    state: 'active',
+    sinceDaysAgo: 200,
+  },
+  {
+    key: 'oakTree',
+    name: 'Oak Tree Nurseries',
+    pack: nurseryPack.name,
+    pkg: packageIds.group,
+    state: 'active',
+    sinceDaysAgo: 300,
+  },
+  {
+    key: 'willowLane',
+    name: 'Willow Lane Nursery',
+    pack: nurseryPack.name,
+    pkg: packageIds.essentials,
+    state: 'pastDue',
+    sinceDaysAgo: 10,
+  },
+  {
+    key: 'maisonElvaro',
+    name: 'Maison Elvaro',
+    pack: 'Luxury retail',
+    pkg: packageIds.group,
+    state: 'active',
+    sinceDaysAgo: 120,
+  },
+  {
+    key: 'brookfield',
+    name: 'Brookfield Primary School',
+    pack: 'Schools',
+    pkg: packageIds.standard,
+    state: 'active',
+    sinceDaysAgo: 250,
+  },
+  {
+    key: 'rosewood',
+    name: 'Rosewood Care Home',
+    pack: 'Social care',
+    pkg: packageIds.standard,
+    state: 'trial',
+    sinceDaysAgo: 12,
+    trialEndsInDays: 18,
+  },
+  {
+    key: 'harbourCafe',
+    name: 'Harbour Cafe Group',
+    pack: 'Hospitality',
+    pkg: packageIds.group,
+    state: 'active',
+    sinceDaysAgo: 400,
+  },
+  {
+    key: 'atelierVasquine',
+    name: 'Atelier Vasquine',
+    pack: 'Luxury retail',
+    pkg: packageIds.standard,
+    state: 'trial',
+    sinceDaysAgo: 5,
+    trialEndsInDays: 25,
+  },
+  {
+    key: 'summitBuilders',
+    name: 'Summit Builders',
+    pack: 'Construction',
+    pkg: packageIds.essentials,
+    state: 'active',
+    sinceDaysAgo: 150,
+  },
+  {
+    key: 'sunnyDays',
+    name: 'Sunny Days Pre-school',
+    pack: nurseryPack.name,
+    pkg: packageIds.essentials,
+    state: 'limited',
+    sinceDaysAgo: 5,
+  },
+  {
+    key: 'littleStars',
+    name: 'Little Stars Day Nursery',
+    pack: nurseryPack.name,
+    pkg: packageIds.essentials,
+    state: 'readOnly',
+    sinceDaysAgo: 9,
+  },
+  {
+    key: 'meadowview',
+    name: 'Meadowview Nursery',
+    pack: nurseryPack.name,
+    pkg: packageIds.essentials,
+    state: 'closed',
+    sinceDaysAgo: 50,
+  },
+  {
+    key: 'pebbles',
+    name: 'Pebbles Childcare',
+    pack: nurseryPack.name,
+    pkg: packageIds.standard,
+    state: 'paused',
+    sinceDaysAgo: 20,
+  },
 ];
 
 const LITTLE_ACORNS: ClientSpec = {
   key: 'littleAcorns',
   ownerKey: 'priya',
   sites: [
-    { key: 'littleAcorns', name: 'Little Acorns', region: 'South East', teams: ['Baby room', 'Toddler room', 'Pre-school room', 'Kitchen'] },
+    {
+      key: 'littleAcorns',
+      name: 'Little Acorns',
+      region: 'South East',
+      teams: ['Baby room', 'Toddler room', 'Pre-school room', 'Kitchen'],
+    },
   ],
   people: [
-    { key: 'priya', first: 'Priya', last: 'Shah', jobRoles: ['Nursery Manager'], admin: { role: 'accountOwner', scope: 'clients' } },
-    { key: 'daniel', first: 'Daniel', last: 'Hughes', jobRoles: ['Deputy Manager', 'Designated Safeguarding Lead'], admin: { role: 'supervisor', scope: 'site' } },
+    {
+      key: 'priya',
+      first: 'Priya',
+      last: 'Shah',
+      jobRoles: ['Nursery Manager'],
+      admin: { role: 'accountOwner', scope: 'clients' },
+    },
+    {
+      key: 'daniel',
+      first: 'Daniel',
+      last: 'Hughes',
+      jobRoles: ['Deputy Manager', 'Designated Safeguarding Lead'],
+      admin: { role: 'supervisor', scope: 'site' },
+    },
     { key: 'jade', first: 'Jade', last: 'Mills', jobRoles: ['Room Leader'], team: 'Toddler room' },
-    { key: 'maureen', first: 'Maureen', last: 'Clarke', jobRoles: ['Cook'], team: 'Kitchen', prefs: { simpleView: true, textScale: 1.5 } },
+    {
+      key: 'maureen',
+      first: 'Maureen',
+      last: 'Clarke',
+      jobRoles: ['Cook'],
+      team: 'Kitchen',
+      prefs: { simpleView: true, textScale: 1.5 },
+    },
     { key: 'sam', first: 'Sam', last: 'Okafor', jobRoles: ['Practitioner'], team: 'Baby room', startDaysAgo: 10 },
     { key: 'ellie', first: 'Ellie', last: 'Brown', jobRoles: ['Apprentice'], team: 'Toddler room' },
     { key: 'hannah', first: 'Hannah', last: 'Patel', jobRoles: ['Room Leader'], team: 'Baby room' },
     { key: 'chris', first: 'Chris', last: 'Wood', jobRoles: ['Practitioner'], team: 'Pre-school room' },
     { key: 'lucy', first: 'Lucy', last: 'Evans', jobRoles: ['Practitioner'], team: 'Toddler room' },
     { key: 'mark', first: 'Mark', last: 'Taylor', jobRoles: ['Room Leader'], team: 'Pre-school room' },
-    { key: 'kasia', first: 'Kasia', last: 'Nowak', jobRoles: ['Practitioner'], team: 'Baby room', prefs: { language: 'pl-PL' } },
+    {
+      key: 'kasia',
+      first: 'Kasia',
+      last: 'Nowak',
+      jobRoles: ['Practitioner'],
+      team: 'Baby room',
+      prefs: { language: 'pl-PL' },
+    },
     { key: 'grace', first: 'Grace', last: 'Lee', jobRoles: ['Practitioner'], team: 'Toddler room', status: 'onLeave' },
     { key: 'ben', first: 'Ben', last: 'Carter', jobRoles: ['Bank Practitioner'] },
     { key: 'amira', first: 'Amira', last: 'Hassan', jobRoles: ['Practitioner'], team: 'Pre-school room' },
-    { key: 'olivia', first: 'Olivia', last: 'Grant', jobRoles: ['Practitioner'], team: 'Baby room', status: 'archived', leftMonthsAgo: 2 },
+    {
+      key: 'olivia',
+      first: 'Olivia',
+      last: 'Grant',
+      jobRoles: ['Practitioner'],
+      team: 'Baby room',
+      status: 'archived',
+      leftMonthsAgo: 2,
+    },
   ],
 };
 
@@ -175,25 +357,132 @@ const OAK_TREE: ClientSpec = {
   key: 'oakTree',
   ownerKey: 'oakTreeGroupAdmin',
   sites: [
-    { key: 'riverside', name: 'Riverside', region: 'South East', teams: ['Baby room', 'Toddler room'], compliance: 0.95 },
-    { key: 'hillside', name: 'Hillside', region: 'South East', teams: ['Baby room', 'Pre-school room'], compliance: 0.8 },
+    {
+      key: 'riverside',
+      name: 'Riverside',
+      region: 'South East',
+      teams: ['Baby room', 'Toddler room'],
+      compliance: 0.95,
+    },
+    {
+      key: 'hillside',
+      name: 'Hillside',
+      region: 'South East',
+      teams: ['Baby room', 'Pre-school room'],
+      compliance: 0.8,
+    },
     { key: 'meadow', name: 'Meadow', region: 'South West', teams: ['Mixed room'], compliance: 0.55 },
   ],
   people: [
-    { key: 'fionaMarsh', userKey: 'oakTreeGroupAdmin', first: 'Fiona', last: 'Marsh', jobRoles: ['Nursery Manager'], site: 'riverside', admin: { role: 'groupAdmin', scope: 'clients' } },
-    { key: 'tariqRahman', userKey: 'riversideManager', first: 'Tariq', last: 'Rahman', jobRoles: ['Nursery Manager'], site: 'riverside', admin: { role: 'siteManager', scope: 'site' } },
-    { key: 'bankPractitioner', first: 'Nadia', last: 'Bell', jobRoles: ['Bank Practitioner'], site: 'riverside', extraSites: ['meadow'] },
-    { key: 'oscarFrost', first: 'Oscar', last: 'Frost', jobRoles: ['Room Leader'], site: 'riverside', team: 'Baby room' },
-    { key: 'priyaNair', first: 'Anita', last: 'Nair', jobRoles: ['Practitioner'], site: 'riverside', team: 'Toddler room' },
-    { key: 'leoWright', first: 'Leo', last: 'Wright', jobRoles: ['Practitioner'], site: 'riverside', team: 'Toddler room' },
-    { key: 'colinReeve', userKey: 'hillsideManager', first: 'Colin', last: 'Reeve', jobRoles: ['Nursery Manager'], site: 'hillside', admin: { role: 'siteManager', scope: 'site' } },
-    { key: 'maeveDoyle', first: 'Maeve', last: 'Doyle', jobRoles: ['Room Leader'], site: 'hillside', team: 'Baby room' },
-    { key: 'imranKhalid', first: 'Imran', last: 'Khalid', jobRoles: ['Practitioner'], site: 'hillside', team: 'Baby room' },
-    { key: 'sophieGale', first: 'Hettie', last: 'Gale', jobRoles: ['Practitioner'], site: 'hillside', team: 'Pre-school room' },
-    { key: 'dylanPark', first: 'Dylan', last: 'Park', jobRoles: ['Apprentice'], site: 'hillside', team: 'Pre-school room' },
-    { key: 'rosaDelgado', userKey: 'meadowManager', first: 'Rosa', last: 'Delgado', jobRoles: ['Nursery Manager'], site: 'meadow', admin: { role: 'siteManager', scope: 'site' } },
+    {
+      key: 'fionaMarsh',
+      userKey: 'oakTreeGroupAdmin',
+      first: 'Fiona',
+      last: 'Marsh',
+      jobRoles: ['Nursery Manager'],
+      site: 'riverside',
+      admin: { role: 'groupAdmin', scope: 'clients' },
+    },
+    {
+      key: 'tariqRahman',
+      userKey: 'riversideManager',
+      first: 'Tariq',
+      last: 'Rahman',
+      jobRoles: ['Nursery Manager'],
+      site: 'riverside',
+      admin: { role: 'siteManager', scope: 'site' },
+    },
+    {
+      key: 'bankPractitioner',
+      first: 'Nadia',
+      last: 'Bell',
+      jobRoles: ['Bank Practitioner'],
+      site: 'riverside',
+      extraSites: ['meadow'],
+    },
+    {
+      key: 'oscarFrost',
+      first: 'Oscar',
+      last: 'Frost',
+      jobRoles: ['Room Leader'],
+      site: 'riverside',
+      team: 'Baby room',
+    },
+    {
+      key: 'priyaNair',
+      first: 'Anita',
+      last: 'Nair',
+      jobRoles: ['Practitioner'],
+      site: 'riverside',
+      team: 'Toddler room',
+    },
+    {
+      key: 'leoWright',
+      first: 'Leo',
+      last: 'Wright',
+      jobRoles: ['Practitioner'],
+      site: 'riverside',
+      team: 'Toddler room',
+    },
+    {
+      key: 'colinReeve',
+      userKey: 'hillsideManager',
+      first: 'Colin',
+      last: 'Reeve',
+      jobRoles: ['Nursery Manager'],
+      site: 'hillside',
+      admin: { role: 'siteManager', scope: 'site' },
+    },
+    {
+      key: 'maeveDoyle',
+      first: 'Maeve',
+      last: 'Doyle',
+      jobRoles: ['Room Leader'],
+      site: 'hillside',
+      team: 'Baby room',
+    },
+    {
+      key: 'imranKhalid',
+      first: 'Imran',
+      last: 'Khalid',
+      jobRoles: ['Practitioner'],
+      site: 'hillside',
+      team: 'Baby room',
+    },
+    {
+      key: 'sophieGale',
+      first: 'Hettie',
+      last: 'Gale',
+      jobRoles: ['Practitioner'],
+      site: 'hillside',
+      team: 'Pre-school room',
+    },
+    {
+      key: 'dylanPark',
+      first: 'Dylan',
+      last: 'Park',
+      jobRoles: ['Apprentice'],
+      site: 'hillside',
+      team: 'Pre-school room',
+    },
+    {
+      key: 'rosaDelgado',
+      userKey: 'meadowManager',
+      first: 'Rosa',
+      last: 'Delgado',
+      jobRoles: ['Nursery Manager'],
+      site: 'meadow',
+      admin: { role: 'siteManager', scope: 'site' },
+    },
     { key: 'tobyAshby', first: 'Toby', last: 'Ashby', jobRoles: ['Room Leader'], site: 'meadow', team: 'Mixed room' },
-    { key: 'yasminOkoye', first: 'Yasmin', last: 'Okoye', jobRoles: ['Practitioner'], site: 'meadow', team: 'Mixed room' },
+    {
+      key: 'yasminOkoye',
+      first: 'Yasmin',
+      last: 'Okoye',
+      jobRoles: ['Practitioner'],
+      site: 'meadow',
+      team: 'Mixed room',
+    },
     { key: 'henryLowe', first: 'Henry', last: 'Lowe', jobRoles: ['Cook'], site: 'meadow', team: 'Mixed room' },
   ],
 };
@@ -201,9 +490,24 @@ const OAK_TREE: ClientSpec = {
 const WILLOW_LANE: ClientSpec = {
   key: 'willowLane',
   ownerKey: 'willowLaneOwner',
-  sites: [{ key: 'willowLane', name: 'Willow Lane', region: 'North West', teams: ['Baby room', 'Toddler room'], compliance: 0.85 }],
+  sites: [
+    {
+      key: 'willowLane',
+      name: 'Willow Lane',
+      region: 'North West',
+      teams: ['Baby room', 'Toddler room'],
+      compliance: 0.85,
+    },
+  ],
   people: [
-    { key: 'gemmaHolt', userKey: 'willowLaneOwner', first: 'Gemma', last: 'Holt', jobRoles: ['Nursery Manager'], admin: { role: 'accountOwner', scope: 'clients' } },
+    {
+      key: 'gemmaHolt',
+      userKey: 'willowLaneOwner',
+      first: 'Gemma',
+      last: 'Holt',
+      jobRoles: ['Nursery Manager'],
+      admin: { role: 'accountOwner', scope: 'clients' },
+    },
     { key: 'ravinSingh', first: 'Ravi', last: 'Singh', jobRoles: ['Deputy Manager'], team: 'Toddler room' },
     { key: 'edithPryce', first: 'Edith', last: 'Pryce', jobRoles: ['Room Leader'], team: 'Baby room' },
     { key: 'joeBarlow', first: 'Joe', last: 'Barlow', jobRoles: ['Practitioner'], team: 'Baby room' },
@@ -234,6 +538,11 @@ const jobRoleByName = (name: string): JobRole => {
   return r;
 };
 
+const must = <T>(value: T | undefined): T => {
+  if (value === undefined) throw new Error('Seed: a record the world refers to is missing');
+  return value;
+};
+
 /** Is this London day a weekday? */
 const isWeekday = (d: Date): boolean => daysBetween(mondayOfWeek(d), d) < 5;
 
@@ -253,7 +562,16 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
   const newId = (rng: Rng) => (): string => ulid(clock, rng);
   const ago = (days: number): Date => addDays(today, -days);
 
-  const keys: SeedKeys = { clients: {}, sites: {}, personas: {}, users: {}, requirements: {}, submissions: {}, roles: {} };
+  // Filled in below; every declared key is set before the keys are returned.
+  const keys = {
+    clients: {},
+    sites: {},
+    personas: {},
+    users: {},
+    requirements: {},
+    submissions: {},
+    roles: {},
+  } as unknown as SeedKeys;
   const data: SeedData = {
     clients: [],
     sites: [],
@@ -333,7 +651,7 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
       data.roleAssignments.push({
         id: id(),
         userId,
-        roleIds: [roleIds[m.role] as string],
+        roleIds: [must(roleIds[m.role])],
         scope: { type: 'all' },
         grants: [],
         denies: [],
@@ -375,7 +693,7 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
   // Client sections: sites, rooms, people, users, roles and role assignments.
   const buildClient = (spec: ClientSpec, rng: Rng): Built => {
     const id = newId(rng);
-    const clientId = keys.clients[spec.key] as string;
+    const clientId = must(keys.clients[spec.key]);
     const clientName = (CLIENTS.find((c) => c.key === spec.key) as { name: string }).name;
     const domain = `${slug(clientName)}.test`;
     const siteIds: Record<string, string> = {};
@@ -399,14 +717,14 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
         data.teams.push({ id: teamId, clientId, siteId, name: t });
       }
     }
-    const firstSite = (spec.sites[0] as SiteSpec).key;
+    const firstSite = must(spec.sites[0]).key;
 
     // Person and user ids are drawn first so role records can name the owner as updatedBy.
     const personIds = new Map(spec.people.map((p) => [p.key, id()]));
     const userIds = new Map(spec.people.map((p) => [p.key, id()]));
     const ownerSpec = spec.people.find((p) => (p.userKey ?? p.key) === spec.ownerKey);
     if (!ownerSpec) throw new Error(`No owner ${spec.ownerKey} in ${spec.key}`);
-    const ownerUserId = userIds.get(ownerSpec.key) as string;
+    const ownerUserId = must(userIds.get(ownerSpec.key));
 
     const roleIdByKey: Record<string, string> = {};
     for (const t of clientRoleTemplates) {
@@ -432,15 +750,15 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     const people: Person[] = [];
     for (const p of spec.people) {
       const siteKey = p.site ?? firstSite;
-      const personId = personIds.get(p.key) as string;
-      const userId = userIds.get(p.key) as string;
+      const personId = must(personIds.get(p.key));
+      const userId = must(userIds.get(p.key));
       const archived = p.status === 'archived';
       const person: Person = {
         id: personId,
         clientId,
-        primarySiteId: siteIds[siteKey] as string,
-        additionalSiteIds: (p.extraSites ?? []).map((s) => siteIds[s] as string),
-        teamIds: p.team ? [teamIds[`${siteKey}/${p.team}`] as string] : [],
+        primarySiteId: must(siteIds[siteKey]),
+        additionalSiteIds: (p.extraSites ?? []).map((s) => must(siteIds[s])),
+        teamIds: p.team ? [must(teamIds[`${siteKey}/${p.team}`])] : [],
         firstName: p.first,
         lastName: p.last,
         jobRoleIds: p.jobRoles.map((r) => jobRoleByName(r).id),
@@ -468,11 +786,13 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
       });
       if (p.admin) {
         const scope: Scope =
-          p.admin.scope === 'clients' ? { type: 'clients', ids: [clientId] } : { type: 'sites', ids: [person.primarySiteId] };
+          p.admin.scope === 'clients'
+            ? { type: 'clients', ids: [clientId] }
+            : { type: 'sites', ids: [person.primarySiteId] };
         data.roleAssignments.push({
           id: id(),
           userId,
-          roleIds: [roleIdByKey[p.admin.role] as string],
+          roleIds: [must(roleIdByKey[p.admin.role])],
           scope,
           grants: [],
           denies: [],
@@ -504,14 +824,20 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
       kind: external ? 'external' : 'module',
       completedAt: iso(completedAt),
       ...(expiresAt ? { expiresAt: iso(expiresAt) } : {}),
-      ...(external ? {} : { moduleId: req.satisfiedByModuleIds[0] as string, moduleVersion: 1 }),
+      ...(external ? {} : { moduleId: req.satisfiedByModuleIds[0], moduleVersion: 1 }),
       siteIdAtTime: person.primarySiteId,
     });
   };
 
   const currentEvidence = (rng: Rng, person: Person, req: Requirement): void => {
     const completed = ago(rng.int(30, 300));
-    addEvidence(rng, person, req, completed, req.renewEveryMonths ? addMonths(completed, req.renewEveryMonths) : undefined);
+    addEvidence(
+      rng,
+      person,
+      req,
+      completed,
+      req.renewEveryMonths ? addMonths(completed, req.renewEveryMonths) : undefined,
+    );
   };
 
   // Little Acorns: exactly the statuses in 7.3.
@@ -521,12 +847,16 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     // 23:59 London on the given day of the cluster week (offset 1 is Tuesday).
     const clusterExpiry = (offset: number): Date =>
       new Date(startOfLondonDay(addDays(clusterMonday, offset + 1)).getTime() - 60_000);
-    const cluster: Record<string, number> = { lucy: 1, hannah: 2, chris: 3 };
+    const cluster = new Map([
+      ['lucy', 1],
+      ['hannah', 2],
+      ['chris', 3],
+    ]);
     for (const p of la.spec.people) {
-      const person = la.people.find((x) => x.id === keys.personas[p.key]) as Person;
+      const person = must(la.people.find((x) => x.id === keys.personas[p.key]));
       if (person.status === 'archived') continue;
       const prng = rng.fork(p.key);
-      const clusterOffset = cluster[p.key];
+      const clusterOffset = cluster.get(p.key);
       if (clusterOffset !== undefined) {
         const expiry = clusterExpiry(clusterOffset);
         addEvidence(prng, person, safeguarding, addMonths(expiry, -24), expiry);
@@ -545,16 +875,21 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
       }
       if (p.key !== 'amira') addEvidence(prng, person, whatChanged, ago(prng.int(3, 30)));
       const inductionDone = addDays(new Date(person.startDate), 14);
-      addEvidence(prng, person, induction, inductionDone.getTime() > today.getTime() ? addDays(new Date(person.startDate), 5) : inductionDone);
+      addEvidence(
+        prng,
+        person,
+        induction,
+        inductionDone.getTime() > today.getTime() ? addDays(new Date(person.startDate), 5) : inductionDone,
+      );
     }
 
     // Ben's DfE safeguarding certificate, uploaded 4 working days ago and waiting for a check.
     let created = today;
-    for (let worked = 0; worked < 4; ) {
+    for (let worked = 0; worked < 4;) {
       if (isWeekday(created)) worked++;
       created = addDays(created, -1);
     }
-    const ben = la.people.find((x) => x.id === keys.personas['ben']) as Person;
+    const ben = must(la.people.find((x) => x.id === keys.personas['ben']));
     const submissionId = ulid(clock, rng);
     keys.submissions['ben'] = submissionId;
     data.evidenceSubmissions.push({
@@ -563,7 +898,7 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
       siteId: ben.primarySiteId,
       personId: ben.id,
       requirementId: safeguarding.id,
-      uploadedBy: keys.users['ben'] as string,
+      uploadedBy: keys.users['ben'],
       fileAttachmentId: ulid(clock, rng),
       providerName: 'Sample Early Years Training',
       completedAt: iso(ago(20)),
@@ -577,7 +912,7 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
   for (const built of [ot, wl]) {
     const rng = streams.evidence.fork(built.spec.key);
     for (const person of built.people) {
-      const site = built.spec.sites.find((s) => built.siteIds[s.key] === person.primarySiteId) as SiteSpec;
+      const site = must(built.spec.sites.find((s) => built.siteIds[s.key] === person.primarySiteId));
       const target = site.compliance ?? 0.9;
       const prng = rng.fork(person.id);
       for (const req of [safeguarding, firstAid, whatChanged, induction]) {
@@ -598,7 +933,7 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
   {
     const rng = streams.billing;
     const id = newId(rng);
-    const willow = keys.clients['willowLane'] as string;
+    const willow = keys.clients['willowLane'];
     const renewalInvoice = id();
     const attempts: [number, PaymentAttempt['result']][] = [
       [10, 'softDecline'],
@@ -607,12 +942,18 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
       [1, 'hardDecline'],
     ];
     for (const [daysAgo, result] of attempts) {
-      data.paymentAttempts.push({ id: id(), clientId: willow, invoiceId: renewalInvoice, at: iso(ago(daysAgo)), result });
+      data.paymentAttempts.push({
+        id: id(),
+        clientId: willow,
+        invoiceId: renewalInvoice,
+        at: iso(ago(daysAgo)),
+        result,
+      });
     }
     for (const key of ['littleAcorns', 'oakTree']) {
       data.paymentAttempts.push({
         id: id(),
-        clientId: keys.clients[key] as string,
+        clientId: must(keys.clients[key]),
         invoiceId: id(),
         at: iso(ago(40)),
         result: 'success',
@@ -621,7 +962,7 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     const aiAssistant = addOns.find((a) => a.name === 'AI Assistant');
     if (aiAssistant) {
       data.addOnSubscriptions.push({
-        clientId: keys.clients['littleAcorns'] as string,
+        clientId: keys.clients['littleAcorns'],
         addOnId: aiAssistant.id,
         status: 'off',
         usageThisPeriod: 0,

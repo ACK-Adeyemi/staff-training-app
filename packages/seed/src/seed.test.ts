@@ -418,7 +418,7 @@ describe('seed: Oak Tree Nurseries and Willow Lane', () => {
       [keys.sites['riverside'], keys.sites['hillside'], keys.sites['meadow']].sort(),
     );
     for (const m of managers) expect(m.scope).toMatchObject({ type: 'sites' });
-    expect(otUsers.has(keys.users['oakTreeGroupAdmin']!)).toBe(true);
+    expect(otUsers.has(keys.users['oakTreeGroupAdmin'])).toBe(true);
     expect(managers.map((a) => a.userId).sort()).toEqual(
       [keys.users['riversideManager'], keys.users['hillsideManager'], keys.users['meadowManager']].sort(),
     );
