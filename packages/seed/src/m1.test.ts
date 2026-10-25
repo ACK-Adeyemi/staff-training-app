@@ -157,7 +157,7 @@ describe('organisation policy and overlays (Assumption 10)', () => {
     }
     const questions = overlays.map((o) => sg.questions.find((q) => q.id === o.questionId)!);
     expect(questions.some((q) => q.sourceRef === 'EYFS 3.4')).toBe(true);
-    expect(questions.some((q) => q.learnMore?.some((l) => l.url.includes('nspcc.org.uk')))).toBe(true);
+    expect(questions.some((q) => q.learnMore.some((l) => l.url?.includes('nspcc.org.uk')))).toBe(true);
   });
 
   it('gives no other client an attachment or overlay', async () => {
@@ -219,12 +219,14 @@ describe('ensureCurrentSeed (Assumption 19)', () => {
   });
 
   it('does nothing when the stored version is current, keeping local changes', async () => {
+    // bulkPut never deletes, so the local change is a changed record: the assignment marked done.
     const { admin, dump } = await seeded();
-    const before = dump['assignments'].length;
-    await admin.bulkPut('assignments', []);
+    expect(dump['assignments']).toHaveLength(1);
+    await admin.bulkPut('assignments', [{ ...dump['assignments']![0], status: 'done' }]);
     expect(await ensureCurrentSeed(admin)).toBeNull();
-    expect(((await admin.dumpAll()) as Record<string, any[]>)['assignments']).toHaveLength(0);
-    expect(before).toBe(1);
+    const after = ((await admin.dumpAll()) as Record<string, any[]>)['assignments']!;
+    expect(after).toHaveLength(1);
+    expect(after[0].status).toBe('done');
   });
 
   it('does nothing when nothing is stored (first load stays with the caller)', async () => {

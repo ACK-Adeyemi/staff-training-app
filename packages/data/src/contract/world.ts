@@ -21,7 +21,7 @@ import {
   type UserAccount,
 } from '@sta/domain';
 import { load } from '@sta/seed';
-import type { DemoAdmin } from '../types';
+import type { DemoAdmin, StoreName } from '../types';
 
 export const TODAY = '2026-10-19T09:00:00.000Z';
 export const SEED_VALUE = 20261019;
@@ -62,8 +62,19 @@ const TEST_ADD_ON: AddOn = {
   adds: { customClientRoles: 1 },
 };
 
+const SEED_LEARNING_STORES = new Set(['modules', 'assignments', 'notifications', 'attachments', 'clientLinkOverlays']);
+
 export async function buildWorld(admin: DemoAdmin) {
   const keys = await load(admin, { seedValue: SEED_VALUE, today: TODAY });
+  // The contract suite builds its own learning records (see learning.ts), so it starts without the seed's M1 ones
+  // and with the M0 shape of the seed metadata.
+  const full = (await admin.dumpAll()) as Record<string, unknown[]>;
+  await admin.clearAll();
+  for (const [store, records] of Object.entries(full)) {
+    if (SEED_LEARNING_STORES.has(store)) continue;
+    await admin.bulkPut(store as StoreName, records);
+  }
+  await admin.setSeedMeta({ seedValue: SEED_VALUE, today: TODAY });
   const seeded = (await admin.dumpAll()) as unknown as WorldData;
   let n = 0;
   const nid = (): string => id(++n);

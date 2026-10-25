@@ -4,4 +4,5 @@ export type { CreateTOptions, LanguageCode, MessageKey, Messages, Params, TFunct
 export { addOnIds, addOns, floorPackageId, packageIds, packages } from './packages';
 export { moduleIds } from './packs/moduleIds';
 export { nurseryPack } from './packs/nursery';
+export { nurseryModules } from './packs/nursery/modules';
 export { allPacks, luxuryRetailPlaceholder, stubPacks } from './packs/stubs';

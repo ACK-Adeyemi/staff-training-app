@@ -1,6 +1,6 @@
 // The M0 seed world (build pack 7, scoped by plan Assumption 1). Pure: no store, no clock reads, no Math.random.
 // Every section draws from its own forked RNG stream, so adding data to one section never moves another.
-import { addOns, allPacks, nurseryPack, packageIds, packages } from '@sta/content';
+import { addOns, allPacks, moduleIds, nurseryModules, nurseryPack, packageIds, packages } from '@sta/content';
 import {
   addDays,
   addMonths,
@@ -10,12 +10,18 @@ import {
   createRng,
   daysBetween,
   fixedClock,
+  londonDateString,
   mondayOfWeek,
   providerRoleTemplates,
   startOfLondonDay,
   ulid,
   type AccountState,
   type AddOnSubscription,
+  type Assignment,
+  type Attachment,
+  type ClientLinkOverlay,
+  type Module,
+  type Notification,
   type Client,
   type Clock,
   type Evidence,
@@ -113,7 +119,31 @@ export type SeedData = {
   subscriptions: Subscription[];
   addOnSubscriptions: AddOnSubscription[];
   paymentAttempts: PaymentAttempt[];
+  modules: Module[];
+  assignments: Assignment[];
+  notifications: Notification[];
+  attachments: Attachment[];
+  clientLinkOverlays: ClientLinkOverlay[];
 };
+
+const POLICY_BODY = `## Little Acorns Safeguarding policy
+
+This is a fictional policy written for the demo.
+
+### Section 1: Our promise
+
+Every child at Little Acorns has the right to be safe. Every adult who works here shares that responsibility.
+
+### Section 2: Who to tell
+
+- Our Designated Safeguarding Lead (DSL) is the Nursery Manager. The Deputy Manager covers when the DSL is away.
+- If you are worried about a child, tell the DSL straight away and write down what you saw or heard, in your own words.
+- If your concern is about an adult at the nursery, tell the DSL. If the concern is about the DSL, tell the owner.
+- If you are not sure your concern is being taken seriously, you can contact the NSPCC whistleblowing advice line. You will not be treated unfairly for speaking up.
+
+### Section 3: Keeping this policy current
+
+The DSL reviews this policy every year and after any serious concern. Everyone signs to say they have read it.`;
 
 const iso = (d: Date): string => d.toISOString();
 const slug = (s: string): string => s.toLowerCase().replace(/[^a-z0-9]+/g, '');
@@ -558,6 +588,10 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     willowLane: root.fork('willowLane'),
     evidence: root.fork('evidence'),
     billing: root.fork('billing'),
+    // Added in M1; separate streams so the M0 streams (and every other persona's evidence) do not move.
+    modules: root.fork('modules'),
+    learning: root.fork('learning'),
+    overlays: root.fork('overlays'),
   };
   const newId = (rng: Rng) => (): string => ulid(clock, rng);
   const ago = (days: number): Date => addDays(today, -days);
@@ -589,6 +623,11 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     subscriptions: [],
     addOnSubscriptions: [],
     paymentAttempts: [],
+    modules: nurseryModules,
+    assignments: [],
+    notifications: [],
+    attachments: [],
+    clientLinkOverlays: [],
   };
 
   keys.requirements = {
@@ -859,7 +898,23 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
       if (person.status === 'archived') continue;
       const prng = rng.fork(p.key);
       const clusterOffset = cluster.get(p.key);
-      if (clusterOffset !== undefined) {
+      if (p.key === 'jade') {
+        // Assumption 1: Safeguarding done 18 months ago (about 6 months left, outside the amber window).
+        prng.int(30, 300); // keeps Jade's later draws where they were in M0
+        const completed = addMonths(today, -18);
+        data.evidence.push({
+          id: ulid(clock, prng),
+          clientId: person.clientId,
+          personId: person.id,
+          requirementId: safeguarding.id,
+          kind: 'module',
+          completedAt: iso(completed),
+          expiresAt: iso(addMonths(completed, 24)),
+          moduleId: moduleIds.safeguardingAndWhistleblowing,
+          moduleVersion: 1,
+          siteIdAtTime: person.primarySiteId,
+        });
+      } else if (clusterOffset !== undefined) {
         const expiry = clusterExpiry(clusterOffset);
         addEvidence(prng, person, safeguarding, addMonths(expiry, -24), expiry);
       } else if (p.key !== 'ben' && p.key !== 'sam') {
@@ -908,6 +963,69 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
       status: 'awaitingCheck',
       createdAt: iso(created),
     });
+  }
+
+  // M1 learning data: Jade's open assignment and its notification, Little Acorns' policy and the two overlays.
+  {
+    const lid = newId(streams.learning);
+    const oid = newId(streams.overlays);
+    const sgModule = must(nurseryModules.find((m) => m.id === moduleIds.safeguardingAndWhistleblowing));
+    const clientId = la.clientId;
+    const createdAt = iso(ago(3));
+    const dueAt = iso(addDays(today, 14));
+    data.assignments.push({
+      id: lid(),
+      clientId,
+      personId: must(keys.personas['jade']),
+      target: { moduleId: sgModule.id },
+      dueAt,
+      source: 'manual',
+      assignedBy: must(keys.users['priya']),
+      createdAt,
+      status: 'open',
+    });
+    data.notifications.push({
+      id: lid(),
+      clientId,
+      userId: must(keys.users['jade']),
+      kind: 'trainingAssigned',
+      params: { moduleTitle: sgModule.title, dueDate: londonDateString(new Date(dueAt)) },
+      createdAt,
+    });
+    const policyId = oid();
+    data.attachments.push({
+      id: policyId,
+      clientId,
+      title: 'Little Acorns Safeguarding policy',
+      mime: 'text/markdown',
+      body: POLICY_BODY,
+      createdAt: iso(ago(120)),
+    });
+    const dslQuestion = must(sgModule.questions.find((q) => q.sourceRef === 'EYFS 3.4'));
+    const whistleQuestion = must(
+      sgModule.questions.find((q) => q.learnMore.some((l) => l.url?.includes('nspcc.org.uk'))),
+    );
+    for (const [n, q] of [dslQuestion, whistleQuestion].entries()) {
+      data.clientLinkOverlays.push({
+        id: oid(),
+        clientId,
+        moduleId: sgModule.id,
+        questionId: q.id,
+        links: [
+          {
+            id: `little-acorns-policy-${n + 1}`,
+            title: 'Little Acorns Safeguarding policy, section 2',
+            attachmentId: policyId,
+            publisher: 'Little Acorns Nursery',
+            kind: 'organisation',
+            language: 'en-GB',
+            showFor: 'all',
+          },
+        ],
+        addedBy: must(keys.users['priya']),
+        addedAt: iso(ago(120)),
+      });
+    }
   }
 
   // Oak Tree and Willow Lane: evidence thinned per site to the stated compliance level.

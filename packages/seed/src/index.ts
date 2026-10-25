@@ -6,6 +6,8 @@ import { buildWorld, type SeedData, type SeedKeys } from './world';
 
 export type { SeedKeys } from './world';
 
+/** Version of the seeded world. 1 was M0; 2 adds modules, learning data and Little Acorns' policy (M1). */
+export const SEED_VERSION = 2;
 export const DEFAULT_SEED_VALUE = 20261019;
 /** Used only when nothing is stored and the caller gave no date. The web app passes the real first-load date. */
 export const DEFAULT_TODAY = '2026-10-19T09:00:00.000Z';
@@ -32,6 +34,11 @@ const storeOrder: (keyof SeedData)[] = [
   'subscriptions',
   'addOnSubscriptions',
   'paymentAttempts',
+  'modules',
+  'assignments',
+  'notifications',
+  'attachments',
+  'clientLinkOverlays',
 ];
 
 /** Replaces everything in the store with the seeded world, and stores the seed value and today. */
@@ -39,7 +46,7 @@ export async function load(admin: DemoAdmin, options: SeedMeta): Promise<SeedKey
   const { data, keys } = buildWorld(options);
   await admin.clearAll();
   for (const store of storeOrder) await admin.bulkPut(store, data[store]);
-  await admin.setSeedMeta({ seedValue: options.seedValue, today: options.today });
+  await admin.setSeedMeta({ seedValue: options.seedValue, today: options.today, seedVersion: SEED_VERSION });
   return keys;
 }
 
@@ -50,4 +57,14 @@ export async function reset(admin: DemoAdmin): Promise<SeedKeys> {
   const keys = await load(admin, meta);
   if (state) await admin.setDemoState({ ...state, clockOffsetMs: 0 });
   return keys;
+}
+
+/**
+ * If a stored world is older than SEED_VERSION, rebuilds it from the same seed value and today (Reset semantics).
+ * Returns the new keys, or null when nothing is stored or the stored world is already current.
+ */
+export async function ensureCurrentSeed(admin: DemoAdmin): Promise<SeedKeys | null> {
+  const meta = await admin.getSeedMeta();
+  if (!meta || (meta.seedVersion ?? 1) >= SEED_VERSION) return null;
+  return reset(admin);
 }

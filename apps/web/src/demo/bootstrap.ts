@@ -1,7 +1,7 @@
 import { createIndexedDbStore } from '@sta/data';
 import type { StoreHandle } from '@sta/data';
 import { createRng, offsetClock, startOfLondonDay, systemClock, type Clock, type DemoState } from '@sta/domain';
-import { DEFAULT_SEED_VALUE, load, reset, seedKeys, type SeedKeys } from '@sta/seed';
+import { DEFAULT_SEED_VALUE, ensureCurrentSeed, load, reset, seedKeys, type SeedKeys } from '@sta/seed';
 
 export type Booted = {
   handle: StoreHandle;
@@ -27,7 +27,7 @@ export async function bootstrap(search: string): Promise<Booted> {
   } else if (new URLSearchParams(search).get('reset') === '1') {
     keys = await reset(admin);
   } else {
-    keys = seedKeys(meta);
+    keys = (await ensureCurrentSeed(admin)) ?? seedKeys(meta);
   }
 
   let state = await admin.getDemoState();

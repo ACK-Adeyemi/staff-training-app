@@ -16,6 +16,8 @@ export type OutboxMessage = z.infer<typeof outboxMessageSchema>;
 export const seedMetaSchema = z.object({
   seedValue: z.number().int(),
   today: isoDateSchema,
+  /** Which version of the seeded world is stored. Missing means version 1 (M0). */
+  seedVersion: z.number().int().positive().optional(),
 });
 export type SeedMeta = z.infer<typeof seedMetaSchema>;
 
