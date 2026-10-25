@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M0
 Milestone base commit: 4fa6d3fdf9c044a7e3eaf4ebde1a00c330bc0689
-Next step: M0 chunk 12 (Demo shell: D1, Demo badge and menu, D2 skeleton, D3, ?reset=1, shortcut and long-press): test-writer then implementer. check.sh is fully green. Nursery renewal periods still VERIFY.
+Next step: M0 chunk 13 (Deploy and docs: deploy.yml, Dependabot npm, README, docs/demo-script.md stub, review-checklist M0 entries, final check.sh --install, local build+preview base-path and hash-routing check), then M0 acceptance criteria, security-reviewer, code-reviewer. Nursery renewal periods still VERIFY.
 
 ## Milestones
 - [ ] M0 Foundations
@@ -29,7 +29,7 @@ Next step: M0 chunk 12 (Demo shell: D1, Demo badge and menu, D2 skeleton, D3, ?r
 - [x] 9 IndexedDB adapter
 - [x] 10 UI tokens and base components
 - [x] 11 Web app and shells
-- [ ] 12 Demo shell
+- [x] 12 Demo shell
 - [ ] 13 Deploy and docs
 
 ## Acceptance criteria results
@@ -43,3 +43,4 @@ Next step: M0 chunk 12 (Demo shell: D1, Demo badge and menu, D2 skeleton, D3, ?r
 - 2026-10-25: M0 chunk 9 IndexedDB adapter landed (5bfbdb0).
 - 2026-10-25: M0 chunk 10 UI tokens and base components landed (adb4330).
 - 2026-10-25: M0 chunk 11 web app and shells landed (0816660); check.sh fully green.
+- 2026-10-25: M0 chunk 12 demo shell landed (db03240); check.sh fully green.
