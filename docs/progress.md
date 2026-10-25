@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M1
 Milestone base commit: 5619f46
-Next step: start M1: record base commit, then delegate docs/plans/m1.md to planner (build pack docs/build-pack/10-02-m1-client-story-core.md). Nursery renewal periods still VERIFY.
+Next step: M1 chunk 1 (test-writer then implementer) per docs/plans/m1.md. Nursery renewal periods still VERIFY.
 
 ## Milestones
 - [x] M0 Foundations
@@ -17,20 +17,19 @@ Next step: start M1: record base commit, then delegate docs/plans/m1.md to plann
 - [ ] M7 Battle Room
 
 ## Current milestone chunks
-(from docs/plans/m0.md, ticked as they land)
-- [x] 1 Workspace and tooling
-- [x] 2 Protected names hook
-- [x] 3 Domain basics
-- [x] 4 Permission engine
-- [x] 5 Entitlements, account states, packs, requirement status
-- [x] 6 Content scaffold
-- [x] 7 Data layer and memory adapter
-- [x] 8 Seed generator
-- [x] 9 IndexedDB adapter
-- [x] 10 UI tokens and base components
-- [x] 11 Web app and shells
-- [x] 12 Demo shell
-- [x] 13 Deploy and docs
+(from docs/plans/m1.md, ticked as they land)
+- [ ] 1 M0 known issues and decisions
+- [ ] 2 Learning schemas and quiz engine
+- [ ] 3 Domain views
+- [ ] 4 Safeguarding content
+- [ ] 5 Data layer
+- [ ] 6 Seed
+- [ ] 7 UI components
+- [ ] 8 Staff screens S1-S3, S8
+- [ ] 9 Staff learning flow S4-S7
+- [ ] 10 Client screens C1-C4
+- [ ] 11 C15 matrix and C8 stats
+- [ ] 12 Track A test and docs
 
 ## Acceptance criteria results
 M0 (final commit f7d32fd, scripts/check.sh fully green): BP-1..BP-8 and F-1..F-10 each proven by the tests listed in docs/plans/m0.md (unit, contract on both adapters, seed, component, Playwright incl. axe, no-network, text-scale, demo-shell). Pass, except deploy parts of BP-1: verified locally (build + preview, base path, hash routing), live check deferred to user in docs/review-checklist.md. Security review: FAIL on first pass (1 High, 3 Medium), all fixed in 1e22e2c; code review: APPROVE.
@@ -48,3 +47,4 @@ M0 (final commit f7d32fd, scripts/check.sh fully green): BP-1..BP-8 and F-1..F-1
 - 2026-10-25: M0 chunk 11 web app and shells landed (0816660); check.sh fully green.
 - 2026-10-25: M0 chunk 12 demo shell landed (db03240); check.sh fully green.
 - 2026-10-25: M0 complete (reviews done, fixes 1e22e2c).
+- 2026-10-25: M1 base 5619f46, plan docs/plans/m1.md written.
