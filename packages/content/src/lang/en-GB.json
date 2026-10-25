@@ -184,7 +184,20 @@
     "validation": "Please check what you entered and try again.",
     "unknown": "Something went wrong. Please try again.",
     "storage": "This device could not save the demo data. Try again, or reset the demo.",
-    "reload": "Try again"
+    "reload": "Try again",
+    "rule": {
+      "lessonsIncomplete": "Finish all the lessons first.",
+      "noRetakesLeft": "You have used all your attempts.",
+      "attemptFinished": "That quiz attempt is already finished.",
+      "alreadyAnswered": "You have already answered that question.",
+      "notInAttempt": "That question is not part of this quiz.",
+      "notAllAnswered": "Answer every question before you finish.",
+      "moduleNotPublished": "This training is not available yet.",
+      "invalidAnswer": "That answer could not be used. Please try again.",
+      "dueInPast": "The due date must be in the future.",
+      "tooMany": "That is too many people at once.",
+      "invalidPeople": "Some of those people cannot be chosen."
+    }
   },
   "staff": {
     "signin": {
@@ -262,6 +275,109 @@
       "other": "You have a new message.",
       "loadError": "We could not load your notifications. Please try again.",
       "bellWithCount": "Notifications, {count} unread"
+    },
+    "module": {
+      "notFoundTitle": "Training not found",
+      "notFound": "We could not find that training. It may not be available to you.",
+      "loadError": "We could not load this training. Please try again.",
+      "back": "Back to the module",
+      "backToLearn": "Back to Learn",
+      "draft": "Draft content",
+      "renewEvery": "Renew every {period}",
+      "renewYears": "{count} years",
+      "renewYear": "1 year",
+      "renewMonths": "{count} months",
+      "lessons": "Lessons",
+      "lessonMinutes": "{count} min",
+      "lessonDone": "Done",
+      "start": "Start",
+      "resume": "Resume",
+      "startQuiz": "Start quiz",
+      "quizHint": "The quiz opens when you have finished every lesson.",
+      "minutesTotal": "About {count} minutes in total"
+    },
+    "lesson": {
+      "step": "Step {current} of {total}",
+      "progress": "Lesson progress",
+      "next": "Next",
+      "back": "Back",
+      "finish": "Finish lesson",
+      "calloutInfo": "Good to know",
+      "calloutWarning": "Important",
+      "image": "Picture: {alt}",
+      "furtherReading": "Learn more",
+      "notFound": "We could not find that lesson.",
+      "saveError": "We could not save your progress. Please try again."
+    },
+    "quiz": {
+      "title": "Quiz: {title}",
+      "blocked": "Finish all the lessons first, then come back to take the quiz.",
+      "intro": "You will answer {count} questions. You need {passMark} out of 100 to pass.",
+      "introRetakes": "You can retake the quiz if you do not pass.",
+      "noRetakesLeft": "You have used all your attempts. Ask your manager what to do next.",
+      "start": "Start quiz",
+      "resume": "Resume quiz",
+      "question": "Question {current} of {total}",
+      "progress": "Quiz progress",
+      "chooseOne": "Choose one answer",
+      "submit": "Submit answer",
+      "continue": "Continue",
+      "nextQuestion": "Next question",
+      "finish": "Finish quiz",
+      "allAnswered": "You have answered every question. Finish the quiz to see your result.",
+      "feedback": "Feedback",
+      "correct": "Correct",
+      "notQuite": "Not quite",
+      "source": "Source: {ref}",
+      "learnMore": "Learn more",
+      "fromOrganisation": "From your organisation",
+      "learnMoreLabel": "Learn more: {title}",
+      "newTab": "(opens in a new tab)",
+      "answerRight": "Right answer",
+      "answerWrong": "Wrong answer",
+      "yourChoice": "You chose: {text}",
+      "outcome": {
+        "best": "Best choice",
+        "ok": "Acceptable",
+        "poor": "Not the best choice"
+      },
+      "kind": {
+        "official": "Official guidance",
+        "legislation": "Legislation",
+        "regulator": "Regulator",
+        "organisation": "Your organisation",
+        "other": "Other guidance"
+      },
+      "saveError": "We could not save your answer. Please try again."
+    },
+    "results": {
+      "passed": "You passed",
+      "failed": "Not passed this time",
+      "score": "Your score",
+      "detail": "You answered {right} of {total} questions correctly. The pass mark is {passMark} out of 100.",
+      "viewCertificate": "View certificate",
+      "retake": "Retake the quiz",
+      "backToModule": "Back to the module",
+      "review": "Review what you missed",
+      "noAttempt": "You have not finished a quiz for this module yet.",
+      "noRetakes": "There are no retakes left. Ask your manager what to do next.",
+      "failedHelp": "Read the explanations below, then try again when you are ready."
+    },
+    "certificate": {
+      "title": "Certificate of completion",
+      "certifies": "This certifies that",
+      "completed": "completed the training",
+      "version": "Version {version}",
+      "completedOn": "Completed on {date}",
+      "where": "{client}, {site} site",
+      "print": "Print or save as PDF",
+      "none": "There is no certificate yet. Pass the quiz to get one.",
+      "back": "Back to the module"
     }
+  },
+  "doc": {
+    "notFoundTitle": "Document not found",
+    "notFound": "We could not find that document. It may belong to another organisation.",
+    "back": "Back to the app"
   }
 }

@@ -13,6 +13,8 @@ export interface LearnMoreLinkProps {
   domain: string;
   locator?: string;
   onOpen?: () => void;
+  /** A link to a page inside this app (it starts with "#/"), such as an organisation document. */
+  internal?: boolean;
 }
 
 /** Only plain https links without embedded credentials become anchors. */
@@ -25,13 +27,22 @@ export function isSafeExternalUrl(url: string): boolean {
   }
 }
 
-export function LearnMoreLink({ url, label, newTabLabel, kindLabel, domain, locator, onOpen }: LearnMoreLinkProps) {
+export function LearnMoreLink({
+  url,
+  label,
+  newTabLabel,
+  kindLabel,
+  domain,
+  locator,
+  onOpen,
+  internal = false,
+}: LearnMoreLinkProps) {
   const ref = useRef<HTMLAnchorElement>(null);
   const openRef = useRef(onOpen);
   useEffect(() => {
     openRef.current = onOpen;
   });
-  const safe = isSafeExternalUrl(url);
+  const safe = internal ? /^#\/[A-Za-z0-9/_-]+$/.test(url) : isSafeExternalUrl(url);
 
   // Native capture listeners so onOpen runs before any other handler, including middle click.
   useEffect(() => {

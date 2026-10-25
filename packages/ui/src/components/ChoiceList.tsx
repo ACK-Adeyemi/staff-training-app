@@ -16,12 +16,27 @@ export interface ChoiceListProps {
   /** When set the list is read only and shows right and wrong marks. */
   result?: { correctIds: string[] } | undefined;
   stateLabels: { correct: string; incorrect: string; selected?: string };
+  /** Announce a single-choice list as a radio group (for questions) instead of a plain group. */
+  radioGroup?: boolean;
 }
 
-export function ChoiceList({ name, legend, type, options, value, onChange, result, stateLabels }: ChoiceListProps) {
+export function ChoiceList({
+  name,
+  legend,
+  type,
+  options,
+  value,
+  onChange,
+  result,
+  stateLabels,
+  radioGroup = false,
+}: ChoiceListProps) {
   const locked = result !== undefined;
   return (
-    <fieldset className="flex flex-col gap-2 border-0 p-0">
+    <fieldset
+      role={radioGroup && type === 'single' ? 'radiogroup' : undefined}
+      className="flex flex-col gap-2 border-0 p-0"
+    >
       <legend className="mb-2 text-lg font-semibold">{legend}</legend>
       {options.map((o) => {
         const selected = value.includes(o.id);

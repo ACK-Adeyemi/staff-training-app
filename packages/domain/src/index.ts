@@ -17,3 +17,4 @@ export * from './progress/client';
 export * from './progress/matrix';
 export * from './progress/moduleStats';
 export * from './assign';
+export * from './progress/learning';
