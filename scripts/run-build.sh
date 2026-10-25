@@ -67,7 +67,7 @@ while :; do
 
   ts="$(date +%Y%m%d-%H%M%S)"
   log "Session $((sessions + 1)) starting (log: $LOG_DIR/session-$ts.jsonl)"
-  "${COMPOSE[@]}" exec -T -e AGENT_TASK=1 dev \
+  "${COMPOSE[@]}" exec -T -e AGENT_TASK=1 -e CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1 dev \
     claude-agent -p "$(cat "$PROMPT_FILE")" \
       --permission-mode auto --model "$MODEL" \
       --output-format stream-json --verbose \
