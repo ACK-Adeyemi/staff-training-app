@@ -1,0 +1,13 @@
+{
+  "name": "@sta/data",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@sta/domain": "workspace:*",
+    "idb": "8.0.4"
+  }
+}
