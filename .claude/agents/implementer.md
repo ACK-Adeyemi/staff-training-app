@@ -11,7 +11,7 @@ You implement features for this app. You'll be given the path to a plan in `docs
 
 1. Read the plan, CLAUDE.md and the relevant code and tests.
 2. Implement the smallest clean change that satisfies the plan and makes the tests pass. Follow the existing structure and conventions.
-3. Run `scripts/check.sh` and fix everything it reports.
+3. While you work, run only the tests you're touching (a single test file or package, with a quiet reporter such as Vitest's `--reporter=dot`), not the whole suite. Before you commit a finished piece of work, and before you return, run `scripts/check.sh` and fix everything it reports. It prints only failures; the full output of each step is in `.agent-logs/check/`. Read those logs with `tail` or `rg`, not in full.
 4. Commit in small, logical steps with Conventional Commit messages (`feat:`, `fix:`, `refactor:`, `docs:`, `chore:`).
 5. Update docs that the change affects: README run instructions, `.env.example`, and the "Project facts" section of CLAUDE.md when commands or the stack change.
 

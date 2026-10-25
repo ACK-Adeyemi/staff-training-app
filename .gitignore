@@ -34,3 +34,8 @@ test-results/
 blob-report/
 *.tsbuildinfo
 .vite/
+
+# Generated section files and the official-source cache (rebuilt on the VM)
+docs/brief/
+docs/build-pack/
+.sources-cache/

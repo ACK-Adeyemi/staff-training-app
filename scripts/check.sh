@@ -4,6 +4,10 @@
 #
 #   scripts/check.sh            run lint, type checks, tests and dependency audits that apply
 #   scripts/check.sh --install  install dependencies first (used by CI)
+#
+# Output is kept short on purpose: each step's full output goes to .agent-logs/check/<step>.log,
+# and only failures print their last lines here. Open the log when you need more detail.
+# In CI (CI=true) the full output is printed, because CI logs are read by humans.
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
 
@@ -11,12 +15,28 @@ install=0
 [ "${1:-}" = "--install" ] && install=1
 failed=0
 ran=0
+LOG_DIR=".agent-logs/check"
+TAIL_LINES="${CHECK_TAIL_LINES:-60}"
+mkdir -p "$LOG_DIR"
 
 step() {
   local name="$1"; shift
-  echo "==> $name"
+  local log
+  log="$LOG_DIR/$(printf '%s' "$name" | tr -c 'A-Za-z0-9._-' '_' | cut -c1-60).log"
   ran=$((ran + 1))
-  if "$@"; then echo "    ok"; else echo "    FAILED: $name"; failed=1; fi
+  if [ "${CI:-}" = "true" ]; then
+    echo "==> $name"
+    if "$@"; then echo "    ok"; else echo "    FAILED: $name"; failed=1; fi
+    return
+  fi
+  local start=$SECONDS
+  if "$@" > "$log" 2>&1; then
+    echo "ok      $name ($((SECONDS - start))s)"
+  else
+    echo "FAILED  $name ($((SECONDS - start))s). Last $TAIL_LINES lines (full output: $log):"
+    tail -n "$TAIL_LINES" "$log" | sed 's/^/    /'
+    failed=1
+  fi
 }
 
 has_npm_script() { jq -e --arg s "$1" '.scripts[$s] // empty' package.json >/dev/null 2>&1; }

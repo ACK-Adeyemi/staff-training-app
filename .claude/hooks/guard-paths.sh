@@ -36,10 +36,12 @@ case "$rel" in
     # This app's build plan has the agents write CI and the Pages deploy workflow.
     # The human reviews every .github change when shipping (ship flags these files).
     exit 0 ;;
-  .devcontainer/*|.claude/*|scripts/agent|scripts/run-build.sh|scripts/BUILD_PROMPT.md)
+  .devcontainer/*|.claude/*|scripts/agent|scripts/run-build.sh|scripts/BUILD_PROMPT.md|scripts/split-docs.py)
     deny "$rel is protected (container, agent configuration or build loop). Don't change it. Describe the change you need in docs/questions-for-user.md." ;;
   docs/brief.md|docs/build-pack.md)
     deny "$rel is a source document owned by the user. Don't edit it; log conflicts or gaps in docs/decisions.md." ;;
+  docs/brief/*|docs/build-pack/*)
+    deny "$rel is generated from docs/brief.md or docs/build-pack.md by scripts/split-docs.py. Don't edit it; log conflicts or gaps in docs/decisions.md." ;;
   .protected-names)
     deny "Don't edit, print or commit .protected-names." ;;
   .env.example)

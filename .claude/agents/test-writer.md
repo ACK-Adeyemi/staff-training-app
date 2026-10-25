@@ -12,7 +12,7 @@ You write the tests for a feature before it's implemented. You'll be given the p
 1. Read the plan and CLAUDE.md. Follow the project's existing test layout and tools. If none exist yet, set up the standard test runner for the stack the plan names (for example Vitest or Jest for TypeScript, pytest for Python) and wire it into `npm test` or pytest so `scripts/check.sh` picks it up.
 2. Write tests that cover every acceptance criterion, plus the error paths, edge cases and permission checks in the test plan. Name each test after the behaviour it checks.
 3. Test against the real database (`DATABASE_URL`) for anything that touches data. Mock only things that are genuinely external.
-4. Run the tests and confirm they fail for the right reason (the feature is missing), not because of a typo or broken setup.
+4. Run just the tests you wrote (not the whole suite, and with a quiet reporter where the runner has one) and confirm they fail for the right reason (the feature is missing), not because of a typo or broken setup.
 5. Commit the tests on the current branch with a message like `test: <feature> acceptance tests`.
 
 ## Rules

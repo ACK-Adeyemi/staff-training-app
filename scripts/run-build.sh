@@ -4,7 +4,9 @@
 #
 #   tmux new -s build scripts/run-build.sh
 #
-# Detach: Ctrl+B then D.   Reattach: tmux attach -t build.   Stop: Ctrl+C in tmux, or tmux kill-session -t build.
+# Detach: Ctrl+B then D.   Reattach: tmux attach -t build.   Stop now: Ctrl+C in tmux, or tmux kill-session -t build.
+# Pause cleanly: touch .agent-logs/build/PAUSE. The current session finishes, then the loop waits
+# until you delete the file (rm .agent-logs/build/PAUSE). Use this before changing anything in the repo.
 # Progress: docs/progress.md.   Loop log: .agent-logs/build/loop.log.   Session logs: .agent-logs/build/.
 #
 # Each session is a fresh headless Claude Code run inside this app's dev container, in auto mode,
@@ -24,10 +26,12 @@ BRANCH="agent/poc-build"
 PROMPT_FILE="scripts/BUILD_PROMPT.md"
 LOG_DIR=".agent-logs/build"
 MODEL="${MODEL:-sonnet}"                 # coordinator; subagents use the models in .claude/agents
-MAX_SESSIONS="${MAX_SESSIONS:-80}"       # sessions that ran to completion
+MAX_SESSIONS="${MAX_SESSIONS:-250}"      # sessions that ran to completion
 MAX_FAILURES="${MAX_FAILURES:-200}"      # failed attempts in total (usage limits, network) before giving up
 WAIT_ON_ERROR="${WAIT_ON_ERROR:-1800}"   # seconds between retries after a failure
 WAIT_LONG="${WAIT_LONG:-7200}"           # after 6 failures in a row (e.g. a weekly limit), retry every 2 hours
+
+PAUSE_FILE="$LOG_DIR/PAUSE"
 
 mkdir -p "$LOG_DIR"
 log() { echo "$(date '+%F %T') $*" | tee -a "$LOG_DIR/loop.log"; }
@@ -37,6 +41,11 @@ status() { grep -m1 '^Status:' docs/progress.md 2>/dev/null | awk '{print $2, $3
 [ -f "$PROMPT_FILE" ] || { log "Missing $PROMPT_FILE"; exit 1; }
 [ -f docs/brief.md ] && [ -f docs/build-pack.md ] || { log "Missing docs/brief.md or docs/build-pack.md"; exit 1; }
 [ -f .protected-names ] || { log "Missing .protected-names (canary names for the M0 hook). See setup steps."; exit 1; }
+[ -f scripts/split-docs.py ] || { log "Missing scripts/split-docs.py"; exit 1; }
+
+# Regenerate the per-section copies of the brief and build pack (docs/brief/, docs/build-pack/).
+# They're git-ignored, so this also recreates them after a fresh clone or a change to the originals.
+split_docs() { "${COMPOSE[@]}" exec -T dev python3 scripts/split-docs.py >> "$LOG_DIR/loop.log" 2>&1; }
 
 # Get onto the build branch.
 current="$(git branch --show-current)"
@@ -46,6 +55,7 @@ if [ "$current" != "$BRANCH" ]; then
 fi
 
 "${COMPOSE[@]}" up -d --build --wait >/dev/null || { log "Containers failed to start. Run: scripts/agent doctor"; exit 1; }
+split_docs || { log "scripts/split-docs.py failed. See $LOG_DIR/loop.log"; exit 1; }
 
 sessions=0
 failures=0
@@ -60,10 +70,18 @@ while :; do
   [ "$sessions" -lt "$MAX_SESSIONS" ] || { log "Reached MAX_SESSIONS=$MAX_SESSIONS. See docs/progress.md"; exit 3; }
   [ "$failures" -lt "$MAX_FAILURES" ] || { log "Reached MAX_FAILURES=$MAX_FAILURES. See $LOG_DIR"; exit 4; }
 
+  if [ -f "$PAUSE_FILE" ]; then
+    log "Paused (delete $PAUSE_FILE to resume)."
+    while [ -f "$PAUSE_FILE" ]; do sleep 30; done
+    log "Resumed."
+    continue
+  fi
+
   # Containers can stop if the VM rebooted; bring them back.
   if [ -z "$("${COMPOSE[@]}" ps -q --status running dev 2>/dev/null)" ]; then
     "${COMPOSE[@]}" up -d --wait >/dev/null || { failures=$((failures + 1)); log "Containers not up; waiting."; sleep "$WAIT_ON_ERROR"; continue; }
   fi
+  split_docs || log "Warning: scripts/split-docs.py failed; using the existing section files."
 
   ts="$(date +%Y%m%d-%H%M%S)"
   log "Session $((sessions + 1)) starting (log: $LOG_DIR/session-$ts.jsonl)"
