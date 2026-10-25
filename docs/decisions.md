@@ -162,3 +162,8 @@ Choices made by the test-writer where build pack section 6 left things open, acc
 - The root layout renders the badge once; a shell header that has a `DemoBadgeSlot` receives it through a portal (the navigation e2e test expects the badge inside the banner), other screens get a strip. Reset demo no longer reloads (see above).
 - Dialog content renders only while the dialog is open, so closed dialogs add nothing to the page (and the build constants are only read when the menu is open).
 - `demo.outboxEmpty` and `demo.resetConfirmTitle` text changed to what the tests require. No test was changed.
+
+## M0 chunk 13
+- Local deploy check: `pnpm build && pnpm preview --host 0.0.0.0` (25 October 2026). `/staff-training-app/` returned 200 with index.html whose script and stylesheet URLs start with `/staff-training-app/assets/`; the hashed JS asset returned 200 as `text/javascript`; `/` redirected (302) to the base path. Routing is hash based (`#/staff` and so on), so the server needs no fallback rules. The preview server was stopped afterwards.
+- deploy.yml uses `actions/configure-pages@v6`, `actions/upload-pages-artifact@v5` and `actions/deploy-pages@v5`, with checkout and setup-node at v7 as in ci.yml. VERIFY: the sandbox cannot reach the actions' releases pages, so these major tags come from the plan and are unconfirmed. Dependabot (github-actions, now also npm) will propose corrections. Listed in docs/review-checklist.md.
+- `.env.example` already carried `BASE_PATH` from an earlier chunk.
