@@ -26,6 +26,8 @@ import {
   type StoreName,
   type StoreOptions,
 } from '../types';
+import { flowOf } from './evidenceFlow';
+import { ruleOf } from './learning';
 import { buildWorld, freshId, TODAY, type World as Fixture } from './world';
 
 const ALL_STORES: StoreName[] = [
@@ -360,9 +362,8 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const { store, fx } = await setup();
         const ctx = staff(fx.ids.users.ben, fx.ids.clients.a);
         const own = await store.evidenceSubmissions.get(ctx, fx.ids.submissions.ben);
-        expect(await forbiddenReason(store.evidenceSubmissions.put(ctx, { ...own, status: 'approved' }))).toBe(
-          'permission',
-        );
+        expect(own.personId).toBe(fx.ids.people.ben);
+        expect(await forbiddenReason(flowOf(store).review(ctx, own.id, { kind: 'approve' }))).toBe('permission');
       });
 
       it.todo(
@@ -664,12 +665,7 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const { store, admin, fx } = await setup();
         const ctx = client(fx.ids.users.daniel, fx.ids.clients.a);
         const pending = await store.evidenceSubmissions.get(ctx, fx.ids.submissions.ben);
-        const approved = await store.evidenceSubmissions.put(ctx, {
-          ...pending,
-          status: 'approved',
-          reviewerId: fx.ids.users.daniel,
-          reviewedAt: TODAY,
-        });
+        const approved = await flowOf(store).review(ctx, pending.id, { kind: 'approve' });
         expect(approved.status).toBe('approved');
         expect(approved.evidenceId).toBeDefined();
 
@@ -721,12 +717,7 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
           ).status;
         expect(await statusNow()).toBe('awaitingCheck');
         const pending = await store.evidenceSubmissions.get(ctx, fx.ids.submissions.ben);
-        await store.evidenceSubmissions.put(ctx, {
-          ...pending,
-          status: 'approved',
-          reviewerId: fx.ids.users.daniel,
-          reviewedAt: TODAY,
-        });
+        await flowOf(store).review(ctx, pending.id, { kind: 'approve' });
         expect(await statusNow()).toBe('current');
       });
 
@@ -734,18 +725,14 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const { store, fx } = await setup();
         const ctx = client(fx.ids.users.daniel, fx.ids.clients.a);
         const own = await store.evidenceSubmissions.get(ctx, fx.ids.submissions.byDaniel);
-        expect(await forbiddenReason(store.evidenceSubmissions.put(ctx, { ...own, status: 'approved' }))).toBe(
-          'ownUpload',
-        );
+        expect(await forbiddenReason(flowOf(store).review(ctx, own.id, { kind: 'approve' }))).toBe('ownUpload');
       });
 
       it('refuses approving evidence about the approver', async () => {
         const { store, fx } = await setup();
         const ctx = client(fx.ids.users.daniel, fx.ids.clients.a);
         const about = await store.evidenceSubmissions.get(ctx, fx.ids.submissions.aboutDaniel);
-        expect(await forbiddenReason(store.evidenceSubmissions.put(ctx, { ...about, status: 'approved' }))).toBe(
-          'aboutSelf',
-        );
+        expect(await forbiddenReason(flowOf(store).review(ctx, about.id, { kind: 'approve' }))).toBe('aboutSelf');
       });
 
       it('refuses approving a submission at a site outside the approver scope', async () => {
@@ -755,16 +742,14 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const daniel = client(fx.ids.users.daniel, fx.ids.clients.a);
         // Daniel cannot even see the other site's submission; he can only send it blind.
         expect(await refusal(store.evidenceSubmissions.get(daniel, other.id))).toBeInstanceOf(NotFoundError);
-        expect(await forbiddenReason(store.evidenceSubmissions.put(daniel, { ...other, status: 'approved' }))).toBe(
-          'outOfScope',
-        );
+        expect(await forbiddenReason(flowOf(store).review(daniel, other.id, { kind: 'approve' }))).toBe('outOfScope');
       });
 
       it('writes neither evidence nor audit when approval is refused', async () => {
         const { store, admin, fx } = await setup();
         const ctx = client(fx.ids.users.daniel, fx.ids.clients.a);
         const own = await store.evidenceSubmissions.get(ctx, fx.ids.submissions.byDaniel);
-        await refusal(store.evidenceSubmissions.put(ctx, { ...own, status: 'approved' }));
+        await refusal(flowOf(store).review(ctx, own.id, { kind: 'approve' }));
         const dump = (await admin.dumpAll()) as Record<string, unknown[]>;
         expect(dump['audit']).toHaveLength(0);
         expect(dump['evidence']).toHaveLength(fx.data.evidence.length);
@@ -775,12 +760,7 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const later = addDays(new Date(TODAY), 3).toISOString();
         const ctx = client(fx.ids.users.daniel, fx.ids.clients.a, later);
         const pending = await store.evidenceSubmissions.get(ctx, fx.ids.submissions.ben);
-        await store.evidenceSubmissions.put(ctx, {
-          ...pending,
-          status: 'approved',
-          reviewerId: fx.ids.users.daniel,
-          reviewedAt: later,
-        });
+        await flowOf(store).review(ctx, pending.id, { kind: 'approve' });
         const created = (await store.evidence.list(ctx, { personId: fx.ids.people.ben })).find(
           (e) => e.submissionId === pending.id,
         );
@@ -793,12 +773,7 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const { store, admin, fx, options } = await setup();
         const ctx = client(fx.ids.users.daniel, fx.ids.clients.a);
         const pending = await store.evidenceSubmissions.get(ctx, fx.ids.submissions.ben);
-        const approved: EvidenceSubmission = await store.evidenceSubmissions.put(ctx, {
-          ...pending,
-          status: 'approved',
-          reviewerId: fx.ids.users.daniel,
-          reviewedAt: TODAY,
-        });
+        const approved: EvidenceSubmission = await flowOf(store).review(ctx, pending.id, { kind: 'approve' });
         const prefix = ulid(options.clock, createRng(1)).slice(0, 10);
         expect(approved.evidenceId!.slice(0, 10)).toBe(prefix);
         const audit = ((await admin.dumpAll()) as Record<string, { id: string }[]>)['audit']!;
@@ -828,10 +803,10 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const { store, fx } = await setup();
         const daniel = client(fx.ids.users.daniel, fx.ids.clients.a);
         const pending = await store.evidenceSubmissions.get(daniel, fx.ids.submissions.ben);
-        const approved = await store.evidenceSubmissions.put(daniel, { ...pending, status: 'approved' });
+        const approved = await flowOf(store).review(daniel, pending.id, { kind: 'approve' });
         const priya = client(fx.ids.users.priya, fx.ids.clients.a);
-        expect(await forbiddenReason(store.evidenceSubmissions.put(priya, { ...approved, status: 'rejected' }))).toBe(
-          'permission',
+        expect(await ruleOf(flowOf(store).review(priya, approved.id, { kind: 'reject', reason: 'other' }))).toBe(
+          'notAwaitingCheck',
         );
         expect(
           await forbiddenReason(store.evidenceSubmissions.put(priya, { ...approved, providerName: 'Changed Ltd' })),
@@ -850,11 +825,11 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         expect(stored.siteId).toBe(other.siteId);
       });
 
-      it('lets staff create their own and withdraw their own waiting submission, and nothing else', async () => {
+      it('lets staff withdraw their own waiting submission through evidenceFlow, and nothing else', async () => {
         const { store, fx } = await setup();
         const ben = staff(fx.ids.users.ben, fx.ids.clients.a);
         const own = await store.evidenceSubmissions.get(ben, fx.ids.submissions.ben);
-        // Cannot set reviewer fields or a decision.
+        // Cannot set reviewer fields or a decision, or create a record, by a direct write.
         expect(
           await forbiddenReason(store.evidenceSubmissions.put(ben, { ...own, reviewerId: fx.ids.users.ben })),
         ).toBe('permission');
@@ -868,9 +843,13 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         );
         const fresh = { ...own, id: freshId(73), reviewedAt: TODAY };
         expect(await forbiddenReason(store.evidenceSubmissions.put(ben, fresh))).toBe('permission');
-        const created = await store.evidenceSubmissions.put(ben, { ...own, id: freshId(74) });
-        expect(created.status).toBe('awaitingCheck');
-        const withdrawn = await store.evidenceSubmissions.put(ben, { ...own, status: 'withdrawn' });
+        expect(await forbiddenReason(store.evidenceSubmissions.put(ben, { ...own, id: freshId(74) }))).toBe(
+          'permission',
+        );
+        expect(await forbiddenReason(flowOf(store).review(ben, own.id, { kind: 'reject', reason: 'other' }))).toBe(
+          'permission',
+        );
+        const withdrawn = await flowOf(store).withdraw(ben, own.id);
         expect(withdrawn.status).toBe('withdrawn');
         // A withdrawn submission cannot be revived.
         expect(await forbiddenReason(store.evidenceSubmissions.put(ben, { ...own, status: 'awaitingCheck' }))).toBe(
@@ -882,13 +861,13 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const { store, admin, fx } = await setup();
         const daniel = client(fx.ids.users.daniel, fx.ids.clients.a);
         const pending = await store.evidenceSubmissions.get(daniel, fx.ids.submissions.ben);
-        const rejected = await store.evidenceSubmissions.put(daniel, {
-          ...pending,
+        const rejected = await flowOf(store).review(daniel, pending.id, { kind: 'reject', reason: 'unreadable' });
+        expect(rejected).toMatchObject({
           status: 'rejected',
-          reviewerId: fx.ids.users.priya,
-          rejectionReason: 'Unreadable',
+          rejectionReason: 'unreadable',
+          reviewerId: fx.ids.users.daniel,
+          reviewedAt: TODAY,
         });
-        expect(rejected).toMatchObject({ status: 'rejected', reviewerId: fx.ids.users.daniel, reviewedAt: TODAY });
         const dump = (await admin.dumpAll()) as Record<string, { action?: string }[]>;
         expect(dump['audit']!.filter((e) => e.action === 'evidence.rejected')).toHaveLength(1);
       });
@@ -915,7 +894,13 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const { store, admin, fx } = await setup();
         const daniel = client(fx.ids.users.daniel, fx.ids.clients.a);
         const pending = await store.evidenceSubmissions.get(daniel, fx.ids.submissions.ben);
-        await store.evidenceSubmissions.put(daniel, { ...pending, status: 'approved', decisionNote: 'Looks fine' });
+        await flowOf(store).review(daniel, pending.id, { kind: 'approve' });
+        const priya = client(fx.ids.users.priya, fx.ids.clients.a);
+        await flowOf(store).review(priya, fx.ids.submissions.otherSite, {
+          kind: 'reject',
+          reason: 'other',
+          note: 'Looks fine',
+        });
         const dump = (await admin.dumpAll()) as Record<string, object[]>;
         const text = JSON.stringify(dump['audit']);
         for (const field of ['personId', 'fileAttachmentId', 'decisionNote', 'providerName', 'Looks fine']) {

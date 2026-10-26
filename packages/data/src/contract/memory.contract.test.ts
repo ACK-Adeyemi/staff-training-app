@@ -5,6 +5,8 @@ import { runBillingContract } from './billing';
 import { runAdminCountContract } from './adminCount';
 import { runCompetitionsContract } from './competitions';
 import { runEngagementContract } from './engagement';
+import { runEvidenceFlowContract } from './evidenceFlow';
+import { runFeedbackTicketsContract } from './feedbackTickets';
 import { runIdentityOrgContract } from './identityOrg';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
@@ -27,3 +29,7 @@ runIdentityOrgContract('memory adapter', (options) => Promise.resolve(createMemo
 runBillingContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
 runAuthoringFilesContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runEvidenceFlowContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runFeedbackTicketsContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));

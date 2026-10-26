@@ -6,6 +6,8 @@ import { runBillingContract } from './billing';
 import { runAdminCountContract } from './adminCount';
 import { runCompetitionsContract } from './competitions';
 import { runEngagementContract } from './engagement';
+import { runEvidenceFlowContract } from './evidenceFlow';
+import { runFeedbackTicketsContract } from './feedbackTickets';
 import { runIdentityOrgContract } from './identityOrg';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
@@ -36,5 +38,13 @@ runIdentityOrgContract('indexeddb adapter', (options) =>
 runBillingContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
 
 runAuthoringFilesContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+
+runEvidenceFlowContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+
+runFeedbackTicketsContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );
