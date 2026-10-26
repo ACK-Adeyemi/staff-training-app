@@ -4,12 +4,12 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M2
 Milestone base commit: 7c4064d
-Next step: M2 chunk 15 (Rewards and progress; see docs/plans/m2.md work chunks): test-writer then implementer. Chunks 1-14 done (latest 0e06274).
+Next step: M2 chunk 16 (Compete and admin engagement; see docs/plans/m2.md work chunks): test-writer then implementer. Chunks 1-15 done (latest c35028b).
 
 ## Milestones
 - [x] M0 Foundations
 - [x] M1 Client story core
-- [ ] M2 Engagement (chunks 1-14 done)
+- [ ] M2 Engagement (chunks 1-15 done)
 - [ ] M3 Client admin depth
 - [ ] M4 Provider story
 - [ ] M5 Polish and demo readiness
@@ -17,7 +17,7 @@ Next step: M2 chunk 15 (Rewards and progress; see docs/plans/m2.md work chunks):
 - [ ] M7 Battle Room
 
 ## Current milestone chunks
-M2 (17 chunks, see docs/plans/m2.md 'Work chunks'): chunks 1-14 done; 15 to 17 pending.
+M2 (17 chunks, see docs/plans/m2.md 'Work chunks'): chunks 1-15 done; 16 and 17 pending.
 M1 (all done):
 - [x] 1 M0 known issues and decisions
 - [x] 2 Learning schemas and quiz engine
@@ -77,3 +77,4 @@ M1 (final commit 5b87b6d, scripts/check.sh fully green): BP-1 refresher on 390x8
 - 2026-10-26: M2 chunk 12 display and accessibility, Me landed (32abca0), check.sh green. Stopping at a clean point; chunk 13 next.
 - 2026-10-26: M2 chunk 13 learn and organise landed (b17a9c2), check.sh green. Stopping at a clean point; chunk 14 next.
 - 2026-10-26: M2 chunk 14 notes and quiz modes landed (0e06274), check.sh green; C1 two-tab flake root-caused and fixed. Stopping at a clean point; chunk 15 next.
+- 2026-10-26: M2 chunk 15 rewards and progress landed (c35028b), check.sh green. Stopping at a clean point; chunk 16 next.
