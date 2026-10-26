@@ -71,3 +71,11 @@ export const competeRoutes: NavEntry[] = [
   { hash: '#/client/competitions/new', label: 'New competition' },
   { hash: '#/client/leaderboards', label: 'Leaderboard settings' },
 ];
+
+/** M2 chunk 17: every new M2 route without an id in it, once each (F-10). */
+export const m2Routes: NavEntry[] = [
+  { hash: '#/staff/notes', label: 'My notes' },
+  ...displayRoutes,
+  ...organiseRoutes,
+  ...competeRoutes,
+].filter((r, i, all) => all.findIndex((x) => x.hash === r.hash) === i);

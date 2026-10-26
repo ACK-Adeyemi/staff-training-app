@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Badge, Button, Card, GoalRing, LinkButton, PageHeader, ProgressRing } from '@sta/ui';
 import {
   competitionStatus,
+  daysBetween,
   staffRingPercent,
   type Assignment,
   type Competition,
@@ -92,6 +93,7 @@ function WeeklyGoalSection({ goal }: { goal: RewardsData['goal'] }) {
 function Banner({ competition, onDismiss }: { competition: Competition; onDismiss: () => void }) {
   const t = useT();
   const [open, setOpen] = useState(false);
+  const left = Math.max(0, daysBetween(useClock().now(), new Date(competition.endAt)));
   return (
     <li
       data-testid="competition-banner"
@@ -113,6 +115,8 @@ function Banner({ competition, onDismiss }: { competition: Competition; onDismis
         </span>
         <span className="block text-sm">
           {t('staff.home.competitionEnds', { date: formatLondonDate(competition.endAt) })}
+          {'. '}
+          {left === 1 ? t('client.person.daysLeftOne') : t('client.person.daysLeft', { count: left })}
         </span>
       </span>
       <Button variant="secondary" onClick={onDismiss}>

@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { readStore } from './helpers/idb';
-import { shellRoutes } from './routes';
+import { m2Routes, shellRoutes } from './routes';
 
 // M1 routes with ids: the module id is the seed's Safeguarding module; lessons come from its module.json;
 // people and attachments are read from the app's own IndexedDB once the seed has loaded.
@@ -57,6 +57,7 @@ const routes: Route[] = [
   ...shellRoutes.map((r) => ({ hash: r.hash, name: `${r.hash} ${r.label}` })),
   { hash: '#/no/such/page', name: 'Not found' },
   ...m1Routes,
+  ...m2Routes.map((r) => ({ hash: r.hash, name: `M2 ${r.hash} ${r.label}` })),
 ];
 
 for (const colorScheme of ['light', 'dark'] as const) {
@@ -68,6 +69,25 @@ for (const colorScheme of ['light', 'dark'] as const) {
         await page.goto(hash === '#/' ? './' : `./${hash}`);
         await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
         await expect(page.getByRole('main')).toHaveCount(1);
+        const results = await new AxeBuilder({ page }).analyze();
+        const bad = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
+        expect(bad.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+      });
+    }
+  });
+}
+
+// F-10: the M2 routes also pass axe with high contrast on (and in dark), at the project's viewport.
+for (const colorScheme of ['light', 'dark'] as const) {
+  test.describe(`high contrast, ${colorScheme}`, () => {
+    test.use({ colorScheme });
+    for (const route of m2Routes) {
+      test(`${route.hash} passes axe with high contrast (${colorScheme})`, async ({ page }) => {
+        await page.goto(`./${route.hash}`);
+        await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+        await page.evaluate(() => {
+          document.documentElement.setAttribute('data-contrast', 'high');
+        });
         const results = await new AxeBuilder({ page }).analyze();
         const bad = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
         expect(bad.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
