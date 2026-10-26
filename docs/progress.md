@@ -4,12 +4,12 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M2
 Milestone base commit: 7c4064d
-Next step: M2 chunk 1 (decisions and schemas) from docs/plans/m2.md, test-writer then implementer. Nursery renewal periods still VERIFY.
+Next step: M2 chunk 2 (XP, levels, badges, weekly goal, history in domain) from docs/plans/m2.md. Chunk 1 done (13afbba).
 
 ## Milestones
 - [x] M0 Foundations
 - [x] M1 Client story core
-- [ ] M2 Engagement
+- [ ] M2 Engagement (chunk 1 done)
 - [ ] M3 Client admin depth
 - [ ] M4 Provider story
 - [ ] M5 Polish and demo readiness
