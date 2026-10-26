@@ -38,7 +38,7 @@ M0 (final commit f7d32fd, scripts/check.sh fully green): BP-1..BP-8 and F-1..F-1
 M1 (final commit 5b87b6d, scripts/check.sh fully green): BP-1 refresher on 390x844 with branching scenario and evidence with version+site (safeguarding-refresher e2e, contract tests); BP-2 wrong-answer explanation, Learn more links (new tab, icon, domain), results list, learnMoreOpened with no XP (component + e2e); BP-3 draw modes and shuffle (domain tests); BP-4 C1 order and live update (client-dashboard e2e, seed test); BP-5 C4 assigns 3 people with notifications (component + e2e); BP-6 matrix print-to-PDF in Chromium plus visual review of the PNG/PDF (training-matrix e2e); BP-7 Track A steps 1, 3, 5 (matrix part) in track-a.spec.ts. K-1, K-2 fixed. Security review PASS (1 Medium and 2 Low fixed, 1 Low documented); code review CHANGES REQUESTED then all Must/Should fixed in one round (F-9 axe coverage on all new routes). Deferred to user: phone checks in docs/review-checklist.md; CI poppler-utils step in .github/workflows/ci.yml needs the user's review.
 
 ## User feedback
-- F1 (M0, ?reset=1): fixed; awaiting user re-check. Cause: editing only the hash (`#/staff?reset=1`) never reloads the page and the hash form was not read. Both forms now work (resetParam.ts, hashchange reload), with e2e for both against the base-path build. Fix commit: see git log (fix: ?reset=1 in both places).
+- F1 (M0, ?reset=1): fixed; awaiting user re-check. Cause: editing only the hash (`#/staff?reset=1`) never reloads the page and the hash form was not read. Both forms now work (resetParam.ts, hashchange reload), with e2e for both against the base-path build. Fix commit: see git log "fix: ?reset=1 works before the hash".
 
 ## Known issues
 - e2e 'C1 updates in one tab when Jade passes the refresher in another tab' (client-dashboard.spec.ts) failed once, passed on rerun: possible flake, watch it.
@@ -81,3 +81,4 @@ M1 (final commit 5b87b6d, scripts/check.sh fully green): BP-1 refresher on 390x8
 - 2026-10-26: M2 chunk 13 learn and organise landed (b17a9c2), check.sh green. Stopping at a clean point; chunk 14 next.
 - 2026-10-26: M2 chunk 14 notes and quiz modes landed (0e06274), check.sh green; C1 two-tab flake root-caused and fixed. Stopping at a clean point; chunk 15 next.
 - 2026-10-26: M2 chunk 15 rewards and progress landed (c35028b), check.sh green. Stopping at a clean point; chunk 16 next.
+- 2026-10-26: merged origin/main (user feedback); F1 fixed and committed, check.sh green. Chunk 16 next.
