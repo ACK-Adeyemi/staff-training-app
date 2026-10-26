@@ -10,7 +10,7 @@ Things only the user can check, by milestone.
 - [ ] Staff, Client admin and Provider each open with their navigation; the tabs and More work with a thumb.
 - [ ] Long-press the Demo badge: the presenter panel opens; Fast-forward and Reset demo work; the Demo menu shows the version and build date.
 - [ ] Dark mode and large text on the phone look right.
-- [ ] `?reset=1` on the URL resets the demo.
+- [ ] `?reset=1` on the URL resets the demo, before the hash and at the end of the address (re-check after F1 fix).
 - [ ] On GitHub: the `checks` job passes, the deploy workflow publishes after a merge to main, and Pages is set to deploy from GitHub Actions.
 
 ### Awaiting review

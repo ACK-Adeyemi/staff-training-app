@@ -5,6 +5,7 @@ import { Button } from '@sta/ui';
 import { App } from './App';
 import { applyRemembered } from './app/display/applied';
 import { bootstrap } from './demo/bootstrap';
+import { reloadAddressForHashReset } from './demo/resetParam';
 import { listenEarly } from './demo/earlyShortcut';
 import './styles/app.css';
 
@@ -15,7 +16,7 @@ const root = createRoot(container);
 
 applyRemembered();
 listenEarly();
-bootstrap(window.location.search).then(
+bootstrap(window.location.search, window.location.hash).then(
   (booted) => {
     root.render(
       <StrictMode>
@@ -41,3 +42,8 @@ bootstrap(window.location.search).then(
     );
   },
 );
+
+window.addEventListener('hashchange', () => {
+  const next = reloadAddressForHashReset(window.location.href);
+  if (next) window.location.replace(next);
+});

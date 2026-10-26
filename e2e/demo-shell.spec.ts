@@ -230,6 +230,29 @@ test.describe('?reset=1', () => {
     expect(dayNumber(await dateText(page))).toBe(today);
   });
 
+  for (const [label, target] of [
+    ['before the hash', './?reset=1#/staff'],
+    ['at the end of the address', './#/staff?reset=1'],
+  ] as const) {
+    test(`resets when reset=1 is ${label}, under the Pages base path`, async ({ page }) => {
+      await page.goto('./#/staff');
+      await page.keyboard.press('Shift+Alt+KeyP');
+      const today = dayNumber(await dateText(page));
+      await panel(page)
+        .getByRole('button', { name: /^Fast-forward 7 days?$/ })
+        .click();
+      await expect.poll(async () => dayNumber(await dateText(page))).toBe(today + 7);
+
+      await page.goto(target);
+      await expect(badge(page)).toBeVisible();
+      expect(page.url()).toContain('/staff-training-app/');
+      expect(page.url()).not.toContain('reset=1');
+      expect(page.url()).toContain('#/staff');
+      await page.keyboard.press('Shift+Alt+KeyP');
+      expect(dayNumber(await dateText(page))).toBe(today);
+    });
+  }
+
   test('other URL parameters are ignored', async ({ page }) => {
     await page.goto('./#/staff');
     await page.keyboard.press('Shift+Alt+KeyP');
