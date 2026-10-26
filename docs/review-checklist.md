@@ -46,3 +46,16 @@ Things only the user can check, by milestone.
 - [ ] VERIFY: NEW_STARTER_DAYS (14). New starters are not flagged as "not started" for this many days after their start date. Confirm the length with the first client.
 - [ ] Production: staff can read answer keys in the static app (modules ship with their answers). Serve questions without answer keys in production, and mark answers on the server.
 - [ ] .github/workflows/ci.yml now has an apt-get step that installs poppler-utils (needed by the matrix PDF e2e tests). Review the .github change before it reaches GitHub.
+
+### M2 phone checks
+
+- [ ] As Jade: add a note in a lesson, take the quiz with notes hidden, see the celebration, XP breakdown, badge and "You're 2nd of 13", then open My notes and tap the course chip.
+- [ ] As Maureen (PIN 1234): Simple view and large text look right; Read this aloud works on a lesson with a local voice (VERIFY on a real phone; some devices have no local voice).
+- [ ] On Display settings (S12), try every setting, including 200 per cent text, display zoom, high contrast, dark mode and the dyslexia-friendly font; reload and check they stay. Check the dyslexia font licence note.
+- [ ] As Priya: create a competition with Suggest a prize, publish it, and check Jade's banner (prize, days left) and details sheet; record winners on an ended one.
+- [ ] Hide Jade from leaderboards and confirm she disappears from colleagues' views.
+- [ ] Review the XP numbers, level thresholds, badge rules and the 20 prize suggestions (placeholders).
+
+### Awaiting review (M2)
+
+- [ ] Draft modules awaiting your review: Paediatric first aid and accidents, Safer eating, allergies and choking, Safer sleep, and What changed in September 2026 (details above under Awaiting content review).
