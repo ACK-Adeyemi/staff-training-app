@@ -13,6 +13,7 @@ import {
   lastOwnerGuard,
   ulid,
   type AddOn,
+  type EffectiveEntitlements,
   type AddOnSubscription,
   type Assignment,
   type AuditEvent,
@@ -586,10 +587,11 @@ function removeRole(call: Call, role: Role): WriteResult {
   };
 }
 
-async function checkCustomRoleLimit(call: Call, clientId: string): Promise<void> {
+/** The account's effective entitlements (package, active add-ons, account state), or undefined if it has no package. */
+export async function clientEntitlements(call: Call, clientId: string): Promise<EffectiveEntitlements | undefined> {
   const client = await call.find<Client>('clients', clientId);
   const pkg = client ? await call.find<Package>('packages', client.packageId) : undefined;
-  if (!client || !pkg) throw new NotEntitledError('customClientRoles');
+  if (!client || !pkg) return undefined;
   const packages = await call.all<Package>('packages');
   // The floor package is the cheapest one: what an account keeps when it is not on a full plan.
   const price = (p: Package): number => p.bands[0]?.pricePerSite ?? 0;
@@ -598,7 +600,12 @@ async function checkCustomRoleLimit(call: Call, clientId: string): Promise<void>
     (s) => s.clientId === clientId && s.status !== 'off',
   );
   const addOns = (await call.all<AddOn>('addOns')).filter((a) => addOnSubs.some((s) => s.addOnId === a.id));
-  const ents = entitlements(pkg, addOns, client.accountState, floor);
+  return entitlements(pkg, addOns, client.accountState, floor);
+}
+
+async function checkCustomRoleLimit(call: Call, clientId: string): Promise<void> {
+  const ents = await clientEntitlements(call, clientId);
+  if (!ents) throw new NotEntitledError('customClientRoles');
   const roles = await call.all<Role>('roles');
   const used = roles.filter((r) => r.owner !== 'provider' && r.owner.clientId === clientId && !r.system).length;
   if (!checkLimit(ents, { customClientRoles: used }, 'customClientRoles').allowed) {

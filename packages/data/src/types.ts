@@ -7,15 +7,18 @@ import type {
   Attachment,
   Attempt,
   AuditEvent,
+  BoardId,
   Category,
   Client,
   ClientLinkOverlay,
   Clock,
+  Competition,
   DemoState,
   Evidence,
   EvidenceSubmission,
   JobRole,
   LearnerPrefs,
+  LeaderboardRow,
   LearningEvent,
   Module,
   ModuleGroup,
@@ -32,9 +35,12 @@ import type {
   RoleAssignment,
   SeedMeta,
   Site,
+  StandingBoardSettings,
   Subscription,
   Team,
   UserAccount,
+  ViewerPosition,
+  WinnerLine,
 } from '@sta/domain';
 
 export type Id = string;
@@ -289,6 +295,51 @@ export interface ModulePlacementsService extends ReadRepo<ModulePlacement> {
   setAvailable(ctx: ActorContext, input: { moduleIds: Id[]; availableToAll: boolean }): Promise<void>;
 }
 
+export type BoardPeriodId = 'allTime' | 'thisMonth' | 'thisQuarter';
+
+/** Admin rows carry ids only for ranked, non-hidden people (or teams, sites). Staff rows never carry ids. */
+export type StandingsRow = LeaderboardRow extends infer R
+  ? Omit<R, 'isViewer'> & { isViewer?: boolean; personId?: string; teamId?: string; siteId?: string }
+  : never;
+
+/** `visible: false` for a custom competition. `eligible` is for staff, so the app can show "not eligible" without ids. */
+export type StandingsView = {
+  visible: boolean;
+  rows?: StandingsRow[];
+  viewer?: ViewerPosition | null;
+  of?: number;
+  eligible?: boolean;
+  winners?: WinnerLine[];
+};
+
+/** `off: true` when the client switched the board off. `unranked` lists teams with nothing due ("No training due"). */
+export type BoardView = {
+  visible: boolean;
+  off?: boolean;
+  rows?: StandingsRow[];
+  viewer?: ViewerPosition | null;
+  of?: number;
+  unranked?: string[];
+};
+
+export interface CompetitionsService {
+  /** Staff get scheduled, live and ended competitions as a projection: no winners' ids, no excluded people. */
+  list(ctx: ActorContext): Promise<Competition[]>;
+  get(ctx: ActorContext, id: Id): Promise<Competition>;
+  save(ctx: ActorContext, competition: Competition): Promise<Competition>;
+  publish(ctx: ActorContext, id: Id): Promise<Competition>;
+  cancel(ctx: ActorContext, id: Id): Promise<Competition>;
+  extend(ctx: ActorContext, id: Id, endAt: string): Promise<Competition>;
+  recordWinners(ctx: ActorContext, id: Id): Promise<Competition>;
+  standings(ctx: ActorContext, id: Id): Promise<StandingsView>;
+}
+
+export interface LeaderboardsService {
+  standing(ctx: ActorContext, input: { board: BoardId; period: BoardPeriodId; siteId?: Id }): Promise<BoardView>;
+  settings(ctx: ActorContext): Promise<StandingBoardSettings>;
+  saveSettings(ctx: ActorContext, settings: StandingBoardSettings): Promise<StandingBoardSettings>;
+}
+
 export interface DataStore {
   clients: WriteRepo<Client>;
   sites: RemovableRepo<Site>;
@@ -331,6 +382,8 @@ export interface DataStore {
   categories: CategoriesService;
   moduleGroups: ModuleGroupsService;
   modulePlacements: ModulePlacementsService;
+  competitions: CompetitionsService;
+  leaderboards: LeaderboardsService;
 }
 
 /** For the seed, the demo shell and tests. Never reachable through an ActorContext. */

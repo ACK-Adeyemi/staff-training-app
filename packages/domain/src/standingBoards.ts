@@ -1,6 +1,6 @@
 // The six standing boards (brief 13.5; plan M2 assumptions 8, 10). XP is never an input.
 // Active people only. Hiding people who opted out is the caller's job (see leaderboardView).
-import type { BoardId } from './schemas/engagement';
+import { BOARD_IDS, standingBoardSettingsSchema, type BoardId, type StandingBoardSettings } from './schemas/engagement';
 import { fromLondonWall, londonDateString } from './dates';
 import {
   ALL_TIME,
@@ -78,4 +78,12 @@ export function standingBoard(board: BoardId, period: BoardPeriod, input: BoardI
       return { unit: 'team', values: r.values, unranked: r.unranked };
     }
   }
+}
+
+/** What a client has before anyone saves settings: every board on, staff see their own site. */
+export function defaultBoardSettings(clientId: string): StandingBoardSettings {
+  return standingBoardSettingsSchema.parse({
+    clientId,
+    boards: Object.fromEntries(BOARD_IDS.map((id) => [id, { enabled: true, staffScopes: ['site'] }])),
+  });
 }

@@ -386,3 +386,13 @@ Every number marked placeholder is engine config in packages/domain (`engagement
 - `notes.save` does not check the closed-book lock (only `list` and `get` do, as assumption 20 says). A note on an existing record may keep a lesson that a newer version dropped; a new or changed lesson must exist (`lessonMissing`). Creating a note needs a published module; editing one on an archived module is allowed.
 - `categories.reorder` hands the ids' existing order slots out in the new sequence, so a subset can be reordered without touching other categories. Organise writes write no audit event (the batch tests require exact store sets).
 - Added `errors.rule.*` keys for every new `RuleName` in en-GB.json (the competition ones are used from chunk 9).
+
+### M2 chunk 9
+
+- Competitions and leaderboards live in packages/data/src/competitionOps.ts. The RuleNames and `errors.rule.*` strings were already added in chunk 8, so no change there. Domain gained only `defaultBoardSettings` (all six boards on, staff scope `site`), used when a client has not saved board settings.
+- `competitions.save` ignores the `status`, `winners` and `finalStandings` of its input: a new competition is always a draft, and publish, cancel and recordWinners own the rest. First broken builder rule from `validateCompetition` becomes the `RuleError`.
+- Staff see scheduled, live and ended competitions only (never drafts or cancelled). Staff copies drop `winners`, `finalStandings` and `eligibility.excludePersonIds` so no other person's id leaves the data layer; the staff standings view carries `eligible` instead so the app can show the "not eligible" note.
+- Publish counts stored-`scheduled` competitions that have not ended (custom and built-in) towards `liveCompetitions`; `NotEntitledError('closedBookCompetitions')` for closed-book-only on a package without it. Needs `newCompetitions` availability (also on create).
+- `extend` refuses any earlier end (`endShortened`), including before the start; recordWinners on a custom competition gives `invalidCompetition` (custom winners are not computed).
+- Admin standing boards: whole client (limited to sites the admin can read), or one site via optional `siteId`; staff get their own primary site (M2). Team boards list teams with nothing due by name in `unranked`.
+- `saveSettings` writes a slim `competitions.boardSettingsSaved` audit event (board count only).

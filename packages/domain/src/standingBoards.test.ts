@@ -1,7 +1,8 @@
 // BP-2: the six standing boards with All time, This month and This quarter (plan M2 assumptions 8, 10).
 // "Now" is Monday 26 October 2026, London. This month is 1 to 31 October London time, This quarter is October to December.
 import { describe, expect, it } from 'vitest';
-import { standingBoard } from './standingBoards';
+import { BOARD_IDS } from './schemas/engagement';
+import { defaultBoardSettings, standingBoard } from './standingBoards';
 import {
   bank,
   boardInput,
@@ -293,5 +294,14 @@ describe('teamBoard: percentage of assigned training completed by its due date, 
       }),
     );
     expect(r.values.get(toddler.id)).toBe(100);
+  });
+});
+
+describe('defaultBoardSettings', () => {
+  it('switches every board on for the client, with staff seeing their own site', () => {
+    const d = defaultBoardSettings('01J00000000000000000000001');
+    expect(d.clientId).toBe('01J00000000000000000000001');
+    for (const id of BOARD_IDS) expect(d.boards[id]).toEqual({ enabled: true, staffScopes: ['site'] });
+    expect(d.siteBoard.enabled).toBe(false);
   });
 });
