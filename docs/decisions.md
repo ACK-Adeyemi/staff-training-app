@@ -373,3 +373,8 @@ Every number marked placeholder is engine config in packages/domain (`engagement
 - VERIFY: the HSE first aid training link comes from EYFS footnote 32 and the GOV.UK food safety page URL is from memory (neither could be opened here). Both are listed in each module's `verify` key and in the review checklist. Paragraph 3.39 exceptions are mentioned only briefly.
 - Both modules carry `draftContent: true`.
 - `build()` in `nursery/modules/index.ts` now takes a minimal `ModuleJson` type instead of `typeof safeguardingJson`. No existing test needed changing.
+
+### M2 chunk 7
+
+- Added Safer sleep (EYFS 3.86; optional, no requirement link) and What changed in September 2026 (EYFS 3.15, 3.17, 3.82, 3.86, 3.94 and footnote 20; requirement contentId(604)). Every cited paragraph and the facts taught were checked against `.sources-cache/eyfs-group.txt` with `rg -n` (printed page numbers). Both carry `draftContent: true`.
+- VERIFY: 3.86 starts on page 40 but its bullets continue on page 41; links use page 40. The GOV.UK banned dogs URL is from memory and could not be opened here. The screen use guidance address is not in the cached text, so no link to it. The Crime and Policing Act 2026 was not read; the regulated activity wording comes from footnote 20. Which paragraphs are headline changes for September 2026 is assumed, not checked against a DfE change list. The one-off trip helper exception in a scenario should be reviewed. NHS and Lullaby Trust advice named in 3.86 is not linked (not on the official-source list). All are in each module's `verify` key.

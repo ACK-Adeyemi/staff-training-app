@@ -1,0 +1,472 @@
+{
+  "title": "Safer sleep",
+  "description": "How to place babies and young children down to sleep safely, and how to check on them. Based on section 3 of the EYFS statutory framework.",
+  "estimatedMinutes": 6,
+  "language": "en-GB",
+  "status": "published",
+  "version": 1,
+  "roleTags": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "A safe sleep space",
+      "minutes": 3
+    },
+    {
+      "id": "lesson-2",
+      "title": "Checking children while they sleep",
+      "minutes": 3
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-sleep-baby-cot",
+      "type": "mcq",
+      "prompt": "Where can a baby aged 12 months or under be placed to sleep?",
+      "options": [
+        {
+          "id": "q-sleep-baby-cot-o1",
+          "text": "Only in a cot",
+          "correct": true
+        },
+        {
+          "id": "q-sleep-baby-cot-o2",
+          "text": "In a cot or on a mattress on the floor",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-baby-cot-o3",
+          "text": "In a bed or a cot",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-baby-cot-o4",
+          "text": "In a car seat or a cot",
+          "correct": false
+        }
+      ],
+      "explanation": "Children must be placed on their back in their own separate sleep space. Babies aged 12 months and under must only be placed to sleep in a cot. Cots include carrycots, Moses baskets and travel cots.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-baby-cot",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-position",
+      "type": "mcq",
+      "prompt": "How should a child be placed down to sleep?",
+      "options": [
+        {
+          "id": "q-sleep-position-o1",
+          "text": "On their back",
+          "correct": true
+        },
+        {
+          "id": "q-sleep-position-o2",
+          "text": "On their front",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-position-o3",
+          "text": "On their side",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-position-o4",
+          "text": "Whichever way they settle fastest",
+          "correct": false
+        }
+      ],
+      "explanation": "Children must be placed down on their back in their own separate sleep space, on a firm flat surface.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-position",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-bumpers",
+      "type": "trueFalse",
+      "prompt": "A cot can have a few soft toys and a bumper as long as the baby is happy. True or false?",
+      "options": [
+        {
+          "id": "q-sleep-bumpers-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-bumpers-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. Cots must not contain extra items such as toys, pillows, extra blankets, bumpers, wedges or straps.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-bumpers",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-blankets",
+      "type": "mcq",
+      "prompt": "If you use a blanket, how should the child be placed in the cot?",
+      "options": [
+        {
+          "id": "q-sleep-blankets-o1",
+          "text": "Feet-to-foot at the bottom of the cot, with the blanket tucked in",
+          "correct": true
+        },
+        {
+          "id": "q-sleep-blankets-o2",
+          "text": "With their head at the top and the blanket loose",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-blankets-o3",
+          "text": "Wrapped tightly, with the blanket over their head",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-blankets-o4",
+          "text": "Anywhere, as long as the blanket is warm",
+          "correct": false
+        }
+      ],
+      "explanation": "Where blankets are used, the child must be placed feet-to-foot at the bottom of the cot, with blankets tucked in. Bedding must be lightweight and firmly tucked in below the shoulders.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-blankets",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-temp",
+      "type": "mcq",
+      "prompt": "What is the recommended room temperature for babies?",
+      "options": [
+        {
+          "id": "q-sleep-temp-o1",
+          "text": "16 to 20 degrees C",
+          "correct": true
+        },
+        {
+          "id": "q-sleep-temp-o2",
+          "text": "10 to 14 degrees C",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-temp-o3",
+          "text": "22 to 26 degrees C",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-temp-o4",
+          "text": "Whatever staff find comfortable",
+          "correct": false
+        }
+      ],
+      "explanation": "Children should not get too hot or cold. The recommended room temperature for babies is 16 to 20 degrees C. Children's heads must not be covered.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-temp",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-under-six",
+      "type": "trueFalse",
+      "prompt": "A baby under six months old must always have an adult with them in the same room for every sleep. True or false?",
+      "options": [
+        {
+          "id": "q-sleep-under-six-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-sleep-under-six-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. Babies under six months of age must always have an adult with them in the same room for every sleep.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-under-six",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-sight-hearing",
+      "type": "trueFalse",
+      "prompt": "A child can sleep in a room on their own, as long as staff look in every hour. True or false?",
+      "options": [
+        {
+          "id": "q-sleep-sight-hearing-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-sight-hearing-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. Children must always be within sight and hearing of staff when sleeping, and must be frequently checked.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-sight-hearing",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-bedding",
+      "type": "mcq",
+      "prompt": "Which bedding is allowed in a sleep space?",
+      "options": [
+        {
+          "id": "q-sleep-bedding-o1",
+          "text": "A firm, flat, waterproof mattress and lightweight bedding tucked in below the shoulders",
+          "correct": true
+        },
+        {
+          "id": "q-sleep-bedding-o2",
+          "text": "A thick duvet and a pillow",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-bedding-o3",
+          "text": "A soft quilt tucked in loosely",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-bedding-o4",
+          "text": "A wedge to prop the child up",
+          "correct": false
+        }
+      ],
+      "explanation": "Sleep spaces must only contain a firm, flat, waterproof mattress and lightweight bedding firmly tucked in below the child's shoulders, or a well fitted baby sleep bag.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-bedding",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sc-sleep-cot",
+      "type": "scenario",
+      "prompt": "Noor, aged 8 months, is going down for her nap. The cot has a new padded bumper and a small soft toy from her parents.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-sleep-cot-s1",
+            "text": "What do you do?",
+            "choices": [
+              {
+                "id": "q-sc-sleep-cot-s1-c1",
+                "text": "Take out the bumper and the toy, and place Noor on her back",
+                "outcome": "best",
+                "feedback": "Yes. Cots must not contain extras such as toys or bumpers.",
+                "next": "q-sc-sleep-cot-s2"
+              },
+              {
+                "id": "q-sc-sleep-cot-s1-c2",
+                "text": "Leave them in because her parents brought them",
+                "outcome": "poor",
+                "feedback": "Bumpers and toys must not be in the cot, even if a parent supplied them.",
+                "next": "q-sc-sleep-cot-s2"
+              },
+              {
+                "id": "q-sc-sleep-cot-s1-c3",
+                "text": "Take out the toy but leave the bumper",
+                "outcome": "poor",
+                "feedback": "Bumpers are not allowed either.",
+                "next": "q-sc-sleep-cot-s2"
+              }
+            ]
+          },
+          {
+            "id": "q-sc-sleep-cot-s2",
+            "text": "Noor is asleep. The room is quiet and you need to prepare lunch in the kitchen. What do you do?",
+            "choices": [
+              {
+                "id": "q-sc-sleep-cot-s2-c1",
+                "text": "Ask a colleague to stay in the room, so Noor is always within sight and hearing",
+                "outcome": "best",
+                "feedback": "Right. Children must be within sight and hearing of staff, and checked often."
+              },
+              {
+                "id": "q-sc-sleep-cot-s2-c2",
+                "text": "Go to the kitchen and check her when you are back",
+                "outcome": "poor",
+                "feedback": "Noor must always be within sight and hearing of staff while she sleeps."
+              },
+              {
+                "id": "q-sc-sleep-cot-s2-c3",
+                "text": "Close the door so she is not disturbed",
+                "outcome": "poor",
+                "feedback": "A closed door means no sight or hearing. Keep her where staff can see and hear her."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Keep the cot clear, place babies on their back, and make sure sleeping children are always within sight and hearing of staff.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sc-sleep-cot",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sc-sleep-warm",
+      "type": "scenario",
+      "prompt": "It is a cold day. A baby in your care is asleep in a cot, and the room feels very warm.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-sleep-warm-s1",
+            "text": "What should you check?",
+            "choices": [
+              {
+                "id": "q-sc-sleep-warm-s1-c1",
+                "text": "The room temperature (recommended 16 to 20 degrees C), and that the baby's head is not covered",
+                "outcome": "best",
+                "feedback": "Yes. Babies should not get too hot or cold, and heads must not be covered."
+              },
+              {
+                "id": "q-sc-sleep-warm-s1-c2",
+                "text": "Nothing, warm is better for babies",
+                "outcome": "poor",
+                "feedback": "Babies should not get too hot. The recommended room temperature is 16 to 20 degrees C."
+              },
+              {
+                "id": "q-sc-sleep-warm-s1-c3",
+                "text": "Add another blanket to be safe",
+                "outcome": "poor",
+                "feedback": "Extra blankets in the cot are not allowed, and the baby may overheat."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Babies should not get too hot or cold. The recommended room temperature is 16 to 20 degrees C.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sc-sleep-warm",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    }
+  ],
+  "quiz": {
+    "mode": "mix",
+    "mixScenarioShare": 0.4,
+    "drawCount": 10,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "passMark": 80,
+    "maxRetakes": null,
+    "feedback": true,
+    "showSourceRef": true,
+    "notesInQuiz": "choice",
+    "learnMoreFor": "all"
+  },
+  "sourceAttribution": "Based on the Early Years Foundation Stage statutory framework for group and school-based providers (Department for Education, September 2026). Contains public sector information licensed under the Open Government Licence v3.0.",
+  "draftContent": true,
+  "verify": [
+    "Draft content: wording checked against the cached September 2026 EYFS PDF (paragraph 3.86 and footnote 68); page 40 is where 3.86 starts; its bullets carry on at the top of page 41 (the page footer 40 comes before them), so check the page link in the PDF.",
+    "The framework also tells practitioners to read NHS advice on sudden infant death syndrome and guidance from The Lullaby Trust. Neither is linked here because they are not on the official-source list; decide whether to add them.",
+    "Open Government Licence attribution wording."
+  ]
+}
