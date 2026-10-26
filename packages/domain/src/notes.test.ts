@@ -19,10 +19,8 @@ const safeguarding = moduleFor({
   id: nextId(),
   title: 'Safeguarding and whistleblowing',
   lessons: [lesson('l1', 'Spotting signs'), lesson('l2', 'Reporting')],
-} as Parameters<typeof moduleFor>[0]);
-const sleep = moduleFor({ id: nextId(), title: 'Safer sleep', lessons: [lesson('l1', 'Cots')] } as Parameters<
-  typeof moduleFor
->[0]);
+});
+const sleep = moduleFor({ id: nextId(), title: 'Safer sleep', lessons: [lesson('l1', 'Cots')] });
 const ME = nextId();
 
 const note = (over: Partial<Note> = {}): Note => ({
@@ -127,7 +125,7 @@ describe('groupNotesByCourse (BP-5)', () => {
       [cat],
     );
     expect(groups).toHaveLength(2);
-    expect(groups.every((g) => g.available === false)).toBe(true);
+    expect(groups.every((g) => !g.available)).toBe(true);
   });
 
   it('has no category when the module has no placement', () => {

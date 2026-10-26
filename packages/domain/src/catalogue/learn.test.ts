@@ -22,8 +22,7 @@ import {
 const jade = person('Jade', 'Test');
 const mainSite = site();
 const lessonOf = (title: string) => ({ id: `l${nextId().slice(-4)}`, title, minutes: 3, blocks: [] });
-const mod = (title: string, over: Record<string, unknown> = {}) =>
-  moduleFor({ id: nextId(), title, ...over } as Parameters<typeof moduleFor>[0]);
+const mod = (title: string, over: Record<string, unknown> = {}) => moduleFor({ id: nextId(), title, ...over });
 const ev = (type: LearningEvent['type'], moduleId: string, at: string): LearningEvent => ({
   id: nextId(),
   clientId: CLIENT,

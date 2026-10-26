@@ -31,3 +31,7 @@ export * from './competitions/winners';
 export * from './competitions/rules';
 export * from './standingBoards';
 export * from './prize';
+export * from './catalogue/learn';
+export * from './catalogue/organise';
+export * from './notes';
+export * from './display';

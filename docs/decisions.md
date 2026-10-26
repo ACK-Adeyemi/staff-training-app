@@ -349,3 +349,14 @@ Every number marked placeholder is engine config in packages/domain (`engagement
 - `validateCompetition` treats stored status `scheduled` as publish (prize required); `draft` may have an empty prize. Entitlement and limit checks stay in the data layer.
 - Leaderboard numbers (top rows 10, default winner count 1, default team target 90) live in `engagementConfig.competitions`.
 - Test fixes: `leaderboard.test.ts` built entry ids as `id-P1` while the tests used `id-P01`; ids are now zero-padded to match the names. Fixture types in `competitions/testFixtures.ts` were tightened (type-only) so inputs match the domain types.
+
+### M2 chunk 4: where the tests differ from the plan
+
+- Group assignments count per module: an open assignment of a group makes every module in that group required for that person, and its due date applies to each of them.
+- `dueAt` is the earliest of the person's open assignment due dates and the expiry of any applicable requirement the module satisfies that is overdue or expiring soon. `dueState` is `overdue` at or before now, `dueSoon` inside the amber window, else `none`.
+- `completed` means a `moduleCompleted` event, or current (not expiring, not expired) Evidence for an applicable requirement the module satisfies. Any other event for the module is `inProgress`.
+- Search sort is a three-way partition: required and due first, other required next, then everything else. A module the person finished themselves (`finished`, a `moduleCompleted` event) has nothing left to do, so it sorts with the optional ones; one that is only covered by current Evidence stays with the required ones. Inside a partition the sort key (A to Z, due date, most recent) applies.
+- "Under 10 minutes" is strict: exactly 10 is excluded.
+- Search is plain substring on folded text (lower case, accents removed, one character in and out so highlight offsets stay valid). Every term must match somewhere in title, description, lesson titles or category name. No regular expressions are built from input.
+- Notes: `notesLocked` is true only for the person's own closed-book attempt with no `finishedAt` that is not abandoned. `canReadNote` and `visibleNotes` fail closed for an unknown person. Notes of archived or removed modules stay, flagged `available: false`, and sort after available ones.
+- Display: `validateDisplayPrefs` rejects unknown keys and returns the offending field names. `mergeDisplayPrefs` ignores undefined patch values. `displayAttributes` clamps scales, and Simple view raises text to at least 1.25 and turns motion off without touching the saved prefs.
