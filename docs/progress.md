@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M3
 Milestone base commit: bb460c4
-Next step: planner writes docs/plans/m3.md, then chunk 1.
+Next step: M3 chunk 2 (domain: sites, leaderboards, calendar, rules, reminders).
 
 ## Milestones
 - [x] M0 Foundations
@@ -17,6 +17,28 @@ Next step: planner writes docs/plans/m3.md, then chunk 1.
 - [ ] M7 Battle Room
 
 ## Current milestone chunks
+M3 (plan docs/plans/m3.md, 21 chunks):
+- [x] 1 Decisions, schemas, stores and personas
+- [ ] 2 Domain: sites, leaderboards, calendar, rules, reminders
+- [ ] 3 Domain: authoring, stats, feedback, evidence
+- [ ] 4 Domain: themes, organisation, account, 2FA, billing, retention, exports
+- [ ] 5 Content
+- [ ] 6 Data A: identity and organisation
+- [ ] 7 Data B: billing and account states
+- [ ] 8 Data C: authoring and files
+- [ ] 9 Data D: evidence, feedback, tickets, FAQs
+- [ ] 10 Data E: rules, jobs, reminders, leaderboards, themes, exports
+- [ ] 11 Seed version 4
+- [ ] 12 UI components
+- [ ] 13 Client foundations UI
+- [ ] 14 Billing UI and Demo AI
+- [ ] 15 Module Library and Builder UI
+- [ ] 16 Stats and feedback UI
+- [ ] 17 Evidence UI
+- [ ] 18 Rules, reminders, notifications and calendars UI
+- [ ] 19 Multi-site, leaderboards and themes UI
+- [ ] 20 Help, tickets and data UI
+- [ ] 21 Track A and docs
 M2: all 17 chunks done.
 M1 (all done):
 - [x] 1 M0 known issues and decisions
@@ -87,3 +109,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-26: M2 chunk 16 compete and admin engagement landed (72395e6), check.sh green. Builder eligibility pickers deferred (see decisions). Stopping at a clean point; chunk 17 next.
 - 2026-10-26: M2 complete (chunk 17, reviews, fixes). Final commit 6425abe. M3 next.
 - 2026-10-26: M3 base bb460c4; planning.
+- 2026-10-26: M3 chunk 1 decisions, schemas, stores (IndexedDB v4), billing.manageAddOns, personas and derived account state landed, check.sh green.

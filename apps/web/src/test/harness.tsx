@@ -48,6 +48,8 @@ export function makeDemo(side: Side, keys: SeedKeys, handle?: StoreHandle) {
     // Chunk 8 contract: the sign-in screen lists staff and switches persona through these.
     listStaffUsers: (clientId: string) => (handle ? handle.admin.listStaffUsers(clientId) : Promise.resolve([])),
     signInAs: vi.fn(),
+    signInAsClient: vi.fn(),
+    listPersonas: () => (handle ? handle.admin.listPersonas() : Promise.resolve([])),
     listOutbox: () => Promise.resolve([] as OutboxMessage[]),
   };
 }

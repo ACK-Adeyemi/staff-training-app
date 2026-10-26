@@ -36,3 +36,4 @@ export * from './catalogue/organise';
 export { fold, findRanges, searchTerms } from './catalogue/text';
 export * from './notes';
 export * from './display';
+export * from './config/admin';

@@ -88,8 +88,8 @@ export function runM3FoundationContract(
           steps: [{ key: 'inviteStaff', ...(doneAt ? { doneAt } : {}) }],
           startedAt: at,
         });
-        await admin.bulkPut('onboarding' as StoreName, [onboarding()]);
-        await admin.bulkPut('onboarding' as StoreName, [onboarding(at)]);
+        await admin.bulkPut('onboarding', [onboarding()]);
+        await admin.bulkPut('onboarding', [onboarding(at)]);
         const rows = ((await admin.dumpAll()) as Record<string, { steps: { doneAt?: string }[] }[]>)['onboarding']!;
         expect(rows).toHaveLength(1);
         expect(rows[0]!.steps[0]!.doneAt).toBe(at);
@@ -102,8 +102,8 @@ export function runM3FoundationContract(
           updatedBy: fx.ids.users.priya,
           updatedAt: at,
         });
-        await admin.bulkPut('billingProfiles' as StoreName, [profile('First Ltd')]);
-        await admin.bulkPut('billingProfiles' as StoreName, [profile('Second Ltd')]);
+        await admin.bulkPut('billingProfiles', [profile('First Ltd')]);
+        await admin.bulkPut('billingProfiles', [profile('Second Ltd')]);
         const profiles = ((await admin.dumpAll()) as Record<string, { billingName: string }[]>)['billingProfiles']!;
         expect(profiles.map((p) => p.billingName)).toEqual(['Second Ltd']);
       });
@@ -137,11 +137,11 @@ export function runM3FoundationContract(
             learnMoreFor: 'all',
           },
         };
-        await admin.bulkPut('moduleVersions' as StoreName, [
+        await admin.bulkPut('moduleVersions', [
           { key: `${moduleId}:1`, moduleId, version: 1, module, publishedAt: at },
           { key: `${moduleId}:2`, moduleId, version: 2, module: { ...module, version: 2 }, publishedAt: at },
         ]);
-        await admin.bulkPut('moduleDrafts' as StoreName, [
+        await admin.bulkPut('moduleDrafts', [
           { moduleId, clientId: fx.ids.clients.a, module, updatedBy: fx.ids.users.priya, updatedAt: at },
         ]);
         const dump = (await admin.dumpAll()) as Record<string, unknown[]>;
@@ -158,8 +158,8 @@ export function runM3FoundationContract(
           userId: fx.ids.users.jade,
           helpful,
         });
-        await admin.bulkPut('faqVotes' as StoreName, [vote(true)]);
-        await admin.bulkPut('faqVotes' as StoreName, [vote(false)]);
+        await admin.bulkPut('faqVotes', [vote(true)]);
+        await admin.bulkPut('faqVotes', [vote(false)]);
         const rows = ((await admin.dumpAll()) as Record<string, { helpful: boolean }[]>)['faqVotes']!;
         expect(rows).toHaveLength(1);
         expect(rows[0]!.helpful).toBe(false);
@@ -167,7 +167,7 @@ export function runM3FoundationContract(
 
       it('clearAll empties the new stores too', async () => {
         const { admin, fx } = await setup();
-        await admin.bulkPut('onboarding' as StoreName, [
+        await admin.bulkPut('onboarding', [
           { clientId: fx.ids.clients.a, steps: [{ key: 'inviteStaff' }], startedAt: at },
         ]);
         await admin.clearAll();
@@ -181,7 +181,7 @@ export function runM3FoundationContract(
         const off = handle.subscribe((stores) => {
           seen.push(stores);
         });
-        await admin.bulkPut('onboarding' as StoreName, [
+        await admin.bulkPut('onboarding', [
           { clientId: fx.ids.clients.a, steps: [{ key: 'inviteStaff' }], startedAt: at },
         ]);
         off();
@@ -295,12 +295,12 @@ export function runM3FoundationContract(
         ...over,
       });
 
-      it('refuses authoring when the stored client says Active but the trial ended 20 days ago (derived Read-only)', async () => {
+      it('refuses authoring when the stored client says Active but the trial ended 10 days ago (derived Read-only)', async () => {
         const { store, admin, fx } = await setup();
         const sc = fx.ids.stateClients.readOnly;
         await admin.bulkPut('clients', [{ ...sc.client, accountState: 'active' }]);
         await admin.bulkPut('subscriptions', [
-          subscription(sc.client.id, { state: 'trial', stateSince: plusDays(-34), nextStateAt: plusDays(-20) }),
+          subscription(sc.client.id, { state: 'trial', stateSince: plusDays(-24), nextStateAt: plusDays(-10) }),
         ]);
         const ctx = client(sc.owner.id, sc.client.id);
         const existing = await store.people.get(ctx, sc.staffPerson.id);
@@ -346,15 +346,15 @@ export function runM3FoundationContract(
         const sc = fx.ids.stateClients.readOnly;
         await admin.bulkPut('clients', [{ ...sc.client, accountState: 'active' }]);
         await admin.bulkPut('subscriptions', [
-          subscription(sc.client.id, { state: 'trial', stateSince: plusDays(-34), nextStateAt: plusDays(-20) }),
+          subscription(sc.client.id, { state: 'trial', stateSince: plusDays(-24), nextStateAt: plusDays(-10) }),
         ]);
-        // 20 days after the trial end is Read-only: staff still read their own record.
+        // 10 days after the trial end is Read-only (14 days, brief 24.3): staff still read their own record.
         expect((await store.people.list(staff(sc.staff.id, sc.client.id))).map((p) => p.id)).toEqual([
           sc.staffPerson.id,
         ]);
-        // 30 days after the trial end is Closed: staff are refused.
+        // 20 days after the trial end is Closed: staff are refused.
         await admin.bulkPut('subscriptions', [
-          subscription(sc.client.id, { state: 'trial', stateSince: plusDays(-44), nextStateAt: plusDays(-30) }),
+          subscription(sc.client.id, { state: 'trial', stateSince: plusDays(-34), nextStateAt: plusDays(-20) }),
         ]);
         const error = await store.people.list(staff(sc.staff.id, sc.client.id)).then(
           () => undefined,

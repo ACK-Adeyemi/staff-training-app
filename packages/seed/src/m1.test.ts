@@ -138,7 +138,8 @@ describe('organisation policy and overlays (Assumption 10)', () => {
     const policy = attachments.find((a) => a.title === 'Little Acorns Safeguarding policy');
     expect(policy).toBeDefined();
     expect(policy!.mime).toBe('text/markdown');
-    const words = policy!.body.split(/\s+/).filter(Boolean).length;
+    expect(policy!.kind).toBe('document');
+    const words = (policy as { body: string }).body.split(/\s+/).filter(Boolean).length;
     expect(words).toBeGreaterThan(100);
     expect(words).toBeLessThan(220);
   });

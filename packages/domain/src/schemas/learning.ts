@@ -171,6 +171,10 @@ export const moduleSchema = z
     translatedFrom: z.object({ moduleId: idSchema, machine: z.boolean() }).optional(),
     clientReviewRequired: z.boolean().optional(),
     draftContent: z.boolean().optional(),
+    updatedAt: isoDateSchema.optional(),
+    duplicatedFrom: z.object({ moduleId: idSchema, version: z.number().int().min(1) }).optional(),
+    /** The explicit "This module is optional" choice (M3 assumption 14). */
+    optional: z.boolean().optional(),
   })
   .superRefine((m, ctx) => {
     const seen = new Set<string>();
@@ -203,15 +207,66 @@ export const clientLinkOverlaySchema = z.object({
 });
 export type ClientLinkOverlay = z.infer<typeof clientLinkOverlaySchema>;
 
-export const attachmentSchema = z.object({
+export const fileMimeSchema = z.enum(['image/jpeg', 'image/png', 'image/webp', 'application/pdf']);
+
+/** The M1 markdown document. Stored records without `kind` parse as documents (M3 assumption 19). */
+const documentAttachmentSchema = z.object({
   id: idSchema,
   clientId: idSchema,
+  kind: z.literal('document'),
   title: z.string().min(1),
   mime: z.literal('text/markdown'),
   body: z.string(),
   createdAt: isoDateSchema,
 });
+
+const fileAttachmentSchema = z.object({
+  id: idSchema,
+  clientId: idSchema,
+  kind: z.literal('file'),
+  purpose: z.enum(['certificate', 'ticketScreenshot', 'learningDocument']),
+  title: z.string().min(1),
+  mime: fileMimeSchema,
+  bytes: z.number().int().nonnegative(),
+  data: z.instanceof(Uint8Array),
+  ownerUserId: idSchema,
+  personId: idSchema.optional(),
+  siteId: idSchema.optional(),
+  redacted: z.boolean(),
+  alt: z.string().optional(),
+  createdAt: isoDateSchema,
+});
+
+export const attachmentSchema = z.preprocess(
+  (value) =>
+    typeof value === 'object' && value !== null && !Array.isArray(value) && !('kind' in value)
+      ? { ...value, kind: 'document' }
+      : value,
+  z.discriminatedUnion('kind', [documentAttachmentSchema, fileAttachmentSchema]),
+);
 export type Attachment = z.infer<typeof attachmentSchema>;
+export type DocumentAttachment = z.infer<typeof documentAttachmentSchema>;
+export type FileAttachment = z.infer<typeof fileAttachmentSchema>;
+
+/** A draft of a published own module, one per module (M3 assumption 11). The module is not checked for publishing. */
+export const moduleDraftSchema = z.object({
+  moduleId: idSchema,
+  clientId: idSchema,
+  module: moduleSchema,
+  updatedBy: idSchema,
+  updatedAt: isoDateSchema,
+});
+export type ModuleDraft = z.infer<typeof moduleDraftSchema>;
+
+/** A snapshot of a previously published version, key `moduleId:version`. */
+export const moduleVersionSchema = z.object({
+  key: z.string().min(1),
+  moduleId: idSchema,
+  version: z.number().int().min(1),
+  module: moduleSchema,
+  publishedAt: isoDateSchema,
+});
+export type ModuleVersion = z.infer<typeof moduleVersionSchema>;
 
 export const assignmentSchema = z.object({
   id: idSchema,

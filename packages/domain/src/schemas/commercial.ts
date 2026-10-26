@@ -59,6 +59,8 @@ export const subscriptionSchema = z.object({
   billingContact: z.string().min(1),
   graceExtendedUntil: isoDateSchema.optional(),
   timelinePaused: z.boolean().optional(),
+  /** A downgrade chosen now, applied at renewal (M3 assumption 41). */
+  pendingPackageId: idSchema.optional(),
 });
 export type Subscription = z.infer<typeof subscriptionSchema>;
 

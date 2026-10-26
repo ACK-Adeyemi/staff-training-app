@@ -1,5 +1,5 @@
 import { createIndexedDbStore } from '@sta/data';
-import type { StoreHandle } from '@sta/data';
+import type { PersonaListing, StoreHandle } from '@sta/data';
 import { wantsReset, withoutReset } from './resetParam';
 import { createRng, offsetClock, startOfLondonDay, systemClock, type Clock, type DemoState } from '@sta/domain';
 import { DEFAULT_SEED_VALUE, ensureCurrentSeed, load, reset, seedKeys, type SeedKeys } from '@sta/seed';
@@ -8,6 +8,7 @@ export type Booted = {
   handle: StoreHandle;
   keys: SeedKeys;
   state: DemoState;
+  personas: PersonaListing[];
   /** The store's own clock; follows setOffset. */
   setOffset: (ms: number) => void;
 };
@@ -49,6 +50,7 @@ export async function bootstrap(search: string, hash = ''): Promise<Booted> {
     handle,
     keys,
     state,
+    personas: await admin.listPersonas(),
     setOffset: (ms) => {
       offsetMs = ms;
     },

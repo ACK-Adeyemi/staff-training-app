@@ -80,6 +80,22 @@ export const storeNames = [
   'moduleGroups',
   'competitions',
   'standingBoardSettings',
+  'moduleDrafts',
+  'moduleVersions',
+  'autoAssignRules',
+  'reminderLog',
+  'themes',
+  'invitations',
+  'onboarding',
+  'invoices',
+  'billingProfiles',
+  'billingChangeRequests',
+  'addOnRequests',
+  'moduleFeedback',
+  'appFeedback',
+  'tickets',
+  'ticketMessages',
+  'faqVotes',
 ] as const;
 export type StoreName = (typeof storeNames)[number];
 
@@ -103,7 +119,8 @@ export type ForbiddenReason =
   | 'lastOwner'
   | 'ownUpload'
   | 'aboutSelf'
-  | 'outOfScope';
+  | 'outOfScope'
+  | 'twoFactorRequired';
 
 export class DataError extends Error {
   readonly code: string;
@@ -179,7 +196,28 @@ export type RuleName =
   | 'prizeRequired'
   | 'invalidCompetition'
   | 'nameTaken'
-  | 'lessonMissing';
+  | 'lessonMissing'
+  | 'checklistFailed'
+  | 'providerModuleReadOnly'
+  | 'hasCompletions'
+  | 'storageFull'
+  | 'fileTooLarge'
+  | 'fileType'
+  | 'imageMetadata'
+  | 'notHttps'
+  | 'anonymousNoReply'
+  | 'openSubmission'
+  | 'notExternal'
+  | 'notApplicable'
+  | 'wrongCode'
+  | 'codeLocked'
+  | 'stepUpRequired'
+  | 'usageCapReached'
+  | 'invalidTemplate'
+  | 'invalidTheme'
+  | 'invalidName'
+  | 'staffTicketsOff'
+  | 'duplicateRule';
 
 /** A business rule said no (for example "finish every lesson first"). The web app maps `rule` to `errors.rule.<rule>`. */
 export class RuleError extends DataError {
@@ -410,7 +448,17 @@ export interface DemoAdmin {
   listOutbox(): Promise<OutboxMessage[]>;
   /** Active staff users of one client, sorted by display name. For the demo shell's user switch. */
   listStaffUsers(clientId: Id): Promise<{ userId: Id; displayName: string; personId: Id }[]>;
+  /** Active client admins and staff users of every client, for the presenter panel's "Jump to persona". */
+  listPersonas(): Promise<PersonaListing[]>;
 }
+
+export type PersonaListing = {
+  userId: Id;
+  displayName: string;
+  side: 'client' | 'staff';
+  clientId: Id;
+  clientName: string;
+};
 
 /** Called after every successful write with the names of the stores written. Never carries data. */
 export type ChangeListener = (stores: StoreName[]) => void;

@@ -16,12 +16,12 @@ export function OrgDoc() {
   });
   return (
     <main className="mx-auto max-w-2xl p-4">
-      {q.isError ? (
+      {q.isError || (q.data && q.data.kind !== 'document') ? (
         <>
           <PageHeader title={t('doc.notFoundTitle')} />
           <p role="alert">{t('doc.notFound')}</p>
         </>
-      ) : q.data ? (
+      ) : q.data?.kind === 'document' ? (
         <>
           <PageHeader title={q.data.title} />
           <Markdown source={q.data.body} />

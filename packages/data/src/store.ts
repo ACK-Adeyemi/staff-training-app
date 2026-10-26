@@ -8,6 +8,7 @@ import {
   type LearnerPrefs,
   type OutboxMessage,
   type SeedMeta,
+  type Client,
   type UserAccount,
 } from '@sta/domain';
 import { createOperations } from './ops';
@@ -194,6 +195,31 @@ function demoAdmin(backend: RawBackend): DemoAdmin {
     },
     async listOutbox() {
       return ((await backend.getAll('outbox')) as OutboxMessage[]).sort(byKey('outbox'));
+    },
+    async listPersonas() {
+      const clients = (await backend.getAll('clients')) as Client[];
+      const nameOf = new Map(clients.map((c) => [c.id, c.displayName]));
+      return ((await backend.getAll('users')) as UserAccount[])
+        .filter(
+          (u): u is UserAccount & { side: 'client' | 'staff'; clientId: string } =>
+            (u.side === 'client' || u.side === 'staff') &&
+            u.status === 'active' &&
+            u.clientId !== undefined &&
+            nameOf.has(u.clientId),
+        )
+        .map((u) => ({
+          userId: u.id,
+          displayName: u.displayName,
+          side: u.side,
+          clientId: u.clientId,
+          clientName: nameOf.get(u.clientId) as string,
+        }))
+        .sort(
+          (a, b) =>
+            (a.side === b.side ? 0 : a.side === 'client' ? -1 : 1) ||
+            (a.clientName < b.clientName ? -1 : a.clientName > b.clientName ? 1 : 0) ||
+            (a.displayName < b.displayName ? -1 : a.displayName > b.displayName ? 1 : 0),
+        );
     },
     async listStaffUsers(clientId) {
       return ((await backend.getAll('users')) as UserAccount[])

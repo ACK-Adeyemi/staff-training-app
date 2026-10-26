@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import type { PersonaListing } from '@sta/data';
 import { Button, Dialog, focusClasses } from '@sta/ui';
 import type { MessageKey } from '@sta/content';
 import { useAppDate, useDemo, useT } from '../app/hooks';
@@ -20,7 +21,28 @@ export function PresenterPanel({ open, onClose }: { open: boolean; onClose: () =
   const demo = useDemo();
   const date = useAppDate();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [confirming, setConfirming] = useState(false);
+  const [personas, setPersonas] = useState<PersonaListing[] | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    let live = true;
+    void demo.listPersonas().then((list) => {
+      if (live) setPersonas(list);
+    });
+    return () => {
+      live = false;
+    };
+  }, [open, demo]);
+  const jumpToPersona = (p: PersonaListing) => {
+    void (async () => {
+      await (p.side === 'client' ? demo.signInAsClient(p.userId) : demo.signInAs(p.userId));
+      await navigate(p.side === 'client' ? '/client' : '/staff');
+      // The actor changed, so anything already loaded belongs to someone else.
+      await queryClient.invalidateQueries();
+    })();
+    close();
+  };
   const close = () => {
     setConfirming(false);
     onClose();
@@ -109,6 +131,36 @@ export function PresenterPanel({ open, onClose }: { open: boolean; onClose: () =
               </li>
             ))}
           </ul>
+          <div role="group" aria-label={t('demo.jumpToPersona')} className="mb-4">
+            <p className="mt-0 mb-1 font-semibold">{t('demo.jumpToPersona')}</p>
+            {personas === null ? (
+              <p className="m-0">{t('demo.personaLoading')}</p>
+            ) : (
+              (['client', 'staff'] as const).map((side) => (
+                <div key={side} className="mb-2">
+                  <p className="mt-0 mb-1 text-sm">
+                    {t(side === 'client' ? 'demo.personaClientAdmins' : 'demo.personaStaff')}
+                  </p>
+                  <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+                    {personas
+                      .filter((p) => p.side === side)
+                      .map((p) => (
+                        <li key={p.userId}>
+                          <Button
+                            variant="secondary"
+                            onClick={() => {
+                              jumpToPersona(p);
+                            }}
+                          >
+                            {t('demo.personaLabel', { name: p.displayName, client: p.clientName })}
+                          </Button>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              ))
+            )}
+          </div>
           <p className="mt-0 mb-1 font-semibold">{t('demo.jumpTo')}</p>
           <ul className="m-0 mb-2 flex list-none flex-col p-0">
             {jumps.map((j) => (

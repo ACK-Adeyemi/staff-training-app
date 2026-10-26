@@ -1027,6 +1027,7 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     data.attachments.push({
       id: policyId,
       clientId,
+      kind: 'document',
       title: 'Little Acorns Safeguarding policy',
       mime: 'text/markdown',
       body: POLICY_BODY,

@@ -54,7 +54,12 @@
     "outboxChannelEmail": "Email",
     "outboxChannelPush": "Push notification",
     "outboxChannelSms": "Text message",
-    "outboxLoadError": "The outbox could not be loaded."
+    "outboxLoadError": "The outbox could not be loaded.",
+    "jumpToPersona": "Jump to persona",
+    "personaLabel": "{name}, {client}",
+    "personaLoading": "Loading people...",
+    "personaClientAdmins": "Client admins",
+    "personaStaff": "Staff"
   },
   "shell": {
     "skipToContent": "Skip to main content",
@@ -210,13 +215,35 @@
       "winnersRecorded": "The winners have already been recorded.",
       "notEnded": "Winners can only be recorded after the competition ends.",
       "prizeRequired": "Add a prize before you publish.",
-      "invalidCompetition": "Some details of this competition need fixing."
+      "invalidCompetition": "Some details of this competition need fixing.",
+      "checklistFailed": "This can't be published yet. Fix the items listed first.",
+      "providerModuleReadOnly": "This training belongs to us, so you can't change it. You can make your own copy.",
+      "hasCompletions": "Someone has already completed this training, so it can't be deleted. Archive it instead.",
+      "storageFull": "This device has no room for more files. Remove some files and try again.",
+      "fileTooLarge": "That file is too big. Choose one under 10 MB.",
+      "fileType": "That kind of file can't be used. Choose a photo or a PDF.",
+      "imageMetadata": "That picture carries hidden details such as a location. Take a new copy and try again.",
+      "notHttps": "Links must start with https://.",
+      "anonymousNoReply": "This feedback is anonymous, so it can't be replied to.",
+      "openSubmission": "There is already a certificate waiting to be checked for this.",
+      "notExternal": "This doesn't accept an outside certificate.",
+      "notApplicable": "This doesn't apply to this person.",
+      "wrongCode": "That code isn't right. Check it and try again.",
+      "codeLocked": "Too many wrong codes. Wait 15 minutes and try again.",
+      "stepUpRequired": "Enter a fresh code from your authenticator app to do this.",
+      "usageCapReached": "The spending limit for this add-on has been reached.",
+      "invalidTemplate": "The message can only use {firstName}, {training} and {date}, and must be 1 to 300 characters.",
+      "invalidTheme": "Some colours don't have enough contrast. Fix the pairs listed.",
+      "invalidName": "Use a name of 2 to 60 characters that is not only numbers or symbols.",
+      "staffTicketsOff": "Your organisation has switched off support requests from staff.",
+      "duplicateRule": "You already have a rule that does the same thing."
     },
     "notEntitled": {
       "liveCompetitions": "You have reached the number of live competitions in your package. End or cancel one first.",
       "closedBookCompetitions": "Closed-book competitions are not included in your package.",
       "other": "That is not included in your package."
-    }
+    },
+    "twoFactorRequired": "Set up two-step sign-in to carry on."
   },
   "client": {
     "status": {

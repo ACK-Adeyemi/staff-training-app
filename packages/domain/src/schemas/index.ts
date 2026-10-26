@@ -7,3 +7,6 @@ export * from './commercial';
 export * from './system';
 export * from './learning';
 export * from './engagement';
+export * from './admin';
+export * from './billing';
+export * from './support';

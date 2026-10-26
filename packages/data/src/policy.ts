@@ -2,7 +2,9 @@
 // validate (in createStore) -> actor -> tenancy -> permission -> role rules (selfEdit, escalation, lastOwner)
 // -> account state -> entitlement limits. Business rules live in @sta/domain; this file only calls them.
 import {
+  accountStateAt,
   canApproveEvidence,
+  defaultDunningPolicy,
   canEditRolesOf,
   canGrant,
   can,
@@ -12,6 +14,7 @@ import {
   featureAvailability,
   lastOwnerGuard,
   ulid,
+  type AccountState,
   type AddOn,
   type EffectiveEntitlements,
   type AddOnSubscription,
@@ -169,12 +172,42 @@ export const forbid = (reason: ForbiddenReason): never => {
   throw new ForbiddenError(reason);
 };
 
+/** The M3 stores no operation is wired to yet: every actor is refused until a later chunk adds its operations. */
+const UNWIRED_STORES: ReadonlySet<StoreName> = new Set<StoreName>([
+  'moduleDrafts',
+  'moduleVersions',
+  'autoAssignRules',
+  'reminderLog',
+  'themes',
+  'invitations',
+  'onboarding',
+  'invoices',
+  'billingProfiles',
+  'billingChangeRequests',
+  'addOnRequests',
+  'moduleFeedback',
+  'appFeedback',
+  'tickets',
+  'ticketMessages',
+  'faqVotes',
+]);
+
+/**
+ * The account state at `now`, derived from the subscription (M3 assumption 45). A client with no subscription
+ * falls back to the stored state. Never read `client.accountState` directly for a decision.
+ */
+export function derivedAccountState(client: Client, subscription: Subscription | undefined, now: Date): AccountState {
+  return subscription ? accountStateAt(subscription, [], defaultDunningPolicy, now) : client.accountState;
+}
+
 export type Actor = {
   ctx: ActorContext;
   user: UserAccount;
   perms: EffectivePermission[];
   now: Date;
   client?: Client;
+  /** The derived account state of the actor's client (undefined for the provider). */
+  accountState?: AccountState;
 };
 
 /** Everything one DataStore call needs: the resolved actor plus lazily loaded, cached reads. */
@@ -234,13 +267,23 @@ export async function beginCall(backend: RawBackend, options: StoreOptions, ctx:
     client = (await backend.get('clients', ctx.clientId ?? '')) as Client | undefined;
     if (!client) return forbid('unknownActor');
   }
-  const actor: Actor = { ctx, user, perms, now, ...(client ? { client } : {}) };
+  const accountState = client
+    ? derivedAccountState(client, (await backend.get('subscriptions', client.id)) as Subscription | undefined, now)
+    : undefined;
+  const actor: Actor = {
+    ctx,
+    user,
+    perms,
+    now,
+    ...(client ? { client } : {}),
+    ...(accountState ? { accountState } : {}),
+  };
   const call = new Call(backend, options, actor);
   // Reads and exports are never blocked before Deleted; Deleted is unavailable to everyone but the provider.
-  if (client) {
+  if (accountState) {
     const feature = ctx.side === 'staff' ? 'staffOwnRecord' : 'coreCompliance';
-    if (featureAvailability(client.accountState, feature) === 'no') {
-      throw new AccountStateError(client.accountState, feature);
+    if (featureAvailability(accountState, feature) === 'no') {
+      throw new AccountStateError(accountState, feature);
     }
   }
   return call;
@@ -413,11 +456,11 @@ function requireWrite(
 
 /** Account state for client-side writes: creating things is `authoring`; everything else needs full compliance use. */
 export function checkAccountState(call: Call, isCreate: boolean): void {
-  const client = call.actor.client;
-  if (!client) return;
+  const state = call.actor.accountState;
+  if (!state) return;
   const feature = isCreate ? 'authoring' : 'coreCompliance';
-  if (featureAvailability(client.accountState, feature) !== 'yes') {
-    throw new AccountStateError(client.accountState, feature);
+  if (featureAvailability(state, feature) !== 'yes') {
+    throw new AccountStateError(state, feature);
   }
 }
 
@@ -458,6 +501,7 @@ export async function authorizePut(
   rec: Rec,
   existing: Rec | undefined,
 ): Promise<WriteResult> {
+  if (UNWIRED_STORES.has(store)) return forbid('permission');
   const tenant = await tenantOf(call, store, rec);
   const isCreate = existing === undefined;
 
@@ -522,6 +566,7 @@ async function cancelOpenAssignments(call: Call, person: Rec): Promise<WriteOp[]
 }
 
 export async function authorizeRemove(call: Call, store: StoreName, existing: Rec): Promise<WriteResult> {
+  if (UNWIRED_STORES.has(store)) return forbid('permission');
   const tenant = await tenantOf(call, store, existing);
   if (READ_ONLY_STORES.has(store)) return forbid('permission');
   if (store === 'evidence') return forbid('permission');
@@ -605,7 +650,7 @@ export async function clientEntitlements(call: Call, clientId: string): Promise<
     (s) => s.clientId === clientId && s.status !== 'off',
   );
   const addOns = (await call.all<AddOn>('addOns')).filter((a) => addOnSubs.some((s) => s.addOnId === a.id));
-  return entitlements(pkg, addOns, client.accountState, floor);
+  return entitlements(pkg, addOns, derivedAccountState(client, subscription, call.actor.now), floor);
 }
 
 async function checkCustomRoleLimit(call: Call, clientId: string): Promise<void> {

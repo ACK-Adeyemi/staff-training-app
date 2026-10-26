@@ -1,7 +1,23 @@
 // The small storage interface an adapter implements. Everything else (validation, tenancy, permissions, audit,
 // copies) lives in createStore, so the memory and IndexedDB adapters enforce exactly the same rules.
 import {
+  addOnRequestSchema,
   addOnSchema,
+  appFeedbackSchema,
+  autoAssignRuleSchema,
+  billingChangeRequestSchema,
+  billingProfileSchema,
+  faqVoteSchema,
+  invitationSchema,
+  invoiceSchema,
+  moduleDraftSchema,
+  moduleFeedbackSchema,
+  moduleVersionSchema,
+  onboardingChecklistSchema,
+  reminderLogSchema,
+  themeSchema,
+  ticketMessageSchema,
+  ticketSchema,
   assignmentSchema,
   attachmentSchema,
   attemptSchema,
@@ -100,6 +116,22 @@ const parsers: Record<StoreName, Parser> = {
   moduleGroups: moduleGroupSchema,
   competitions: competitionSchema,
   standingBoardSettings: standingBoardSettingsSchema,
+  moduleDrafts: moduleDraftSchema,
+  moduleVersions: moduleVersionSchema,
+  autoAssignRules: autoAssignRuleSchema,
+  reminderLog: reminderLogSchema,
+  themes: themeSchema,
+  invitations: invitationSchema,
+  onboarding: onboardingChecklistSchema,
+  invoices: invoiceSchema,
+  billingProfiles: billingProfileSchema,
+  billingChangeRequests: billingChangeRequestSchema,
+  addOnRequests: addOnRequestSchema,
+  moduleFeedback: moduleFeedbackSchema,
+  appFeedback: appFeedbackSchema,
+  tickets: ticketSchema,
+  ticketMessages: ticketMessageSchema,
+  faqVotes: faqVoteSchema,
 };
 
 /** Parses with the domain schema; throws ValidationError listing every issue. Returns the cleaned record. */
@@ -121,7 +153,15 @@ export function keyOf(store: StoreName, record: unknown): string {
   switch (store) {
     case 'subscriptions':
     case 'standingBoardSettings':
+    case 'onboarding':
+    case 'billingProfiles':
       return r['clientId'] as string;
+    case 'moduleDrafts':
+      return r['moduleId'] as string;
+    case 'moduleVersions':
+    case 'reminderLog':
+    case 'faqVotes':
+      return r['key'] as string;
     case 'addOnSubscriptions':
       return `${r['clientId'] as string}:${r['addOnId'] as string}`;
     case 'modulePlacements':

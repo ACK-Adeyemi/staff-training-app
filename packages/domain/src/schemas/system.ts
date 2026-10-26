@@ -46,6 +46,8 @@ export const demoStateSchema = z.object({
   clockOffsetMs: z.number(),
   industry: z.enum(['nursery', 'luxuryRetail']),
   persona: z.object({ side: sideSchema, userId: idSchema }),
+  /** The client admin persona chosen in the presenter panel (M3 assumption 1). */
+  clientPersona: z.object({ userId: idSchema }).optional(),
   displayPrefs: displayPrefsSchema.optional(),
 });
 export type DemoState = z.infer<typeof demoStateSchema>;

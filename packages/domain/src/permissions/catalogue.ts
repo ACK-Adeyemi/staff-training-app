@@ -46,6 +46,7 @@ export const clientCatalogue: Permission[] = build([
   ['org.editName', 'Change the organisation name', { requires: ['settings.manage'] }],
   ['billing.view', 'See billing', S],
   ['billing.manage', 'Manage billing', { ...S, requires: ['billing.view'] }],
+  ['billing.manageAddOns', 'Turn add-ons on and off', { ...S, requires: ['billing.view'] }],
   ['support.raise', 'Raise support tickets'],
   ['support.viewOrgTickets', "See everyone's support tickets", { requires: ['support.raise'] }],
   ['support.allowStaffTickets', 'Let staff raise tickets', { requires: ['support.raise'] }],

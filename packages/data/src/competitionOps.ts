@@ -198,9 +198,9 @@ export function createCompetitionOperations(backend: RawBackend, options: StoreO
   }
 
   function requireNew(call: Call): void {
-    const client = call.actor.client;
-    if (client && featureAvailability(client.accountState, 'newCompetitions') !== 'yes') {
-      throw new AccountStateError(client.accountState, 'newCompetitions');
+    const state = call.actor.accountState;
+    if (state && featureAvailability(state, 'newCompetitions') !== 'yes') {
+      throw new AccountStateError(state, 'newCompetitions');
     }
   }
 
