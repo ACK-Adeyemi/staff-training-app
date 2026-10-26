@@ -4,6 +4,7 @@ import { runAdminCountContract } from './adminCount';
 import { runCompetitionsContract } from './competitions';
 import { runEngagementContract } from './engagement';
 import { runLearningContract } from './learning';
+import { runM3FoundationContract } from './m3Foundation';
 import { runContractSuite } from './suite';
 
 runContractSuite('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
@@ -15,3 +16,5 @@ runLearningContract('memory adapter', (options) => Promise.resolve(createMemoryS
 runEngagementContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
 runCompetitionsContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runM3FoundationContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));

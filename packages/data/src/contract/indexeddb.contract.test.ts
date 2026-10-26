@@ -5,6 +5,7 @@ import { runAdminCountContract } from './adminCount';
 import { runCompetitionsContract } from './competitions';
 import { runEngagementContract } from './engagement';
 import { runLearningContract } from './learning';
+import { runM3FoundationContract } from './m3Foundation';
 import { runContractSuite } from './suite';
 
 let counter = 0;
@@ -18,5 +19,9 @@ runLearningContract('indexeddb adapter', (options) => createIndexedDbStore(optio
 runEngagementContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
 
 runCompetitionsContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+
+runM3FoundationContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );

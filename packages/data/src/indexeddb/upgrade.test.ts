@@ -1,4 +1,4 @@
-// IndexedDB schema versions 2 (M1) and 3 (M2 chunk 8) add object stores only and keep every earlier record.
+// IndexedDB schema versions 2 (M1), 3 (M2 chunk 8) and 4 (M3 chunk 1) add object stores only and keep every earlier record.
 import 'fake-indexeddb/auto';
 import { openDB } from 'idb';
 import { describe, expect, it } from 'vitest';
@@ -53,6 +53,25 @@ const NEW_STORES = [
   'clientLinkOverlays',
 ];
 const V3_STORES = ['notes', 'categories', 'modulePlacements', 'moduleGroups', 'competitions', 'standingBoardSettings'];
+const V4_STORES = [
+  'moduleDrafts',
+  'moduleVersions',
+  'autoAssignRules',
+  'reminderLog',
+  'themes',
+  'invitations',
+  'onboarding',
+  'invoices',
+  'billingProfiles',
+  'billingChangeRequests',
+  'addOnRequests',
+  'moduleFeedback',
+  'appFeedback',
+  'tickets',
+  'ticketMessages',
+  'faqVotes',
+];
+const ALL_NEW = [...NEW_STORES, ...V3_STORES, ...V4_STORES];
 const CLIENT_INDEXED_NEW = [
   'attachments',
   'assignments',
@@ -98,8 +117,8 @@ async function makeV1(name: string): Promise<void> {
 }
 
 describe('indexeddb schema upgrade from version 1', () => {
-  it('declares version 3', () => {
-    expect(DB_VERSION).toBe(3);
+  it('declares version 4', () => {
+    expect(DB_VERSION).toBe(4);
   });
 
   it('keeps the version 1 records and adds the new object stores with client indexes', async () => {
@@ -110,8 +129,8 @@ describe('indexeddb schema upgrade from version 1', () => {
     backend.close();
 
     const db = await openDB('upgrade-a');
-    expect(db.version).toBe(3);
-    expect([...db.objectStoreNames].sort()).toEqual([...V1_STORES, ...NEW_STORES, ...V3_STORES].sort());
+    expect(db.version).toBe(4);
+    expect([...db.objectStoreNames].sort()).toEqual([...V1_STORES, ...ALL_NEW].sort());
     for (const s of CLIENT_INDEXED_NEW) {
       expect([...db.transaction(s).store.indexNames], s).toContain('clientId');
     }
@@ -122,7 +141,7 @@ describe('indexeddb schema upgrade from version 1', () => {
   it('can write and read the new stores after the upgrade', async () => {
     await makeV1('upgrade-b');
     const backend = await createIndexedDbBackend('upgrade-b');
-    for (const s of [...NEW_STORES, ...V3_STORES]) {
+    for (const s of ALL_NEW) {
       await backend.apply([{ type: 'put', store: s as never, key: 'k', record: { id: 'k' } }]);
       expect(await backend.get(s as never, 'k')).toEqual({ id: 'k' });
     }
@@ -137,7 +156,7 @@ describe('indexeddb schema upgrade from version 1', () => {
     );
     const dump = await handle.admin.dumpAll();
     expect(dump['people'].length).toBe(1);
-    for (const s of [...NEW_STORES, ...V3_STORES]) expect(Array.isArray(dump[s as keyof typeof dump]), s).toBe(true);
+    for (const s of ALL_NEW) expect(Array.isArray(dump[s as keyof typeof dump]), s).toBe(true);
     handle.close();
   });
 });
@@ -153,8 +172,8 @@ describe('indexeddb schema upgrade from version 2 to 3', () => {
     backend.close();
 
     const db = await openDB('upgrade-v2-a');
-    expect(db.version).toBe(3);
-    expect([...db.objectStoreNames].sort()).toEqual([...V1_STORES, ...NEW_STORES, ...V3_STORES].sort());
+    expect(db.version).toBe(4);
+    expect([...db.objectStoreNames].sort()).toEqual([...V1_STORES, ...ALL_NEW].sort());
     for (const s of V3_STORES) {
       expect([...db.transaction(s).store.indexNames], s).toContain('clientId');
     }
@@ -196,5 +215,82 @@ describe('indexeddb schema upgrade from version 2 to 3', () => {
     expect(dump['people'].length).toBe(1);
     expect((dump as Record<string, unknown[]>)['notes']).toEqual([note]);
     handle.close();
+  });
+});
+
+async function makeV3(name: string): Promise<void> {
+  const db = await openDB(name, 3, {
+    upgrade(database) {
+      for (const s of V1_STORES) {
+        const store = database.createObjectStore(s);
+        if (V1_INDEXED.has(s)) store.createIndex('clientId', 'clientId');
+      }
+      for (const s of [...NEW_STORES, ...V3_STORES]) {
+        const store = database.createObjectStore(s);
+        store.createIndex('clientId', 'clientId');
+      }
+    },
+  });
+  await db.put('settings', { key: 'demoState', value: { kept: 'v3' } }, 'demoState');
+  await db.put('people', { id: 'p3', clientId: 'c3' }, 'p3');
+  await db.put('notes', { id: 'n3', clientId: 'c3' }, 'n3');
+  await db.put('competitions', { id: 'comp3', clientId: 'c3' }, 'comp3');
+  db.close();
+}
+
+describe('indexeddb schema upgrade from version 3 to 4', () => {
+  it('keeps the version 3 records and adds the sixteen M3 stores, each with a clientId index', async () => {
+    await makeV3('upgrade-v3-a');
+    const backend = await createIndexedDbBackend('upgrade-v3-a');
+    expect(await backend.get('settings', 'demoState')).toEqual({ key: 'demoState', value: { kept: 'v3' } });
+    expect(await backend.get('people', 'p3')).toEqual({ id: 'p3', clientId: 'c3' });
+    expect(await backend.get('notes', 'n3')).toEqual({ id: 'n3', clientId: 'c3' });
+    expect(await backend.get('competitions', 'comp3')).toEqual({ id: 'comp3', clientId: 'c3' });
+    backend.close();
+
+    const db = await openDB('upgrade-v3-a');
+    expect(db.version).toBe(4);
+    expect([...db.objectStoreNames].sort()).toEqual([...V1_STORES, ...ALL_NEW].sort());
+    expect(V4_STORES).toHaveLength(16);
+    for (const s of V4_STORES) {
+      expect([...db.transaction(s).store.indexNames], s).toContain('clientId');
+    }
+    // Earlier stores keep their indexes.
+    for (const s of [...CLIENT_INDEXED_NEW, ...V3_STORES]) {
+      expect([...db.transaction(s).store.indexNames], s).toContain('clientId');
+    }
+    db.close();
+  });
+
+  it('can write and read every new store after the upgrade', async () => {
+    await makeV3('upgrade-v3-b');
+    const backend = await createIndexedDbBackend('upgrade-v3-b');
+    for (const s of V4_STORES) {
+      await backend.apply([{ type: 'put', store: s as never, key: 'k', record: { id: 'k', clientId: 'c3' } }]);
+      expect(await backend.get(s as never, 'k')).toEqual({ id: 'k', clientId: 'c3' });
+    }
+    backend.close();
+  });
+
+  it('opens through the store, keeps the old demo state and dumps every new store as an empty list', async () => {
+    await makeV3('upgrade-v3-c');
+    const handle = await createIndexedDbStore(
+      { clock: fixedClock('2026-10-19T09:00:00.000Z'), rng: createRng(1) },
+      'upgrade-v3-c',
+    );
+    const dump = await handle.admin.dumpAll();
+    expect(dump['people'].length).toBe(1);
+    for (const s of V4_STORES) expect((dump as Record<string, unknown[]>)[s], s).toEqual([]);
+    handle.close();
+  });
+
+  it('is reachable straight from version 1 in one open', async () => {
+    await makeV1('upgrade-v1-to-v4');
+    const backend = await createIndexedDbBackend('upgrade-v1-to-v4');
+    backend.close();
+    const db = await openDB('upgrade-v1-to-v4');
+    expect(db.version).toBe(4);
+    for (const s of V4_STORES) expect(db.objectStoreNames.contains(s), s).toBe(true);
+    db.close();
   });
 });

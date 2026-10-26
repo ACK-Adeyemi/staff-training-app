@@ -61,6 +61,22 @@ const ALL_STORES: StoreName[] = [
   'moduleGroups',
   'competitions',
   'standingBoardSettings',
+  'moduleDrafts',
+  'moduleVersions',
+  'autoAssignRules',
+  'reminderLog',
+  'themes',
+  'invitations',
+  'onboarding',
+  'invoices',
+  'billingProfiles',
+  'billingChangeRequests',
+  'addOnRequests',
+  'moduleFeedback',
+  'appFeedback',
+  'tickets',
+  'ticketMessages',
+  'faqVotes',
 ];
 
 type Setup = { store: DataStore; admin: StoreHandle['admin']; fx: Fixture; options: StoreOptions };
