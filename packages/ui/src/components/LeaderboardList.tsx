@@ -16,9 +16,18 @@ export interface LeaderboardListProps {
   youLabel: string;
   /** The viewer's own position when they are not shown in the list. Kept out of the list. */
   privatePositionText?: string;
+  /** Optional test id put on every row. */
+  rowTestId?: string;
 }
 
-export function LeaderboardList({ label, rows, jointLabel, youLabel, privatePositionText }: LeaderboardListProps) {
+export function LeaderboardList({
+  label,
+  rows,
+  jointLabel,
+  youLabel,
+  privatePositionText,
+  rowTestId,
+}: LeaderboardListProps) {
   return (
     <div className="flex flex-col gap-2">
       <ol aria-label={label} className="m-0 flex list-none flex-col gap-2 p-0">
@@ -26,6 +35,8 @@ export function LeaderboardList({ label, rows, jointLabel, youLabel, privatePosi
           <li
             key={r.id}
             data-viewer={r.isViewer ? 'true' : undefined}
+            data-testid={rowTestId}
+            aria-current={r.isViewer ? 'true' : undefined}
             className={`flex min-h-[var(--target-min)] flex-wrap items-center gap-x-3 gap-y-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-3 py-2 ${r.isViewer ? 'border-4 border-[var(--color-accent)]' : 'border-2 border-[var(--color-border)]'}`}
           >
             <span className="min-w-8 font-bold">{r.tied ? `${r.rank} (${jointLabel})` : r.rank}</span>

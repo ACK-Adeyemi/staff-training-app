@@ -16,7 +16,7 @@ export const clientBar: NavEntry[] = [
   { hash: '#/client', label: 'Dashboard' },
   { hash: '#/client/people', label: 'People' },
   { hash: '#/client/modules', label: 'Training' },
-  { hash: '#/client/competitions', label: 'Engage' },
+  { hash: '#/client/competitions', label: 'Competitions' },
 ];
 export const clientMore: NavEntry[] = [
   { hash: '#/client/reports', label: 'Reports' },
@@ -62,4 +62,12 @@ export function need<T>(value: T | null | undefined): T {
 export const organiseRoutes: NavEntry[] = [
   { hash: '#/staff/learn', label: 'Learn' },
   { hash: '#/client/organise', label: 'Organise modules' },
+];
+
+/** M2 chunk 16 routes (competitions and leaderboard settings). */
+export const competeRoutes: NavEntry[] = [
+  { hash: '#/staff/compete', label: 'Compete' },
+  { hash: '#/client/competitions', label: 'Competitions' },
+  { hash: '#/client/competitions/new', label: 'New competition' },
+  { hash: '#/client/leaderboards', label: 'Leaderboard settings' },
 ];

@@ -3,6 +3,7 @@ import type {
   AccountState,
   AddOn,
   AddOnSubscription,
+  EffectiveEntitlements,
   Assignment,
   Attachment,
   Attempt,
@@ -339,6 +340,8 @@ export interface CompetitionsService {
   extend(ctx: ActorContext, id: Id, endAt: string): Promise<Competition>;
   recordWinners(ctx: ActorContext, id: Id): Promise<Competition>;
   standings(ctx: ActorContext, id: Id): Promise<StandingsView>;
+  /** What the client's package allows (for example closed-book competitions), so the builder can explain a disabled switch. */
+  entitlements(ctx: ActorContext): Promise<EffectiveEntitlements>;
 }
 
 export interface LeaderboardsService {

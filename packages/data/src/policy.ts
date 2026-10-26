@@ -28,6 +28,7 @@ import {
   type Role,
   type RoleAssignment,
   type Scope,
+  type Subscription,
   type Site,
   type Target,
   type UserAccount,
@@ -590,7 +591,11 @@ function removeRole(call: Call, role: Role): WriteResult {
 /** The account's effective entitlements (package, active add-ons, account state), or undefined if it has no package. */
 export async function clientEntitlements(call: Call, clientId: string): Promise<EffectiveEntitlements | undefined> {
   const client = await call.find<Client>('clients', clientId);
-  const pkg = client ? await call.find<Package>('packages', client.packageId) : undefined;
+  // The subscription is the billing record; the client's packageId is its copy, used when there is no subscription.
+  const subscription = client
+    ? (await call.all<Subscription>('subscriptions')).find((x) => x.clientId === clientId)
+    : undefined;
+  const pkg = client ? await call.find<Package>('packages', subscription?.packageId ?? client.packageId) : undefined;
   if (!client || !pkg) return undefined;
   const packages = await call.all<Package>('packages');
   // The floor package is the cheapest one: what an account keeps when it is not on a full plan.

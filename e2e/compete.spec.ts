@@ -59,9 +59,10 @@ test('Jade sees Mastery Month and 2nd of 13; hiding removes her from Hannah and 
   await expect(boardOf(hannah)).toContainText('of 12');
   await expect(boardOf(hannah)).not.toContainText('Jade');
 
-  // Jade still sees her own private position, and no row of her own.
+  // Jade still sees her own private position, as if she were included (plan M2 assumption 9: 12 others plus her, so 13),
+  // and no row of her own.
   await jade.goto('./#/staff/compete');
-  await expect(boardOf(jade)).toContainText(/of 12/);
+  await expect(boardOf(jade)).toContainText(/of 13\. Only you can see this/);
   await expect(boardOf(jade).locator('[aria-current="true"]')).toHaveCount(0);
 
   // Priya (C13): Jade's name is absent, even for admins.

@@ -4,6 +4,7 @@ import {
   competitionStatus,
   staffRingPercent,
   type Assignment,
+  type Competition,
   type ComingUpItem,
   type Module,
   type StaffSummary,
@@ -11,6 +12,7 @@ import {
 import type { MessageKey } from '@sta/content';
 import { useClock, useT } from '../../app/hooks';
 import { formatLondonDate } from '../../demo/format';
+import { CompetitionSheet } from '../compete/CompetitionSheet';
 import { useStaffData } from './queries';
 import { badgeDefinitionFor, latestBadge, useRewards, type RewardsData } from './rewardsQueries';
 import { focusLink } from './styles';
@@ -87,6 +89,46 @@ function WeeklyGoalSection({ goal }: { goal: RewardsData['goal'] }) {
   );
 }
 
+function Banner({ competition, onDismiss }: { competition: Competition; onDismiss: () => void }) {
+  const t = useT();
+  const [open, setOpen] = useState(false);
+  return (
+    <li
+      data-testid="competition-banner"
+      className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius-md)] border-2 border-[var(--color-border)] p-2"
+    >
+      <span>
+        <button
+          type="button"
+          aria-label={t('staff.home.competitionDetails', { name: competition.name })}
+          onClick={() => {
+            setOpen(true);
+          }}
+          className={`block min-h-[var(--target-min)] cursor-pointer border-0 bg-transparent p-0 text-start font-semibold underline ${focusLink}`}
+        >
+          {competition.name}
+        </button>
+        <span className="block text-sm">
+          {t('competition.prize')}: {competition.prizeText}
+        </span>
+        <span className="block text-sm">
+          {t('staff.home.competitionEnds', { date: formatLondonDate(competition.endAt) })}
+        </span>
+      </span>
+      <Button variant="secondary" onClick={onDismiss}>
+        {t('staff.home.dismiss', { name: competition.name })}
+      </Button>
+      <CompetitionSheet
+        competition={competition}
+        open={open}
+        onClose={() => {
+          setOpen(false);
+        }}
+      />
+    </li>
+  );
+}
+
 function CompetitionBanners({ competitions }: { competitions: RewardsData['competitions'] }) {
   const t = useT();
   const now = useClock().now();
@@ -99,26 +141,13 @@ function CompetitionBanners({ competitions }: { competitions: RewardsData['compe
       ) : (
         <ul className="m-0 flex list-none flex-col gap-2 p-0">
           {live.map((c) => (
-            <li
+            <Banner
               key={c.id}
-              data-testid="competition-banner"
-              className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius-md)] border-2 border-[var(--color-border)] p-2"
-            >
-              <span>
-                <span className="block font-semibold">{c.name}</span>
-                <span className="block text-sm">
-                  {t('staff.home.competitionEnds', { date: formatLondonDate(c.endAt) })}
-                </span>
-              </span>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  setDismissed(new Set([...dismissed, c.id]));
-                }}
-              >
-                {t('staff.home.dismiss', { name: c.name })}
-              </Button>
-            </li>
+              competition={c}
+              onDismiss={() => {
+                setDismissed(new Set([...dismissed, c.id]));
+              }}
+            />
           ))}
         </ul>
       )}

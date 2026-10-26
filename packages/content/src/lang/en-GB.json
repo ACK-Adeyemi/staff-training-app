@@ -83,7 +83,7 @@
       "dashboard": "Dashboard",
       "people": "People",
       "training": "Training",
-      "engage": "Engage",
+      "engage": "Competitions",
       "reports": "Reports",
       "settings": "Settings",
       "help": "Help"
@@ -203,7 +203,7 @@
       "lessonMissing": "That lesson is no longer part of this course.",
       "nameTaken": "You already have one with that name. Choose a different name.",
       "metricLocked": "You cannot change what is measured once a competition has started.",
-      "endBeforeStart": "The end date must be after the start date.",
+      "endBeforeStart": "End date must be after the start date.",
       "endShortened": "A competition can only be made longer, not shorter.",
       "competitionEnded": "This competition has already ended.",
       "competitionCancelled": "This competition was cancelled.",
@@ -211,6 +211,11 @@
       "notEnded": "Winners can only be recorded after the competition ends.",
       "prizeRequired": "Add a prize before you publish.",
       "invalidCompetition": "Some details of this competition need fixing."
+    },
+    "notEntitled": {
+      "liveCompetitions": "You have reached the number of live competitions in your package. End or cancel one first.",
+      "closedBookCompetitions": "Closed-book competitions are not included in your package.",
+      "other": "That is not included in your package."
     }
   },
   "client": {
@@ -374,7 +379,8 @@
       "latestBadge": "Latest badge",
       "noBadge": "You have not earned a badge yet.",
       "badgeEarnedOn": "Earned {date}",
-      "myNotes": "My notes"
+      "myNotes": "My notes",
+      "competitionDetails": "Details: {name}"
     },
     "learn": {
       "title": "Learn",
@@ -754,7 +760,77 @@
   },
   "compete": {
     "title": "Compete",
-    "empty": "There are no competitions running at the moment."
+    "empty": "There are no competitions running at the moment.",
+    "live": "Live competitions",
+    "ended": "Recently ended",
+    "noEnded": "Nothing has ended recently.",
+    "boards": "Standing boards",
+    "boardsIntro": "Boards for your site. People who hide themselves never appear.",
+    "details": "Details: {name}",
+    "dates": "{start} to {end}",
+    "datesLabel": "Dates",
+    "endsOn": "Ends {date}",
+    "notEligible": "You are not eligible for this competition",
+    "winners": "Winners",
+    "winnerHidden": "A colleague",
+    "noWinners": "Winners have not been announced yet.",
+    "leaderboardLater": "The leaderboard stays hidden until the competition ends.",
+    "noRows": "Nobody is on this board yet.",
+    "period": "Period",
+    "periods": {
+      "allTime": "All time",
+      "thisMonth": "This month",
+      "thisQuarter": "This quarter"
+    },
+    "position": "You're {ordinal} of {of}",
+    "positionPrivate": "You're {ordinal} of {of}. Only you can see this.",
+    "notOnBoard": "You're not on the board yet. Answer a question correctly to join in.",
+    "noTraining": "No training due: {names}",
+    "battleRoom": "Battle Room",
+    "battleLater": "Arrives in a later build",
+    "loadError": "We could not load the competitions. Please try again.",
+    "close": "Close",
+    "teamBoardOwn": "Your team's position is shown above.",
+    "boardTitles": {
+      "correctQuestions": "Most questions answered correctly",
+      "modulesCompleted": "Most modules completed",
+      "modulesMastered": "Most modules mastered",
+      "activeWeeks": "Most active weeks",
+      "refresherChampions": "Refresher champions",
+      "teamBoard": "Team board"
+    },
+    "units": {
+      "correctQuestions": {
+        "one": "{n} correct",
+        "other": "{n} correct"
+      },
+      "modulesCompleted": {
+        "one": "{n} module",
+        "other": "{n} modules"
+      },
+      "modulesMastered": {
+        "one": "{n} module",
+        "other": "{n} modules"
+      },
+      "activeWeeks": {
+        "one": "{n} week",
+        "other": "{n} weeks"
+      },
+      "refresherChampions": {
+        "one": "{n} refresher",
+        "other": "{n} refreshers"
+      },
+      "teamBoard": {
+        "one": "{n}%",
+        "other": "{n}%"
+      },
+      "competition": {
+        "one": "{n}",
+        "other": "{n}"
+      }
+    },
+    "joint": "joint",
+    "closeSheet": "Close"
   },
   "competition": {
     "title": "Competitions",
@@ -805,6 +881,82 @@
         "howToWin": "Answer correctly the most different questions in closed-book mode in the period.",
         "why": "It rewards recall without notes. Notes are locked in counted attempts. Open-book attempts are still available, they just do not count here."
       }
+    },
+    "newTitle": "New competition",
+    "editTitle": "Edit competition",
+    "newLink": "New competition",
+    "settingsLink": "Leaderboard settings",
+    "noAccess": "You do not have permission to see this page.",
+    "notFound": "We could not find that competition.",
+    "loadError": "We could not load the competitions. Please try again.",
+    "none": "None",
+    "groups": {
+      "live": "Live",
+      "scheduled": "Scheduled",
+      "ended": "Ended",
+      "draft": "Draft"
+    },
+    "status": {
+      "live": "Live",
+      "scheduled": "Scheduled",
+      "ended": "Ended",
+      "draft": "Draft",
+      "cancelled": "Cancelled"
+    },
+    "datesRange": "{start} to {end}",
+    "noLeaderboard": "No leaderboard for this competition",
+    "leaderboardOff": "The live leaderboard is switched off for staff. You can still see it here.",
+    "adminRows": "{n} people ranked",
+    "extend": "Extend end date",
+    "newEnd": "New end date",
+    "extendSave": "Extend",
+    "cancelAction": "Cancel competition",
+    "cancelTitle": "Cancel this competition?",
+    "cancelBody": "Staff will no longer see it. This cannot be undone.",
+    "cancelYes": "Yes, cancel competition",
+    "cancelNo": "No, keep it",
+    "recordWinners": "Record winners",
+    "winners": "Winners",
+    "noWinners": "No winners recorded yet.",
+    "edit": "Edit",
+    "actionError": "That could not be saved. Please try again.",
+    "builder": {
+      "type": "Type",
+      "builtIn": "Built-in template",
+      "custom": "Custom",
+      "template": "Template",
+      "name": "Name",
+      "description": "Description",
+      "start": "Start date",
+      "end": "End date",
+      "liveLeaderboard": "Show live leaderboard",
+      "on": "On",
+      "off": "Off",
+      "closedBook": "Closed-book only",
+      "closedBookNotIncluded": "Closed-book competitions are not included in your package.",
+      "winnerSelection": "How winners are chosen",
+      "winnerTop": "Top places",
+      "winnerDraw": "Winners are chosen by a random draw from everyone who qualifies.",
+      "winnerTarget": "Every team that reaches the target",
+      "winnerCount": "Number of winners",
+      "teamTarget": "Target percentage",
+      "teamUnit": "Compete as",
+      "unitTeam": "Teams",
+      "unitSite": "Sites",
+      "modules": "Modules that count",
+      "everyone": "Everyone active at your organisation can take part.",
+      "preview": "Banner preview",
+      "previewEnds": "Ends {date}",
+      "previewNoPrize": "Prize to be added",
+      "saveDraft": "Save draft",
+      "publish": "Publish",
+      "pickTemplate": "Choose a template first.",
+      "pickModules": "Choose at least one module.",
+      "prizeHelp": "Prize",
+      "saveChanges": "Save changes",
+      "nameRequired": "Add a name for the competition.",
+      "datesRequired": "Choose a start date and an end date.",
+      "previewNoName": "Your competition name"
     }
   },
   "leaderboard": {
@@ -816,7 +968,25 @@
       "two": "{n}nd",
       "few": "{n}rd",
       "other": "{n}th"
-    }
+    },
+    "settingsTitle": "Leaderboard settings",
+    "settingsIntro": "Choose which standing boards your staff see. Changes save straight away.",
+    "on": "On",
+    "off": "Off",
+    "staffScopes": "Staff can see",
+    "scopes": {
+      "site": "My site",
+      "region": "Region",
+      "country": "Country",
+      "all": "All sites"
+    },
+    "scopeLater": "Appears when your organisation has more than one site, region or country",
+    "privacyTitle": "Privacy",
+    "privacy": "People who hide themselves never appear. They are left out of every ranking and count, including the views you see.",
+    "readOnly": "You can see these settings but not change them.",
+    "saveError": "That could not be saved. Please try again.",
+    "loadError": "We could not load the settings. Please try again.",
+    "selected": "Selected"
   },
   "organise": {
     "title": "Organise modules",

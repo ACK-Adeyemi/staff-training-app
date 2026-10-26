@@ -60,6 +60,7 @@ export type CompetitionStore = EngagementStore & {
     extend(ctx: ActorContext, id: string, endAt: string): Promise<Competition>;
     recordWinners(ctx: ActorContext, id: string): Promise<Competition>;
     standings(ctx: ActorContext, id: string): Promise<StandingsView>;
+    entitlements(ctx: ActorContext): Promise<{ closedBookCompetitions?: boolean; flags: string[] }>;
   };
   leaderboards: {
     standing(
@@ -363,6 +364,13 @@ export function runCompetitionsContract(
           competition(s, { clientId: s.fx.ids.clients.b, closedBookOnly: true }),
         );
         await expectError(s.store.competitions.publish(beth(s), c.id), NotEntitledError);
+      });
+
+      it('tells the client admin what the package allows, and refuses staff', async () => {
+        const s = await setup();
+        expect((await s.store.competitions.entitlements(beth(s))).closedBookCompetitions).toBe(false);
+        expect((await s.store.competitions.entitlements(viewer(s))).closedBookCompetitions).toBe(true);
+        await expectError(s.store.competitions.entitlements(jade(s)), ForbiddenError);
       });
 
       it('lets Priya (entitled) publish a closed-book-only competition', async () => {

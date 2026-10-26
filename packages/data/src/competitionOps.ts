@@ -249,6 +249,14 @@ export function createCompetitionOperations(backend: RawBackend, options: StoreO
   }
 
   const competitions: CompetitionsService = {
+    async entitlements(ctx) {
+      const call = await reader(ctx);
+      if (call.side !== 'client') return forbid('permission');
+      const ents = await clientEntitlements(call, call.clientId as string);
+      if (!ents) throw new NotFoundError();
+      return structuredClone(ents);
+    },
+
     async list(ctx) {
       const call = await reader(ctx);
       const out: Competition[] = [];

@@ -12,8 +12,10 @@ import { ModuleStats } from '../pages/client/ModuleStats';
 import { Reports } from '../pages/client/Reports';
 import { People } from '../pages/client/People';
 import { PersonRecord } from '../pages/client/Person';
+import { Competitions } from '../pages/client/Competitions';
 import { Display } from '../pages/me/Display';
 import { Me } from '../pages/me/Me';
+import { Compete } from '../pages/staff/Compete';
 import { Certificate } from '../pages/staff/Certificate';
 import { Home } from '../pages/staff/Home';
 import { LessonPlayer } from '../pages/staff/LessonPlayer';
@@ -57,7 +59,7 @@ export const routes: RouteObject[] = [
           { path: 'module/:moduleId/done', element: <Results /> },
           { path: 'notes', element: <MyNotes /> },
           { path: 'progress', element: <Progress /> },
-          page('compete', 'nav.staff.compete', 'placeholder.staff.compete'),
+          { path: 'compete', element: <Compete /> },
           { path: 'me', element: <Me /> },
           { path: 'me/display', element: <Display /> },
           { path: 'notifications', element: <Notifications /> },
@@ -73,7 +75,31 @@ export const routes: RouteObject[] = [
           { path: 'people/:personId', element: <PersonRecord /> },
           { path: 'assign', element: <Assign /> },
           page('modules', 'nav.client.training', 'placeholder.client.training'),
-          page('competitions', 'nav.client.engage', 'placeholder.client.engage'),
+          { path: 'competitions', element: <Competitions /> },
+          {
+            path: 'competitions/new',
+            lazy: async () => ({
+              Component: (await import('../pages/client/CompetitionBuilder')).CompetitionBuilder,
+            }),
+          },
+          {
+            path: 'competitions/:id/edit',
+            lazy: async () => ({
+              Component: (await import('../pages/client/CompetitionBuilder')).CompetitionBuilder,
+            }),
+          },
+          {
+            path: 'competitions/:id',
+            lazy: async () => ({
+              Component: (await import('../pages/client/CompetitionDetail')).CompetitionDetail,
+            }),
+          },
+          {
+            path: 'leaderboards',
+            lazy: async () => ({
+              Component: (await import('../pages/client/LeaderboardSettings')).LeaderboardSettings,
+            }),
+          },
           {
             path: 'organise',
             lazy: async () => ({ Component: (await import('../pages/client/Organise')).Organise }),
