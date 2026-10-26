@@ -24,6 +24,8 @@ Things only the user can check, by milestone.
 ### Awaiting content review
 
 - [ ] Safeguarding and whistleblowing module (nursery, Draft content): four lessons, 12 questions and 7 scenarios drafted from EYFS section 3 (September 2026 PDF). Check wording, the list in `packages/content/src/packs/nursery/modules/safeguarding/module.json` under `verify`, and the Open Government Licence line.
+- [ ] Paediatric first aid and accidents module (nursery, Draft content): two lessons, 8 questions and 2 scenarios drafted from EYFS 3.37 to 3.40, 3.78 and 3.79. Check wording, the `verify` list in `packages/content/src/packs/nursery/modules/paediatric-first-aid/module.json`, the HSE link and the Open Government Licence line.
+- [ ] Safer eating, allergies and choking module (nursery, Draft content, optional, no requirement link): three lessons, 11 questions and 2 scenarios drafted from EYFS 3.64 to 3.73. Check wording, the `verify` list in `packages/content/src/packs/nursery/modules/safer-eating/module.json`, the GOV.UK food safety link (from memory) and the Open Government Licence line.
 - [ ] Open the NSPCC whistleblowing advice line link used in the question bank; it could not be fetched from the build environment.
 - [ ] Lesson 2 "Noticing" is general guidance rather than EYFS text; confirm it suits you.
 

@@ -366,3 +366,10 @@ Every number marked placeholder is engine config in packages/domain (`engagement
 - `packs/nursery/prizes.test.ts` had two `as string[]` casts that lint flags as unnecessary once `prizes.json` is typed as `string[]`. Removed the casts only (lint autofix); no assertion changed.
 - Coming soon card titles live in `comingSoon.nursery.*` in en-GB.json, with the tier in the title text.
 - Prettier formatting applied to the chunk 5 test files (whitespace only).
+
+### M2 chunk 6
+
+- Added Paediatric first aid and accidents (EYFS 3.37, 3.39, 3.40, 3.78, 3.79; requirement contentId(602)) and Safer eating, allergies and choking (3.64 to 3.73 except 3.69, 3.72 which are only taught; optional, no requirement link). All cited paragraphs and page numbers were checked against `.sources-cache/eyfs-group.txt` (printed page numbers).
+- VERIFY: the HSE first aid training link comes from EYFS footnote 32 and the GOV.UK food safety page URL is from memory (neither could be opened here). Both are listed in each module's `verify` key and in the review checklist. Paragraph 3.39 exceptions are mentioned only briefly.
+- Both modules carry `draftContent: true`.
+- `build()` in `nursery/modules/index.ts` now takes a minimal `ModuleJson` type instead of `typeof safeguardingJson`. No existing test needed changing.
