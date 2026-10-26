@@ -4,12 +4,12 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M2
 Milestone base commit: 7c4064d
-Next step: M2 chunk 6 (nursery modules A: Paediatric first aid and Safer eating) from docs/plans/m2.md: test-writer then implementer. Chunks 1-5 done (latest c998452).
+Next step: M2 chunk 7 (nursery modules B: Safer sleep and What changed in September 2026) from docs/plans/m2.md: test-writer then implementer. Chunks 1-6 done (latest d11c0d1).
 
 ## Milestones
 - [x] M0 Foundations
 - [x] M1 Client story core
-- [ ] M2 Engagement (chunks 1-5 done)
+- [ ] M2 Engagement (chunks 1-6 done)
 - [ ] M3 Client admin depth
 - [ ] M4 Provider story
 - [ ] M5 Polish and demo readiness
@@ -17,7 +17,7 @@ Next step: M2 chunk 6 (nursery modules A: Paediatric first aid and Safer eating)
 - [ ] M7 Battle Room
 
 ## Current milestone chunks
-M2 (17 chunks, see docs/plans/m2.md 'Work chunks'): chunks 1-5 done; 6 to 17 pending.
+M2 (17 chunks, see docs/plans/m2.md 'Work chunks'): chunks 1-6 done; 7 to 17 pending.
 M1 (all done):
 - [x] 1 M0 known issues and decisions
 - [x] 2 Learning schemas and quiz engine
@@ -66,3 +66,4 @@ M1 (final commit 5b87b6d, scripts/check.sh fully green): BP-1 refresher on 390x8
 - 2026-10-26: merged origin/main; M2 chunk 3 competitions, standing boards, prize domain landed (cb563cf), check.sh green.
 - 2026-10-26: M2 chunk 4 catalogue, notes, display domain landed (40501c5), check.sh green. Stopping at a clean point; chunk 5 next.
 - 2026-10-26: M2 chunk 5 engagement content and config landed (c998452), check.sh green.
+- 2026-10-26: M2 chunk 6 nursery modules A landed (d11c0d1), check.sh green.
