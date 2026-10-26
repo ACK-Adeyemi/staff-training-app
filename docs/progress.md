@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M3
 Milestone base commit: bb460c4
-Next step: M3 chunk 5 (content: fire evacuation module, support features, FAQs, theme presets, en-GB keys incl. account.works.* and staff.accountNotice.speakToManager) per docs/plans/m3.md: test-writer then implementer.
+Next step: M3 chunk 6 (Data A: identity and organisation) per docs/plans/m3.md: test-writer then implementer.
 
 ## Milestones
 - [x] M0 Foundations
@@ -22,7 +22,7 @@ M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 2 Domain: sites, leaderboards, calendar, rules, reminders
 - [x] 3 Domain: authoring, stats, feedback, evidence
 - [x] 4 Domain: themes, organisation, account, 2FA, billing, retention, exports
-- [ ] 5 Content
+- [x] 5 Content
 - [ ] 6 Data A: identity and organisation
 - [ ] 7 Data B: billing and account states
 - [ ] 8 Data C: authoring and files
@@ -115,3 +115,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-26: e2e flake seen once: compete.spec.ts:88 desktop (waiting for "New competition" link, 120s timeout) in a full run; passed alone and on full rerun. Watch; likely slow load of competitions page when two tabs open under load.
 - 2026-10-26: M3 chunk 3 domain authoring, stats, feedback, evidence landed (19904d1), check.sh green. Stopping at a clean point; chunk 4 next.
 - 2026-10-26: M3 chunk 4 domain themes, organisation, account, 2FA, billing, retention, exports landed (2e8087c), check.sh green. Stopping at a clean point; chunk 5 next.
+- 2026-10-26: M3 chunk 5 content landed (3cd282d), check.sh green. Stopping at a clean point; chunk 6 next.
