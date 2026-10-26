@@ -1260,11 +1260,12 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const { store, fx } = await setup();
         const ctx = client(fx.ids.users.priya, fx.ids.clients.a);
         const got = await store.people.get(ctx, fx.ids.people.jade);
+        const storedSound = got.prefs.sound;
         got.firstName = 'Changed';
-        got.prefs.sound = false;
+        got.prefs.sound = !storedSound;
         const again = await store.people.get(ctx, fx.ids.people.jade);
         expect(again.firstName).toBe('Jade');
-        expect(again.prefs.sound).toBe(true);
+        expect(again.prefs.sound).toBe(storedSound);
         const listed = await store.people.list(ctx);
         listed[0]!.firstName = 'Changed';
         expect((await store.people.list(ctx))[0]!.firstName).not.toBe('Changed');
