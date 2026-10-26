@@ -238,6 +238,22 @@ describe('safeguards', () => {
     expect(plan).toEqual([]);
   });
 
+  it('also counts a requirement the module names itself (module.requirementIds) as already current', () => {
+    const r = rule({ action: { moduleId: safeguarding } });
+    const bare = { id: safeguarding, requirementIds: [sgReq.id] };
+    const plan = evaluateAutoAssign(
+      added(),
+      input({
+        rules: [r],
+        people: [joiner],
+        modules: [bare],
+        requirements: [{ ...sgReq, satisfiedByModuleIds: [] }],
+        evidence: [evidenceExpiring(joiner, sgReq, 300)],
+      }),
+    );
+    expect(plan).toEqual([]);
+  });
+
   it('does assign it when the requirement is expiring inside the amber window', () => {
     const r = rule({ action: { moduleId: safeguarding } });
     const plan = evaluateAutoAssign(

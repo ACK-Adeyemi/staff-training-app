@@ -1,11 +1,9 @@
 // createStore: builds a DataStore and DemoAdmin on top of any RawBackend. Both adapters use it, so the
 // policy (validation, tenancy, permissions, audit, account state, entitlements) is identical.
 import {
-  defaultDisplayPrefs,
   demoStateSchema,
   seedMetaSchema,
   type DemoState,
-  type LearnerPrefs,
   type OutboxMessage,
   type SeedMeta,
   type Client,
@@ -18,6 +16,7 @@ import { createIdentityOperations } from './identityOps';
 import { createAuthoringOperations } from './authoringOps';
 import { createEvidenceOperations } from './evidenceOps';
 import { createSupportOperations } from './supportOps';
+import { createRulesOperations, newPersonPrefs } from './rulesOps';
 import { createBillingOperations, simulateFailedPayment } from './billingOps';
 import { keyOf, validate, type RawBackend, type SettingsRecord, type WriteOp } from './backend';
 import {
@@ -68,13 +67,6 @@ function shape(call: Call, store: StoreName, record: Rec): Rec {
   delete rest['prefs'];
   return rest;
 }
-
-const newPersonPrefs = (): LearnerPrefs => ({
-  hideFromLeaderboards: false,
-  ...defaultDisplayPrefs,
-  language: 'en-GB',
-  battleExtraTimePercent: 0,
-});
 
 function repo(backend: RawBackend, options: StoreOptions, store: StoreName) {
   const begin = (ctx: ActorContext, opts?: { allowLimited?: boolean }): Promise<Call> =>
@@ -158,7 +150,7 @@ function appendOnly(backend: RawBackend, options: StoreOptions, store: 'audit' |
   };
 }
 
-function demoAdmin(backend: RawBackend, options: StoreOptions): DemoAdmin {
+function demoAdmin(backend: RawBackend, options: StoreOptions, runJobs: DemoAdmin['runJobs']): DemoAdmin {
   const setting = async (key: string): Promise<unknown> => {
     const row = (await backend.get('settings', key)) as SettingsRecord | undefined;
     return row?.value;
@@ -168,6 +160,7 @@ function demoAdmin(backend: RawBackend, options: StoreOptions): DemoAdmin {
 
   return {
     clearAll: () => backend.clear(),
+    runJobs,
     async bulkPut(store, records) {
       const ops = records.map((record, i): WriteOp => {
         const clean = validate(store, record, `[${i}] `);
@@ -285,6 +278,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const authoringOps = createAuthoringOperations(backend, options);
   const evidenceFlow = createEvidenceOperations(backend, options);
   const support = createSupportOperations(backend, options);
+  const rules = createRulesOperations(backend, options);
   const readOnly = (name: StoreName) => {
     const full = repo(backend, options, name);
     return { get: full.get, list: full.list };
@@ -295,11 +289,14 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     return { get: full.get, list: full.list, put: full.put };
   };
   const audit = r('audit');
+  const notificationsRepo = readOnly('notifications');
   const store = {
     clients: withoutRemove('clients'),
     sites: r('sites'),
     teams: r('teams'),
-    people: r('people'),
+    people: { ...r('people'), ...rules.people },
+    autoAssign: rules.autoAssign,
+    reminders: rules.reminders,
     users: r('users'),
     jobRoles: r('jobRoles'),
     requirements: r('requirements'),
@@ -326,7 +323,16 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     assignments: { ...readOnly('assignments'), assign: ops.assign, assignGroup: authoringOps.assignGroup },
     learningEvents: readOnly('learningEvents'),
     attempts: readOnly('attempts'),
-    notifications: { ...readOnly('notifications'), markRead: ops.markRead },
+    notifications: {
+      ...readOnly('notifications'),
+      list: async (ctx: ActorContext, filter?: Filter) => {
+        const visible = (await notificationsRepo.list(ctx, filter)) as { snoozedUntil?: string }[];
+        const now = new Date(ctx.now).getTime();
+        return visible.filter((n) => n.snoozedUntil === undefined || new Date(n.snoozedUntil).getTime() <= now);
+      },
+      markRead: ops.markRead,
+      snooze: rules.snooze,
+    },
     learning: ops.learning,
     ...engagement,
     access: { ...engagement.access, features: (ctx: ActorContext) => billingOps.features(ctx) },
@@ -335,5 +341,9 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     evidenceFlow,
     ...support,
   };
-  return { store: store as unknown as DataStore, admin: demoAdmin(backend, options), subscribe };
+  return {
+    store: store as unknown as DataStore,
+    admin: demoAdmin(backend, options, (now) => rules.runJobs(now)),
+    subscribe,
+  };
 }

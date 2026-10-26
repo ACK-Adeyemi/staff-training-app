@@ -18,6 +18,8 @@ export type RuleInput = {
   groups: ModuleGroup[];
   now: Date;
   amberWindowDays: number;
+  /** Modules may name the requirements they satisfy (`requirementIds`) as well as the requirement naming them. */
+  modules?: { id: string; requirementIds: string[] }[];
 };
 
 export type Trigger =
@@ -62,8 +64,9 @@ function planPerson(rule: AutoAssignRule, p: Person, input: RuleInput, taken: Se
   for (const moduleId of moduleIdsOf(rule, input.groups)) {
     const key = `${p.id}|${moduleId}`;
     if (taken.has(key)) continue;
+    const named = input.modules?.find((m) => m.id === moduleId)?.requirementIds ?? [];
     const alreadyCurrent = input.requirements
-      .filter((r) => r.satisfiedByModuleIds.includes(moduleId))
+      .filter((r) => r.satisfiedByModuleIds.includes(moduleId) || named.includes(r.id))
       .some((r) => requirementStatus(r, mine, [], input.now, window).status === 'current');
     if (alreadyCurrent) continue;
     taken.add(key);

@@ -38,6 +38,7 @@ import {
   type OutboxMessage,
   type Person,
   type ReminderLog,
+  type Subscription,
 } from '@sta/domain';
 import {
   AccountStateError,
@@ -223,6 +224,11 @@ export function runRulesRemindersContract(
       const p = (await people()).find((x) => x.id === personId)!;
       await admin.bulkPut('people', [{ ...p, ...patch }]);
     };
+    /** The learning fixture gives Jade an assignment due 2 November; tests that count the 26 October sends clear it. */
+    const clearFixtureAssignment = async (): Promise<void> => {
+      const x = (await dump<Assignment>(admin, 'assignments')).find((a) => a.id === lf.assignments.jade)!;
+      await admin.bulkPut('assignments', [{ ...x, status: 'cancelled' }]);
+    };
     const jade = fx.ids.people.jade;
     const jadeUser = fx.ids.users.jade;
 
@@ -252,6 +258,7 @@ export function runRulesRemindersContract(
       reminderNotes,
       reminderMail,
       patchPerson,
+      clearFixtureAssignment,
       jade,
       jadeUser,
     };
@@ -728,6 +735,7 @@ export function runRulesRemindersContract(
 
       it('stops at the weekly cap per person per London week and starts again the next week', async () => {
         const s = await setup();
+        await s.clearFixtureAssignment();
         await s.admin.bulkPut(
           'assignments',
           [1, 2, 3, 4].map((n) => s.dueAssignment(n, s.jade, SEVEN)),
@@ -743,6 +751,7 @@ export function runRulesRemindersContract(
 
       it('counts the week in London time across the 25 October clock change', async () => {
         const s = await setup();
+        await s.clearFixtureAssignment();
         const week = londonWeekKey('2026-10-25T10:00:00.000Z');
         const prior: ReminderLog[] = [1, 2, 3].map((n) => ({
           key: `${s.jade}:overdue:${freshId(6700 + n)}:1`,
@@ -875,6 +884,9 @@ export function runRulesRemindersContract(
       it('limits a Limited account to in-app notices: a Notification but no Outbox message', async () => {
         const s = await setup();
         const st = s.ids.stateClients.closed;
+        // Account state is derived from the subscription (plan assumption 45), so the subscription moves too.
+        const sub = (await dump<Subscription>(s.admin, 'subscriptions')).find((x) => x.clientId === st.client.id)!;
+        await s.admin.bulkPut('subscriptions', [{ ...sub, state: 'limited', stateSince: '2026-10-14T09:00:00.000Z' }]);
         await s.admin.bulkPut('clients', [{ ...st.client, accountState: 'limited' }]);
         const a1: Assignment = {
           ...s.dueAssignment(1, st.staffPerson.id, SEVEN),

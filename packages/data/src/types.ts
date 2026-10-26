@@ -60,6 +60,8 @@ import type {
   AddOnRequest,
   BillingChangeRequest,
   Invoice,
+  AutoAssignRule,
+  ClientSettings,
 } from '@sta/domain';
 
 export type Id = string;
@@ -632,11 +634,51 @@ export interface LinkOverlaysService {
   remove(ctx: ActorContext, overlayId: Id): Promise<void>;
 }
 
+export type PersonInput = Pick<
+  Person,
+  'primarySiteId' | 'additionalSiteIds' | 'teamIds' | 'firstName' | 'lastName' | 'jobRoleIds' | 'startDate' | 'status'
+>;
+export type RuleInput = Omit<AutoAssignRule, 'id' | 'clientId'> & { id?: Id };
+export type ReminderPolicy = ClientSettings['reminderPolicy'];
+export type ChaseResult = {
+  willSend: { personId: Id }[];
+  skipped: { personId: Id; reason: string }[];
+};
+
+/** All need assign.manage and, to create or enable, `authoring` availability. */
+export interface AutoAssignService {
+  list(ctx: ActorContext): Promise<AutoAssignRule[]>;
+  /** Upserts. RuleError('duplicateRule') when another rule has the same trigger, filters and action. */
+  save(ctx: ActorContext, input: RuleInput): Promise<AutoAssignRule>;
+  setEnabled(ctx: ActorContext, id: Id, enabled: boolean): Promise<AutoAssignRule>;
+  remove(ctx: ActorContext, id: Id): Promise<void>;
+  /** Who the rule would assign now (the domain previewRule on the stored data). */
+  preview(ctx: ActorContext, id: Id): Promise<{ count: number; personIds: Id[] }>;
+  /** Assignments that carry `source: { ruleId }`, oldest first. */
+  history(ctx: ActorContext, id: Id): Promise<Assignment[]>;
+}
+
+export interface RemindersService {
+  /** reminders.view */
+  policy(ctx: ActorContext): Promise<ReminderPolicy>;
+  /** reminders.manage */
+  savePolicy(ctx: ActorContext, policy: ReminderPolicy): Promise<ReminderPolicy>;
+  /** reminders.manage. Writes nothing. */
+  chaseOverdue(ctx: ActorContext, options: { preview: true }): Promise<ChaseResult>;
+}
+
 export interface DataStore {
   clients: WriteRepo<Client>;
   sites: RemovableRepo<Site>;
   teams: RemovableRepo<Team>;
-  people: RemovableRepo<Person>;
+  people: RemovableRepo<Person> & {
+    /** Needs staff.manage in scope. Runs the `personAdded` auto-assign rules in the same batch. */
+    add(ctx: ActorContext, input: PersonInput): Promise<Person>;
+    /** Runs the `roleChanged` rules in the same batch when `jobRoleIds` changes. */
+    update(ctx: ActorContext, id: Id, patch: Partial<PersonInput> & { pausedUntil?: string }): Promise<Person>;
+  };
+  autoAssign: AutoAssignService;
+  reminders: RemindersService;
   users: RemovableRepo<UserAccount>;
   jobRoles: RemovableRepo<JobRole>;
   requirements: RemovableRepo<Requirement>;
@@ -683,7 +725,11 @@ export interface DataStore {
   };
   learningEvents: ReadRepo<LearningEvent>;
   attempts: ReadRepo<Attempt>;
-  notifications: ReadRepo<Notification> & { markRead(ctx: ActorContext, ids: Id[]): Promise<void> };
+  notifications: ReadRepo<Notification> & {
+    markRead(ctx: ActorContext, ids: Id[]): Promise<void>;
+    /** The owner only: hides it until 08:00 London time on the next London day. `list` leaves snoozed items out. */
+    snooze(ctx: ActorContext, id: Id): Promise<Notification>;
+  };
   learning: LearningService;
   notes: NotesService;
   me: MeService;
@@ -811,6 +857,11 @@ export interface DemoAdmin {
   getSeedMeta(): Promise<SeedMeta | undefined>;
   setSeedMeta(meta: SeedMeta): Promise<void>;
   listOutbox(): Promise<OutboxMessage[]>;
+  /**
+   * The server-cron stand-in (M3 assumption 27): runs requirementExpiring rules and reminders for every client as at
+   * `now` (ISO), idempotently. Writes only assignments and notices from rules, notifications, outbox and reminderLog.
+   */
+  runJobs(now: string): Promise<void>;
   /** Active staff users of one client, sorted by display name. For the demo shell's user switch. */
   listStaffUsers(clientId: Id): Promise<{ userId: Id; displayName: string; personId: Id }[]>;
   /** Active client admins and staff users of every client, for the presenter panel's "Jump to persona". */
