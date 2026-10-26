@@ -236,7 +236,13 @@
       "invalidTheme": "Some colours don't have enough contrast. Fix the pairs listed.",
       "invalidName": "Use a name of 2 to 60 characters that is not only numbers or symbols.",
       "staffTicketsOff": "Your organisation has switched off support requests from staff.",
-      "duplicateRule": "You already have a rule that does the same thing."
+      "duplicateRule": "You already have a rule that does the same thing.",
+      "invalidSubmission": "Check the course provider, the dates and the expiry date, then try again.",
+      "invalidDecision": "Check the note, the reason and the dates, then try again.",
+      "notAwaitingCheck": "This certificate is not waiting for a check any more.",
+      "invalidFeedback": "Check your feedback and try again.",
+      "invalidTicket": "Check the details of your request and try again.",
+      "invalidReply": "Write a reply of up to 2,000 characters."
     },
     "notEntitled": {
       "liveCompetitions": "You have reached the number of live competitions in your package. End or cancel one first.",

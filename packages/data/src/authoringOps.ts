@@ -34,6 +34,8 @@ import {
   type OnboardingChecklist,
   type Person,
   type Requirement,
+  type Ticket,
+  type TicketMessage,
   type UserAccount,
   type Attachment,
 } from '@sta/domain';
@@ -88,6 +90,44 @@ const OWNED_FIELDS = ['id', 'owner', 'status', 'version', 'updatedAt', 'duplicat
 
 const byId = (a: { id: string }, b: { id: string }): number => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 const isFile = (a: Attachment): a is FileAttachment => a.kind === 'file';
+
+/** Assumption 20: who can read a stored attachment. Everything else is NotFound. */
+export function canSeeAttachment(call: Call, a: Attachment, shared?: ReadonlySet<string>): boolean {
+  if (call.side === 'provider' || a.clientId !== call.clientId) return false;
+  if (!isFile(a) || a.purpose === 'learningDocument') return true;
+  if (a.purpose === 'ticketScreenshot') return a.ownerUserId === call.actor.user.id || shared?.has(a.id) === true;
+  const own = call.actor.user.personId;
+  if (a.ownerUserId === call.actor.user.id || (own !== undefined && a.personId === own)) return true;
+  return (
+    call.side === 'client' &&
+    canAny(call, ['evidence.view'], { clientId: a.clientId, ...(a.siteId ? { siteIds: [a.siteId] } : {}) }, 'read')
+  );
+}
+
+/** Screenshots on admin tickets and on staff tickets shared with the manager, for people who may read those tickets. */
+async function sharedScreenshotIds(call: Call): Promise<Set<string>> {
+  if (call.side !== 'client' || !holds(call, ['support.viewOrgTickets'])) return new Set();
+  const readable = new Set(
+    (await call.all<Ticket>('tickets'))
+      .filter(
+        (t) =>
+          t.clientId === call.clientId &&
+          (t.raiserSide === 'client' || t.sharedWithManager) &&
+          canAny(
+            call,
+            ['support.viewOrgTickets'],
+            { clientId: t.clientId, ...(t.siteId !== undefined ? { siteIds: [t.siteId] } : {}) },
+            'read',
+          ),
+      )
+      .map((t) => t.id),
+  );
+  return new Set(
+    (await call.all<TicketMessage>('ticketMessages'))
+      .filter((m) => readable.has(m.ticketId))
+      .flatMap((m) => m.attachmentIds),
+  );
+}
 
 export function createAuthoringOperations(backend: RawBackend, options: StoreOptions): AuthoringOperations {
   const apply = (ops: WriteOp[]): Promise<void> => backend.apply(ops);
@@ -605,34 +645,22 @@ export function createAuthoringOperations(backend: RawBackend, options: StoreOpt
 
   // ------------------------------------------------------------ files
 
-  /** Assumption 20: who can read a stored attachment. Everything else is NotFound. */
-  function canSee(call: Call, a: Attachment): boolean {
-    if (call.side === 'provider' || a.clientId !== call.clientId) return false;
-    if (!isFile(a) || a.purpose === 'learningDocument') return true;
-    if (a.purpose === 'ticketScreenshot') return a.ownerUserId === call.actor.user.id;
-    const own = call.actor.user.personId;
-    if (a.ownerUserId === call.actor.user.id || (own !== undefined && a.personId === own)) return true;
-    return (
-      call.side === 'client' &&
-      canAny(call, ['evidence.view'], { clientId: a.clientId, ...(a.siteId ? { siteIds: [a.siteId] } : {}) }, 'read')
-    );
-  }
-
   const attachments: AuthoringOperations['attachments'] = {
     async get(ctx, id) {
       const call = await beginCall(backend, options, ctx);
       const a = await call.find<Attachment>('attachments', id);
-      if (!a || !canSee(call, a)) throw new NotFoundError();
+      if (!a || !canSeeAttachment(call, a, await sharedScreenshotIds(call))) throw new NotFoundError();
       return structuredClone(a);
     },
 
     async list(ctx, filter) {
       const call = await beginCall(backend, options, ctx);
+      const shared = await sharedScreenshotIds(call);
       return structuredClone(
         (await call.all<Attachment>('attachments'))
           .filter(
             (a) =>
-              canSee(call, a) &&
+              canSeeAttachment(call, a, shared) &&
               Object.entries(filter ?? {}).every(([k, v]) => (a as Record<string, unknown>)[k] === v),
           )
           .sort(byId),
@@ -713,7 +741,7 @@ export function createAuthoringOperations(backend: RawBackend, options: StoreOpt
     async remove(ctx, id) {
       const call = await beginCall(backend, options, ctx);
       const a = await call.find<Attachment>('attachments', id);
-      if (!a || !canSee(call, a) || !isFile(a)) throw new NotFoundError();
+      if (!a || !canSeeAttachment(call, a) || !isFile(a)) throw new NotFoundError();
       const owner = a.ownerUserId === call.actor.user.id;
       const approver =
         call.side === 'client' &&

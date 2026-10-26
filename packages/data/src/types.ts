@@ -48,6 +48,13 @@ import type {
   WinnerLine,
   ClientLevels,
   Invitation,
+  AppFeedback,
+  FaqVote,
+  ModuleFeedback,
+  ProviderFeedbackProjection,
+  ReviewDecision,
+  Ticket,
+  TicketMessage,
   Scope,
   TwoFactorStatus,
   AddOnRequest,
@@ -227,7 +234,13 @@ export type RuleName =
   | 'invalidTheme'
   | 'invalidName'
   | 'staffTicketsOff'
-  | 'duplicateRule';
+  | 'duplicateRule'
+  | 'invalidSubmission'
+  | 'invalidDecision'
+  | 'notAwaitingCheck'
+  | 'invalidFeedback'
+  | 'invalidTicket'
+  | 'invalidReply';
 
 /** A business rule said no (for example "finish every lesson first"). The web app maps `rule` to `errors.rule.<rule>`. */
 export class RuleError extends DataError {
@@ -684,6 +697,107 @@ export interface DataStore {
   team: TeamService;
   organisation: OrganisationService;
   onboarding: OnboardingService;
+  evidenceFlow: EvidenceFlowService;
+  moduleFeedback: ModuleFeedbackService;
+  appFeedback: AppFeedbackService;
+  tickets: TicketsService;
+  faqs: FaqsService;
+}
+
+export type EvidenceSubmitInput = {
+  requirementId: Id;
+  personId?: Id;
+  providerName: string;
+  completedAt: string;
+  expiresAt?: string;
+  certificateRef?: string;
+  fileAttachmentId: Id;
+};
+export type EvidenceResubmitInput = Omit<EvidenceSubmitInput, 'requirementId' | 'personId'>;
+export type EvidenceReviewInput = ReviewDecision extends infer D
+  ? D extends { reviewerId: string }
+    ? Omit<D, 'reviewerId'>
+    : never
+  : never;
+
+/** External evidence (M3 assumption 22). Decisions are the only way a submission becomes Evidence. */
+export interface EvidenceFlowService {
+  submit(ctx: ActorContext, input: EvidenceSubmitInput): Promise<EvidenceSubmission>;
+  /** The person or their uploader; from Needs a better copy or Rejected back to Awaiting check on the same record. */
+  resubmit(ctx: ActorContext, id: Id, input: EvidenceResubmitInput): Promise<EvidenceSubmission>;
+  withdraw(ctx: ActorContext, id: Id): Promise<EvidenceSubmission>;
+  /** Submissions awaiting a check in the admin's read scope, oldest first. */
+  queue(ctx: ActorContext, filter?: { siteId?: Id; requirementId?: Id }): Promise<EvidenceSubmission[]>;
+  get(ctx: ActorContext, id: Id): Promise<EvidenceSubmission>;
+  review(ctx: ActorContext, id: Id, decision: EvidenceReviewInput): Promise<EvidenceSubmission>;
+}
+
+export type ModuleFeedbackInput = {
+  moduleId: Id;
+  kind: ModuleFeedback['kind'];
+  lessonId?: string;
+  questionId?: string;
+  rating?: number;
+  thumb?: 'up' | 'down';
+  tags: string[];
+  text?: string;
+  anonymous: boolean;
+};
+/** Module feedback (M3 assumption 18). Anonymous items never carry a person or user id. */
+export interface ModuleFeedbackService {
+  submit(ctx: ActorContext, input: ModuleFeedbackInput): Promise<ModuleFeedback>;
+  list(
+    ctx: ActorContext,
+    filter?: { moduleId?: Id; status?: ModuleFeedback['status']; kind?: ModuleFeedback['kind'] },
+  ): Promise<ModuleFeedback[]>;
+  get(ctx: ActorContext, id: Id): Promise<ModuleFeedback>;
+  reply(ctx: ActorContext, id: Id, text: string): Promise<ModuleFeedback>;
+  setStatus(ctx: ActorContext, id: Id, status: ModuleFeedback['status']): Promise<ModuleFeedback>;
+  escalate(ctx: ActorContext, id: Id, note: string): Promise<ModuleFeedback>;
+  /** Provider only (`feedback.read`): no people, sites or replies, and counts only for client-own modules. */
+  providerView(ctx: ActorContext): Promise<ProviderFeedbackProjection>;
+}
+
+/** App feedback is written by staff and admins and readable only by the provider. */
+export interface AppFeedbackService {
+  submit(
+    ctx: ActorContext,
+    input: { kind: AppFeedback['kind']; rating?: number; text: string; context: Record<string, string> },
+  ): Promise<AppFeedback>;
+  providerList(ctx: ActorContext, filter?: { status?: AppFeedback['status'] }): Promise<AppFeedback[]>;
+}
+
+export type TicketRaiseInput = {
+  title: string;
+  description: string;
+  impact: Ticket['impact'];
+  featureId?: string;
+  featureOtherText?: string;
+  issueTypeId?: string;
+  issueTypeOtherText?: string;
+  sharedWithManager?: boolean;
+  /** Stored exactly as given: the app removes what the person took off. */
+  context: Record<string, string>;
+  attachmentIds?: Id[];
+};
+/** Customer-side tickets (M3 assumption 24). Provider replies and status changes arrive in M4. */
+export interface TicketsService {
+  raise(ctx: ActorContext, input: TicketRaiseInput): Promise<Ticket>;
+  /** Own tickets, or with `organisation` (support.viewOrgTickets) admin tickets and staff tickets shared with the manager. */
+  list(ctx: ActorContext, filter?: { organisation?: boolean }): Promise<Ticket[]>;
+  get(ctx: ActorContext, id: Id): Promise<Ticket>;
+  /** Oldest first, without internal provider notes. */
+  messages(ctx: ActorContext, id: Id): Promise<TicketMessage[]>;
+  reply(ctx: ActorContext, id: Id, input: { body: string; attachmentIds?: Id[] }): Promise<TicketMessage>;
+  resolve(ctx: ActorContext, id: Id): Promise<Ticket>;
+  reopen(ctx: ActorContext, id: Id): Promise<Ticket>;
+  rate(ctx: ActorContext, id: Id, rating: 'up' | 'down'): Promise<Ticket>;
+}
+
+export interface FaqsService {
+  /** One vote per user and FAQ: a second vote replaces the first. */
+  vote(ctx: ActorContext, faqId: string, helpful: boolean): Promise<FaqVote>;
+  myVotes(ctx: ActorContext): Promise<FaqVote[]>;
 }
 
 /** For the seed, the demo shell and tests. Never reachable through an ActorContext. */

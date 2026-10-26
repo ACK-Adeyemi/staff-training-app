@@ -574,7 +574,7 @@ export function runFeedbackTicketsContract(
       async function seeded() {
         const s = await setup();
         const card = s.fb(1, {
-          text: 'Named comment from Jade',
+          text: 'Named comment about the pace',
           reply: { byUserId: s.fx.ids.users.priya, text: 'Private reply text', at: TODAY },
         });
         const report = s.fb(2, {

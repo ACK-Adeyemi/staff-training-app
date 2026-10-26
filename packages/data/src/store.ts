@@ -16,6 +16,8 @@ import { createEngagementOperations } from './engagementOps';
 import { createCompetitionOperations } from './competitionOps';
 import { createIdentityOperations } from './identityOps';
 import { createAuthoringOperations } from './authoringOps';
+import { createEvidenceOperations } from './evidenceOps';
+import { createSupportOperations } from './supportOps';
 import { createBillingOperations, simulateFailedPayment } from './billingOps';
 import { keyOf, validate, type RawBackend, type SettingsRecord, type WriteOp } from './backend';
 import {
@@ -281,6 +283,8 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const identity = createIdentityOperations(backend, options);
   const billingOps = createBillingOperations(backend, options);
   const authoringOps = createAuthoringOperations(backend, options);
+  const evidenceFlow = createEvidenceOperations(backend, options);
+  const support = createSupportOperations(backend, options);
   const readOnly = (name: StoreName) => {
     const full = repo(backend, options, name);
     return { get: full.get, list: full.list };
@@ -328,6 +332,8 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     access: { ...engagement.access, features: (ctx: ActorContext) => billingOps.features(ctx) },
     ...competitionOps,
     ...identity,
+    evidenceFlow,
+    ...support,
   };
   return { store: store as unknown as DataStore, admin: demoAdmin(backend, options), subscribe };
 }
