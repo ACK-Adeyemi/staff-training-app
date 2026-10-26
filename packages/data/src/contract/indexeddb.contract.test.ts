@@ -4,6 +4,7 @@ import { createIndexedDbStore } from '../indexeddb/index';
 import { runAdminCountContract } from './adminCount';
 import { runCompetitionsContract } from './competitions';
 import { runEngagementContract } from './engagement';
+import { runIdentityOrgContract } from './identityOrg';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
 import { runContractSuite } from './suite';
@@ -23,5 +24,9 @@ runCompetitionsContract('indexeddb adapter', (options) =>
 );
 
 runM3FoundationContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+
+runIdentityOrgContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );

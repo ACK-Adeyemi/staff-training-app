@@ -3,6 +3,7 @@ import { createMemoryStore } from '../memory/index';
 import { runAdminCountContract } from './adminCount';
 import { runCompetitionsContract } from './competitions';
 import { runEngagementContract } from './engagement';
+import { runIdentityOrgContract } from './identityOrg';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
 import { runContractSuite } from './suite';
@@ -18,3 +19,5 @@ runEngagementContract('memory adapter', (options) => Promise.resolve(createMemor
 runCompetitionsContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
 runM3FoundationContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runIdentityOrgContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
