@@ -112,3 +112,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-26: M3 chunk 1 decisions, schemas, stores (IndexedDB v4), billing.manageAddOns, personas and derived account state landed, check.sh green.
 - 2026-10-26: M3 plan committed (b395acf); chunk 1 schemas, stores, personas landed (0bc8159), check.sh green. Stopping at a clean point; chunk 2 next.
 - 2026-10-26: merged origin/main (F1 already fixed, awaiting user re-check); M3 chunk 2 domain sites, leaderboards, rules, reminders, calendar landed (be935ac), check.sh green. Stopping at a clean point; chunk 3 next.
+- 2026-10-26: e2e flake seen once: compete.spec.ts:88 desktop (waiting for "New competition" link, 120s timeout) in a full run; passed alone and on full rerun. Watch; likely slow load of competitions page when two tabs open under load.
