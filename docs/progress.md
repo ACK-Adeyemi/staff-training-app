@@ -3,8 +3,8 @@ Status: IN PROGRESS
 Mode: unattended
 Branch: agent/poc-build
 Current milestone: M3
-Milestone base commit: (set when M3 starts)
-Next step: start M3 (client admin depth): record the base commit, then delegate docs/plans/m3.md to planner using docs/build-pack/10-04 section file.
+Milestone base commit: bb460c4
+Next step: planner writes docs/plans/m3.md, then chunk 1.
 
 ## Milestones
 - [x] M0 Foundations
@@ -86,3 +86,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-26: merged origin/main (user feedback); F1 fixed and committed, check.sh green. Chunk 16 next.
 - 2026-10-26: M2 chunk 16 compete and admin engagement landed (72395e6), check.sh green. Builder eligibility pickers deferred (see decisions). Stopping at a clean point; chunk 17 next.
 - 2026-10-26: M2 complete (chunk 17, reviews, fixes). Final commit 6425abe. M3 next.
+- 2026-10-26: M3 base bb460c4; planning.
