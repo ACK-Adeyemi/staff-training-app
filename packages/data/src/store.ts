@@ -1,9 +1,11 @@
 // createStore: builds a DataStore and DemoAdmin on top of any RawBackend. Both adapters use it, so the
 // policy (validation, tenancy, permissions, audit, account state, entitlements) is identical.
 import {
+  defaultDisplayPrefs,
   demoStateSchema,
   seedMetaSchema,
   type DemoState,
+  type LearnerPrefs,
   type OutboxMessage,
   type SeedMeta,
   type UserAccount,
@@ -53,6 +55,21 @@ const byKey = (store: StoreName) => (a: unknown, b: unknown) => {
 const matches = (record: Rec, filter: Filter | undefined): boolean =>
   filter === undefined || Object.entries(filter).every(([k, v]) => record[k] === v);
 
+/** Another person's personal settings are theirs alone: everyone else reads a person without `prefs`. */
+function shape(call: Call, store: StoreName, record: Rec): Rec {
+  if (store !== 'people' || call.actor.user.personId === record['id']) return record;
+  const rest = { ...record };
+  delete rest['prefs'];
+  return rest;
+}
+
+const newPersonPrefs = (): LearnerPrefs => ({
+  hideFromLeaderboards: false,
+  ...defaultDisplayPrefs,
+  language: 'en-GB',
+  battleExtraTimePercent: 0,
+});
+
 function repo(backend: RawBackend, options: StoreOptions, store: StoreName) {
   const begin = (ctx: ActorContext): Promise<Call> => beginCall(backend, options, ctx);
 
@@ -64,7 +81,7 @@ function repo(backend: RawBackend, options: StoreOptions, store: StoreName) {
       const call = await begin(ctx);
       const record = (await backend.get(store, id)) as Rec | undefined;
       if (!record || !(await visible(call, record))) throw new NotFoundError();
-      return record;
+      return shape(call, store, record);
     },
 
     list: async (ctx: ActorContext, filter?: Filter) => {
@@ -72,20 +89,35 @@ function repo(backend: RawBackend, options: StoreOptions, store: StoreName) {
       if (!(await canReadStore(call, store))) throw new ForbiddenError('permission');
       const out: Rec[] = [];
       for (const record of (await backend.getAll(store)) as Rec[]) {
-        if (matches(record, filter) && (await canReadRecord(call, store, record))) out.push(record);
+        if (matches(record, filter) && (await canReadRecord(call, store, record))) out.push(shape(call, store, record));
       }
       return out.sort(byKey(store));
     },
 
     put: async (ctx: ActorContext, input: unknown) => {
-      const rec = validate(store, input) as Rec;
       const call = await begin(ctx);
+      let given = input;
+      const stored =
+        store === 'people' && typeof input === 'object' && input !== null
+          ? ((await backend.get(store, String((input as Rec)['id']))) as Rec | undefined)
+          : undefined;
+      // Admins read people without prefs, so a write that omits them keeps the stored ones.
+      if ((input as Rec | null)?.['prefs'] === undefined && typeof input === 'object' && input !== null) {
+        given = { ...(input as Rec), prefs: stored ? stored['prefs'] : newPersonPrefs() };
+      }
+      let rec = validate(store, given) as Rec;
       const existing = (await backend.get(store, keyOf(store, rec))) as Rec | undefined;
+      // Personal settings and the nickname belong to the person: nobody else's write changes them.
+      if (store === 'people' && call.actor.user.personId !== rec['id']) {
+        rec = { ...rec, prefs: existing ? existing['prefs'] : newPersonPrefs() };
+        if (existing && existing['nickname'] === undefined) delete rec['nickname'];
+        else if (existing) rec['nickname'] = existing['nickname'];
+      }
       await checkTenancy(call, store, rec, existing);
       const result = await authorizePut(call, store, rec, existing);
       const ops: WriteOp[] = [{ type: 'put', store, key: keyOf(store, rec), record: result.record }, ...result.extra];
       await backend.apply(ops);
-      return structuredClone(result.record);
+      return structuredClone(shape(call, store, result.record as Rec));
     },
 
     remove: async (ctx: ActorContext, id: string) => {

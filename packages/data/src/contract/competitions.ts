@@ -842,5 +842,197 @@ export function runCompetitionsContract(
         );
       });
     });
+    describe('competitions: site scope and privacy (M2 security review)', () => {
+      /** A client admin scoped to one site, holding the given permissions. */
+      async function siteAdmin(s: S, permissionIds: string[], siteIds: string[]): Promise<ActorContext> {
+        const n = 400 + counter++;
+        const a = s.fx.ids.clients.a;
+        await s.admin.bulkPut('roles', [
+          {
+            id: freshId(n),
+            owner: { clientId: a },
+            name: `Site admin ${n}`,
+            description: 'Site admin',
+            colour: '#996633',
+            permissionIds,
+            system: false,
+            version: 1,
+            updatedBy: s.fx.ids.users.priya,
+            updatedAt: TODAY,
+          },
+        ]);
+        await s.admin.bulkPut('users', [
+          {
+            id: freshId(n + 100),
+            side: 'client',
+            clientId: a,
+            email: `site-admin-${n}@example.test`,
+            displayName: `Site admin ${n}`,
+            status: 'active',
+            login: { method: 'emailPassword', pinSet: false },
+          },
+        ]);
+        await s.admin.bulkPut('roleAssignments', [
+          {
+            id: freshId(n + 200),
+            userId: freshId(n + 100),
+            roleIds: [freshId(n)],
+            scope: { type: 'sites', ids: siteIds },
+            grants: [],
+            denies: [],
+            status: 'active',
+          },
+        ]);
+        return client(freshId(n + 100), a);
+      }
+      /** Moves Hannah to the Annexe, so she is "another site's person" with real scores. */
+      async function moveHannahToAnnexe(s: S): Promise<void> {
+        const dump = (await s.admin.dumpAll())['people'] as Person[];
+        const h = dump.find((p) => p.id === hannahId(s))!;
+        await s.admin.bulkPut('people', [{ ...h, primarySiteId: s.fx.ids.sites.annexe }]);
+      }
+      const noHannah = (s: S, value: unknown) => {
+        const found = scan(value);
+        expect(found.strings).not.toContain(hannahId(s));
+        expect(JSON.stringify(value)).not.toContain('Hannah');
+      };
+
+      it('gives a site manager with empty eligibility no other site people in standings or winners', async () => {
+        const s = await setup();
+        const mgr = await siteAdmin(s, ['competitions.view', 'competitions.manage'], [s.fx.ids.sites.main]);
+        const c = await s.store.competitions.save(
+          mgr,
+          competition(s, { siteIds: [s.fx.ids.sites.main], winnerCount: 2 }),
+        );
+        await s.store.competitions.publish(mgr, c.id);
+        await play(s);
+        await moveHannahToAnnexe(s);
+        const view = await s.store.competitions.standings(mgr, c.id);
+        expect(view.rows!.map((r) => r.name)).toEqual(['Jade M.']);
+        noHannah(s, view);
+        const done = await s.store.competitions.recordWinners(at(mgr, AFTER_END), c.id);
+        noHannah(s, done);
+        expect((done.finalStandings as unknown[]).length).toBe(1);
+      });
+
+      it('gives a site viewer on a competition covering two sites only their own site people', async () => {
+        const s = await setup();
+        const c = await live(s, { siteIds: [s.fx.ids.sites.main, s.fx.ids.sites.annexe] });
+        await play(s);
+        await moveHannahToAnnexe(s);
+        const v = await siteAdmin(s, ['competitions.view'], [s.fx.ids.sites.main]);
+        const view = await s.store.competitions.standings(v, c.id);
+        expect(view.rows!.map((r) => r.name)).toEqual(['Jade M.']);
+        noHannah(s, view);
+        // Someone who can read both sites still sees both.
+        const both = await s.store.competitions.standings(priya(s), c.id);
+        expect(both.rows!.map((r) => r.name)).toEqual(['Jade M.', 'Hannah P.']);
+      });
+
+      it('refuses a save whose eligibility sites go beyond the competition sites or the writer scope', async () => {
+        const s = await setup();
+        const mgr = await siteAdmin(s, ['competitions.view', 'competitions.manage'], [s.fx.ids.sites.main]);
+        await expectError(
+          s.store.competitions.save(
+            mgr,
+            competition(s, {
+              siteIds: [s.fx.ids.sites.main],
+              eligibility: { excludePersonIds: [], siteIds: [s.fx.ids.sites.annexe] },
+            }),
+          ),
+          ForbiddenError,
+        );
+        // Competition-wide with an out-of-scope eligibility site: also refused for the site-scoped writer.
+        await expectError(
+          s.store.competitions.save(
+            mgr,
+            competition(s, { eligibility: { excludePersonIds: [], siteIds: [s.fx.ids.sites.annexe] } }),
+          ),
+          ForbiddenError,
+        );
+        // Priya can write both sites, but eligibility must stay inside the competition's sites.
+        await expectError(
+          s.store.competitions.save(
+            priya(s),
+            competition(s, {
+              siteIds: [s.fx.ids.sites.main],
+              eligibility: { excludePersonIds: [], siteIds: [s.fx.ids.sites.annexe] },
+            }),
+          ),
+          ForbiddenError,
+        );
+      });
+
+      it('keeps another person prefs and nickname when an admin writes their record', async () => {
+        const s = await setup();
+        const people = s.store as unknown as {
+          people: {
+            get(ctx: ActorContext, id: string): Promise<Person>;
+            list(ctx: ActorContext): Promise<Person[]>;
+            put(ctx: ActorContext, p: Person): Promise<Person>;
+          };
+        };
+        const own = await people.people.get(jade(s), jadeId(s));
+        await s.store.me.updateProfile(jade(s), { hideFromLeaderboards: true });
+        const listed = (await people.people.list(priya(s))).find((p) => p.id === jadeId(s))!;
+        const result = await people.people.put(priya(s), {
+          ...listed,
+          lastName: 'Renamed',
+          nickname: 'Hijack',
+          prefs: { ...own.prefs, hideFromLeaderboards: false, readingFont: 'dyslexiaFriendly' },
+        });
+        expect(result).not.toHaveProperty('prefs');
+        const stored = ((await s.admin.dumpAll())['people'] as Person[]).find((p) => p.id === jadeId(s))!;
+        expect(stored.lastName).toBe('Renamed');
+        expect(stored.nickname).toBe(own.nickname);
+        expect(stored.prefs.hideFromLeaderboards).toBe(true);
+        expect(stored.prefs.readingFont).toBe(own.prefs.readingFont);
+      });
+
+      it('gives admins and the provider people without prefs, but the person keeps their own', async () => {
+        const s = await setup();
+        const people = s.store as unknown as {
+          people: { get(ctx: ActorContext, id: string): Promise<Person>; list(ctx: ActorContext): Promise<Person[]> };
+        };
+        const listed = await people.people.list(priya(s));
+        expect(listed.length).toBeGreaterThan(1);
+        for (const p of listed.filter((x) => x.id !== s.fx.ids.people.priya)) expect(p).not.toHaveProperty('prefs');
+        expect(await people.people.get(priya(s), jadeId(s))).not.toHaveProperty('prefs');
+        const fromProvider = await people.people.list(provider(s)).catch(() => [] as Person[]);
+        for (const p of fromProvider) expect(p).not.toHaveProperty('prefs');
+        expect(await people.people.get(jade(s), jadeId(s))).toHaveProperty('prefs');
+        expect((await s.store.me.get(jade(s))).prefs).toBeDefined();
+      });
+
+      it('lists no other site team names in the unranked part of the staff team board', async () => {
+        const s = await setup();
+        await s.admin.bulkPut('teams', [
+          {
+            id: freshId(390),
+            clientId: s.fx.ids.clients.a,
+            siteId: s.fx.ids.sites.annexe,
+            name: 'Annexe Secret Team',
+          },
+        ]);
+        const board = { board: 'teamBoard' as const, period: 'thisMonth' as const };
+        const forStaff = await s.store.leaderboards.standing(hannah(s), board);
+        expect(JSON.stringify(forStaff)).not.toContain('Annexe Secret Team');
+        const forSite = await s.store.leaderboards.standing(
+          await siteAdmin(s, ['competitions.view'], [s.fx.ids.sites.main]),
+          board,
+        );
+        expect(JSON.stringify(forSite)).not.toContain('Annexe Secret Team');
+      });
+
+      it('gives staff no distance to the next place while the live leaderboard is off', async () => {
+        const s = await setup();
+        const c = await live(s, { liveLeaderboard: false });
+        await play(s);
+        const during = await s.store.competitions.standings(hannah(s), c.id);
+        expect(during.viewer).toMatchObject({ value: 2, toNext: null });
+        const after = await s.store.competitions.standings(at(hannah(s), AFTER_END), c.id);
+        expect(after.viewer).toMatchObject({ toNext: 2 });
+      });
+    });
   });
 }

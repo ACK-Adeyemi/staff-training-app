@@ -110,6 +110,22 @@ function entriesOf(result: MetricResult, data: Data, siteNames: ReadonlyMap<stri
   return { entries, hiddenIds, unranked: [...unranked].map((id) => names.get(id) ?? '').sort() };
 }
 
+/** The sites a client caller may read competitions for. Empty for staff (they are scoped by their own site). */
+function readableSites(call: Call, clientId: string, sites: Site[]): Set<string> {
+  if (call.side !== 'client') return new Set();
+  return new Set(
+    sites.filter((s) => canAny(call, ['competitions.view'], { clientId, siteIds: [s.id] }, 'read')).map((s) => s.id),
+  );
+}
+
+/** For client callers, only the people whose primary site the caller can read (nobody else's id, name or score). */
+function scopeToReadable(call: Call, data: Data, readable: ReadonlySet<string>): Data {
+  if (call.side !== 'client') return data;
+  const people = data.people.filter((p) => readable.has(p.primarySiteId));
+  const inScope = new Set(people.flatMap((p) => p.teamIds));
+  return { ...data, people, teams: data.teams.filter((tm) => inScope.has(tm.id)) };
+}
+
 /** The unit the viewer is ranked as: themselves, or their team (first with an entry) or their site. */
 function viewerUnit(result: MetricResult, person: Person): string {
   if (result.unit === 'person') return person.id;
@@ -210,10 +226,12 @@ export function createCompetitionOperations(backend: RawBackend, options: StoreO
 
   async function standingsFor(call: Call, c: Competition): Promise<StandingsView> {
     if (c.type === 'custom' || c.templateId === undefined) return { visible: false };
-    const data = await gather(call, c.clientId);
     const sites = (await call.all<Site>('sites')).filter((s) => s.clientId === c.clientId);
+    const readable = readableSites(call, c.clientId, sites);
+    const data = scopeToReadable(call, await gather(call, c.clientId), readable);
     const result = metricFor(c, data);
-    const { entries, hiddenIds } = entriesOf(result, data, new Map(sites.map((s) => [s.id, s.name])));
+    const seen = call.side === 'client' ? sites.filter((s) => readable.has(s.id)) : sites;
+    const { entries, hiddenIds } = entriesOf(result, data, new Map(seen.map((s) => [s.id, s.name])));
     const status = competitionStatus(c, call.actor.now);
     const winners = c.winners
       ? winnerNames({
@@ -239,10 +257,12 @@ export function createCompetitionOperations(backend: RawBackend, options: StoreO
       hiddenIds,
       rowsVisible,
     });
+    // With the live board off, the distance to the next place would let staff work out the rows.
+    const viewer = view.viewer && !rowsVisible ? { ...view.viewer, toNext: null } : view.viewer;
     return {
       visible: true,
       rows: view.rows,
-      viewer: view.viewer,
+      viewer,
       eligible: isEligible(c, me),
       ...withWinners,
     };
@@ -280,7 +300,18 @@ export function createCompetitionOperations(backend: RawBackend, options: StoreO
       if (found && found.clientId !== call.clientId) throw new NotFoundError();
       if (!found && input.clientId !== call.clientId) return forbid('tenant');
       if (found && input.clientId !== found.clientId) return forbid('tenant');
-      if (!canAny(call, ['competitions.manage'], sitesOfComp(input), 'write')) return forbid('permission');
+      // Eligibility can only narrow the competition's own sites, and the writer needs write scope over all of them.
+      const eligible = input.eligibility.siteIds ?? [];
+      if (
+        input.siteIds &&
+        input.siteIds.length > 0 &&
+        eligible.some((id) => !(input.siteIds as string[]).includes(id))
+      ) {
+        return forbid('permission');
+      }
+      const written = [...new Set([...(input.siteIds ?? []), ...eligible])];
+      const scope: Target = written.length > 0 ? { clientId: input.clientId, siteIds: written } : sitesOfComp(input);
+      if (!canAny(call, ['competitions.manage'], scope, 'write')) return forbid('permission');
       if (found && !canAny(call, ['competitions.manage'], sitesOfComp(found), 'write')) return forbid('permission');
       if (found) checkAccountState(call, false);
       else requireNew(call);
@@ -373,10 +404,12 @@ export function createCompetitionOperations(backend: RawBackend, options: StoreO
       if (before.winners !== undefined) throw new RuleError('winnersRecorded');
       if (status !== 'ended') throw new RuleError('notEnded');
 
-      const data = await gather(call, before.clientId);
       const sites = (await call.all<Site>('sites')).filter((s) => s.clientId === before.clientId);
+      const readable = readableSites(call, before.clientId, sites);
+      const data = scopeToReadable(call, await gather(call, before.clientId), readable);
       const result = metricFor(before, data);
-      const { entries, hiddenIds } = entriesOf(result, data, new Map(sites.map((s) => [s.id, s.name])));
+      const seen = sites.filter((s) => readable.has(s.id));
+      const { entries, hiddenIds } = entriesOf(result, data, new Map(seen.map((s) => [s.id, s.name])));
       // Hidden people stay out of the top places but are in the draw (assumption 15).
       const names = new Map(entries.map((e) => [e.id, e.name]));
       const standing: Ranked[] = rankEntries(
@@ -468,22 +501,21 @@ export function createCompetitionOperations(backend: RawBackend, options: StoreO
         scoped = data.people.filter((p) => p.primarySiteId === person.primarySiteId);
       } else {
         const sites = (await call.all<Site>('sites')).filter((s) => s.clientId === clientId);
-        const readable = new Set(
-          sites
-            .filter((s) => canAny(call, ['competitions.view'], { clientId, siteIds: [s.id] }, 'read'))
-            .map((s) => s.id),
-        );
+        const readable = readableSites(call, clientId, sites);
         if (input.siteId !== undefined && !readable.has(input.siteId)) throw new NotFoundError();
         scoped = data.people.filter((p) =>
           input.siteId !== undefined ? p.primarySiteId === input.siteId : readable.has(p.primarySiteId),
         );
       }
+      const inScope = new Set(scoped.flatMap((p) => p.teamIds));
+      const teams = data.teams.filter((tm) => inScope.has(tm.id));
       const result = standingBoard(board.data, input.period, {
         ...data,
+        teams,
         people: scoped,
         now: call.actor.now,
       });
-      const scopedData: Data = { ...data, people: scoped };
+      const scopedData: Data = { ...data, teams, people: scoped };
       const { entries, hiddenIds, unranked } = entriesOf(result, scopedData, new Map());
       if (call.side === 'client') {
         const view = adminLeaderboardView({ entries, hiddenIds, idKey: idKeyOf(result.unit) });

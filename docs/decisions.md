@@ -455,3 +455,11 @@ Every number marked placeholder is engine config in packages/domain (`engagement
 - **Pause in read-aloud skipped.** The plan's step 4 test line mentions Pause, but the speech adapter has only speak and stop, and the e2e test (and the plan's S5 wording) uses Read this aloud and Stop reading. Adding pause and resume needs adapter, stub and wording changes for little gain, so Stop reading is the only control for now.
 - **Competition banner days left.** The S2 banner shows "N days left" (London calendar days from the injected Clock to the end date, never below 0), using the existing `client.person.daysLeft` and `daysLeftOne` keys.
 - **"Your progress" in the details sheet** is the position line ("You're 2nd of 13", or how to join), which already is her progress on the board. No separate metric line was added.
+
+## M2 security review fixes
+
+- Competition standings and recordWinners for client callers only include people whose primary site the caller can read (competitions.view, read), and only teams with such a member. Saving a competition requires eligibility sites to sit inside the competition's sites, and write scope over every site named in either list.
+- Admins and the provider now read people without `prefs`; only the person reads their own. A write to someone else's record keeps their stored prefs and nickname; a new person gets default prefs. Existing contract tests that edited a nickname through an admin now edit `qualificationLevel`, and the "copies" test reads prefs as the person. These relied on the leaky behaviour, not weakened.
+- Staff see no `toNext` while the live leaderboard is off; staff team boards list only unranked teams with a member in scope.
+- The remembered display copy applied at start-up is allowlisted (known data-* attributes, `--*` variable names, plain values only).
+- Accepted/deferred: nickname collisions between people (low) and small-team percentage disclosure (low) are accepted for the PoC and revisited in M3.

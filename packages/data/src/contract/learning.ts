@@ -14,6 +14,7 @@ import {
   type Module,
   type Question,
   type UserAccount,
+  type Person,
 } from '@sta/domain';
 import {
   DataError,
@@ -1061,7 +1062,7 @@ export function runLearningContract(name: string, makeStore: (options: StoreOpti
       it('writes nothing when one chosen person is archived', async () => {
         const s = await setup();
         const archived = freshId(500);
-        const person = (await s.store.people.list(priya(s))).find((x) => x.id === lucy(s))!;
+        const person = ((await s.admin.dumpAll())['people'] as Person[]).find((x) => x.id === lucy(s))!;
         await s.admin.bulkPut('people', [
           { ...person, id: archived, firstName: 'Gone', status: 'archived', leftDate: '2026-09-01T09:00:00.000Z' },
         ]);

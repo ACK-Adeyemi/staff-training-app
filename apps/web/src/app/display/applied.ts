@@ -5,10 +5,28 @@ import type { DisplayAttributes } from '@sta/domain';
 
 const KEY = 'sta.display.applied';
 
+// Only the names and plain values the display settings produce reach the page. The remembered copy comes from local
+// storage, so it is treated as untrusted: anything else is ignored.
+const ATTRIBUTE_NAMES = new Set([
+  'data-contrast',
+  'data-colour-mode',
+  'data-reading-font',
+  'data-spacing',
+  'data-reduce-motion',
+  'data-simple-view',
+  'data-bigger-buttons',
+]);
+const VARIABLE_NAME = /^--[a-z][a-z0-9-]*$/;
+const SAFE_VALUE = /^[a-zA-Z0-9.-]{1,20}$/;
+
 export function applyToHtml({ attributes, variables }: DisplayAttributes): void {
   const root = document.documentElement;
-  for (const [name, value] of Object.entries(attributes)) root.setAttribute(name, value);
-  for (const [name, value] of Object.entries(variables)) root.style.setProperty(name, value);
+  for (const [name, value] of Object.entries(attributes)) {
+    if (ATTRIBUTE_NAMES.has(name) && SAFE_VALUE.test(value)) root.setAttribute(name, value);
+  }
+  for (const [name, value] of Object.entries(variables)) {
+    if (VARIABLE_NAME.test(name) && SAFE_VALUE.test(value)) root.style.setProperty(name, value);
+  }
 }
 
 export function rememberApplied(applied: DisplayAttributes): void {
