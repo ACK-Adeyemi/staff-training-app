@@ -13,6 +13,7 @@ import {
   entitlements,
   featureAvailability,
   lastOwnerGuard,
+  twoFactorStatus,
   ulid,
   type AccountState,
   type AddOn,
@@ -245,7 +246,12 @@ export class Call {
 }
 
 /** Resolves the actor. Unknown, suspended or mismatched users get `unknownActor` on every call. */
-export async function beginCall(backend: RawBackend, options: StoreOptions, ctx: ActorContext): Promise<Call> {
+export async function beginCall(
+  backend: RawBackend,
+  options: StoreOptions,
+  ctx: ActorContext,
+  opts: { allowLimited?: boolean } = {},
+): Promise<Call> {
   const user = (await backend.get('users', ctx.userId)) as UserAccount | undefined;
   if (
     !user ||
@@ -279,6 +285,11 @@ export async function beginCall(backend: RawBackend, options: StoreOptions, ctx:
     ...(accountState ? { accountState } : {}),
   };
   const call = new Call(backend, options, actor);
+  // The two-step sign-in gate (M3 assumption 3): one check here covers every operation. The few calls that must work
+  // while limited (own user, own permissions, me, twoFactor) pass `allowLimited`.
+  if (ctx.side === 'client' && !opts.allowLimited && twoFactorStatus(user, now).kind === 'limited') {
+    return forbid('twoFactorRequired');
+  }
   // Reads and exports are never blocked before Deleted; Deleted is unavailable to everyone but the provider.
   if (accountState) {
     const feature = ctx.side === 'staff' ? 'staffOwnRecord' : 'coreCompliance';
@@ -653,7 +664,7 @@ export async function clientEntitlements(call: Call, clientId: string): Promise<
   return entitlements(pkg, addOns, derivedAccountState(client, subscription, call.actor.now), floor);
 }
 
-async function checkCustomRoleLimit(call: Call, clientId: string): Promise<void> {
+export async function checkCustomRoleLimit(call: Call, clientId: string): Promise<void> {
   const ents = await clientEntitlements(call, clientId);
   if (!ents) throw new NotEntitledError('customClientRoles');
   const roles = await call.all<Role>('roles');

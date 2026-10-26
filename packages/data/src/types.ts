@@ -43,6 +43,10 @@ import type {
   UserAccount,
   ViewerPosition,
   WinnerLine,
+  ClientLevels,
+  Invitation,
+  Scope,
+  TwoFactorStatus,
 } from '@sta/domain';
 
 export type Id = string;
@@ -388,6 +392,89 @@ export interface LeaderboardsService {
   saveSettings(ctx: ActorContext, settings: StandingBoardSettings): Promise<StandingBoardSettings>;
 }
 
+export type TeamMember = {
+  userId: Id;
+  displayName: string;
+  email?: string;
+  status: UserAccount['status'];
+  roleIds: Id[];
+  scope?: Scope;
+};
+
+/** An activity entry: ids, action names and counts only. Never note text, feedback text or file contents. */
+export type ActivityLine = {
+  id: Id;
+  actorId: Id;
+  clientId?: Id;
+  action: string;
+  target: string;
+  before?: unknown;
+  after?: unknown;
+  at: string;
+};
+
+export type CustomRoleInput = {
+  id?: Id;
+  name: string;
+  description?: string;
+  colour?: string;
+  levels: ClientLevels;
+  allows: string[];
+};
+
+export type SettingsPatch = Partial<{
+  amberWindowDays: number;
+  weeklyGoalLessons: number;
+  firstAiderThreshold: number;
+  allowStaffTickets: boolean;
+  pulseSurveys: boolean;
+}>;
+
+export type OnboardingView = {
+  steps: { key: string; done: boolean; doneAt?: string }[];
+  startedAt?: string;
+  completedAt?: string;
+};
+
+/** Two-step sign-in (simulated: the demo accepts 123456). Reachable while an admin is limited. */
+export interface TwoFactorService {
+  status(ctx: ActorContext): Promise<TwoFactorStatus>;
+  startEnrolment(ctx: ActorContext): Promise<{ secret: string; uri: string }>;
+  /** Returns the ten recovery codes, once. Only their hashes are stored. */
+  confirmEnrolment(ctx: ActorContext, code: string): Promise<{ recoveryCodes: string[] }>;
+  verify(ctx: ActorContext, code: string): Promise<void>;
+  useRecoveryCode(ctx: ActorContext, code: string): Promise<void>;
+}
+
+export interface TeamService {
+  members(ctx: ActorContext): Promise<TeamMember[]>;
+  invite(
+    ctx: ActorContext,
+    input: { email: string; displayName?: string; roleIds: Id[]; scope: Scope },
+  ): Promise<Invitation>;
+  setAccess(ctx: ActorContext, userId: Id, input: { roleIds: Id[]; scope: Scope }): Promise<RoleAssignment>;
+  revoke(ctx: ActorContext, userId: Id): Promise<void>;
+  saveCustomRole(ctx: ActorContext, input: CustomRoleInput): Promise<Role>;
+  removeCustomRole(ctx: ActorContext, roleId: Id): Promise<void>;
+  activity(ctx: ActorContext, filter?: { action?: string }): Promise<ActivityLine[]>;
+}
+
+export interface OrganisationService {
+  /** Display name and short name only; any actor of the client, staff included. */
+  profile(ctx: ActorContext): Promise<{ displayName: string; shortName?: string }>;
+  updateProfile(
+    ctx: ActorContext,
+    patch: { displayName?: string; shortName?: string },
+  ): Promise<{ displayName: string; shortName?: string }>;
+  updateSettings(ctx: ActorContext, patch: SettingsPatch): Promise<Client['settings']>;
+  sites: { update(ctx: ActorContext, siteId: Id, patch: { name?: string; region?: string }): Promise<Site> };
+}
+
+export interface OnboardingService {
+  checklist(ctx: ActorContext): Promise<OnboardingView>;
+  markDone(ctx: ActorContext, step: string): Promise<OnboardingView>;
+}
+
 export interface DataStore {
   clients: WriteRepo<Client>;
   sites: RemovableRepo<Site>;
@@ -433,6 +520,10 @@ export interface DataStore {
   modulePlacements: ModulePlacementsService;
   competitions: CompetitionsService;
   leaderboards: LeaderboardsService;
+  twoFactor: TwoFactorService;
+  team: TeamService;
+  organisation: OrganisationService;
+  onboarding: OnboardingService;
 }
 
 /** For the seed, the demo shell and tests. Never reachable through an ActorContext. */

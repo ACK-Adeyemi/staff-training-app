@@ -86,7 +86,8 @@ async function personCall(
   options: StoreOptions,
   ctx: ActorContext,
 ): Promise<{ call: Call; person: Person }> {
-  const call = await beginCall(backend, options, ctx);
+  // Own settings stay reachable while the two-step sign-in gate is limiting an admin.
+  const call = await beginCall(backend, options, ctx, { allowLimited: true });
   if (call.side === 'provider') return forbid('permission');
   const personId = call.actor.user.personId;
   const person = personId ? await call.find<Person>('people', personId) : undefined;
@@ -487,7 +488,7 @@ export function createEngagementOperations(backend: RawBackend, options: StoreOp
 
   const access: AccessService = {
     async permissions(ctx) {
-      const call = await beginCall(backend, options, ctx);
+      const call = await beginCall(backend, options, ctx, { allowLimited: true });
       return structuredClone(call.actor.perms);
     },
   };

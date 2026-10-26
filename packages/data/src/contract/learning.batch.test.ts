@@ -77,7 +77,7 @@ describe('learning writes are single atomic batches', () => {
       dueAt: dueAtFromLondonDate('2026-11-02'),
     });
     expect(s.batches.length - before).toBe(1);
-    expect(storesOf(s.batches.at(-1))).toEqual(['assignments', 'audit', 'notifications']);
+    expect(storesOf(s.batches.at(-1))).toEqual(['assignments', 'audit', 'notifications', 'onboarding']);
   });
 
   it('archiving a person writes the person and the cancelled assignments in one batch', async () => {

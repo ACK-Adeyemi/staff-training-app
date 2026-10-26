@@ -1208,7 +1208,7 @@ export function runLearningContract(name: string, makeStore: (options: StoreOpti
         const lucy = s.fx.keys.personas['lucy'];
         await s.store.assignments.assign(priya(s), { moduleId: s.lf.moduleId, personIds: [lucy], dueAt: due });
         expect(calls).toHaveLength(1);
-        expect(new Set(calls[0])).toEqual(new Set(['assignments', 'notifications', 'audit']));
+        expect(new Set(calls[0])).toEqual(new Set(['assignments', 'notifications', 'audit', 'onboarding']));
         await refusal(
           s.store.assignments.assign(priya(s), {
             moduleId: s.lf.moduleId,

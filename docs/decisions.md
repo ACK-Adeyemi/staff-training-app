@@ -614,3 +614,12 @@ Copied from docs/plans/m3.md (chunk 1). Numbers match the plan, so other docs ca
 - `supportFeatures` carry an extra `areaKey` for the display label; `area` stays a plain lower-case name as the tests require. Release notes use `whatsNew.*` keys (the plan did not name a group). Staff-side groups `help.staff`, `faq.staff`, `tickets.staff`, `calendar.staff` and `feedback.staff` exist and hold no payment words.
 - Default auto-assign rules use `dueInDays` 14 for the induction and 30 for the other two (placeholders, VERIFY). "What changed in September 2026" is assigned on `personAdded` for everyone.
 - FAQ answers are 30 words or fewer to satisfy the existing en-GB wording test.
+
+## M3 chunk 6
+
+- **Two existing tests extended, one chunk 6 test corrected.** `assignments.assign` now ticks the onboarding "assign first training" step in the same batch (plan chunk 6), so the batch gains an `onboarding` write. `contract/learning.ts` (change notices) and `contract/learning.batch.test.ts` now expect `onboarding` among the stores written. In `contract/identityOrg.ts`, the "never leaves the organisation without an Account Owner" test set up two owners (Priya and Olive), so demoting Priya could not hit the guard, while the next test relies on exactly that. It now suspends Olive's assignment first; the next test is unchanged.
+- **Gate.** `beginCall` takes `{ allowLimited }`; `users.get` of the actor's own record, `access.permissions`, `me.*` and `twoFactor.*` pass it. The gate applies to `side: 'client'` only. `faqs.*` and own `tickets.*` will pass it when those services arrive.
+- **Failed enrolment codes are not counted** (no `twoFactor` object exists before enrolment, and the test requires it stays absent). The fifth wrong code on `verify` or `useRecoveryCode` throws `codeLocked`.
+- **Removing a role that someone holds** and **inviting an email already on the team** throw `ValidationError` (no new RuleName). Revoking suspends the user and their assignments and marks an open invitation `revoked`. `setAccess` keeps the person's first assignment (same id), drops any others and clears per-person grants and denies.
+- **Invitation email** body and subject are plain English strings in the Outbox (demo-only, not UI text).
+- **Activity log** shows `before` and `after` only for actions starting `team.`, `organisation.`, `onboarding.`, `twoFactor.`, `assignments.`; every other entry shows ids and the action name only.

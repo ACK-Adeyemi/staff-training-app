@@ -690,6 +690,18 @@ export function runIdentityOrgContract(name: string, makeStore: (options: StoreO
 
       it('never leaves the organisation without an Account Owner (lastOwnerGuard) for setAccess and revoke', async () => {
         const s = await setup();
+        // Olive (the second Account Owner added in setup) steps aside, so Priya is the only active owner.
+        await s.admin.bulkPut('roleAssignments', [
+          {
+            id: freshId(2020),
+            userId: s.olive.id,
+            roleIds: [s.fx.ids.roles.aOwner],
+            scope: { type: 'clients', ids: [s.a] },
+            grants: [],
+            denies: [],
+            status: 'suspended',
+          },
+        ]);
         // Mega holds every owner permission but is not an Account Owner, so only the guard can refuse.
         const demote = {
           roleIds: [s.fx.ids.roles.supervisor],

@@ -19,3 +19,10 @@ export function otpauthUri(secret: string, label: string, issuer = 'Staff Traini
   const i = encodeURIComponent(issuer);
   return `otpauth://totp/${i}:${encodeURIComponent(label)}?secret=${encodeURIComponent(secret)}&issuer=${i}`;
 }
+
+/** The fixed code the demo accepts as a correct authenticator code (simulated; Demo only, M3 assumption 4). */
+export const demoTwoFactorCode = '123456';
+export const recoveryCodeCount = 10;
+/** Wrong codes in a row that lock code entry, and for how long (M3 assumption 4). */
+export const maxWrongCodes = 5;
+export const codeLockMinutes = 15;

@@ -14,6 +14,7 @@ import {
 import { createOperations } from './ops';
 import { createEngagementOperations } from './engagementOps';
 import { createCompetitionOperations } from './competitionOps';
+import { createIdentityOperations } from './identityOps';
 import { keyOf, validate, type RawBackend, type SettingsRecord, type WriteOp } from './backend';
 import {
   authorizePut,
@@ -72,14 +73,16 @@ const newPersonPrefs = (): LearnerPrefs => ({
 });
 
 function repo(backend: RawBackend, options: StoreOptions, store: StoreName) {
-  const begin = (ctx: ActorContext): Promise<Call> => beginCall(backend, options, ctx);
+  const begin = (ctx: ActorContext, opts?: { allowLimited?: boolean }): Promise<Call> =>
+    beginCall(backend, options, ctx, opts);
 
   const visible = async (call: Call, record: Rec): Promise<boolean> =>
     (await canReadStore(call, store)) && (await canReadRecord(call, store, record));
 
   return {
     get: async (ctx: ActorContext, id: string) => {
-      const call = await begin(ctx);
+      // A limited admin may still read their own user record (M3 assumption 3).
+      const call = await begin(ctx, { allowLimited: store === 'users' && id === ctx.userId });
       const record = (await backend.get(store, id)) as Rec | undefined;
       if (!record || !(await visible(call, record))) throw new NotFoundError();
       return shape(call, store, record);
@@ -272,6 +275,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const ops = createOperations(backend, options);
   const engagement = createEngagementOperations(backend, options);
   const competitionOps = createCompetitionOperations(backend, options);
+  const identity = createIdentityOperations(backend, options);
   const readOnly = (name: StoreName) => {
     const full = repo(backend, options, name);
     return { get: full.get, list: full.list };
@@ -311,6 +315,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     learning: ops.learning,
     ...engagement,
     ...competitionOps,
+    ...identity,
   };
   return { store: store as unknown as DataStore, admin: demoAdmin(backend), subscribe };
 }

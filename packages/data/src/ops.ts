@@ -21,12 +21,14 @@ import {
   type LearningEvent,
   type Module,
   type Notification,
+  type OnboardingChecklist,
   type Person,
   type Requirement,
   type Site,
   type UserAccount,
 } from '@sta/domain';
 import type { RawBackend, WriteOp } from './backend';
+import { tickOnboarding } from './identityOps';
 import { audit, beginCall, canAny, checkAccountState, forbid, holds, type Call } from './policy';
 import {
   NotFoundError,
@@ -437,6 +439,7 @@ export function createOperations(backend: RawBackend, options: StoreOptions): Op
             moduleId: module.id,
             count: created.length,
           }),
+          ...tickOnboarding(call, clientId, await call.all<OnboardingChecklist>('onboarding'), 'assignTraining'),
         );
         await apply(ops);
       }
