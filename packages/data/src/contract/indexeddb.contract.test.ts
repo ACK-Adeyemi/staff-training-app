@@ -2,6 +2,7 @@
 import 'fake-indexeddb/auto';
 import { createIndexedDbStore } from '../indexeddb/index';
 import { runAdminCountContract } from './adminCount';
+import { runEngagementContract } from './engagement';
 import { runLearningContract } from './learning';
 import { runContractSuite } from './suite';
 
@@ -12,3 +13,5 @@ runContractSuite('indexeddb adapter', (options) => createIndexedDbStore(options,
 runAdminCountContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
 
 runLearningContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
+
+runEngagementContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
