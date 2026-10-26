@@ -1,5 +1,6 @@
 // Runs the shared contract suite against the memory adapter (plan chunk 7). The IndexedDB adapter runs it in chunk 9.
 import { createMemoryStore } from '../memory/index';
+import { runAuthoringFilesContract } from './authoringFiles';
 import { runBillingContract } from './billing';
 import { runAdminCountContract } from './adminCount';
 import { runCompetitionsContract } from './competitions';
@@ -24,3 +25,5 @@ runM3FoundationContract('memory adapter', (options) => Promise.resolve(createMem
 runIdentityOrgContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
 runBillingContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runAuthoringFilesContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
