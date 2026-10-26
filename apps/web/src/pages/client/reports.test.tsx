@@ -272,8 +272,9 @@ describe('C8 Module stats (basic)', () => {
     expect(value('Completed')).toBe('0');
     expect(value('Completion rate')).toBe('0%');
     expect(value('Overdue')).toBe('0');
-    expect(value('Average score')).toBe('No scores yet');
-    expect(value('Pass rate')).toBe('No scores yet');
+    // M2 seed history (conflict 11): Daniel's two failed closed-book practice attempts, 70% each, none passed.
+    expect(value('Average score')).toBe('70%');
+    expect(value('Pass rate')).toBe('0%');
   });
 
   it('updates the headline numbers after Jade passes with every answer right', async () => {
@@ -288,8 +289,8 @@ describe('C8 Module stats (basic)', () => {
     expect(value('Assigned')).toBe('1');
     expect(value('Started')).toBe('1');
     expect(value('Completion rate')).toBe('100%');
-    expect(value('Average score')).toBe('100%');
-    expect(value('Pass rate')).toBe('100%');
+    expect(value('Average score')).toBe('80%'); // (70 + 70 + 100) / 3 with the seeded practice attempts
+    expect(value('Pass rate')).toBe('50%'); // one of the two people with finished attempts (Daniel, Jade) has passed
   });
 
   it('counts an assignment past its due date as overdue', async () => {
@@ -328,17 +329,22 @@ describe('C8 Module stats (basic)', () => {
     expect(body).toHaveLength(sgModule.questions.length);
     const cell = (row: HTMLElement, col: string) => (row.children[heads.indexOf(col)]?.textContent ?? '').trim();
     const missedPrompts = missed.map((id) => sgModule.questions.find((q) => q.id === id)?.prompt ?? '');
-    const firstTwo = body.slice(0, 2).map((r) => cell(r, 'Question'));
-    for (const p of missedPrompts)
-      expect(
-        firstTwo.some((c) => c.includes(p)),
-        p,
-      ).toBe(true);
-    expect(body.slice(0, 2).map((r) => cell(r, 'Percent correct'))).toEqual(['0%', '0%']);
-    // Order: numeric percentages never decrease, then every "No answers yet" row.
+    // Seeded practice attempts (conflict 11) mean other questions are also at 0% or 50%: a question Jade missed is at
+    // most 50% (Daniel may have got it right) and is listed before every unanswered question.
+    const rowFor = (p: string) => body.find((r) => cell(r, 'Question').includes(p));
+    for (const p of missedPrompts) {
+      const row = rowFor(p);
+      expect(row, p).toBeDefined();
+      const value = Number.parseInt(cell(row!, 'Percent correct'), 10);
+      expect(value, p).toBeLessThanOrEqual(50);
+    }
+    const zeroRows = body.filter((r) => cell(r, 'Percent correct') === '0%').length;
+    expect(zeroRows).toBeGreaterThanOrEqual(1);
+    expect(body.slice(0, zeroRows).map((r) => cell(r, 'Percent correct'))).toEqual(Array(zeroRows).fill('0%'));
+    // Order: numeric percentages never decrease, then any "No answers yet" rows. The seeded practice attempts answer
+    // every question of this bank, so there may be no unanswered rows left.
     const pct = body.map((r) => cell(r, 'Percent correct'));
-    const firstBlank = pct.indexOf('No answers yet');
-    expect(firstBlank).toBeGreaterThan(1);
+    const firstBlank = pct.includes('No answers yet') ? pct.indexOf('No answers yet') : pct.length;
     expect(pct.slice(firstBlank).every((p) => p === 'No answers yet')).toBe(true);
     const nums = pct.slice(0, firstBlank).map((p) => Number.parseInt(p, 10));
     expect(nums).toEqual([...nums].sort((a, b) => a - b));

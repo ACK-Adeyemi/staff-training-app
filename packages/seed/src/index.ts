@@ -6,8 +6,9 @@ import { buildWorld, type SeedData, type SeedKeys } from './world';
 
 export type { SeedKeys } from './world';
 
-/** Version of the seeded world. 1 was M0; 2 adds modules, learning data and Little Acorns' policy (M1). */
-export const SEED_VERSION = 2;
+/** Version of the seeded world. 1 was M0; 2 adds modules, learning data and Little Acorns' policy (M1); 3 adds history, notes, organising data and
+ * competitions (M2). */
+export const SEED_VERSION = 3;
 export const DEFAULT_SEED_VALUE = 20261019;
 /** Used only when nothing is stored and the caller gave no date. The web app passes the real first-load date. */
 export const DEFAULT_TODAY = '2026-10-19T09:00:00.000Z';
@@ -39,6 +40,14 @@ const storeOrder: (keyof SeedData)[] = [
   'notifications',
   'attachments',
   'clientLinkOverlays',
+  'learningEvents',
+  'attempts',
+  'notes',
+  'categories',
+  'moduleGroups',
+  'modulePlacements',
+  'competitions',
+  'standingBoardSettings',
 ];
 
 /** Replaces everything in the store with the seeded world, and stores the seed value and today. */

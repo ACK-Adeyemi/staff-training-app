@@ -51,7 +51,10 @@ describe('Jade (Assumption 1)', () => {
     const evidence = (dump['evidence'] as Evidence[])
       .filter((e) => e.personId === personId && e.requirementId === req)
       .sort((a, b) => (a.completedAt < b.completedAt ? 1 : -1));
-    const assignments = (dump['assignments'] as Assignment[]).filter((a) => a.personId === personId);
+    // M2 adds a past Safer sleep assignment for Jade, so compare Safeguarding assignments only (conflict 11).
+    const assignments = (dump['assignments'] as Assignment[]).filter(
+      (a) => a.personId === personId && 'moduleId' in a.target && a.target.moduleId === sgId,
+    );
     return { ...s, personId, evidence, assignments };
   }
 
@@ -191,7 +194,11 @@ describe('determinism with the new streams', () => {
 
   it('still places Jade, Safeguarding and the assignment for a different seed value', async () => {
     const { dump, keys } = await seeded({ seedValue: 42, today: TODAY });
-    expect((dump['assignments'] as Assignment[]).filter((a) => a.personId === keys.personas['jade'])).toHaveLength(1);
+    expect(
+      (dump['assignments'] as Assignment[]).filter(
+        (a) => a.personId === keys.personas['jade'] && 'moduleId' in a.target && a.target.moduleId === sgId,
+      ),
+    ).toHaveLength(1);
   });
 });
 
@@ -225,12 +232,12 @@ describe('ensureCurrentSeed (Assumption 19)', () => {
   it('does nothing when the stored version is current, keeping local changes', async () => {
     // bulkPut never deletes, so the local change is a changed record: the assignment marked done.
     const { admin, dump } = await seeded();
-    expect(dump['assignments']).toHaveLength(1);
-    await admin.bulkPut('assignments', [{ ...dump['assignments']![0], status: 'done' }]);
+    const open = dump['assignments']!.find((a) => 'moduleId' in a.target && a.target.moduleId === sgId)!;
+    await admin.bulkPut('assignments', [{ ...open, status: 'done' }]);
     expect(await ensureCurrentSeed(admin)).toBeNull();
     const after = ((await admin.dumpAll()) as Record<string, any[]>)['assignments']!;
-    expect(after).toHaveLength(1);
-    expect(after[0].status).toBe('done');
+    expect(after).toHaveLength(dump['assignments']!.length);
+    expect(after.find((a) => a.id === open.id).status).toBe('done');
   });
 
   it('does nothing when nothing is stored (first load stays with the caller)', async () => {

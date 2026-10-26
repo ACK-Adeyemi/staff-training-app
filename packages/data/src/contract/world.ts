@@ -62,7 +62,22 @@ const TEST_ADD_ON: AddOn = {
   adds: { customClientRoles: 1 },
 };
 
-const SEED_LEARNING_STORES = new Set(['modules', 'assignments', 'notifications', 'attachments', 'clientLinkOverlays']);
+// M1 and M2 learning data from the seed. The suite builds its own records, so it starts without them.
+const SEED_LEARNING_STORES = new Set([
+  'modules',
+  'assignments',
+  'notifications',
+  'attachments',
+  'clientLinkOverlays',
+  'learningEvents',
+  'attempts',
+  'notes',
+  'categories',
+  'moduleGroups',
+  'modulePlacements',
+  'competitions',
+  'standingBoardSettings',
+]);
 
 export async function buildWorld(admin: DemoAdmin) {
   const keys = await load(admin, { seedValue: SEED_VALUE, today: TODAY });

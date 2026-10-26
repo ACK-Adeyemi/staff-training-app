@@ -19,6 +19,14 @@ import {
   type AddOnSubscription,
   type Assignment,
   type Attachment,
+  type Attempt,
+  type Category,
+  type Competition,
+  type LearningEvent,
+  type ModuleGroup,
+  type ModulePlacement,
+  type Note,
+  type StandingBoardSettings,
   type ClientLinkOverlay,
   type Module,
   type Notification,
@@ -41,6 +49,7 @@ import {
   type Team,
   type UserAccount,
 } from '@sta/domain';
+import { buildHistory } from './history';
 
 /** Well-known keys are declared properties, so reading one gives a string; any other key is looked up by index. */
 type KeyMap<K extends string> = Record<K, string> & Record<string, string>;
@@ -124,6 +133,15 @@ export type SeedData = {
   notifications: Notification[];
   attachments: Attachment[];
   clientLinkOverlays: ClientLinkOverlay[];
+  // Added in M2 (seed version 3).
+  learningEvents: LearningEvent[];
+  attempts: Attempt[];
+  notes: Note[];
+  categories: Category[];
+  moduleGroups: ModuleGroup[];
+  modulePlacements: ModulePlacement[];
+  competitions: Competition[];
+  standingBoardSettings: StandingBoardSettings[];
 };
 
 const POLICY_BODY = `## Little Acorns Safeguarding policy
@@ -595,6 +613,8 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     modules: root.fork('modules'),
     learning: root.fork('learning'),
     overlays: root.fork('overlays'),
+    // Added in M2; its own stream so every earlier stream (and every Evidence record) is untouched.
+    history: root.fork('history'),
   };
   const newId = (rng: Rng) => (): string => ulid(clock, rng);
   const ago = (days: number): Date => addDays(today, -days);
@@ -631,6 +651,14 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     notifications: [],
     attachments: [],
     clientLinkOverlays: [],
+    learningEvents: [],
+    attempts: [],
+    notes: [],
+    categories: [],
+    moduleGroups: [],
+    modulePlacements: [],
+    competitions: [],
+    standingBoardSettings: [],
   };
 
   keys.requirements = {
@@ -1092,6 +1120,9 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
       });
     }
   }
+
+  // M2: six months of history, notes, organising data, competitions and board settings (Little Acorns only).
+  buildHistory({ data, keys, today, clock, rng: streams.history });
 
   return { data, keys };
 }

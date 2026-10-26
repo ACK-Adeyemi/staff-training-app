@@ -61,8 +61,18 @@ afterEach(() => {
 const base = `/staff/module/${sgModule.id}`;
 type Dump = Record<string, Record<string, unknown>[]>;
 const dump = async (h: { admin: { dumpAll(): Promise<unknown> } }) => (await h.admin.dumpAll()) as Dump;
-const events = async (h: Parameters<typeof dump>[0], type: string) =>
-  (await dump(h)).learningEvents!.filter((e) => e['type'] === type);
+// The M2 seed holds history for other people and modules (conflict 11), so these helpers look at Jade's Safeguarding
+// records only: she has none in the seed, which is what these tests were written against.
+const isJadeSg = (d: Dump, r: Record<string, unknown>) =>
+  r['moduleId'] === sgModule.id && r['personId'] === d.people!.find((p) => p['firstName'] === 'Jade')!['id'];
+const events = async (h: Parameters<typeof dump>[0], type: string) => {
+  const d = await dump(h);
+  return d.learningEvents!.filter((e) => e['type'] === type && isJadeSg(d, e));
+};
+const jadeAttempts = async (h: Parameters<typeof dump>[0]) => {
+  const d = await dump(h);
+  return d.attempts!.filter((a) => isJadeSg(d, a));
+};
 
 // Stops jsdom trying to navigate when a target=_blank link is clicked.
 function blockNavigation() {
@@ -231,9 +241,9 @@ describe('S6 quiz', () => {
     expect(await screen.findByText('Draft content')).toBeTruthy();
     await user.click(screen.getByRole('button', { name: /Start quiz/ }));
     expect(await screen.findByText('Question 1 of 10')).toBeTruthy();
-    const d = await dump(r.handle);
-    expect(d.attempts).toHaveLength(1);
-    expect((d.attempts![0]!['questionIds'] as string[]).length).toBe(10);
+    const mine = await jadeAttempts(r.handle);
+    expect(mine).toHaveLength(1);
+    expect((mine[0]!['questionIds'] as string[]).length).toBe(10);
   });
 
   it('shows the choices as a radio group and keeps Submit answer disabled until one is chosen', async () => {
@@ -343,7 +353,7 @@ describe('S6 quiz', () => {
     });
     unblock();
     const after = await dump(r.handle);
-    const opened = after.learningEvents!.filter((e) => e['type'] === 'learnMoreOpened');
+    const opened = after.learningEvents!.filter((e) => e['type'] === 'learnMoreOpened' && isJadeSg(after, e));
     expect(opened).toHaveLength(1);
     expect(opened[0]).toMatchObject({ linkId: q.learnMore[0]!.id, questionId: q.id, moduleId: sgModule.id });
     expect(after.learningEvents!.length).toBe(before.learningEvents!.length + 1);
@@ -411,7 +421,7 @@ describe('S6 quiz', () => {
     });
     await user.click(await screen.findByRole('button', { name: /(Start|Resume) quiz/ }));
     expect(await screen.findByText('Question 2 of 10')).toBeTruthy();
-    expect((await dump(r.handle)).attempts).toHaveLength(1);
+    expect(await jadeAttempts(r.handle)).toHaveLength(1);
   });
 
   it('BP-1: answering every question and finishing passes, writes Evidence for the Safeguarding requirement and closes the assignment', async () => {
@@ -522,7 +532,7 @@ describe('S7 results', () => {
     await waitFor(() => {
       expect(r.router.state.location.pathname).toBe(`${base}/quiz`);
     });
-    expect((await dump(r.handle)).attempts).toHaveLength(2);
+    expect(await jadeAttempts(r.handle)).toHaveLength(2);
     const fresh = (await dump(r.handle)).evidence!.filter((e) => e['completedAt'] === '2026-10-19T09:00:00.000Z');
     expect(fresh).toHaveLength(0);
   });
