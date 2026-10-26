@@ -71,7 +71,7 @@ describe('reset demo (BP-4)', () => {
     const { admin, dump } = await seeded(options);
     const expected = hashStores(dump);
     await reset(admin);
-    expect(await admin.getSeedMeta()).toEqual({ ...options, seedVersion: 2 });
+    expect(await admin.getSeedMeta()).toEqual({ ...options, seedVersion: 3 });
     expect(hashStores(await admin.dumpAll())).toEqual(expected);
   });
 

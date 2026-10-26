@@ -124,9 +124,10 @@ test('Jade completes the Safeguarding refresher, sees links for a wrong answer, 
         await expect(a.locator('svg')).not.toHaveCount(0);
         await expect(a).toHaveAccessibleName(/\(opens in a new tab\)$/);
       }
-      expect(
-        await readStore(page, 'learningEvents').then((e) => e.filter((x) => x['type'] === 'learnMoreOpened')),
-      ).toHaveLength(0);
+      const openedBefore = (await readStore(page, 'learningEvents')).filter(
+        (x) => x['type'] === 'learnMoreOpened',
+      ).length;
+      // Showing the links does not count as opening them (the seed already holds some opens, so compare deltas).
       const first = official[0];
       if (!first?.url) throw new Error('wrong question has no link');
       const [popup] = await Promise.all([context.waitForEvent('page'), fb.locator(`a[href="${first.url}"]`).click()]);
@@ -135,8 +136,11 @@ test('Jade completes the Safeguarding refresher, sees links for a wrong answer, 
         .poll(
           async () => (await readStore(page, 'learningEvents')).filter((x) => x['type'] === 'learnMoreOpened').length,
         )
-        .toBe(1);
-      const opened = (await readStore(page, 'learningEvents')).filter((x) => x['type'] === 'learnMoreOpened');
+        .toBe(openedBefore + 1);
+      const opened = (await readStore(page, 'learningEvents')).filter(
+        (x) => x['type'] === 'learnMoreOpened' && String(x['at']) >= '2026-10-19T09:00:00.000Z',
+      );
+      expect(opened).toHaveLength(1);
       expect(opened[0]).toMatchObject({ linkId: first.id, questionId: q.id });
     }
     await page.getByRole('button', { name: n === 10 ? 'Finish quiz' : 'Next question' }).click();

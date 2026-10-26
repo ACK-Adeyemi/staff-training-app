@@ -12,10 +12,10 @@ const daysBetween = (a: string, b: string) => (new Date(b).getTime() - new Date(
 const sgId = moduleIds.safeguardingAndWhistleblowing;
 
 describe('seed version', () => {
-  it('is 2 for M1 and is stored in SeedMeta by load', async () => {
-    expect(SEED_VERSION).toBe(2);
+  it('is 3 after M2 (2 was M1) and is stored in SeedMeta by load', async () => {
+    expect(SEED_VERSION).toBe(3);
     const { admin } = await seeded();
-    expect(await admin.getSeedMeta()).toMatchObject({ seedValue: SEED.seedValue, today: TODAY, seedVersion: 2 });
+    expect(await admin.getSeedMeta()).toMatchObject({ seedValue: SEED.seedValue, today: TODAY, seedVersion: 3 });
   });
 });
 
@@ -88,9 +88,11 @@ describe('Jade (Assumption 1)', () => {
     expect(daysBetween(TODAY, a.dueAt)).toBeLessThan(15);
   });
 
-  it('is the only person with an assignment; other personas keep the M0 evidence', async () => {
+  it('is the only person with a Safeguarding assignment; other personas keep the M0 evidence (M2 adds Safer sleep ones)', async () => {
     const { dump, personId } = await jade();
-    const others = (dump['assignments'] as Assignment[]).filter((a) => a.personId !== personId);
+    const others = (dump['assignments'] as Assignment[]).filter(
+      (a) => a.personId !== personId && 'moduleId' in a.target && a.target.moduleId === sgId,
+    );
     expect(others).toEqual([]);
   });
 
@@ -202,10 +204,12 @@ describe('ensureCurrentSeed (Assumption 19)', () => {
     await admin.setSeedMeta({ seedValue: 777, today: TODAY }); // what M0 stored: no version
     const keys = await ensureCurrentSeed(admin);
     expect(keys).not.toBeNull();
-    expect(await admin.getSeedMeta()).toMatchObject({ seedValue: 777, today: TODAY, seedVersion: 2 });
+    expect(await admin.getSeedMeta()).toMatchObject({ seedValue: 777, today: TODAY, seedVersion: 3 });
     const dump = (await admin.dumpAll()) as Record<string, any[]>;
     expect(dump['modules']!.length).toBeGreaterThan(0);
-    expect(dump['assignments']).toHaveLength(1);
+    expect(
+      (dump['assignments'] as Assignment[]).filter((a) => 'moduleId' in a.target && a.target.moduleId === sgId),
+    ).toHaveLength(1);
     expect(dump['clients']).toHaveLength(13);
   });
 
@@ -215,7 +219,7 @@ describe('ensureCurrentSeed (Assumption 19)', () => {
     await admin.setSeedMeta({ seedValue: SEED.seedValue, today: TODAY, seedVersion: 1 });
     await admin.bulkPut('assignments', []);
     expect(await ensureCurrentSeed(admin)).not.toBeNull();
-    expect((await admin.getSeedMeta())?.seedVersion).toBe(2);
+    expect((await admin.getSeedMeta())?.seedVersion).toBe(3);
   });
 
   it('does nothing when the stored version is current, keeping local changes', async () => {
