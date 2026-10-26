@@ -258,7 +258,7 @@ describe('S3 Learn: filters (BP-6)', () => {
     }
   });
 
-  it('sorts A to Z inside the required group and inside the optional group', async () => {
+  it('sorts A to Z after the required-and-due module, and inside the optional group', async () => {
     await renderRoute('/staff/learn', 'staff');
     await ready();
     const dialog = await openFilters();
@@ -267,7 +267,8 @@ describe('S3 Learn: filters (BP-6)', () => {
     await waitFor(() => {
       expect(titles().slice(3)).toEqual([EATING, SLEEP]);
     });
-    expect(titles().slice(0, 3)).toEqual([PAED, SAFEGUARDING, WHAT_CHANGED]);
+    // Safeguarding is required and due soon, so it stays first whatever the sort (plan assumption 27); A to Z orders the rest.
+    expect(titles().slice(0, 3)).toEqual([SAFEGUARDING, PAED, WHAT_CHANGED]);
   });
 });
 

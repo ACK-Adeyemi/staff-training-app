@@ -31,6 +31,7 @@ import {
   NotFoundError,
   RuleError,
   ValidationError,
+  type AccessService,
   type ActorContext,
   type CategoriesService,
   type MeRecord,
@@ -44,6 +45,7 @@ import {
 export type EngagementOperations = {
   notes: NotesService;
   me: MeService;
+  access: AccessService;
   categories: CategoriesService;
   moduleGroups: ModuleGroupsService;
   modulePlacements: ModulePlacementsService;
@@ -465,9 +467,14 @@ export function createEngagementOperations(backend: RawBackend, options: StoreOp
         ctx,
         input.moduleIds,
         async (call) => {
-          await ownCategory(call, input.categoryId);
+          if (input.categoryId !== undefined) await ownCategory(call, input.categoryId);
         },
-        (p) => ({ ...p, categoryId: input.categoryId }),
+        (p) => {
+          const next: ModulePlacement = { ...p };
+          if (input.categoryId === undefined) delete next.categoryId;
+          else next.categoryId = input.categoryId;
+          return next;
+        },
       ),
     setAvailable: (ctx, input) =>
       changePlacements(
@@ -478,5 +485,12 @@ export function createEngagementOperations(backend: RawBackend, options: StoreOp
       ),
   };
 
-  return { notes, me, categories, moduleGroups, modulePlacements };
+  const access: AccessService = {
+    async permissions(ctx) {
+      const call = await beginCall(backend, options, ctx);
+      return structuredClone(call.actor.perms);
+    },
+  };
+
+  return { notes, me, access, categories, moduleGroups, modulePlacements };
 }

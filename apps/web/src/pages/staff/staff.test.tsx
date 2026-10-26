@@ -164,7 +164,8 @@ describe('S3 Learn', () => {
     expect(screen.queryByText('Safeguarding and whistleblowing')).toBeNull();
     await userEvent.clear(box);
     await userEvent.type(box, 'safeguarding');
-    expect(await screen.findByText('Safeguarding and whistleblowing')).toBeTruthy();
+    // Matches are highlighted in <mark>, which splits the text, so look the row up by its link name.
+    expect(await screen.findByRole('link', { name: 'Safeguarding and whistleblowing' })).toBeTruthy();
   });
 });
 

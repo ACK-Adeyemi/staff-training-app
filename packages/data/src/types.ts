@@ -14,6 +14,7 @@ import type {
   Clock,
   Competition,
   DemoState,
+  EffectivePermission,
   Evidence,
   EvidenceSubmission,
   JobRole,
@@ -256,6 +257,11 @@ export interface NotesService {
 }
 
 /** The caller's own person: display settings and profile. Never paywalled (accessibility). */
+/** What the signed-in person may do. Their own effective permissions only; never anyone else's. */
+export interface AccessService {
+  permissions(ctx: ActorContext): Promise<EffectivePermission[]>;
+}
+
 export interface MeService {
   get(ctx: ActorContext): Promise<MeRecord>;
   updatePrefs(ctx: ActorContext, patch: Partial<LearnerPrefs>): Promise<MeRecord>;
@@ -291,7 +297,8 @@ export interface ModuleGroupsService extends ReadRepo<ModuleGroup> {
 
 /** Keyed by `${clientId}:${moduleId}`. */
 export interface ModulePlacementsService extends ReadRepo<ModulePlacement> {
-  setCategory(ctx: ActorContext, input: { moduleIds: Id[]; categoryId: Id }): Promise<void>;
+  /** Leave `categoryId` out to take the modules out of any category. */
+  setCategory(ctx: ActorContext, input: { moduleIds: Id[]; categoryId?: Id }): Promise<void>;
   setAvailable(ctx: ActorContext, input: { moduleIds: Id[]; availableToAll: boolean }): Promise<void>;
 }
 
@@ -379,6 +386,7 @@ export interface DataStore {
   learning: LearningService;
   notes: NotesService;
   me: MeService;
+  access: AccessService;
   categories: CategoriesService;
   moduleGroups: ModuleGroupsService;
   modulePlacements: ModulePlacementsService;

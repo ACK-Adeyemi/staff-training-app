@@ -64,6 +64,7 @@ type Reads<T> = {
 };
 export type MeRecord = { displayName: string; nickname?: string; prefs: LearnerPrefs };
 export type EngagementStore = LearningStore & {
+  access: { permissions(ctx: ActorContext): Promise<{ permissionId: string }[]> };
   learning: {
     startAttempt(ctx: ActorContext, moduleId: string, opts?: { mode?: 'open' | 'closed' }): Promise<Attempt>;
     answer(
@@ -105,7 +106,7 @@ export type EngagementStore = LearningStore & {
     remove(ctx: ActorContext, id: string): Promise<void>;
   };
   modulePlacements: Reads<PlacementRecord> & {
-    setCategory(ctx: ActorContext, input: { moduleIds: string[]; categoryId: string }): Promise<void>;
+    setCategory(ctx: ActorContext, input: { moduleIds: string[]; categoryId?: string }): Promise<void>;
     setAvailable(ctx: ActorContext, input: { moduleIds: string[]; availableToAll: boolean }): Promise<void>;
   };
 };
@@ -866,6 +867,26 @@ export function runEngagementContract(name: string, makeStore: (options: StoreOp
         const second = await s.store.modulePlacements.get(priya(s), `${a}:${s.lf.retakeId}`);
         expect(first).toMatchObject({ categoryId: s.cats.three.id, availableToAll: false });
         expect(second).toMatchObject({ categoryId: s.cats.three.id, availableToAll: true });
+      });
+
+      it('access.permissions gives a person their own effective permissions only', async () => {
+        const s = await setup();
+        const mine = (await s.store.access.permissions(viewer(s))).map((p) => p.permissionId);
+        expect(mine).toContain('modules.view');
+        expect(mine).not.toContain('modules.manage');
+        expect((await s.store.access.permissions(priya(s))).map((p) => p.permissionId)).toContain('modules.manage');
+      });
+
+      it('setCategory without a category takes the modules out of their category and keeps availableToAll', async () => {
+        const s = await setup();
+        await s.store.modulePlacements.setCategory(priya(s), {
+          moduleIds: [s.lf.retakeId],
+          categoryId: s.cats.three.id,
+        });
+        await s.store.modulePlacements.setCategory(priya(s), { moduleIds: [s.lf.retakeId] });
+        const placement = await s.store.modulePlacements.get(priya(s), `${s.fx.ids.clients.a}:${s.lf.retakeId}`);
+        expect(placement.categoryId).toBeUndefined();
+        expect(placement.availableToAll).toBe(true);
       });
 
       it('setCategory creates a placement for a module that has none', async () => {

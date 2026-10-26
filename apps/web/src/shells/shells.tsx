@@ -49,6 +49,7 @@ export function ClientShell() {
           item('/client/competitions', t('nav.client.engage'), 'trophy'),
         ],
         more: [
+          item('/client/organise', t('organise.title'), 'book'),
           item('/client/reports', t('nav.client.reports'), 'chart'),
           item('/client/settings', t('nav.client.settings'), 'more'),
           item('/client/help', t('nav.client.help'), 'help'),

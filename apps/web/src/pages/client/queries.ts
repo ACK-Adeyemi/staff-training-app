@@ -1,7 +1,6 @@
 // Data loading for the client screens. All reads go through the data layer; rules live in the domain package.
 import { useQuery } from '@tanstack/react-query';
 import {
-  effectivePermissions,
   londonDateString,
   type Assignment,
   type ClientView,
@@ -66,13 +65,7 @@ export function usePermissions() {
     queryKey: ['permissions', actor.userId, londonDateString(now)],
     queryFn: async (): Promise<EffectivePermission[]> => {
       try {
-        const [assignments, roles] = await Promise.all([store.roleAssignments.list(actor), store.roles.list(actor)]);
-        return effectivePermissions(
-          actor.userId,
-          assignments.filter((a) => a.userId === actor.userId),
-          roles,
-          now,
-        );
+        return await store.access.permissions(actor);
       } catch {
         return [];
       }

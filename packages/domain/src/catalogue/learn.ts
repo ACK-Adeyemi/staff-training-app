@@ -134,8 +134,10 @@ const merge = (ranges: { start: number; end: number }[]): { start: number; end: 
   return out;
 };
 
-// Modules the person has finished have nothing left to do, so they sort with the optional ones.
-const partition = (r: CatalogueRow): number => (r.finished || !r.required ? 2 : r.dueState !== 'none' ? 0 : 1);
+// Required and due first, then other required, then optional. Modules the person has finished have nothing left to
+// do, so they drop below the unfinished ones, still with required ahead of optional.
+const partition = (r: CatalogueRow): number =>
+  r.finished ? (r.required ? 3 : 4) : !r.required ? 2 : r.dueState !== 'none' ? 0 : 1;
 const byTitle = (a: CatalogueRow, b: CatalogueRow): number => a.module.title.localeCompare(b.module.title, 'en-GB');
 const missingLast = (a: string | undefined, b: string | undefined, dir: 1 | -1): number => {
   if (a === undefined && b === undefined) return 0;

@@ -53,7 +53,8 @@ test('Priya adds a category, moves Safer sleep into it and puts it first; Jade f
   await page.getByRole('searchbox', { name: 'Search' }).fill('rest and rhythm');
   await expect(page.getByTestId('learn-count')).toHaveText('1 module');
   await expect(page.getByRole('link', { name: 'Safer sleep' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Safer sleep' }).locator('mark').first()).toBeVisible();
+  // The match is on the category name, which the row shows highlighted (the module title has no match).
+  await expect(page.getByTestId('path-node').locator('mark').first()).toBeVisible();
   await expect(page.getByRole('link', { name: /Safeguarding and whistleblowing/ })).toHaveCount(0);
 
   // The category card filters the list and shows a removable chip.

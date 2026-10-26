@@ -70,6 +70,10 @@ export const routes: RouteObject[] = [
           { path: 'assign', element: <Assign /> },
           page('modules', 'nav.client.training', 'placeholder.client.training'),
           page('competitions', 'nav.client.engage', 'placeholder.client.engage'),
+          {
+            path: 'organise',
+            lazy: async () => ({ Component: (await import('../pages/client/Organise')).Organise }),
+          },
           { path: 'reports', element: <Reports /> },
           { path: 'reports/matrix', element: <Matrix /> },
           { path: 'modules/:moduleId/stats', element: <ModuleStats /> },

@@ -25,6 +25,14 @@
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --target-min: 44px;
   --focus-ring: 3px solid var(--color-focus);
+  --cat-1: #1a6b3a; /* green */
+  --cat-2: #1f5fa8; /* blue */
+  --cat-3: #8a5300; /* amber */
+  --cat-4: #5b3fa0; /* purple */
+  --cat-5: #a8325a; /* rose */
+  --cat-6: #0b6b6b; /* teal */
+  --cat-7: #4a5864; /* slate */
+  --cat-8: #6b4423; /* brown */
   color-scheme: light;
 }
 
@@ -46,6 +54,14 @@
   --status-overdue: #ff9a92;
   --status-not-assigned: #b7c3cd;
   --status-awaiting: #c3b0f2;
+  --cat-1: #6fd194; /* green */
+  --cat-2: #8ab8ee; /* blue */
+  --cat-3: #f2b45a; /* amber */
+  --cat-4: #c3b0f2; /* purple */
+  --cat-5: #f2a0bd; /* rose */
+  --cat-6: #6fd0d0; /* teal */
+  --cat-7: #b7c3cd; /* slate */
+  --cat-8: #d4a67a; /* brown */
   color-scheme: dark;
 }
 
@@ -64,6 +80,14 @@
     --status-overdue: #ff9a92;
     --status-not-assigned: #b7c3cd;
     --status-awaiting: #c3b0f2;
+    --cat-1: #6fd194; /* green */
+    --cat-2: #8ab8ee; /* blue */
+    --cat-3: #f2b45a; /* amber */
+    --cat-4: #c3b0f2; /* purple */
+    --cat-5: #f2a0bd; /* rose */
+    --cat-6: #6fd0d0; /* teal */
+    --cat-7: #b7c3cd; /* slate */
+    --cat-8: #d4a67a; /* brown */
     color-scheme: dark;
   }
 }
@@ -111,6 +135,14 @@
   --status-overdue: #8a0f08;
   --status-not-assigned: #000000;
   --status-awaiting: #3d2477;
+  --cat-1: #0d4a24; /* green */
+  --cat-2: #123f73; /* blue */
+  --cat-3: #5c3700; /* amber */
+  --cat-4: #3d2477; /* purple */
+  --cat-5: #7a1f40; /* rose */
+  --cat-6: #004646; /* teal */
+  --cat-7: #000000; /* slate */
+  --cat-8: #46290f; /* brown */
 }
 :root[data-contrast='high'][data-colour-mode='dark'] {
   --color-bg: #000000;
@@ -126,6 +158,14 @@
   --status-overdue: #ffb3ad;
   --status-not-assigned: #ffffff;
   --status-awaiting: #dccfff;
+  --cat-1: #8ff0b0; /* green */
+  --cat-2: #b5d3f7; /* blue */
+  --cat-3: #ffd08a; /* amber */
+  --cat-4: #dccfff; /* purple */
+  --cat-5: #ffc4d6; /* rose */
+  --cat-6: #9ff0f0; /* teal */
+  --cat-7: #ffffff; /* slate */
+  --cat-8: #f0c9a0; /* brown */
 }
 @media (prefers-color-scheme: dark) {
   :root[data-contrast='high'][data-colour-mode='auto'] {
@@ -142,6 +182,14 @@
     --status-overdue: #ffb3ad;
     --status-not-assigned: #ffffff;
     --status-awaiting: #dccfff;
+    --cat-1: #8ff0b0; /* green */
+    --cat-2: #b5d3f7; /* blue */
+    --cat-3: #ffd08a; /* amber */
+    --cat-4: #dccfff; /* purple */
+    --cat-5: #ffc4d6; /* rose */
+    --cat-6: #9ff0f0; /* teal */
+    --cat-7: #ffffff; /* slate */
+    --cat-8: #f0c9a0; /* brown */
   }
 }
 @media (prefers-contrast: more) {

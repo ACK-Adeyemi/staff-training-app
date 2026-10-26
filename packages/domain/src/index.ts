@@ -33,5 +33,6 @@ export * from './standingBoards';
 export * from './prize';
 export * from './catalogue/learn';
 export * from './catalogue/organise';
+export { fold, findRanges, searchTerms } from './catalogue/text';
 export * from './notes';
 export * from './display';
