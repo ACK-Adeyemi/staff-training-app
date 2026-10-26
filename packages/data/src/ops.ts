@@ -6,6 +6,7 @@ import {
   checkAnswer,
   drawQuestions,
   isDueInPast,
+  notesLocked,
   learningEventSchema,
   londonDateString,
   planAssignment,
@@ -45,7 +46,7 @@ export type Operations = {
 
 const MAX_PEOPLE_PER_ASSIGN = 500;
 
-const put = (store: WriteOp['store'], record: { id: string }): WriteOp => ({
+export const put = (store: WriteOp['store'], record: { id: string }): WriteOp => ({
   type: 'put',
   store,
   key: record.id,
@@ -53,7 +54,7 @@ const put = (store: WriteOp['store'], record: { id: string }): WriteOp => ({
 });
 
 /** A staff actor and the person they are. Anyone else is refused. */
-async function staffCall(
+export async function staffCall(
   backend: RawBackend,
   options: StoreOptions,
   ctx: ActorContext,
@@ -67,13 +68,13 @@ async function staffCall(
 }
 
 /** A module the actor may use: provider modules, or their own client's. Drafts are the caller's business. */
-async function moduleFor(call: Call, moduleId: string): Promise<Module> {
+export async function moduleFor(call: Call, moduleId: string): Promise<Module> {
   const m = await call.find<Module>('modules', moduleId);
   if (!m || (m.owner !== 'provider' && m.owner.clientId !== call.clientId)) throw new NotFoundError();
   return m;
 }
 
-async function ownAttempt(call: Call, person: Person, attemptId: string): Promise<Attempt> {
+export async function ownAttempt(call: Call, person: Person, attemptId: string): Promise<Attempt> {
   const attempt = await call.find<Attempt>('attempts', attemptId);
   if (!attempt || attempt.personId !== person.id || attempt.clientId !== person.clientId) throw new NotFoundError();
   return attempt;
@@ -129,8 +130,12 @@ export function createOperations(backend: RawBackend, options: StoreOptions): Op
         return event;
       },
 
-      async startAttempt(ctx, moduleId) {
+      async startAttempt(ctx, moduleId, opts) {
         const { call, person } = await staffCall(backend, options, ctx);
+        const asked: string | undefined = opts?.mode;
+        if (asked !== undefined && asked !== 'open' && asked !== 'closed') {
+          throw new ValidationError(['mode: must be open or closed']);
+        }
         const module = await moduleFor(call, moduleId);
         if (module.status !== 'published') throw new RuleError('moduleNotPublished');
         const events = await personEvents(call, person);
@@ -139,8 +144,18 @@ export function createOperations(backend: RawBackend, options: StoreOptions): Op
         );
         if (!module.lessons.every((l) => done.has(l.id))) throw new RuleError('lessonsIncomplete');
 
+        // A closed-book-only module always starts closed (assumption 19); asking for open is refused.
+        const closedOnly = module.quiz.notesInQuiz === 'closedBookOnly';
+        if (closedOnly && opts?.mode === 'open') throw new RuleError('closedBookOnly');
+        const mode: Attempt['mode'] = closedOnly ? 'closed' : (opts?.mode ?? 'open');
+
+        // Abandoned attempts are never resumed and never count towards retakes (assumption 20).
         const mine = (await call.all<Attempt>('attempts')).filter(
-          (a) => a.personId === person.id && a.moduleId === module.id && a.moduleVersion === module.version,
+          (a) =>
+            a.personId === person.id &&
+            a.moduleId === module.id &&
+            a.moduleVersion === module.version &&
+            a.abandoned !== true,
         );
         const unfinished = mine.find((a) => a.finishedAt === undefined);
         if (unfinished) return unfinished;
@@ -156,7 +171,7 @@ export function createOperations(backend: RawBackend, options: StoreOptions): Op
           personId: person.id,
           moduleId: module.id,
           moduleVersion: module.version,
-          mode: 'open',
+          mode,
           questionIds: draw.questionIds,
           ...(Object.keys(draw.optionOrder).length > 0 ? { optionOrder: draw.optionOrder } : {}),
           startedAt: ctx.now,
@@ -165,7 +180,7 @@ export function createOperations(backend: RawBackend, options: StoreOptions): Op
           attemptId: id,
           moduleId: module.id,
           moduleVersion: module.version,
-          attemptMode: 'open',
+          attemptMode: mode,
         });
         await apply([put('attempts', attempt), put('learningEvents', started)]);
         return structuredClone(attempt);
@@ -174,8 +189,10 @@ export function createOperations(backend: RawBackend, options: StoreOptions): Op
       async answer(ctx, input) {
         const { call, person } = await staffCall(backend, options, ctx);
         const attempt = await ownAttempt(call, person, input.attemptId);
-        if (attempt.finishedAt !== undefined) throw new RuleError('attemptFinished');
+        if (attempt.finishedAt !== undefined || attempt.abandoned === true) throw new RuleError('attemptFinished');
         if (!attempt.questionIds.includes(input.questionId)) throw new RuleError('notInAttempt');
+        const notesVisible = input.notesVisible ?? false;
+        if (notesVisible && attempt.mode === 'closed') throw new RuleError('notesLocked');
         const events = await personEvents(call, person);
         if (
           events.some(
@@ -201,7 +218,7 @@ export function createOperations(backend: RawBackend, options: StoreOptions): Op
           moduleVersion: attempt.moduleVersion,
           questionId: question.id,
           correct: result.correct,
-          notesVisible: false,
+          notesVisible,
           attemptMode: attempt.mode,
           ...(result.outcome ? { scenarioOutcome: result.outcome } : {}),
           ...('optionId' in answer ? { optionId: answer.optionId } : { choiceIds: answer.choiceIds }),
@@ -213,7 +230,7 @@ export function createOperations(backend: RawBackend, options: StoreOptions): Op
       async finishAttempt(ctx, attemptId): Promise<FinishResult> {
         const { call, person } = await staffCall(backend, options, ctx);
         const attempt = await ownAttempt(call, person, attemptId);
-        if (attempt.finishedAt !== undefined) throw new RuleError('attemptFinished');
+        if (attempt.finishedAt !== undefined || attempt.abandoned === true) throw new RuleError('attemptFinished');
         const module = await moduleFor(call, attempt.moduleId);
         const events = await personEvents(call, person);
         const answers: Record<string, Answer> = {};
@@ -299,8 +316,19 @@ export function createOperations(backend: RawBackend, options: StoreOptions): Op
         return { attempt: structuredClone(finished), passed, score, missedQuestionIds, evidence };
       },
 
+      async abandonAttempt(ctx, attemptId) {
+        const { call, person } = await staffCall(backend, options, ctx);
+        const attempt = await ownAttempt(call, person, attemptId);
+        if (attempt.finishedAt !== undefined || attempt.abandoned === true) throw new RuleError('attemptFinished');
+        const abandoned: Attempt = { ...attempt, abandoned: true };
+        await apply([put('attempts', abandoned)]);
+        return structuredClone(abandoned);
+      },
+
       async learnMoreOpened(ctx, input) {
         const { call, person } = await staffCall(backend, options, ctx);
+        // Learn more is shut while any closed-book attempt of the caller is unfinished (assumption 20).
+        if (notesLocked(await call.all<Attempt>('attempts'), person.id)) throw new RuleError('closedBook');
         const module = await moduleFor(call, input.moduleId);
         const question = input.questionId ? module.questions.find((q) => q.id === input.questionId) : undefined;
         const lesson = input.lessonId ? module.lessons.find((l) => l.id === input.lessonId) : undefined;

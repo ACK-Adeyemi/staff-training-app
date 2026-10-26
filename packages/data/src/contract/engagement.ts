@@ -12,7 +12,6 @@ import {
   ValidationError,
   type ActorContext,
   type StoreHandle,
-  type StoreName,
   type StoreOptions,
 } from '../types';
 import {
@@ -186,8 +185,8 @@ export function runEngagementContract(name: string, makeStore: (options: StoreOp
       three: cat(3, a, 'Contract Gamma', 903),
       foreign: cat(4, fx.ids.clients.ot, 'Contract Oak', 901),
     };
-    await handle.admin.bulkPut('categories' as StoreName, Object.values(cats));
-    await handle.admin.bulkPut('modulePlacements' as StoreName, [
+    await handle.admin.bulkPut('categories', Object.values(cats));
+    await handle.admin.bulkPut('modulePlacements', [
       { clientId: a, moduleId: lf.moduleId, categoryId: cats.one.id, availableToAll: false },
       { clientId: a, moduleId: lf.retakeId, categoryId: cats.one.id, availableToAll: true },
     ]);
@@ -199,7 +198,7 @@ export function runEngagementContract(name: string, makeStore: (options: StoreOp
       moduleIds: [lf.moduleId, lf.retakeId],
       inOrder: true,
     };
-    await handle.admin.bulkPut('moduleGroups' as StoreName, [group]);
+    await handle.admin.bulkPut('moduleGroups', [group]);
     return { store, admin: handle.admin, handle, fx, lf, closedOnly, cats, group, viewerUserId: viewerUser.id };
   }
   type S = Awaited<ReturnType<typeof setup>>;

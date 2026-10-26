@@ -9,6 +9,7 @@ import {
   type UserAccount,
 } from '@sta/domain';
 import { createOperations } from './ops';
+import { createEngagementOperations } from './engagementOps';
 import { keyOf, validate, type RawBackend, type SettingsRecord, type WriteOp } from './backend';
 import {
   authorizePut,
@@ -210,6 +211,7 @@ function notifying(inner: RawBackend): { backend: RawBackend; subscribe: StoreHa
 export function createStore(rawBackend: RawBackend, options: StoreOptions): StoreHandle {
   const { backend, subscribe } = notifying(rawBackend);
   const ops = createOperations(backend, options);
+  const engagement = createEngagementOperations(backend, options);
   const readOnly = (name: StoreName) => {
     const full = repo(backend, options, name);
     return { get: full.get, list: full.list };
@@ -247,6 +249,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     attempts: readOnly('attempts'),
     notifications: { ...readOnly('notifications'), markRead: ops.markRead },
     learning: ops.learning,
+    ...engagement,
   };
   return { store: store as unknown as DataStore, admin: demoAdmin(backend), subscribe };
 }

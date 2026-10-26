@@ -378,3 +378,11 @@ Every number marked placeholder is engine config in packages/domain (`engagement
 
 - Added Safer sleep (EYFS 3.86; optional, no requirement link) and What changed in September 2026 (EYFS 3.15, 3.17, 3.82, 3.86, 3.94 and footnote 20; requirement contentId(604)). Every cited paragraph and the facts taught were checked against `.sources-cache/eyfs-group.txt` with `rg -n` (printed page numbers). Both carry `draftContent: true`.
 - VERIFY: 3.86 starts on page 40 but its bullets continue on page 41; links use page 40. The GOV.UK banned dogs URL is from memory and could not be opened here. The screen use guidance address is not in the cached text, so no link to it. The Crime and Policing Act 2026 was not read; the regulated activity wording comes from footnote 20. Which paragraphs are headline changes for September 2026 is assumed, not checked against a DfE change list. The one-off trip helper exception in a scenario should be reviewed. NHS and Lullaby Trust advice named in 3.86 is not linked (not on the official-source list). All are in each module's `verify` key.
+
+### M2 chunk 8
+
+- The contract suite's `ALL_STORES` list (suite.ts) gains the six new stores, because `dumpAll` now returns them (plan: add to `dumpAll`). Same check, longer list. Lint-only edits removed redundant type assertions in the chunk 8 test files.
+- A new `modulePlacements` row made by `setCategory` or `setAvailable` starts with `availableToAll: true`, because a module with no placement is visible today (assumption 25); starting at false would hide it from staff.
+- `notes.save` does not check the closed-book lock (only `list` and `get` do, as assumption 20 says). A note on an existing record may keep a lesson that a newer version dropped; a new or changed lesson must exist (`lessonMissing`). Creating a note needs a published module; editing one on an archived module is allowed.
+- `categories.reorder` hands the ids' existing order slots out in the new sequence, so a subset can be reordered without touching other categories. Organise writes write no audit event (the batch tests require exact store sets).
+- Added `errors.rule.*` keys for every new `RuleName` in en-GB.json (the competition ones are used from chunk 9).

@@ -191,7 +191,7 @@ describe('indexeddb schema upgrade from version 2 to 3', () => {
       createdAt: '2026-10-19T09:00:00.000Z',
       updatedAt: '2026-10-19T09:00:00.000Z',
     };
-    await handle.admin.bulkPut('notes' as never, [note]);
+    await handle.admin.bulkPut('notes', [note]);
     const dump = await handle.admin.dumpAll();
     expect(dump['people'].length).toBe(1);
     expect((dump as Record<string, unknown[]>)['notes']).toEqual([note]);

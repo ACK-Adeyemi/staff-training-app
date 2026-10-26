@@ -5,7 +5,7 @@ import { createRng, fixedClock } from '@sta/domain';
 import { createMemoryBackend } from '../memory/index';
 import { createStore } from '../store';
 import type { RawBackend, WriteOp } from '../backend';
-import type { ActorContext, StoreName } from '../types';
+import type { ActorContext } from '../types';
 import type { EngagementStore } from './engagement';
 import { addLearningFixture } from './learning';
 import { buildWorld, freshId, TODAY } from './world';
@@ -41,8 +41,8 @@ async function setup() {
     order,
   });
   const cats = [cat(1, 901), cat(2, 902), cat(3, 903)];
-  await handle.admin.bulkPut('categories' as StoreName, cats);
-  await handle.admin.bulkPut('modulePlacements' as StoreName, [
+  await handle.admin.bulkPut('categories', cats);
+  await handle.admin.bulkPut('modulePlacements', [
     { clientId: a, moduleId: lf.moduleId, categoryId: cats[0]!.id, availableToAll: true },
     { clientId: a, moduleId: lf.retakeId, categoryId: cats[0]!.id, availableToAll: true },
   ]);

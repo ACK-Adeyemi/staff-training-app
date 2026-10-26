@@ -198,7 +198,19 @@
       "tooMany": "That is too many people at once.",
       "invalidPeople": "Some of those people cannot be chosen.",
       "notesLocked": "Notes are locked during a closed-book quiz.",
-      "closedBook": "This is not available during a closed-book quiz."
+      "closedBook": "This is not available during a closed-book quiz.",
+      "closedBookOnly": "This quiz is always closed-book, so notes stay locked.",
+      "lessonMissing": "That lesson is no longer part of this course.",
+      "nameTaken": "You already have one with that name. Choose a different name.",
+      "metricLocked": "You cannot change what is measured once a competition has started.",
+      "endBeforeStart": "The end date must be after the start date.",
+      "endShortened": "A competition can only be made longer, not shorter.",
+      "competitionEnded": "This competition has already ended.",
+      "competitionCancelled": "This competition was cancelled.",
+      "winnersRecorded": "The winners have already been recorded.",
+      "notEnded": "Winners can only be recorded after the competition ends.",
+      "prizeRequired": "Add a prize before you publish.",
+      "invalidCompetition": "Some details of this competition need fixing."
     }
   },
   "client": {

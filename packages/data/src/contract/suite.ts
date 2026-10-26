@@ -55,6 +55,12 @@ const ALL_STORES: StoreName[] = [
   'attempts',
   'notifications',
   'clientLinkOverlays',
+  'notes',
+  'categories',
+  'modulePlacements',
+  'moduleGroups',
+  'competitions',
+  'standingBoardSettings',
 ];
 
 type Setup = { store: DataStore; admin: StoreHandle['admin']; fx: Fixture; options: StoreOptions };

@@ -7,6 +7,7 @@ import type {
   Attachment,
   Attempt,
   AuditEvent,
+  Category,
   Client,
   ClientLinkOverlay,
   Clock,
@@ -14,8 +15,12 @@ import type {
   Evidence,
   EvidenceSubmission,
   JobRole,
+  LearnerPrefs,
   LearningEvent,
   Module,
+  ModuleGroup,
+  ModulePlacement,
+  Note,
   Notification,
   OutboxMessage,
   Package,
@@ -61,6 +66,12 @@ export const storeNames = [
   'attempts',
   'notifications',
   'clientLinkOverlays',
+  'notes',
+  'categories',
+  'modulePlacements',
+  'moduleGroups',
+  'competitions',
+  'standingBoardSettings',
 ] as const;
 export type StoreName = (typeof storeNames)[number];
 
@@ -146,7 +157,21 @@ export type RuleName =
   | 'invalidAnswer'
   | 'dueInPast'
   | 'tooMany'
-  | 'invalidPeople';
+  | 'invalidPeople'
+  | 'notesLocked'
+  | 'closedBook'
+  | 'closedBookOnly'
+  | 'metricLocked'
+  | 'endBeforeStart'
+  | 'endShortened'
+  | 'competitionEnded'
+  | 'competitionCancelled'
+  | 'winnersRecorded'
+  | 'notEnded'
+  | 'prizeRequired'
+  | 'invalidCompetition'
+  | 'nameTaken'
+  | 'lessonMissing';
 
 /** A business rule said no (for example "finish every lesson first"). The web app maps `rule` to `errors.rule.<rule>`. */
 export class RuleError extends DataError {
@@ -190,16 +215,78 @@ export interface LearningService {
     ctx: ActorContext,
     input: { moduleId: Id; lessonId: string; kind: 'viewed' | 'completed' },
   ): Promise<LearningEvent>;
-  startAttempt(ctx: ActorContext, moduleId: Id): Promise<Attempt>;
+  /** `closed` hides notes and Learn more until the attempt ends. A closed-book-only module always starts closed. */
+  startAttempt(ctx: ActorContext, moduleId: Id, opts?: { mode?: 'open' | 'closed' }): Promise<Attempt>;
   answer(
     ctx: ActorContext,
-    input: { attemptId: Id; questionId: string; optionId?: string; choiceIds?: string[] },
+    input: {
+      attemptId: Id;
+      questionId: string;
+      optionId?: string;
+      choiceIds?: string[];
+      notesVisible?: boolean;
+    },
   ): Promise<{ correct: boolean; outcome?: 'best' | 'ok' | 'poor' }>;
   finishAttempt(ctx: ActorContext, attemptId: Id): Promise<FinishResult>;
+  /** Ends an unfinished attempt without a score ("Leave this attempt"). Never counts towards retakes. */
+  abandonAttempt(ctx: ActorContext, attemptId: Id): Promise<Attempt>;
   learnMoreOpened(
     ctx: ActorContext,
     input: { moduleId: Id; questionId?: string; lessonId?: string; linkId: string; attemptId?: Id },
   ): Promise<LearningEvent>;
+}
+
+export type MeRecord = { displayName: string; nickname?: string; prefs: LearnerPrefs };
+
+/** Private notes: staff, own person only (M2 assumptions 20, 21). */
+export interface NotesService {
+  list(ctx: ActorContext, filter?: { moduleId?: Id; starred?: boolean }): Promise<Note[]>;
+  get(ctx: ActorContext, id: Id): Promise<Note>;
+  save(
+    ctx: ActorContext,
+    input: { id?: Id; moduleId: Id; lessonId?: string; body: string; starred?: boolean },
+  ): Promise<Note>;
+  remove(ctx: ActorContext, id: Id): Promise<void>;
+}
+
+/** The caller's own person: display settings and profile. Never paywalled (accessibility). */
+export interface MeService {
+  get(ctx: ActorContext): Promise<MeRecord>;
+  updatePrefs(ctx: ActorContext, patch: Partial<LearnerPrefs>): Promise<MeRecord>;
+  updateProfile(
+    ctx: ActorContext,
+    patch: { nickname?: string | null; hideFromLeaderboards?: boolean },
+  ): Promise<MeRecord>;
+}
+
+export interface CategoriesService extends ReadRepo<Category> {
+  save(ctx: ActorContext, input: { id?: Id; name: string; colour: string; icon: string }): Promise<Category>;
+  /** One batch. The given ids take the existing order slots in the new sequence. */
+  reorder(ctx: ActorContext, ids: Id[]): Promise<void>;
+  /** Moves the category's placements to `moveTo` (or leaves them uncategorised) and deletes it, in one batch. */
+  remove(ctx: ActorContext, id: Id, opts?: { moveTo?: Id }): Promise<void>;
+  merge(ctx: ActorContext, fromId: Id, intoId: Id): Promise<void>;
+}
+
+export interface ModuleGroupsService extends ReadRepo<ModuleGroup> {
+  save(
+    ctx: ActorContext,
+    input: {
+      id?: Id;
+      siteId?: Id;
+      name: string;
+      description: string;
+      moduleIds: Id[];
+      inOrder: boolean;
+    },
+  ): Promise<ModuleGroup>;
+  remove(ctx: ActorContext, id: Id): Promise<void>;
+}
+
+/** Keyed by `${clientId}:${moduleId}`. */
+export interface ModulePlacementsService extends ReadRepo<ModulePlacement> {
+  setCategory(ctx: ActorContext, input: { moduleIds: Id[]; categoryId: Id }): Promise<void>;
+  setAvailable(ctx: ActorContext, input: { moduleIds: Id[]; availableToAll: boolean }): Promise<void>;
 }
 
 export interface DataStore {
@@ -239,6 +326,11 @@ export interface DataStore {
   attempts: ReadRepo<Attempt>;
   notifications: ReadRepo<Notification> & { markRead(ctx: ActorContext, ids: Id[]): Promise<void> };
   learning: LearningService;
+  notes: NotesService;
+  me: MeService;
+  categories: CategoriesService;
+  moduleGroups: ModuleGroupsService;
+  modulePlacements: ModulePlacementsService;
 }
 
 /** For the seed, the demo shell and tests. Never reachable through an ActorContext. */
