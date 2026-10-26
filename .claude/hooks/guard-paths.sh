@@ -38,6 +38,8 @@ case "$rel" in
     exit 0 ;;
   .devcontainer/*|.claude/*|scripts/agent|scripts/run-build.sh|scripts/BUILD_PROMPT.md|scripts/split-docs.py)
     deny "$rel is protected (container, agent configuration or build loop). Don't change it. Describe the change you need in docs/questions-for-user.md." ;;
+  docs/user-feedback.md)
+    deny "$rel is the user's feedback file. Don't edit it; record what you did about each item in docs/progress.md under User feedback." ;;
   docs/brief.md|docs/build-pack.md)
     deny "$rel is a source document owned by the user. Don't edit it; log conflicts or gaps in docs/decisions.md." ;;
   docs/brief/*|docs/build-pack/*)
