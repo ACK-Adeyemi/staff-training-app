@@ -1751,6 +1751,11 @@
     "requests": "Requests",
     "approve": "Approve",
     "decline": "Decline",
+    "notifications": {
+      "requested": "{person} asked to turn on {addOn}.",
+      "approved": "Your request for {addOn} was approved.",
+      "declined": "Your request for {addOn} was declined."
+    },
     "copy": {
       "aiAssistant": {
         "what": "Explains a quiz answer in simple words when someone asks, using only the lesson and the official source.",

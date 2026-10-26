@@ -463,7 +463,7 @@ export function runBillingContract(name: string, makeStore: (options: StoreOptio
         expect(o.planPrice.total).toBe(o.planPrice.perSite * 2);
         expect(o.planPrice.perSite).toBeGreaterThan(0);
         // No card number is ever held.
-        expect(JSON.stringify(o)).not.toMatch(/\d{12,}/);
+        expect(JSON.stringify({ ...o, packageId: undefined })).not.toMatch(/\d{12,}/);
       });
 
       it('previews an upgrade as immediate and a downgrade as at renewal, with items that become read-only', async () => {
@@ -674,7 +674,9 @@ export function runBillingContract(name: string, makeStore: (options: StoreOptio
         const priyaUser = (await dump<UserAccount>(s.admin, 'users')).find((u) => u.id === s.fx.ids.users.priya)!;
         expect(await s.outboxTo(priyaUser.email!)).toHaveLength(1);
         expect(await s.outboxTo(s.max.email!)).toHaveLength(1);
-        expect((await s.admin.listOutbox()).length).toBe(before + 2);
+        // Tim holds Group Admin until tomorrow (world fixture), so he is a holder too: three emails in all.
+        expect(await s.notificationsOf(s.fx.ids.users.tim)).toHaveLength(1);
+        expect((await s.admin.listOutbox()).length).toBe(before + 3);
       });
 
       it('lists only the own requests to a requester and every request to a holder', async () => {

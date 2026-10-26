@@ -15,6 +15,7 @@ import { createOperations } from './ops';
 import { createEngagementOperations } from './engagementOps';
 import { createCompetitionOperations } from './competitionOps';
 import { createIdentityOperations } from './identityOps';
+import { createBillingOperations, simulateFailedPayment } from './billingOps';
 import { keyOf, validate, type RawBackend, type SettingsRecord, type WriteOp } from './backend';
 import {
   authorizePut,
@@ -154,7 +155,7 @@ function appendOnly(backend: RawBackend, options: StoreOptions, store: 'audit' |
   };
 }
 
-function demoAdmin(backend: RawBackend): DemoAdmin {
+function demoAdmin(backend: RawBackend, options: StoreOptions): DemoAdmin {
   const setting = async (key: string): Promise<unknown> => {
     const row = (await backend.get('settings', key)) as SettingsRecord | undefined;
     return row?.value;
@@ -224,6 +225,7 @@ function demoAdmin(backend: RawBackend): DemoAdmin {
             (a.displayName < b.displayName ? -1 : a.displayName > b.displayName ? 1 : 0),
         );
     },
+    simulateFailedPayment: (clientId, now) => simulateFailedPayment(backend, options, clientId, now),
     async listStaffUsers(clientId) {
       return ((await backend.getAll('users')) as UserAccount[])
         .filter(
@@ -276,6 +278,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const engagement = createEngagementOperations(backend, options);
   const competitionOps = createCompetitionOperations(backend, options);
   const identity = createIdentityOperations(backend, options);
+  const billingOps = createBillingOperations(backend, options);
   const readOnly = (name: StoreName) => {
     const full = repo(backend, options, name);
     return { get: full.get, list: full.list };
@@ -299,7 +302,11 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     roles: r('roles'),
     roleAssignments: r('roleAssignments'),
     packages: withoutRemove('packages'),
-    addOns: withoutRemove('addOns'),
+    addOns: { ...withoutRemove('addOns'), ...billingOps.addOnOps },
+    billing: billingOps.billing,
+    addOnRequests: billingOps.addOnRequests,
+    account: billingOps.account,
+    ai: billingOps.ai,
     subscriptions: withoutRemove('subscriptions'),
     addOnSubscriptions: withoutRemove('addOnSubscriptions'),
     paymentAttempts: withoutRemove('paymentAttempts'),
@@ -314,8 +321,9 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     notifications: { ...readOnly('notifications'), markRead: ops.markRead },
     learning: ops.learning,
     ...engagement,
+    access: { ...engagement.access, features: (ctx: ActorContext) => billingOps.features(ctx) },
     ...competitionOps,
     ...identity,
   };
-  return { store: store as unknown as DataStore, admin: demoAdmin(backend), subscribe };
+  return { store: store as unknown as DataStore, admin: demoAdmin(backend, options), subscribe };
 }

@@ -45,7 +45,7 @@ import {
 export type EngagementOperations = {
   notes: NotesService;
   me: MeService;
-  access: AccessService;
+  access: Omit<AccessService, 'features'>;
   categories: CategoriesService;
   moduleGroups: ModuleGroupsService;
   modulePlacements: ModulePlacementsService;
@@ -125,12 +125,15 @@ export function createEngagementOperations(backend: RawBackend, options: StoreOp
     return person !== undefined && [person.primarySiteId, ...person.additionalSiteIds].includes(siteId);
   }
 
-  /** Writes: client actors with modules.manage in scope, on an account that allows full use. */
-  function writer(call: Call, siteIds?: string[]): void {
+  /**
+   * Writes: client actors with modules.manage in scope, on an account that allows full use. `authoring` is for
+   * category writes, which need the stricter authoring state (not Limited, Read-only or worse; M3 assumption 45).
+   */
+  function writer(call: Call, siteIds?: string[], authoring = false): void {
     if (call.side !== 'client') return forbid('permission');
     const target: Target = { clientId: call.clientId as string, ...(siteIds ? { siteIds } : {}) };
     if (!canAny(call, ['modules.manage'], target, 'write')) return forbid('permission');
-    checkAccountState(call, false);
+    checkAccountState(call, authoring);
   }
 
   const ownCategories = async (call: Call): Promise<Category[]> =>
@@ -302,7 +305,7 @@ export function createEngagementOperations(backend: RawBackend, options: StoreOp
 
     async save(ctx, input) {
       const call = await beginCall(backend, options, ctx);
-      writer(call);
+      writer(call, undefined, true);
       const clientId = call.clientId as string;
       const all = await ownCategories(call);
       const existing = input.id === undefined ? undefined : all.find((c) => c.id === input.id);
@@ -326,7 +329,7 @@ export function createEngagementOperations(backend: RawBackend, options: StoreOp
 
     async reorder(ctx, ids) {
       const call = await beginCall(backend, options, ctx);
-      writer(call);
+      writer(call, undefined, true);
       if (new Set(ids).size !== ids.length) throw new ValidationError(['ids: a category is listed twice']);
       const all = await ownCategories(call);
       const chosen = ids.map((id) => {
@@ -344,7 +347,7 @@ export function createEngagementOperations(backend: RawBackend, options: StoreOp
 
     async remove(ctx, id, opts) {
       const call = await beginCall(backend, options, ctx);
-      writer(call);
+      writer(call, undefined, true);
       await ownCategory(call, id);
       if (opts?.moveTo !== undefined) await ownCategory(call, opts.moveTo);
       if (opts?.moveTo === id) throw new ValidationError(['moveTo: choose a different category']);
@@ -354,7 +357,7 @@ export function createEngagementOperations(backend: RawBackend, options: StoreOp
 
     async merge(ctx, fromId, intoId) {
       const call = await beginCall(backend, options, ctx);
-      writer(call);
+      writer(call, undefined, true);
       await ownCategory(call, fromId);
       await ownCategory(call, intoId);
       if (fromId === intoId) throw new ValidationError(['intoId: choose a different category']);
@@ -486,7 +489,7 @@ export function createEngagementOperations(backend: RawBackend, options: StoreOp
       ),
   };
 
-  const access: AccessService = {
+  const access: Omit<AccessService, 'features'> = {
     async permissions(ctx) {
       const call = await beginCall(backend, options, ctx, { allowLimited: true });
       return structuredClone(call.actor.perms);

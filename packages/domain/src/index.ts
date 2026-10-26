@@ -61,3 +61,4 @@ export * from './twoFactor';
 export * from './billing';
 export * from './retention';
 export * from './exports/csv';
+export * from './demoAi';

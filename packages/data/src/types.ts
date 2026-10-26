@@ -47,6 +47,9 @@ import type {
   Invitation,
   Scope,
   TwoFactorStatus,
+  AddOnRequest,
+  BillingChangeRequest,
+  Invoice,
 } from '@sta/domain';
 
 export type Id = string;
@@ -303,6 +306,8 @@ export interface NotesService {
 /** What the signed-in person may do. Their own effective permissions only; never anyone else's. */
 export interface AccessService {
   permissions(ctx: ActorContext): Promise<EffectivePermission[]>;
+  /** Which paid features are on for the actor's organisation. Staff and client actors; never prices (M3 assumption 44). */
+  features(ctx: ActorContext): Promise<{ aiAssistant: boolean }>;
 }
 
 export interface MeService {
@@ -475,6 +480,93 @@ export interface OnboardingService {
   markDone(ctx: ActorContext, step: string): Promise<OnboardingView>;
 }
 
+export type PlanPreview = {
+  direction: 'upgrade' | 'downgrade' | 'same';
+  applies: 'now' | 'atRenewal';
+  currentPrice: number;
+  newPrice: number;
+  newLimits: Record<string, unknown>;
+  becomesReadOnly: { key: string; used: number; limit: number; overBy: number }[];
+};
+
+export type BillingOverview = {
+  packageId: Id;
+  /** Package band price per site for the active staff count, times active sites (assumption 41). Pence. */
+  planPrice: { perSite: number; sites: number; total: number };
+  period: 'monthly' | 'annual';
+  state: AccountState;
+  renewalAt: string;
+  pendingPackageId?: Id;
+  billingContact: string;
+  paymentMethod?: { brand: string; last4: string; expMonth: number; expYear: number };
+};
+
+/** Billing for client admins: `billing.view` to read, `billing.manage` to change (M3 assumptions 40, 41). */
+export interface BillingService {
+  overview(ctx: ActorContext): Promise<BillingOverview>;
+  invoices(ctx: ActorContext): Promise<Invoice[]>;
+  invoice(ctx: ActorContext, id: Id): Promise<Invoice>;
+  /** Stores a pending request; the billing profile is not changed. */
+  requestDetailsChange(
+    ctx: ActorContext,
+    proposed: { billingName?: string; address?: string; vatNumber?: string },
+  ): Promise<BillingChangeRequest>;
+  /** Needs the step-up code. */
+  updateContact(ctx: ActorContext, email: string, code: string): Promise<void>;
+  previewPlanChange(ctx: ActorContext, packageId: Id): Promise<PlanPreview>;
+  /** Needs the step-up code. An upgrade applies now, a downgrade at renewal. */
+  changePlan(ctx: ActorContext, packageId: Id, code: string): Promise<void>;
+  /** Mock payment: pays everything owed and returns the account to Active. */
+  payNow(ctx: ActorContext): Promise<void>;
+}
+
+export type AddOnListing = {
+  addOnId: Id;
+  name: string;
+  status: 'off' | 'on' | 'trial';
+  startedAt?: string;
+  endsAt?: string;
+  usageCapPence?: number;
+  usageThisPeriod: number;
+};
+
+/** The add-on catalogue (get, put) plus the billing-aware operations. `list` is per client and needs `billing.view`. */
+export interface AddOnsService extends Omit<WriteRepo<AddOn>, 'list'> {
+  list(ctx: ActorContext): Promise<AddOnListing[]>;
+  turnOn(ctx: ActorContext, addOnId: Id, options?: { trial?: boolean }): Promise<AddOnSubscription>;
+  /** Keeps it on until the renewal date. */
+  turnOff(ctx: ActorContext, addOnId: Id): Promise<AddOnSubscription>;
+  /** `null` removes the cap. */
+  setCap(ctx: ActorContext, addOnId: Id, capPence: number | null): Promise<AddOnSubscription>;
+}
+
+export interface AddOnRequestsService {
+  create(ctx: ActorContext, input: { addOnId: Id; note?: string }): Promise<AddOnRequest>;
+  /** Your own requests, or every request for the organisation with `billing.manageAddOns`. */
+  list(ctx: ActorContext): Promise<AddOnRequest[]>;
+  decide(ctx: ActorContext, requestId: Id, decision: 'approved' | 'declined'): Promise<AddOnRequest>;
+}
+
+export type AccountStatus = {
+  state: AccountState;
+  since: string;
+  nextChange?: { state: AccountState; at: string };
+  whatWorks: { feature: string; availability: string; key: string }[];
+  /** Amount due in pence. Only for actors with `billing.view`. */
+  amountDuePence?: number;
+};
+
+export interface AccountService {
+  status(ctx: ActorContext): Promise<AccountStatus>;
+  /** Staff only: tells them to speak to a manager when the account needs attention. No payment wording. */
+  staffNotice(ctx: ActorContext): Promise<{ needsAttention: true } | null>;
+}
+
+export interface AiService {
+  /** Canned "simpler words" text from the lesson itself, labelled Demo AI. Counts one use. */
+  explain(ctx: ActorContext, input: { moduleId: Id; lessonId: string }): Promise<{ label: string; text: string }>;
+}
+
 export interface DataStore {
   clients: WriteRepo<Client>;
   sites: RemovableRepo<Site>;
@@ -488,7 +580,11 @@ export interface DataStore {
   roles: RemovableRepo<Role>;
   roleAssignments: RemovableRepo<RoleAssignment>;
   packages: WriteRepo<Package>;
-  addOns: WriteRepo<AddOn>;
+  addOns: AddOnsService;
+  billing: BillingService;
+  addOnRequests: AddOnRequestsService;
+  account: AccountService;
+  ai: AiService;
   /** Keyed by clientId. */
   subscriptions: WriteRepo<Subscription>;
   /** Keyed by `${clientId}:${addOnId}`. */
@@ -541,6 +637,11 @@ export interface DemoAdmin {
   listStaffUsers(clientId: Id): Promise<{ userId: Id; displayName: string; personId: Id }[]>;
   /** Active client admins and staff users of every client, for the presenter panel's "Jump to persona". */
   listPersonas(): Promise<PersonaListing[]>;
+  /**
+   * Demo presenter control: a payment fails now. The account goes Past due from `now`, with a hard decline, an
+   * overdue invoice and an email in the Outbox. Throws NotFoundError for an unknown client.
+   */
+  simulateFailedPayment(clientId: Id, now: string): Promise<void>;
 }
 
 export type PersonaListing = {

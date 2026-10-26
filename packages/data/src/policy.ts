@@ -658,7 +658,10 @@ export async function clientEntitlements(call: Call, clientId: string): Promise<
   const price = (p: Package): number => p.bands[0]?.pricePerSite ?? 0;
   const floor = packages.reduce((lowest, p) => (price(p) < price(lowest) ? p : lowest), pkg);
   const addOnSubs = (await call.all<AddOnSubscription>('addOnSubscriptions')).filter(
-    (s) => s.clientId === clientId && s.status !== 'off',
+    (s) =>
+      s.clientId === clientId &&
+      s.status !== 'off' &&
+      (s.endsAt === undefined || Date.parse(s.endsAt) > call.actor.now.getTime()),
   );
   const addOns = (await call.all<AddOn>('addOns')).filter((a) => addOnSubs.some((s) => s.addOnId === a.id));
   return entitlements(pkg, addOns, derivedAccountState(client, subscription, call.actor.now), floor);

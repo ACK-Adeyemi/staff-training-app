@@ -193,3 +193,24 @@ export function nextTransition(
   }
   return { state: next, at };
 }
+
+/**
+ * When the state in force at `now` began. Equal to `stateSince` while the stored state still applies; once the clock
+ * has moved the account on (for example Past due to Limited) it is the first day of the new state.
+ */
+export function stateStartedAt(subscription: Subscription, policy: DunningPolicy, now: Date): Date {
+  const since = new Date(subscription.stateSince);
+  const current = accountStateAt(subscription, [], policy, now);
+  if (current === subscription.state) return since;
+  const end = trialEnd(subscription);
+  if (subscription.state === 'trial' && end) {
+    if (current === 'readOnly') return end;
+    if (current === 'closed') return startOfLondonDay(addDays(end, TRIAL_READ_ONLY_DAYS));
+    if (current === 'deleted') return startOfLondonDay(addDays(end, TRIAL_READ_ONLY_DAYS + TRIAL_CLOSED_DAYS));
+    return since;
+  }
+  const starts = startDays(policy);
+  const from = subscription.state as Stage;
+  if (!ORDER.includes(from) || !ORDER.includes(current as Stage)) return since;
+  return startOfLondonDay(addDays(since, starts[current as Stage] - starts[from]));
+}
