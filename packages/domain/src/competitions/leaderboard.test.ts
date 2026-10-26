@@ -9,7 +9,7 @@ const entries = (pairs: [string, number][]): Entry[] => pairs.map(([n, v]) => ({
 /** 14 distinct people with values 14 down to 1 named P01..P14. */
 const fourteen = (): Entry[] =>
   Array.from({ length: 14 }, (_, i) => ({
-    id: `id-P${i + 1}`,
+    id: `id-P${String(i + 1).padStart(2, '0')}`,
     name: `P${String(i + 1).padStart(2, '0')}`,
     value: 14 - i,
   }));

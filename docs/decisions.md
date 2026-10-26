@@ -336,3 +336,16 @@ Every number marked placeholder is engine config in packages/domain (`engagement
 - The line that crosses the daily cap is reduced and also flagged `capped: true`.
 - Badge definitions are `{ id, kind, moduleId? }`; Mastery gives one badge `mastery:<moduleId>` per module. Rest weeks before a leave end are looked for at most `maxRestWeeks` (8, placeholder) back, because the leave start is not stored.
 - All numbers live in `engagementConfig` (packages/domain/src/engagement/config.ts).
+
+### M2 chunk 3: where the tests differ from the plan
+
+- `winnerNames` returns `{ name, hidden: false }` per winner, and `{ hidden: true }` (no name) for a hidden winner shown to staff. Admins see every name.
+- Zeros stay in ranks and "of N", but rows need a value above 0. A viewer on 0 has `rank: null`. `toNext` is the gap to the nearest better value (null at rank 1 or on 0).
+- A hidden viewer gets `hidden: true`, a position computed as if included, and no row. Hiding people from rankings is the caller's job (`hiddenIds`); hidden people stay drawable in `drawWinners`.
+- Team units with nothing due are returned in a new `unranked` set instead of `values`.
+- Beat the Expiry needs earlier Evidence and a `renewEveryMonths` on the requirement. Approved external Evidence counts by `completedAt`; unapproved external does not.
+- Team Showdown and the Team board count module assignments (not group bundles, not cancelled) due in `[start, end)` and completed at or before the due instant. Completion has no lower bound, so finishing early still counts. Percentages are rounded down.
+- This month and This quarter use London calendar boundaries (DST-safe via `fromLondonWall`).
+- `validateCompetition` treats stored status `scheduled` as publish (prize required); `draft` may have an empty prize. Entitlement and limit checks stay in the data layer.
+- Leaderboard numbers (top rows 10, default winner count 1, default team target 90) live in `engagementConfig.competitions`.
+- Test fixes: `leaderboard.test.ts` built entry ids as `id-P1` while the tests used `id-P01`; ids are now zero-padded to match the names. Fixture types in `competitions/testFixtures.ts` were tightened (type-only) so inputs match the domain types.

@@ -1,7 +1,11 @@
 // Test-only builders for the competition, leaderboard and standing board tests (M2 chunk 3). Plain data, no behaviour.
 import type { Competition } from '../schemas/engagement';
-import type { Attempt, LearningEvent, Module } from '../schemas/learning';
-import type { Person } from '../schemas/tenancy';
+import type { Evidence } from '../schemas/evidence';
+import type { Assignment, Attempt, LearningEvent, Module } from '../schemas/learning';
+import type { Requirement } from '../schemas/packs';
+import type { Person, Team } from '../schemas/tenancy';
+import type { BoardInput } from '../standingBoards';
+import type { MetricInput } from './metrics';
 import { CLIENT, SITE_ID, event, moduleFor, nextId, person } from '../engagement/testFixtures';
 
 export { CLIENT, SITE_ID, event, moduleFor, nextId, person };
@@ -44,27 +48,27 @@ export const customCompetition = (over: Partial<Competition> = {}): Competition 
 /** A person who is on the roll and active by default. */
 export const staff = (first: string, last: string, over: Partial<Person> = {}): Person => person(first, last, over);
 
-export type MetricInputOver = Record<string, unknown>;
+export type MetricInputOver = Partial<MetricInput>;
 
 /** The input bag for competitionMetric (plan Design: competitions/metrics.ts). */
-export const metricInput = (over: MetricInputOver = {}) => ({
+export const metricInput = (over: MetricInputOver = {}): MetricInput => ({
   competition: competition(),
   people: [] as Person[],
-  teams: [] as unknown[],
+  teams: [] as Team[],
   events: [] as LearningEvent[],
   attempts: [] as Attempt[],
-  assignments: [] as unknown[],
-  evidence: [] as unknown[],
-  requirements: [] as unknown[],
+  assignments: [] as Assignment[],
+  evidence: [] as Evidence[],
+  requirements: [] as Requirement[],
   modules: [] as Module[],
   ...over,
 });
 
 /** The input bag for standingBoard (plan Design: standingBoards.ts). */
-export const boardInput = (over: MetricInputOver = {}) => {
-  const base: Record<string, unknown> = metricInput();
+export const boardInput = (over: Partial<BoardInput> = {}): BoardInput => {
+  const base: Partial<MetricInput> = metricInput();
   delete base.competition;
-  return { ...base, now: new Date('2026-10-26T09:00:00.000Z'), ...over } as MetricInputOver & { now: Date };
+  return { ...(base as Omit<MetricInput, 'competition'>), now: new Date('2026-10-26T09:00:00.000Z'), ...over };
 };
 
 /** A correct answer by a person, optionally tied to an attempt. */
@@ -120,7 +124,7 @@ export const bank = (keys: string[], over: Partial<Module> = {}): Module =>
     ...over,
   });
 
-export const dueAssignment = (p: Person, m: Module, dueAt: string, over: Record<string, unknown> = {}) => ({
+export const dueAssignment = (p: Person, m: Module, dueAt: string, over: Partial<Assignment> = {}): Assignment => ({
   id: nextId(),
   clientId: CLIENT,
   personId: p.id,

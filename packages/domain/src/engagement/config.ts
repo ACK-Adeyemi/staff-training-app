@@ -21,6 +21,13 @@ export type EngagementConfig = {
   amberWindowDays: number;
   /** How many empty weeks before a leave end are treated as rest weeks. */
   maxRestWeeks: number;
+  competitions: {
+    /** Staff leaderboards show this many places (more only when tied at the last one). */
+    topRows: number;
+    defaultWinnerCount: number;
+    /** Team target per cent when a competition does not set one. */
+    defaultTeamTarget: number;
+  };
 };
 
 export const engagementConfig: EngagementConfig = {
@@ -41,4 +48,5 @@ export const engagementConfig: EngagementConfig = {
   learningHabitWeeks: 4,
   amberWindowDays: 60,
   maxRestWeeks: 8,
+  competitions: { topRows: 10, defaultWinnerCount: 1, defaultTeamTarget: 90 },
 };
