@@ -2,14 +2,14 @@
 Status: IN PROGRESS
 Mode: unattended
 Branch: agent/poc-build
-Current milestone: M2
-Milestone base commit: 7c4064d
-Next step: M2 chunk 17 (Track A and docs; see docs/plans/m2.md work chunks), then security-reviewer and code-reviewer on git diff 7c4064d...HEAD. Chunks 1-16 done (latest 72395e6).
+Current milestone: M3
+Milestone base commit: (set when M3 starts)
+Next step: start M3 (client admin depth): record the base commit, then delegate docs/plans/m3.md to planner using docs/build-pack/10-04 section file.
 
 ## Milestones
 - [x] M0 Foundations
 - [x] M1 Client story core
-- [ ] M2 Engagement (chunks 1-16 done)
+- [x] M2 Engagement
 - [ ] M3 Client admin depth
 - [ ] M4 Provider story
 - [ ] M5 Polish and demo readiness
@@ -17,7 +17,7 @@ Next step: M2 chunk 17 (Track A and docs; see docs/plans/m2.md work chunks), the
 - [ ] M7 Battle Room
 
 ## Current milestone chunks
-M2 (17 chunks, see docs/plans/m2.md 'Work chunks'): chunks 1-16 done; 17 pending.
+M2: all 17 chunks done.
 M1 (all done):
 - [x] 1 M0 known issues and decisions
 - [x] 2 Learning schemas and quiz engine
@@ -36,6 +36,8 @@ M1 (all done):
 M0 (final commit f7d32fd, scripts/check.sh fully green): BP-1..BP-8 and F-1..F-10 each proven by the tests listed in docs/plans/m0.md (unit, contract on both adapters, seed, component, Playwright incl. axe, no-network, text-scale, demo-shell). Pass, except deploy parts of BP-1: verified locally (build + preview, base path, hash routing), live check deferred to user in docs/review-checklist.md. Security review: FAIL on first pass (1 High, 3 Medium), all fixed in 1e22e2c; code review: APPROVE.
 
 M1 (final commit 5b87b6d, scripts/check.sh fully green): BP-1 refresher on 390x844 with branching scenario and evidence with version+site (safeguarding-refresher e2e, contract tests); BP-2 wrong-answer explanation, Learn more links (new tab, icon, domain), results list, learnMoreOpened with no XP (component + e2e); BP-3 draw modes and shuffle (domain tests); BP-4 C1 order and live update (client-dashboard e2e, seed test); BP-5 C4 assigns 3 people with notifications (component + e2e); BP-6 matrix print-to-PDF in Chromium plus visual review of the PNG/PDF (training-matrix e2e); BP-7 Track A steps 1, 3, 5 (matrix part) in track-a.spec.ts. K-1, K-2 fixed. Security review PASS (1 Medium and 2 Low fixed, 1 Low documented); code review CHANGES REQUESTED then all Must/Should fixed in one round (F-9 axe coverage on all new routes). Deferred to user: phone checks in docs/review-checklist.md; CI poppler-utils step in .github/workflows/ci.yml needs the user's review.
+
+M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to F-11 each proven by tests listed in docs/plans/m2.md (domain, contract on both adapters, seed, component, Playwright incl. Track A steps 3, 4, 7, axe in light, dark and high contrast, text scale 200%, no-network). Pass. Phone checks deferred to user in docs/review-checklist.md. Security review: FAIL first pass (1 High cross-site standings leak, 2 Medium, several Low), fixed in 6425abe; two Lows (nickname collision, small-team percentages) accepted and logged in docs/decisions.md. Code review: APPROVE with Should fixes left open (builder multi-press UI test confirmation, Switch/Chip use fixed min-h instead of --target-min token, C8 unanswered-order test could pass vacuously, no Pause in read-aloud).
 
 ## User feedback
 - F1 (M0, ?reset=1): fixed; awaiting user re-check. Cause: editing only the hash (`#/staff?reset=1`) never reloads the page and the hash form was not read. Both forms now work (resetParam.ts, hashchange reload), with e2e for both against the base-path build. Fix commit: see git log "fix: ?reset=1 works before the hash".
@@ -83,3 +85,4 @@ M1 (final commit 5b87b6d, scripts/check.sh fully green): BP-1 refresher on 390x8
 - 2026-10-26: M2 chunk 15 rewards and progress landed (c35028b), check.sh green. Stopping at a clean point; chunk 16 next.
 - 2026-10-26: merged origin/main (user feedback); F1 fixed and committed, check.sh green. Chunk 16 next.
 - 2026-10-26: M2 chunk 16 compete and admin engagement landed (72395e6), check.sh green. Builder eligibility pickers deferred (see decisions). Stopping at a clean point; chunk 17 next.
+- 2026-10-26: M2 complete (chunk 17, reviews, fixes). Final commit 6425abe. M3 next.
