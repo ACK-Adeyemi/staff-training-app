@@ -61,18 +61,21 @@ export async function renderRoute(
     prepare?: (ctx: { handle: StoreHandle; keys: SeedKeys }) => Promise<void>;
     /** Run as someone other than the side's default persona (chunk 10: client users other than Priya). */
     actor?: (keys: SeedKeys) => ActorContext;
+    /** M3 chunk 13: the demo "now" (ISO) for the actor and the clock, to walk account states. Defaults to TODAY. */
+    now?: string;
   } = {},
 ) {
   const { handle, keys } = await seededStore();
   if (opts.prepare) await opts.prepare({ handle, keys });
   const router = createMemoryRouter(routes, { initialEntries: [path] });
-  const actor = opts.actor ? opts.actor(keys) : actorFor(side, keys);
+  const at = opts.now ?? TODAY;
+  const actor = { ...(opts.actor ? opts.actor(keys) : actorFor(side, keys)), now: at };
   const demo = makeDemo(side, keys, handle);
   demo.state.persona.userId = actor.userId;
   const view = render(
     <AppProviders
       store={handle.store}
-      clock={fixedClock(TODAY)}
+      clock={fixedClock(at)}
       actor={actor}
       demo={demo}
       subscribe={(l) => handle.subscribe(l)}
