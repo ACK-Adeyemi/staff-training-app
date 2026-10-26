@@ -4,7 +4,7 @@ import prizes from './prizes.json' with { type: 'json' };
 import { nurseryPack } from '../nursery';
 
 const brief = [
-  '£20 online shopping voucher (retailer of the winner\'s choice)',
+  "£20 online shopping voucher (retailer of the winner's choice)",
   '£25 high street shopping voucher',
   '£15 coffee shop voucher',
   'x1 free lunch (max spend £10)',
@@ -27,8 +27,23 @@ const brief = [
 ];
 
 const denylist = [
-  'wine', 'beer', 'prosecco', 'champagne', 'gin', 'alcohol', 'cigar', 'cigarette', 'vape', 'tobacco',
-  'lottery', 'scratchcard', 'raffle ticket', 'bet', 'betting', 'casino', 'gambling',
+  'wine',
+  'beer',
+  'prosecco',
+  'champagne',
+  'gin',
+  'alcohol',
+  'cigar',
+  'cigarette',
+  'vape',
+  'tobacco',
+  'lottery',
+  'scratchcard',
+  'raffle ticket',
+  'bet',
+  'betting',
+  'casino',
+  'gambling',
 ];
 
 describe('nursery prizes.json', () => {
@@ -43,13 +58,11 @@ describe('nursery prizes.json', () => {
   });
 
   it('has no duplicates ignoring case', () => {
-    expect(new Set((prizes as string[]).map((p) => p.toLowerCase())).size).toBe(20);
+    expect(new Set(prizes.map((p) => p.toLowerCase())).size).toBe(20);
   });
 
   it('contains no alcohol, tobacco or gambling words', () => {
-    const hits = (prizes as string[]).filter((p) =>
-      denylist.some((w) => new RegExp(`\\b${w}\\b`, 'i').test(p)),
-    );
+    const hits = prizes.filter((p) => denylist.some((w) => new RegExp(`\\b${w}\\b`, 'i').test(p)));
     expect(hits).toEqual([]);
   });
 

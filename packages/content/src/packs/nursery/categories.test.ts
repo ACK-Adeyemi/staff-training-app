@@ -14,9 +14,10 @@ const iconKeys = new Set(
 );
 
 const lang = (key: string): string | undefined =>
-  key.split('.').reduce<unknown>((n, k) => (n && typeof n === 'object' ? (n as Record<string, unknown>)[k] : undefined), enGB) as
-    | string
-    | undefined;
+  key
+    .split('.')
+    .reduce<unknown>((n, k) => (n && typeof n === 'object' ? (n as Record<string, unknown>)[k] : undefined), enGB) as
+    string | undefined;
 
 describe('moduleIds.saferSleep', () => {
   it('is the content id 207 and distinct from every other module id', () => {
@@ -86,15 +87,26 @@ describe('nursery coming soon cards', () => {
     expect(new Set(nurseryComingSoon.map((c) => c.id)).size).toBe(10);
     for (const c of nurseryComingSoon) {
       expect(typeof lang(c.titleKey), c.titleKey).toBe('string');
-      expect(nurseryCategories.map((k) => k.key), c.id).toContain(c.categoryKey);
+      expect(
+        nurseryCategories.map((k) => k.key),
+        c.id,
+      ).toContain(c.categoryKey);
     }
   });
 
   it('names the brief 7 topics', () => {
     const titles = nurseryComingSoon.map((c) => `${c.tier}|${lang(c.titleKey)}`.toLowerCase()).join('\n');
     for (const [tier, word] of [
-      [2, 'suitable people'], [2, 'ratios'], [2, 'risk assessment'], [2, 'medicines'], [2, 'records'],
-      [3, 'learning and development'], [3, 'assessment'], [3, 'send'], [3, 'behaviour'], [3, 'induction and supervision'],
+      [2, 'suitable people'],
+      [2, 'ratios'],
+      [2, 'risk assessment'],
+      [2, 'medicines'],
+      [2, 'records'],
+      [3, 'learning and development'],
+      [3, 'assessment'],
+      [3, 'send'],
+      [3, 'behaviour'],
+      [3, 'induction and supervision'],
     ] as const) {
       expect(titles, word).toMatch(new RegExp(`${tier}\\|[^\\n]*${word}`));
     }

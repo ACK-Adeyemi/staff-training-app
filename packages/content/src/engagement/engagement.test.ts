@@ -8,7 +8,9 @@ import levels from './levels.json' with { type: 'json' };
 import badges from './badges.json' with { type: 'json' };
 
 const lang = (key: string): unknown =>
-  key.split('.').reduce<unknown>((n, k) => (n && typeof n === 'object' ? (n as Record<string, unknown>)[k] : undefined), enGB);
+  key
+    .split('.')
+    .reduce<unknown>((n, k) => (n && typeof n === 'object' ? (n as Record<string, unknown>)[k] : undefined), enGB);
 
 const iconSource = readFileSync(new URL('../../../ui/src/components/Icon.tsx', import.meta.url), 'utf8');
 const iconKeys = new Set(
@@ -33,7 +35,16 @@ describe('engagement/levels.json', () => {
 });
 
 describe('engagement/badges.json', () => {
-  const kinds = ['firstModule', 'safeguardingReady', 'mastery', 'earlyBird', 'scenarioSavvy', 'learningHabit', 'allCompliant', 'competitionWinner'];
+  const kinds = [
+    'firstModule',
+    'safeguardingReady',
+    'mastery',
+    'earlyBird',
+    'scenarioSavvy',
+    'learningHabit',
+    'allCompliant',
+    'competitionWinner',
+  ];
 
   it('has one definition for each of the eight domain badge kinds', () => {
     expect(badges.map((b) => b.kind).sort()).toEqual([...kinds].sort());
@@ -64,6 +75,7 @@ describe('engagement/badges.json', () => {
   });
 
   it('mentions no speed in any badge description', () => {
-    for (const b of badges) expect(String(lang(b.descriptionKey))).not.toMatch(/\b(fast|quick|quickly|speed|fastest|seconds)\b/i);
+    for (const b of badges)
+      expect(String(lang(b.descriptionKey))).not.toMatch(/\b(fast|quick|quickly|speed|fastest|seconds)\b/i);
   });
 });

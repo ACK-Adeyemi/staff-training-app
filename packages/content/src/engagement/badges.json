@@ -1,0 +1,59 @@
+[
+  {
+    "id": "firstModule",
+    "kind": "firstModule",
+    "icon": "check",
+    "nameKey": "badge.items.firstModule.name",
+    "descriptionKey": "badge.items.firstModule.description"
+  },
+  {
+    "id": "safeguardingReady",
+    "kind": "safeguardingReady",
+    "icon": "bell",
+    "nameKey": "badge.items.safeguardingReady.name",
+    "descriptionKey": "badge.items.safeguardingReady.description",
+    "moduleId": "01M0C0N7000000000000000201"
+  },
+  {
+    "id": "mastery",
+    "kind": "mastery",
+    "icon": "trophy",
+    "nameKey": "badge.items.mastery.name",
+    "descriptionKey": "badge.items.mastery.description"
+  },
+  {
+    "id": "earlyBird",
+    "kind": "earlyBird",
+    "icon": "clock",
+    "nameKey": "badge.items.earlyBird.name",
+    "descriptionKey": "badge.items.earlyBird.description"
+  },
+  {
+    "id": "scenarioSavvy",
+    "kind": "scenarioSavvy",
+    "icon": "help",
+    "nameKey": "badge.items.scenarioSavvy.name",
+    "descriptionKey": "badge.items.scenarioSavvy.description"
+  },
+  {
+    "id": "learningHabit",
+    "kind": "learningHabit",
+    "icon": "book",
+    "nameKey": "badge.items.learningHabit.name",
+    "descriptionKey": "badge.items.learningHabit.description"
+  },
+  {
+    "id": "allCompliant",
+    "kind": "allCompliant",
+    "icon": "chart",
+    "nameKey": "badge.items.allCompliant.name",
+    "descriptionKey": "badge.items.allCompliant.description"
+  },
+  {
+    "id": "competitionWinner",
+    "kind": "competitionWinner",
+    "icon": "trophy",
+    "nameKey": "badge.items.competitionWinner.name",
+    "descriptionKey": "badge.items.competitionWinner.description"
+  }
+]

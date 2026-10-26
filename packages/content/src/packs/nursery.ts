@@ -2,6 +2,7 @@
 import type { IndustryPack, JobRole, Requirement } from '@sta/domain';
 import { contentId } from './contentId';
 import { moduleIds } from './moduleIds';
+import prizes from './nursery/prizes.json';
 
 const packId = contentId(101);
 
@@ -109,5 +110,5 @@ export const nurseryPack: IndustryPack = {
   defaultRules: [],
   faqIds: [],
   supportFeatureIds: [],
-  prizeSuggestions: ['Extra break', 'Choose the next team treat', 'Early finish on a quiet day'],
+  prizeSuggestions: prizes,
 };

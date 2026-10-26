@@ -196,7 +196,9 @@
       "invalidAnswer": "That answer could not be used. Please try again.",
       "dueInPast": "The due date must be in the future.",
       "tooMany": "That is too many people at once.",
-      "invalidPeople": "Some of those people cannot be chosen."
+      "invalidPeople": "Some of those people cannot be chosen.",
+      "notesLocked": "Notes are locked during a closed-book quiz.",
+      "closedBook": "This is not available during a closed-book quiz."
     }
   },
   "client": {
@@ -504,5 +506,195 @@
     "notFoundTitle": "Document not found",
     "notFound": "We could not find that document. It may belong to another organisation.",
     "back": "Back to the app"
+  },
+  "xp": {
+    "title": "Experience points",
+    "total": "{xp} XP in total",
+    "today": "{xp} XP earned today",
+    "note": "You earn XP for learning well. Taking longer never costs you anything."
+  },
+  "level": {
+    "title": "Your level",
+    "label": "Level {level}",
+    "toNext": "{xp} XP to reach level {next}"
+  },
+  "badge": {
+    "title": "Badges",
+    "earned": "Earned",
+    "locked": "Not earned yet",
+    "items": {
+      "firstModule": {
+        "name": "First module",
+        "description": "Finished your first module."
+      },
+      "safeguardingReady": {
+        "name": "Safeguarding ready",
+        "description": "Passed the safeguarding and whistleblowing module."
+      },
+      "mastery": {
+        "name": "Mastery",
+        "description": "Answered every question in a module correctly at least once."
+      },
+      "earlyBird": {
+        "name": "Early bird",
+        "description": "Finished a module well before its due date."
+      },
+      "scenarioSavvy": {
+        "name": "Scenario savvy",
+        "description": "Chose the best outcome in a run of scenario questions."
+      },
+      "learningHabit": {
+        "name": "Learning habit",
+        "description": "Learned in several different weeks."
+      },
+      "allCompliant": {
+        "name": "All up to date",
+        "description": "Every required module is complete and in date."
+      },
+      "competitionWinner": {
+        "name": "Competition winner",
+        "description": "Won a competition run by your workplace."
+      }
+    }
+  },
+  "weeklyGoal": {
+    "title": "Weekly goal",
+    "met": "Goal met this week",
+    "progress": "{done} of {goal} done this week"
+  },
+  "history": {
+    "title": "Your history",
+    "empty": "Nothing here yet."
+  },
+  "notes": {
+    "title": "My notes",
+    "add": "Add a note",
+    "save": "Save note",
+    "empty": "You have no notes yet. Notes are private to you.",
+    "star": "Star this note",
+    "unstar": "Remove star",
+    "remove": "Delete note",
+    "lockedInQuiz": "Notes are hidden during a closed-book quiz.",
+    "private": "Only you can see your notes."
+  },
+  "learn": {
+    "search": {
+      "label": "Search modules",
+      "placeholder": "Search by title or topic",
+      "none": "No modules match your search."
+    },
+    "filters": {
+      "title": "Filters",
+      "all": "All",
+      "category": "Category",
+      "status": "Status"
+    }
+  },
+  "compete": {
+    "title": "Compete",
+    "empty": "There are no competitions running at the moment."
+  },
+  "competition": {
+    "title": "Competitions",
+    "prize": "Prize",
+    "prizeDisclaimer": "The client provides and pays for the prize and is responsible for any tax, payroll or legal implications.",
+    "suggestPrize": "Suggest a prize",
+    "clearPrize": "Clear prize",
+    "howToWin": "How to win",
+    "why": "Why this works",
+    "templates": {
+      "masteryMonth": {
+        "name": "Mastery Month",
+        "howToWin": "Master the most modules in the period. A module is mastered when you have answered every question in it correctly at least once. Retakes are welcome.",
+        "why": "It rewards real knowledge. Trying again is encouraged, not penalised, and speed does not matter."
+      },
+      "knowledgeBuilder": {
+        "name": "Knowledge Builder",
+        "howToWin": "Answer correctly the most different questions in the period.",
+        "why": "It rewards the amount of correct learning, and repeating the same quiz does not help."
+      },
+      "learningStreak": {
+        "name": "Learning Streak Challenge",
+        "howToWin": "Be active in the most weeks in the period. A week counts when you complete at least one lesson or quiz.",
+        "why": "It encourages little-and-often learning that suits shift work. Each week counts once, and holidays or sickness do not wipe out your progress."
+      },
+      "teamShowdown": {
+        "name": "Team Showdown",
+        "howToWin": "Teams or sites compete on the percentage of their assigned training completed before the due date.",
+        "why": "Percentages are fair to teams and sites of different sizes, a shared goal builds support, and no individual is ranked."
+      },
+      "beatTheExpiry": {
+        "name": "Beat the Expiry",
+        "howToWin": "Complete a refresher before it expires, within the window, to be entered into a random draw. Refreshers done outside the app count once the certificate is approved.",
+        "why": "It rewards keeping up to date, not speed."
+      },
+      "completeAndWin": {
+        "name": "Complete and Win",
+        "howToWin": "Complete and pass the chosen modules by the end date to be entered into a random draw.",
+        "why": "Everyone who qualifies has an equal chance, so there is no reason to race. It suits must-do training such as the September framework update."
+      },
+      "scenarioSavvy": {
+        "name": "Scenario Savvy",
+        "howToWin": "Choose the best outcome in the most scenario questions. Each question counts once.",
+        "why": "It rewards good judgement, which is what inspectors want staff to show."
+      },
+      "closedBook": {
+        "name": "Closed-Book Challenge",
+        "howToWin": "Answer correctly the most different questions in closed-book mode in the period.",
+        "why": "It rewards recall without notes. Notes are locked in counted attempts. Open-book attempts are still available, they just do not count here."
+      }
+    }
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "you": "You",
+    "hidden": "Hidden at your request",
+    "ordinal": {
+      "one": "{n}st",
+      "two": "{n}nd",
+      "few": "{n}rd",
+      "other": "{n}th"
+    }
+  },
+  "organise": {
+    "title": "Organise modules",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
+  },
+  "display": {
+    "title": "Display settings",
+    "simpleView": "Simple view",
+    "textSize": "Text size",
+    "contrast": "Contrast",
+    "colourMode": "Colour mode",
+    "spacing": "Spacing"
+  },
+  "readAloud": {
+    "title": "Read aloud",
+    "play": "Read this aloud",
+    "stop": "Stop reading"
+  },
+  "me": {
+    "title": "Me",
+    "nickname": "Nickname",
+    "hideFromLeaderboards": "Hide me from leaderboards"
+  },
+  "celebration": {
+    "levelUp": "You reached level {level}",
+    "badge": "You earned the {name} badge"
+  },
+  "comingSoon": {
+    "nursery": {
+      "suitablePeople": "Suitable people and vetting (Tier 2)",
+      "ratios": "Ratios and qualifications (Tier 2)",
+      "riskAssessment": "Risk assessment and outings (Tier 2)",
+      "medicines": "Medicines (Tier 2)",
+      "records": "Records, confidentiality and data protection (Tier 2)",
+      "learningAndDevelopment": "Learning and development (Tier 3)",
+      "assessment": "Assessment (Tier 3)",
+      "send": "SEND (Tier 3)",
+      "behaviour": "Behaviour (Tier 3)",
+      "inductionAndSupervision": "Induction and supervision (Tier 3)"
+    }
   }
 }

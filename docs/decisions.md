@@ -360,3 +360,9 @@ Every number marked placeholder is engine config in packages/domain (`engagement
 - Search is plain substring on folded text (lower case, accents removed, one character in and out so highlight offsets stay valid). Every term must match somewhere in title, description, lesson titles or category name. No regular expressions are built from input.
 - Notes: `notesLocked` is true only for the person's own closed-book attempt with no `finishedAt` that is not abandoned. `canReadNote` and `visibleNotes` fail closed for an unknown person. Notes of archived or removed modules stay, flagged `available: false`, and sort after available ones.
 - Display: `validateDisplayPrefs` rejects unknown keys and returns the offending field names. `mergeDisplayPrefs` ignores undefined patch values. `displayAttributes` clamps scales, and Simple view raises text to at least 1.25 and turns motion off without touching the saved prefs.
+
+## M2 chunk 5
+
+- `packs/nursery/prizes.test.ts` had two `as string[]` casts that lint flags as unnecessary once `prizes.json` is typed as `string[]`. Removed the casts only (lint autofix); no assertion changed.
+- Coming soon card titles live in `comingSoon.nursery.*` in en-GB.json, with the tier in the title text.
+- Prettier formatting applied to the chunk 5 test files (whitespace only).
