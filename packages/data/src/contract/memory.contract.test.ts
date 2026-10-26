@@ -10,6 +10,7 @@ import { runFeedbackTicketsContract } from './feedbackTickets';
 import { runIdentityOrgContract } from './identityOrg';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
+import { runRulesRemindersContract } from './rulesReminders';
 import { runContractSuite } from './suite';
 
 runContractSuite('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
@@ -33,3 +34,5 @@ runAuthoringFilesContract('memory adapter', (options) => Promise.resolve(createM
 runEvidenceFlowContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
 runFeedbackTicketsContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runRulesRemindersContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));

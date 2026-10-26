@@ -11,6 +11,7 @@ import { runFeedbackTicketsContract } from './feedbackTickets';
 import { runIdentityOrgContract } from './identityOrg';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
+import { runRulesRemindersContract } from './rulesReminders';
 import { runContractSuite } from './suite';
 
 let counter = 0;
@@ -46,5 +47,9 @@ runEvidenceFlowContract('indexeddb adapter', (options) =>
 );
 
 runFeedbackTicketsContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+
+runRulesRemindersContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );
