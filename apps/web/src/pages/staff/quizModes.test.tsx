@@ -95,6 +95,8 @@ describe('S6 notes control in an open-book attempt', () => {
   it('records notesVisible per question: true only for the question where notes were opened', async () => {
     const user = userEvent.setup();
     const { handle } = await renderRoute(quizPath, 'staff', { prepare: withNote });
+    // The seed already holds answers to these questions from earlier attempts; only this attempt's events count.
+    const earlier = new Set((await dump(handle)).learningEvents!.map((e) => e['id']));
     await startOpen(user);
     await user.click(screen.getByRole('button', { name: 'Notes hidden: bonus XP' }));
     const panel = await screen.findByRole('dialog', { name: `Notes for ${sgModule.title}` });
@@ -108,7 +110,7 @@ describe('S6 notes control in an open-book attempt', () => {
     const second = await answerCurrent(user, true);
     await waitFor(async () => {
       const again = (await dump(handle)).learningEvents!.filter(
-        (e) => e['type'] === 'questionAnswered' && e['moduleId'] === sgModule.id,
+        (e) => e['type'] === 'questionAnswered' && e['moduleId'] === sgModule.id && !earlier.has(e['id']),
       );
       expect(again.find((e) => e['questionId'] === first.id)?.['notesVisible']).toBe(true);
       expect(again.find((e) => e['questionId'] === second.id)?.['notesVisible']).toBe(false);
@@ -215,13 +217,16 @@ describe('S6 closed-book choice and locked mode', () => {
     await screen.findByRole('heading', { name: 'Review what you missed' });
     const links = screen.getAllByRole('link', { name: /^Learn more:/ });
     expect(links.length).toBeGreaterThan(0);
-    const before = (await dump(handle)).learningEvents!.filter((e) => e['type'] === 'learnMoreOpened').length;
+    const earlierOpens = (await dump(handle)).learningEvents!.filter((e) => e['type'] === 'learnMoreOpened');
+    const before = earlierOpens.length;
+    const earlierIds = new Set(earlierOpens.map((e) => e['id']));
     await user.click(links[0]!);
     await waitFor(async () => {
       const opened = (await dump(handle)).learningEvents!.filter((e) => e['type'] === 'learnMoreOpened');
       expect(opened.length).toBe(before + 1);
-      expect(opened.at(-1)).toMatchObject({ moduleId: sgModule.id });
-      expect(opened.at(-1)!['attemptId']).toBeTruthy();
+      const added = opened.filter((e) => !earlierIds.has(e['id']));
+      expect(added[0]).toMatchObject({ moduleId: sgModule.id });
+      expect(added[0]!['attemptId']).toBeTruthy();
     });
     expect((await handle.store.notes.list(actorFor('staff', keys), { moduleId: sgModule.id })).length).toBe(1);
     document.removeEventListener('click', stop);
@@ -335,7 +340,12 @@ describe('S6 read aloud', () => {
   it('shows no Read this aloud button on a question when Read aloud is off', async () => {
     const user = userEvent.setup();
     stubSpeech();
-    await renderRoute(quizPath, 'staff', { prepare: lessonsDone });
+    await renderRoute(quizPath, 'staff', {
+      prepare: async (ctx) => {
+        await lessonsDone(ctx);
+        await ctx.handle.store.me.updatePrefs(actorFor('staff', ctx.keys), { readAloud: false });
+      },
+    });
     await startOpen(user);
     expect(screen.queryByRole('button', { name: 'Read this aloud' })).toBeNull();
   });

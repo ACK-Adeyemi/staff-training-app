@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { RuleError } from '@sta/data';
 import { Badge, Button, ChoiceList, Icon, PageHeader, Stepper } from '@sta/ui';
 import {
   answeredQuestionIds,
+  closedBookChoiceApplies,
   retakesLeft,
   visibleLearnMore,
   type Attempt,
@@ -11,7 +13,10 @@ import {
   type Question,
 } from '@sta/domain';
 import type { MessageKey } from '@sta/content';
-import { useActor, useStore, useT } from '../../app/hooks';
+import { useActor, useClock, useStore, useT } from '../../app/hooks';
+import { ConfirmDialog } from './ConfirmDialog';
+import { NotesPanel } from './Notes';
+import { ReadAloud } from './ReadAloud';
 import { LearnMoreGroups } from './LearnMoreList';
 import { LearningFrame } from './LearningFrame';
 import { useModuleId, type LearningData } from './learningQueries';
@@ -59,6 +64,10 @@ function QuestionView({
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [error, setError] = useState<MessageKey | null>(null);
   const [busy, setBusy] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
+  // Notes count as shown for the whole question once the panel has been opened (it costs the bonus XP).
+  const [notesSeen, setNotesSeen] = useState(false);
+  const closed = attempt.mode === 'closed';
   const feedbackRef = useRef<HTMLElement>(null);
   useEffect(() => {
     if (feedback) feedbackRef.current?.focus();
@@ -93,6 +102,7 @@ function QuestionView({
             attemptId: attempt.id,
             questionId: question.id,
             choiceIds: nextPath,
+            notesVisible: notesSeen,
           });
           setPath(nextPath);
           setFeedback({ correct: res.correct, choice, final: true });
@@ -102,6 +112,7 @@ function QuestionView({
           attemptId: attempt.id,
           questionId: question.id,
           optionId: id,
+          notesVisible: notesSeen,
         });
         setFeedback({ correct: res.correct, chosenOptionId: id, final: true });
       }
@@ -137,6 +148,12 @@ function QuestionView({
       .learnMoreOpened(actor, { moduleId: module.id, questionId: question.id, linkId: l.id, attemptId: attempt.id })
       .catch(() => undefined);
   };
+  // Read aloud covers the question and its answers only, never the learner's notes.
+  const spokenText = [
+    question.prompt,
+    ...(question.type === 'scenario' && step ? [step.text] : []),
+    ...items.map((i) => i.label),
+  ].join('. ');
   const correctOptionIds = options.filter((o) => o.correct).map((o) => o.id);
 
   return (
@@ -147,9 +164,37 @@ function QuestionView({
         label={t('staff.quiz.question', { current: index + 1, total })}
         progressLabel={t('staff.quiz.progress')}
       />
+      {closed ? (
+        <p data-testid="notes-locked" className="my-3 flex items-center gap-2 font-semibold">
+          <Icon name="alert" />
+          <span>{t('staff.quiz.notesLocked')}</span>
+        </p>
+      ) : (
+        <div className="my-3">
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setNotesSeen(true);
+              setNotesOpen(true);
+            }}
+          >
+            {notesSeen ? t('staff.quiz.notesShown') : t('staff.quiz.notesHidden')}
+          </Button>
+          <NotesPanel
+            module={module}
+            open={notesOpen}
+            onClose={() => {
+              setNotesOpen(false);
+            }}
+          />
+        </div>
+      )}
       <h2 data-testid="question-prompt" className="my-4 text-xl font-bold">
         {question.prompt}
       </h2>
+      <div className="mb-3">
+        <ReadAloud text={spokenText} />
+      </div>
       {question.type === 'scenario' && step ? <p className="mt-0 text-lg">{step.text}</p> : null}
       {question.type !== 'scenario' && feedback ? (
         <ChoiceList
@@ -244,8 +289,25 @@ function Runner({ data }: { data: LearningData }) {
   const store = useStore();
   const actor = useActor();
   const navigate = useNavigate();
-  const { module, attempts, events } = data;
+  const clock = useClock();
+  const queryClient = useQueryClient();
+  const { module, attempts, events, person } = data;
   const unfinished = attempts.find((a) => a.finishedAt === undefined);
+  const [mode, setMode] = useState<'open' | 'closed' | null>(null);
+  const [leaving, setLeaving] = useState(false);
+  const competitions = useQuery({
+    queryKey: ['competitions', actor.userId],
+    queryFn: () => store.competitions.list(actor).catch(() => []),
+  });
+  const now = clock.now();
+  // Live closed-book competitions the person can enter for this module. A closed-book-only module needs no choice.
+  const closedBookNames =
+    module.quiz.notesInQuiz === 'closedBookOnly' || unfinished
+      ? []
+      : (competitions.data ?? [])
+          .filter((c) => closedBookChoiceApplies([c], person, module.id, now))
+          .map((c) => c.name);
+  const mustChoose = closedBookNames.length > 0;
   const finishedCount = attempts.filter((a) => a.finishedAt !== undefined).length;
   const [attempt, setAttempt] = useState<Attempt | null>(null);
   const [index, setIndex] = useState(0);
@@ -257,7 +319,7 @@ function Runner({ data }: { data: LearningData }) {
     setBusy(true);
     setError(null);
     try {
-      const a = await store.learning.startAttempt(actor, module.id);
+      const a = await store.learning.startAttempt(actor, module.id, mustChoose && mode ? { mode } : undefined);
       const answered = answeredQuestionIds(a, events);
       const first = a.questionIds.findIndex((q) => !answered.has(q));
       setIndex(first === -1 ? a.questionIds.length : first);
@@ -269,11 +331,25 @@ function Runner({ data }: { data: LearningData }) {
     }
   };
 
+  const leave = async (a: Attempt) => {
+    setBusy(true);
+    try {
+      await store.learning.abandonAttempt(actor, a.id);
+      await queryClient.invalidateQueries({ queryKey: ['learning'] });
+      await navigate(`/staff/module/${module.id}`);
+    } catch (e) {
+      setLeaving(false);
+      setError(ruleKey(e));
+      setBusy(false);
+    }
+  };
+
   const finish = async (a: Attempt) => {
     setBusy(true);
     setError(null);
     try {
       await store.learning.finishAttempt(actor, a.id);
+      await queryClient.invalidateQueries({ queryKey: ['learning'] });
       await navigate(`/staff/module/${module.id}/done`);
     } catch (e) {
       setError(ruleKey(e));
@@ -294,8 +370,28 @@ function Runner({ data }: { data: LearningData }) {
         {module.quiz.maxRetakes !== 0 ? <p>{t('staff.quiz.introRetakes')}</p> : null}
         {!canStart ? <p role="alert">{t('staff.quiz.noRetakesLeft')}</p> : null}
         {error ? <p role="alert">{t(error)}</p> : null}
+        {mustChoose ? (
+          <>
+            <p>{t('staff.quiz.modeIntro', { names: closedBookNames.join(', ') })}</p>
+            <ChoiceList
+              name="quiz-mode"
+              legend={t('staff.quiz.modeTitle')}
+              type="single"
+              radioGroup
+              options={[
+                { id: 'closed', label: t('staff.quiz.modeClosed') },
+                { id: 'open', label: t('staff.quiz.modeOpen') },
+              ]}
+              value={mode ? [mode] : []}
+              onChange={([id]) => {
+                if (id === 'closed' || id === 'open') setMode(id);
+              }}
+              stateLabels={{ correct: '', incorrect: '' }}
+            />
+          </>
+        ) : null}
         <Button
-          disabled={!canStart || busy}
+          disabled={!canStart || busy || (mustChoose && mode === null)}
           onClick={() => {
             void start();
           }}
@@ -309,6 +405,34 @@ function Runner({ data }: { data: LearningData }) {
   const total = attempt.questionIds.length;
   const qid = attempt.questionIds[index];
   const question = module.questions.find((q) => q.id === qid);
+  const leaveControl = (
+    <>
+      <div className="mt-6">
+        <Button
+          variant="quiet"
+          onClick={() => {
+            setLeaving(true);
+          }}
+        >
+          {t('staff.quiz.leave')}
+        </Button>
+      </div>
+      <ConfirmDialog
+        open={leaving}
+        title={t('staff.quiz.leaveTitle')}
+        body={t('staff.quiz.leaveBody')}
+        confirmLabel={t('staff.quiz.leaveYes')}
+        cancelLabel={t('staff.quiz.leaveStay')}
+        busy={busy}
+        onCancel={() => {
+          setLeaving(false);
+        }}
+        onConfirm={() => {
+          void leave(attempt);
+        }}
+      />
+    </>
+  );
   if (!qid || !question) {
     return (
       <>
@@ -322,24 +446,28 @@ function Runner({ data }: { data: LearningData }) {
         >
           {t('staff.quiz.finish')}
         </Button>
+        {leaveControl}
       </>
     );
   }
   const isLast = index >= total - 1;
   return (
-    <QuestionView
-      key={qid}
-      data={data}
-      attempt={attempt}
-      question={question}
-      index={index}
-      total={total}
-      isLast={isLast}
-      onNext={() => {
-        if (isLast) void finish(attempt);
-        else setIndex(index + 1);
-      }}
-    />
+    <>
+      <QuestionView
+        key={qid}
+        data={data}
+        attempt={attempt}
+        question={question}
+        index={index}
+        total={total}
+        isLast={isLast}
+        onNext={() => {
+          if (isLast) void finish(attempt);
+          else setIndex(index + 1);
+        }}
+      />
+      {leaveControl}
+    </>
   );
 }
 

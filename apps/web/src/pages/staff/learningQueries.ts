@@ -58,7 +58,11 @@ export function useLearning(moduleId: string) {
         client,
         events,
         attempts: allAttempts.filter(
-          (a) => a.personId === person.id && a.moduleId === module.id && a.moduleVersion === module.version,
+          (a) =>
+            a.personId === person.id &&
+            a.moduleId === module.id &&
+            a.moduleVersion === module.version &&
+            a.abandoned !== true,
         ),
         evidence: allEvidence.filter((e) => e.personId === person.id && e.moduleId === module.id),
         overlays: overlaysForPerson(allOverlays, person, module.id),

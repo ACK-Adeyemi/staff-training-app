@@ -59,7 +59,8 @@ test('Jade takes notes, answers Safer sleep closed-book with notes locked, sees 
   // Open Safer sleep from Learn, write a note in the first lesson, then finish the lessons.
   await page.goto('./#/staff/learn');
   await page.getByRole('link', { name: 'Safer sleep' }).click();
-  await page.getByRole('link', { name: /^Start/ }).click();
+  // The seed has Jade past Safer sleep already, so open its first lesson from the list rather than a Start link.
+  await page.getByRole('region', { name: 'Lessons' }).getByRole('link').first().click();
   await page.getByRole('button', { name: 'Add note' }).click();
   const sheet = page.getByRole('dialog', { name: 'Add note' });
   await expect(sheet).toContainText('Safer sleep');
@@ -78,6 +79,10 @@ test('Jade takes notes, answers Safer sleep closed-book with notes locked, sees 
   await page.goto('./#/staff/learn');
   await page.getByRole('link', { name: 'Safer sleep' }).click();
   await finishLessons(page);
+
+  // The seed already holds some closed-book history; only this attempt's answers are counted below.
+  const seeded = new Set((await closedAnswers(page)).map((e) => e['id']));
+  const mine = async () => (await closedAnswers(page)).filter((e) => !seeded.has(e['id']));
 
   // Closed-book quiz.
   await page.getByRole('link', { name: /Start quiz/ }).click();
@@ -110,10 +115,12 @@ test('Jade takes notes, answers Safer sleep closed-book with notes locked, sees 
   for (const l of withLinks) await expect(page.locator(`a[href="${l.url}"]`).first()).toBeVisible();
 
   // Counted: every closed answer is stored with notes hidden.
-  const afterClosed = await closedAnswers(page);
+  const afterClosed = await mine();
   expect(afterClosed).toHaveLength(total);
   expect(afterClosed.every((e) => e['notesVisible'] === false)).toBe(true);
-  const attempts = (await readStore(page, 'attempts')).filter((a) => a['mode'] === 'closed');
+  const attempts = (await readStore(page, 'attempts')).filter(
+    (a) => a['mode'] === 'closed' && a['id'] === afterClosed[0]?.['attemptId'],
+  );
   expect(attempts.some((a) => a['finishedAt'])).toBe(true);
 
   // Open-book attempt on another module: the notes control is available and the closed count does not move.
@@ -129,7 +136,7 @@ test('Jade takes notes, answers Safer sleep closed-book with notes locked, sees 
   await expect(page.getByRole('button', { name: 'Notes hidden: bonus XP' })).toBeVisible();
   await answerQuestion(page, await question(page, eating), true);
   await expect(page.getByRole('region', { name: 'Feedback' })).toBeVisible();
-  expect(await closedAnswers(page)).toHaveLength(total);
+  expect(await mine()).toHaveLength(total);
 });
 
 test('Leave this attempt ends a closed attempt without a score and unlocks the notes', async ({ page }) => {

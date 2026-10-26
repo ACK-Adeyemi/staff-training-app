@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button, Markdown, PageHeader, Stepper } from '@sta/ui';
-import type { ContentBlock, Lesson } from '@sta/domain';
+import type { ContentBlock, Lesson, Module } from '@sta/domain';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { LearnMoreGroups } from './LearnMoreList';
 import { ReadAloud } from './ReadAloud';
 import { LearningFrame } from './LearningFrame';
-import { useModuleId } from './learningQueries';
+import { NoteSheet, NotesButton } from './Notes';
 import { focusLink } from './styles';
 
 function Block({
@@ -77,19 +78,14 @@ function blockText(block: ContentBlock | undefined): string {
   }
 }
 
-function Player({
-  moduleId,
-  lesson,
-  organisationName,
-}: {
-  moduleId: string;
-  lesson: Lesson;
-  organisationName: string;
-}) {
+function Player({ module, lesson, organisationName }: { module: Module; lesson: Lesson; organisationName: string }) {
   const t = useT();
   const store = useStore();
   const actor = useActor();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const moduleId = module.id;
+  const [adding, setAdding] = useState(false);
   const [step, setStep] = useState(0);
   const [ticked, setTicked] = useState<Record<number, boolean>>({});
   const [busy, setBusy] = useState(false);
@@ -104,6 +100,8 @@ function Player({
     setFailed(false);
     try {
       await store.learning.recordLesson(actor, { moduleId, lessonId: lesson.id, kind: 'completed' });
+      // Refresh first, so the overview never shows the old progress and offers a lesson that is already done.
+      await queryClient.invalidateQueries({ queryKey: ['learning'] });
       await navigate(`/staff/module/${moduleId}`);
     } catch {
       setFailed(true);
@@ -177,6 +175,24 @@ function Player({
           </Button>
         )}
       </div>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <Button
+          variant="secondary"
+          onClick={() => {
+            setAdding(true);
+          }}
+        >
+          {t('notes.add')}
+        </Button>
+        <NotesButton module={module} />
+      </div>
+      <NoteSheet
+        module={module}
+        target={adding ? { lessonId: lesson.id } : null}
+        onClose={() => {
+          setAdding(false);
+        }}
+      />
       <p className="mt-4">
         <a
           href={`#/staff/module/${moduleId}`}
@@ -192,7 +208,6 @@ function Player({
 /** S5. */
 export function LessonPlayer() {
   const t = useT();
-  const moduleId = useModuleId();
   const { lessonId } = useParams();
   return (
     <LearningFrame>
@@ -206,7 +221,7 @@ export function LessonPlayer() {
             </>
           );
         }
-        return <Player key={lesson.id} moduleId={moduleId} lesson={lesson} organisationName={client.displayName} />;
+        return <Player key={lesson.id} module={module} lesson={lesson} organisationName={client.displayName} />;
       }}
     </LearningFrame>
   );

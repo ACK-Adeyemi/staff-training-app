@@ -1,9 +1,8 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Badge, Button, Card, Icon, LinkButton, PageHeader, Sheet } from '@sta/ui';
-import { useActor, useStore, useT } from '../../app/hooks';
+import { Badge, Card, Icon, LinkButton, PageHeader } from '@sta/ui';
+import { useT } from '../../app/hooks';
 import { useDisplayPrefs } from '../../app/display/context';
 import { LearningFrame } from './LearningFrame';
+import { NotesButton } from './Notes';
 import { useModuleId } from './learningQueries';
 import { focusLink } from './styles';
 
@@ -15,54 +14,6 @@ function renewalText(months: number, t: ReturnType<typeof useT>): string {
         : t('staff.module.renewYears', { count: months / 12 })
       : t('staff.module.renewMonths', { count: months });
   return t('staff.module.renewEvery', { period });
-}
-
-/** The entry point to the learner's private notes for this course; adding and editing notes arrive with the lesson player. */
-function NotesButton({ moduleId, title }: { moduleId: string; title: string }) {
-  const t = useT();
-  const store = useStore();
-  const actor = useActor();
-  const [open, setOpen] = useState(false);
-  const notes = useQuery({
-    queryKey: ['moduleNotes', actor.userId, moduleId],
-    queryFn: () => store.notes.list(actor, { moduleId }),
-    enabled: open,
-  });
-  return (
-    <>
-      <Button
-        variant="secondary"
-        data-testid="module-notes-button"
-        onClick={() => {
-          setOpen(true);
-        }}
-      >
-        {t('staff.module.notes')}
-      </Button>
-      <Sheet
-        open={open}
-        title={t('staff.module.notesFor', { course: title })}
-        onClose={() => {
-          setOpen(false);
-        }}
-      >
-        {open ? (
-          <>
-            <p className="mt-0">{t('notes.private')}</p>
-            {notes.isError ? <p role="alert">{t('notes.lockedInQuiz')}</p> : null}
-            {notes.data && notes.data.length === 0 ? <p>{t('notes.empty')}</p> : null}
-            <ul className="m-0 flex list-none flex-col gap-2 p-0">
-              {(notes.data ?? []).map((n) => (
-                <li key={n.id}>
-                  <Card>{n.body}</Card>
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : null}
-      </Sheet>
-    </>
-  );
 }
 
 /** S4. */
@@ -97,7 +48,7 @@ export function ModuleOverview() {
               {!allLessonsDone ? <p className="mb-0 text-sm">{t('staff.module.quizHint')}</p> : null}
             </div>
             <div className="mb-4">
-              <NotesButton moduleId={module.id} title={module.title} />
+              <NotesButton module={module} />
             </div>
             <section aria-labelledby={`lessons-${moduleId}`}>
               <h2 id={`lessons-${moduleId}`} className="text-lg font-bold">
