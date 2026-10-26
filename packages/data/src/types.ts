@@ -8,6 +8,9 @@ import type {
   Attachment,
   Attempt,
   AuditEvent,
+  FileAttachment,
+  ModuleDraft,
+  ModuleVersion,
   BoardId,
   Category,
   Client,
@@ -567,6 +570,55 @@ export interface AiService {
   explain(ctx: ActorContext, input: { moduleId: Id; lessonId: string }): Promise<{ label: string; text: string }>;
 }
 
+/** A Module without the fields the data layer owns. `siteId` makes an own module belong to one site. */
+export type ModuleInput = Omit<Module, 'id' | 'owner' | 'status' | 'version' | 'updatedAt' | 'duplicatedFrom'> & {
+  siteId?: Id;
+};
+/** A link added to a provider module: a web address or a learning document of the same client. */
+export type LinkInput = { id: string; title: string; url: string } | { id: string; title: string; attachmentId: Id };
+export type FileUpload = {
+  purpose: 'certificate' | 'ticketScreenshot' | 'learningDocument';
+  title: string;
+  mime: string;
+  data: Uint8Array;
+  personId?: Id;
+  siteId?: Id;
+  alt?: string;
+  redacted?: boolean;
+};
+
+/** The module builder (M3 assumptions 11 to 17). Every write is one batch and writes one audit event. */
+export interface AuthoringService {
+  /** A never-published own module (provider actors: a provider module): status draft, version 1. */
+  create(ctx: ActorContext, input: ModuleInput): Promise<Module>;
+  /** Never runs the publish checklist. A published module keeps its edits in a ModuleDraft. */
+  saveDraft(ctx: ActorContext, moduleId: Id, input: ModuleInput): Promise<Module>;
+  /** Refused with RuleError('checklistFailed') until the checklist passes. `reassign` asks earlier completers again. */
+  publish(
+    ctx: ActorContext,
+    moduleId: Id,
+    options: { reassign: boolean },
+  ): Promise<{ module: Module; reassigned: Assignment[] }>;
+  duplicate(ctx: ActorContext, moduleId: Id): Promise<Module>;
+  archive(ctx: ActorContext, moduleId: Id): Promise<Module>;
+  /** RuleError('hasCompletions') once anyone has completed the module. */
+  remove(ctx: ActorContext, moduleId: Id): Promise<void>;
+  exportJson(ctx: ActorContext, moduleId: Id): Promise<string>;
+  /** Snapshots of earlier published versions, oldest first. */
+  versions(ctx: ActorContext, moduleId: Id): Promise<ModuleVersion[]>;
+  getVersion(ctx: ActorContext, moduleId: Id, version: number): Promise<Module>;
+  drafts: { get(ctx: ActorContext, moduleId: Id): Promise<ModuleDraft | null> };
+}
+
+export interface LinkOverlaysService {
+  /** Upserts the one overlay for the target. The data layer fills publisher, kind, language and showFor. */
+  save(
+    ctx: ActorContext,
+    input: { moduleId: Id; questionId?: string; lessonId?: string; links: LinkInput[] },
+  ): Promise<ClientLinkOverlay>;
+  remove(ctx: ActorContext, overlayId: Id): Promise<void>;
+}
+
 export interface DataStore {
   clients: WriteRepo<Client>;
   sites: RemovableRepo<Site>;
@@ -595,13 +647,25 @@ export interface DataStore {
   outbox: AppendRepo<OutboxMessage>;
   /** The learning stores below are read-only for actors; writes go through the operations. */
   modules: ReadRepo<Module>;
-  attachments: ReadRepo<Attachment>;
+  attachments: ReadRepo<Attachment> & {
+    /** Checks the type by its first bytes, the size (10 MB a file, 50 MB in all) and image metadata. */
+    upload(ctx: ActorContext, input: FileUpload): Promise<FileAttachment>;
+    /** The owner, or an approver, may remove a file nobody has submitted yet. */
+    remove(ctx: ActorContext, id: Id): Promise<void>;
+  };
+  authoring: AuthoringService;
+  linkOverlays: LinkOverlaysService;
   clientLinkOverlays: ReadRepo<ClientLinkOverlay>;
   assignments: ReadRepo<Assignment> & {
     /** All or nothing. People who already have an open assignment for the module are skipped and reported. */
     assign(
       ctx: ActorContext,
       input: { moduleId: Id; personIds: Id[]; dueAt: string },
+    ): Promise<{ created: Assignment[]; skipped: { personId: Id; reason: 'alreadyAssigned' }[] }>;
+    /** One batch: one module assignment per person and group module; open duplicates are skipped and reported. */
+    assignGroup(
+      ctx: ActorContext,
+      input: { groupId: Id; personIds: Id[]; dueAt: string },
     ): Promise<{ created: Assignment[]; skipped: { personId: Id; reason: 'alreadyAssigned' }[] }>;
   };
   learningEvents: ReadRepo<LearningEvent>;

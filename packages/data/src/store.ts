@@ -15,6 +15,7 @@ import { createOperations } from './ops';
 import { createEngagementOperations } from './engagementOps';
 import { createCompetitionOperations } from './competitionOps';
 import { createIdentityOperations } from './identityOps';
+import { createAuthoringOperations } from './authoringOps';
 import { createBillingOperations, simulateFailedPayment } from './billingOps';
 import { keyOf, validate, type RawBackend, type SettingsRecord, type WriteOp } from './backend';
 import {
@@ -279,6 +280,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const competitionOps = createCompetitionOperations(backend, options);
   const identity = createIdentityOperations(backend, options);
   const billingOps = createBillingOperations(backend, options);
+  const authoringOps = createAuthoringOperations(backend, options);
   const readOnly = (name: StoreName) => {
     const full = repo(backend, options, name);
     return { get: full.get, list: full.list };
@@ -313,9 +315,11 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     audit: { get: audit.get, list: audit.list, append: appendOnly(backend, options, 'audit') },
     outbox: { append: appendOnly(backend, options, 'outbox') },
     modules: readOnly('modules'),
-    attachments: readOnly('attachments'),
+    attachments: authoringOps.attachments,
+    authoring: authoringOps.authoring,
+    linkOverlays: authoringOps.linkOverlays,
     clientLinkOverlays: readOnly('clientLinkOverlays'),
-    assignments: { ...readOnly('assignments'), assign: ops.assign },
+    assignments: { ...readOnly('assignments'), assign: ops.assign, assignGroup: authoringOps.assignGroup },
     learningEvents: readOnly('learningEvents'),
     attempts: readOnly('attempts'),
     notifications: { ...readOnly('notifications'), markRead: ops.markRead },

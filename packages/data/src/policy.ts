@@ -406,7 +406,25 @@ export async function canReadRecord(call: Call, store: StoreName, r: Rec): Promi
   if (!visibleToTenant(call, store, tenant)) return false;
   const { actor } = call;
   if (store === 'notifications') return r['userId'] === actor.user.id;
-  if (store === 'modules' && call.side !== 'provider' && r['status'] !== 'published') return false;
+  if (store === 'modules' && call.side !== 'provider') {
+    const owner = r['owner'] as 'provider' | { clientId: string; siteId?: string };
+    // Drafts and archived modules are for the client admins who own them; everyone else sees published modules only.
+    if (
+      r['status'] !== 'published' &&
+      !(call.side === 'client' && owner !== 'provider' && holds(call, ['modules.view']))
+    ) {
+      return false;
+    }
+    // A site module is for that site: its people, and admins who can read modules there.
+    if (owner !== 'provider' && owner.siteId !== undefined) {
+      if (call.side === 'client') {
+        return canAny(call, ['modules.view'], { clientId: owner.clientId, siteIds: [owner.siteId] }, 'read');
+      }
+      const personId = call.actor.user.personId;
+      const person = personId ? await call.find<Person>('people', personId) : undefined;
+      return person !== undefined && [person.primarySiteId, ...person.additionalSiteIds].includes(owner.siteId);
+    }
+  }
   if (call.side === 'staff') {
     if (!STAFF_STORES.has(store)) return false;
     const personId = actor.user.personId;

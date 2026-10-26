@@ -402,7 +402,8 @@ export function runLearningContract(name: string, makeStore: (options: StoreOpti
           'notifications',
         ] as const) {
           expect(Object.keys(store[key]).sort(), key).not.toContain('put');
-          expect(Object.keys(store[key]).sort(), key).not.toContain('remove');
+          // attachments.remove is the owner-or-approver removal of an unsubmitted file (M3 chunk 8), not a generic remove.
+          if (key !== 'attachments') expect(Object.keys(store[key]).sort(), key).not.toContain('remove');
         }
       });
 

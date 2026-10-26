@@ -724,7 +724,7 @@ export function runAuthoringFilesContract(
       it('gives NotFound when another client reads or writes an own module, its drafts or its versions', async () => {
         const s = await setup();
         const m = await published(s);
-        await s.store.authoring.saveDraft(s.priya, m.id, goodInput(s.req, { title: 'v2' }));
+        await s.store.authoring.saveDraft(s.priya, m.id, goodInput(s.req, { title: 'Fire drills v2' }));
         await s.store.authoring.publish(s.priya, m.id, { reassign: false });
         for (const ctx of [s.beth, s.gina]) {
           await notFound(s.store.modules.get(ctx, m.id));

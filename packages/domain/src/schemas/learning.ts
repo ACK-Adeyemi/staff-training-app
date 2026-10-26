@@ -249,13 +249,19 @@ export type DocumentAttachment = z.infer<typeof documentAttachmentSchema>;
 export type FileAttachment = z.infer<typeof fileAttachmentSchema>;
 
 /** A draft of a published own module, one per module (M3 assumption 11). The module is not checked for publishing. */
-export const moduleDraftSchema = z.object({
-  moduleId: idSchema,
-  clientId: idSchema,
-  module: moduleSchema,
-  updatedBy: idSchema,
-  updatedAt: isoDateSchema,
-});
+export const moduleDraftSchema = z
+  .object({
+    moduleId: idSchema,
+    /** Required for a client's draft; a provider-authored module's draft has none (M3 chunk 8 decision). */
+    clientId: idSchema.optional(),
+    module: moduleSchema,
+    updatedBy: idSchema,
+    updatedAt: isoDateSchema,
+  })
+  .refine((d) => d.module.owner === 'provider' || d.clientId !== undefined, {
+    message: 'A client draft needs a clientId',
+    path: ['clientId'],
+  });
 export type ModuleDraft = z.infer<typeof moduleDraftSchema>;
 
 /** A snapshot of a previously published version, key `moduleId:version`. */

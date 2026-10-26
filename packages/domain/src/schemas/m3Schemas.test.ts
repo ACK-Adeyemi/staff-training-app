@@ -171,13 +171,21 @@ describe('moduleSchema M3 additions', () => {
 });
 
 describe('moduleDraftSchema and moduleVersionSchema (assumption 11)', () => {
-  const module = moduleWith([mcq('m1')]);
+  // A client's own module: its draft must name the client. (A provider module's draft carries none; tested below.)
+  const module = { ...moduleWith([mcq('m1')]), owner: { clientId: id(2) } };
   const draft = { moduleId: id(1), clientId: id(2), module, updatedBy: id(3), updatedAt: at };
 
   it('accepts a draft keyed by module id and requires clientId', () => {
     expect(moduleDraftSchema.safeParse(draft).success).toBe(true);
     const { clientId: _c, ...bad } = draft;
     expect(moduleDraftSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it('lets a provider-authored module draft carry no clientId', () => {
+    const { clientId: _c, ...rest } = draft;
+    expect(moduleDraftSchema.safeParse({ ...rest, module: { ...module, owner: 'provider' as const } }).success).toBe(
+      true,
+    );
   });
 
   it('lets a draft hold a module that would fail the publish checks (no status checks)', () => {
