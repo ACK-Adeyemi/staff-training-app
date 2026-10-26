@@ -45,6 +45,13 @@ export const shellRoutes: NavEntry[] = [
   ...providerMore,
 ];
 
+/** M2 chunk 12 routes (display and Me). The full M2 route list is added to as chunks land. */
+export const displayRoutes: NavEntry[] = [
+  { hash: '#/staff/me', label: 'Me' },
+  { hash: '#/staff/me/display', label: 'Display and accessibility' },
+  { hash: '#/client/display', label: 'Display and accessibility' },
+];
+
 /** Narrow a possibly-null value or fail the test. */
 export function need<T>(value: T | null | undefined): T {
   if (value === null || value === undefined) throw new Error('Expected a value');
