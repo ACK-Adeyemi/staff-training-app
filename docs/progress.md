@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M3
 Milestone base commit: bb460c4
-Next step: M3 chunk 2 (domain: sites, leaderboards, calendar, rules, reminders).
+Next step: M3 chunk 2 (domain: sites, leaderboards, calendar, rules, reminders) per docs/plans/m3.md: test-writer then implementer.
 
 ## Milestones
 - [x] M0 Foundations
@@ -110,3 +110,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-26: M2 complete (chunk 17, reviews, fixes). Final commit 6425abe. M3 next.
 - 2026-10-26: M3 base bb460c4; planning.
 - 2026-10-26: M3 chunk 1 decisions, schemas, stores (IndexedDB v4), billing.manageAddOns, personas and derived account state landed, check.sh green.
+- 2026-10-26: M3 plan committed (b395acf); chunk 1 schemas, stores, personas landed (0bc8159), check.sh green. Stopping at a clean point; chunk 2 next.
