@@ -4,12 +4,12 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M2
 Milestone base commit: 7c4064d
-Next step: M2 chunk 2 (XP, levels, badges, weekly goal, history in domain) from docs/plans/m2.md. Chunk 1 done (13afbba).
+Next step: M2 chunk 3 (competitions, leaderboards, standing boards, prize in domain) from docs/plans/m2.md: test-writer then implementer. Chunks 1-2 done (13afbba, 1c6aa7c).
 
 ## Milestones
 - [x] M0 Foundations
 - [x] M1 Client story core
-- [ ] M2 Engagement (chunk 1 done)
+- [ ] M2 Engagement (chunks 1-2 done)
 - [ ] M3 Client admin depth
 - [ ] M4 Provider story
 - [ ] M5 Polish and demo readiness
@@ -17,7 +17,7 @@ Next step: M2 chunk 2 (XP, levels, badges, weekly goal, history in domain) from 
 - [ ] M7 Battle Room
 
 ## Current milestone chunks
-M2 (17 chunks, see docs/plans/m2.md 'Work chunks'); none done yet. Plan committed.
+M2 (17 chunks, see docs/plans/m2.md 'Work chunks'): chunks 1 and 2 done; 3 to 17 pending.
 M1 (all done):
 - [x] 1 M0 known issues and decisions
 - [x] 2 Learning schemas and quiz engine
@@ -61,3 +61,4 @@ M1 (final commit 5b87b6d, scripts/check.sh fully green): BP-1 refresher on 390x8
 - 2026-10-25: M1 chunk 11 C15 matrix and basic C8 landed. Visual review of test-results/matrix-print.png and matrix.pdf (A4 landscape, 2 pages): header, key, status words with icons and dates, team rows and repeating column headings are all readable; nav, Demo badge and buttons are hidden; no clipped columns. No problems found. Also fixed a test bug: the matrix people test compared against every client's people (now Little Acorns only).
 - 2026-10-25: M1 chunk 12 Track A spec, demo script and checklist landed.
 - 2026-10-25: M1 complete (chunks 1-12, reviews, fixes). Final commit 5b87b6d.
+- 2026-10-26: M2 base 7c4064d, plan docs/plans/m2.md (17 chunks); chunks 1 (schemas, 13afbba) and 2 (engagement domain, 1c6aa7c) landed.
