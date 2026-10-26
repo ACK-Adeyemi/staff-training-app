@@ -24,7 +24,7 @@ import type { AccountState } from './schemas/primitives';
 const NOW = new Date('2026-10-26T12:00:00.000Z');
 const perm = (permissionId: string): EffectivePermission => ({
   permissionId,
-  scopes: [{ type: 'client' } as EffectivePermission['scopes'][number]],
+  scopes: [{ type: 'all' }],
   sources: [],
 });
 const OWNER = [perm('billing.view'), perm('billing.manage'), perm('billing.manageAddOns')];

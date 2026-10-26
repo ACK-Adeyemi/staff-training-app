@@ -1,4 +1,5 @@
 // Training matrix and its CSV export. Plan "Domain package", Assumption 2.
+import { csvField } from '../exports/csv';
 import { personRequirementStatus, type RequirementStatusName } from '../requirements';
 import type { Evidence, EvidenceSubmission } from '../schemas/evidence';
 import type { Requirement } from '../schemas/packs';
@@ -69,10 +70,7 @@ export function trainingMatrix(input: MatrixInput): Matrix {
   return { columns, groups };
 }
 
-/** Stop spreadsheets running a cell as a formula. */
-const guard = (s: string): string => (/^[=+\-@\t\r]/.test(s) ? `'${s}` : s);
-const quote = (s: string): string => (/[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s);
-const field = (s: string): string => quote(guard(s));
+const field = csvField;
 
 const londonDate = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Europe/London',
