@@ -11,6 +11,9 @@ import { runFeedbackTicketsContract } from './feedbackTickets';
 import { runIdentityOrgContract } from './identityOrg';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
+import { runExportsRetentionContract } from './exportsRetention';
+import { runLeaderboardsThemesContract } from './leaderboardsThemes';
+import { runRemindersLeftoversContract } from './remindersLeftovers';
 import { runRulesRemindersContract } from './rulesReminders';
 import { runContractSuite } from './suite';
 
@@ -51,5 +54,17 @@ runFeedbackTicketsContract('indexeddb adapter', (options) =>
 );
 
 runRulesRemindersContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+
+runLeaderboardsThemesContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+
+runExportsRetentionContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+
+runRemindersLeftoversContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );

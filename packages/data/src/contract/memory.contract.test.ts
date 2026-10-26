@@ -10,6 +10,9 @@ import { runFeedbackTicketsContract } from './feedbackTickets';
 import { runIdentityOrgContract } from './identityOrg';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
+import { runExportsRetentionContract } from './exportsRetention';
+import { runLeaderboardsThemesContract } from './leaderboardsThemes';
+import { runRemindersLeftoversContract } from './remindersLeftovers';
 import { runRulesRemindersContract } from './rulesReminders';
 import { runContractSuite } from './suite';
 
@@ -36,3 +39,9 @@ runEvidenceFlowContract('memory adapter', (options) => Promise.resolve(createMem
 runFeedbackTicketsContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
 runRulesRemindersContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runLeaderboardsThemesContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runExportsRetentionContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runRemindersLeftoversContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
