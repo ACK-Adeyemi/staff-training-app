@@ -48,6 +48,19 @@ const ALL_STORES: StoreName[] = [
   'audit',
   'outbox',
   'settings',
+  'modules',
+  'attachments',
+  'assignments',
+  'learningEvents',
+  'attempts',
+  'notifications',
+  'clientLinkOverlays',
+  'notes',
+  'categories',
+  'modulePlacements',
+  'moduleGroups',
+  'competitions',
+  'standingBoardSettings',
 ];
 
 type Setup = { store: DataStore; admin: StoreHandle['admin']; fx: Fixture; options: StoreOptions };
@@ -267,18 +280,20 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const { store, fx } = await setup();
         const ctx = client(fx.ids.users.riverMgr, fx.ids.clients.ot);
         const colleague = await store.people.get(ctx, fx.ids.people.otRiver);
-        const updated = await store.people.put(ctx, { ...colleague, nickname: 'Oz' });
-        expect(updated.nickname).toBe('Oz');
+        const updated = await store.people.put(ctx, { ...colleague, qualificationLevel: 'Level 3' });
+        expect(updated.qualificationLevel).toBe('Level 3');
         const bank = await store.people.get(ctx, fx.ids.people.bank);
-        expect(await forbiddenReason(store.people.put(ctx, { ...bank, nickname: 'Floater' }))).toBe('permission');
+        expect(await forbiddenReason(store.people.put(ctx, { ...bank, qualificationLevel: 'Level 3' }))).toBe(
+          'permission',
+        );
       });
 
       it('lets the Group Admin update the person on two sites', async () => {
         const { store, fx } = await setup();
         const ctx = client(fx.ids.users.gina, fx.ids.clients.ot);
         const bank = await store.people.get(ctx, fx.ids.people.bank);
-        const updated = await store.people.put(ctx, { ...bank, nickname: 'Floater' });
-        expect(updated.nickname).toBe('Floater');
+        const updated = await store.people.put(ctx, { ...bank, qualificationLevel: 'Level 3' });
+        expect(updated.qualificationLevel).toBe('Level 3');
       });
     });
 
@@ -1254,10 +1269,14 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const ctx = client(fx.ids.users.priya, fx.ids.clients.a);
         const got = await store.people.get(ctx, fx.ids.people.jade);
         got.firstName = 'Changed';
-        got.prefs.sound = false;
         const again = await store.people.get(ctx, fx.ids.people.jade);
         expect(again.firstName).toBe('Jade');
-        expect(again.prefs.sound).toBe(true);
+        // Prefs are only read by the person themselves.
+        const own = { userId: fx.keys.users['jade'], side: 'staff' as const, clientId: fx.ids.clients.a, now: TODAY };
+        const mine = await store.people.get(own, fx.ids.people.jade);
+        const storedSound = mine.prefs.sound;
+        mine.prefs.sound = !storedSound;
+        expect((await store.people.get(own, fx.ids.people.jade)).prefs.sound).toBe(storedSound);
         const listed = await store.people.list(ctx);
         listed[0]!.firstName = 'Changed';
         expect((await store.people.list(ctx))[0]!.firstName).not.toBe('Changed');
@@ -1267,10 +1286,10 @@ export function runContractSuite(name: string, makeStore: (options: StoreOptions
         const { store, fx } = await setup();
         const ctx = client(fx.ids.users.priya, fx.ids.clients.a);
         const jade = await store.people.get(ctx, fx.ids.people.jade);
-        const mine = { ...jade, nickname: 'J' };
+        const mine = { ...jade, qualificationLevel: 'Level 3' };
         await store.people.put(ctx, mine);
-        mine.nickname = 'Changed later';
-        expect((await store.people.get(ctx, fx.ids.people.jade)).nickname).toBe('J');
+        mine.qualificationLevel = 'Changed later';
+        expect((await store.people.get(ctx, fx.ids.people.jade)).qualificationLevel).toBe('Level 3');
       });
 
       it('copies what bulkPut was given', async () => {

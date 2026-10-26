@@ -210,6 +210,7 @@ const role = {
   colour: '#2255aa',
   permissionIds: ['staff.view'],
   system: true,
+  systemKey: 'accountOwner',
   version: 1,
   updatedBy: USER,
   updatedAt: AT,

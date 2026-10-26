@@ -1,0 +1,528 @@
+{
+  "title": "What changed in September 2026",
+  "description": "The main changes in the September 2026 EYFS framework for staff: safer sleep, screen use, banned dogs, and who counts as regulated activity.",
+  "estimatedMinutes": 6,
+  "language": "en-GB",
+  "status": "published",
+  "version": 1,
+  "roleTags": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "Safer sleep and screen use",
+      "minutes": 3
+    },
+    {
+      "id": "lesson-2",
+      "title": "Banned dogs, volunteers and regulated activity",
+      "minutes": 3
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-wc-dogs",
+      "type": "trueFalse",
+      "prompt": "Banned dog breeds, including the XL Bully type, must not be kept or present on the premises at any time. True or false?",
+      "options": [
+        {
+          "id": "q-wc-dogs-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-wc-dogs-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. Dogs to which section 1 of the Dangerous Dogs Act 1991 applies, including the XL Bully type, must not be kept or present on the premises at any time.",
+      "sourceRef": "EYFS 3.82",
+      "learnMore": [
+        {
+          "id": "eyfs-3-82-q-wc-dogs",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.82, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "govuk-banned-dogs",
+          "title": "GOV.UK guidance on banned and restricted dog breeds",
+          "url": "https://www.gov.uk/controlling-your-dog-in-public/banned-or-restricted-dogs",
+          "publisher": "GOV.UK",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["what-changed"]
+    },
+    {
+      "id": "q-wc-dog-exempt",
+      "type": "trueFalse",
+      "prompt": "A banned dog is allowed on the premises if its owner has a certificate of exemption. True or false?",
+      "options": [
+        {
+          "id": "q-wc-dog-exempt-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-wc-dog-exempt-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. The requirement still applies if the dog's owner has a certificate of exemption issued under the Dangerous Dogs Act 1991.",
+      "sourceRef": "EYFS 3.82",
+      "learnMore": [
+        {
+          "id": "eyfs-3-82-q-wc-dog-exempt",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.82, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "govuk-banned-dogs",
+          "title": "GOV.UK guidance on banned and restricted dog breeds",
+          "url": "https://www.gov.uk/controlling-your-dog-in-public/banned-or-restricted-dogs",
+          "publisher": "GOV.UK",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["what-changed"]
+    },
+    {
+      "id": "q-wc-screen",
+      "type": "mcq",
+      "prompt": "What does the EYFS now say providers must do about children's screen use?",
+      "options": [
+        {
+          "id": "q-wc-screen-o1",
+          "text": "Have regard to the Government's guidance on children's screen use in early years settings",
+          "correct": true
+        },
+        {
+          "id": "q-wc-screen-o2",
+          "text": "Ban all screens",
+          "correct": false
+        },
+        {
+          "id": "q-wc-screen-o3",
+          "text": "Let each child decide how much screen time they have",
+          "correct": false
+        },
+        {
+          "id": "q-wc-screen-o4",
+          "text": "Nothing, screen use is not covered",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers must have regard to the guidance on children's screen use in early years settings. Your manager will tell you how your setting does this.",
+      "sourceRef": "EYFS 3.94",
+      "learnMore": [
+        {
+          "id": "eyfs-3-94-q-wc-screen",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=42",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.94, page 42",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["what-changed"]
+    },
+    {
+      "id": "q-wc-sleep-back",
+      "type": "mcq",
+      "prompt": "Which of these is part of the safer sleep requirements for children under 2?",
+      "options": [
+        {
+          "id": "q-wc-sleep-back-o1",
+          "text": "Placing children on their back in their own sleep space",
+          "correct": true
+        },
+        {
+          "id": "q-wc-sleep-back-o2",
+          "text": "Letting babies sleep on a sofa",
+          "correct": false
+        },
+        {
+          "id": "q-wc-sleep-back-o3",
+          "text": "Using a pillow for comfort",
+          "correct": false
+        },
+        {
+          "id": "q-wc-sleep-back-o4",
+          "text": "Leaving sleeping babies alone for short spells",
+          "correct": false
+        }
+      ],
+      "explanation": "Children under 2 must be placed on their back in their own separate sleep space. Babies aged 12 months and under sleep only in a cot.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-wc-sleep-back",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["what-changed"]
+    },
+    {
+      "id": "q-wc-sleep-six",
+      "type": "mcq",
+      "prompt": "A baby is under six months old. What must happen for every sleep?",
+      "options": [
+        {
+          "id": "q-wc-sleep-six-o1",
+          "text": "An adult must be with them in the same room",
+          "correct": true
+        },
+        {
+          "id": "q-wc-sleep-six-o2",
+          "text": "Staff check them from the next room",
+          "correct": false
+        },
+        {
+          "id": "q-wc-sleep-six-o3",
+          "text": "The cot is moved to a quiet corridor",
+          "correct": false
+        },
+        {
+          "id": "q-wc-sleep-six-o4",
+          "text": "The baby is checked at the start and end only",
+          "correct": false
+        }
+      ],
+      "explanation": "Babies under six months of age must always have an adult with them in the same room for every sleep. All children must also be within sight and hearing of staff.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-wc-sleep-six",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["what-changed"]
+    },
+    {
+      "id": "q-wc-volunteers",
+      "type": "mcq",
+      "prompt": "From September 2026, which volunteers need an enhanced criminal records check and barred list check?",
+      "options": [
+        {
+          "id": "q-wc-volunteers-o1",
+          "text": "Every volunteer aged 16 and over who works directly with children, lives on the premises or works there",
+          "correct": true
+        },
+        {
+          "id": "q-wc-volunteers-o2",
+          "text": "Only paid staff",
+          "correct": false
+        },
+        {
+          "id": "q-wc-volunteers-o3",
+          "text": "Only volunteers who stay overnight",
+          "correct": false
+        },
+        {
+          "id": "q-wc-volunteers-o4",
+          "text": "Only volunteers who have worked there for a year",
+          "correct": false
+        }
+      ],
+      "explanation": "Registered providers must get an enhanced criminal records check and barred list check for every person aged 16 and over, including all volunteers, who works directly with children, lives on the premises or works on the premises (with limited exceptions).",
+      "sourceRef": "EYFS 3.15",
+      "learnMore": [
+        {
+          "id": "eyfs-3-15-q-wc-volunteers",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=26",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.15, page 26",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["what-changed"]
+    },
+    {
+      "id": "q-wc-supervised",
+      "type": "trueFalse",
+      "prompt": "Volunteers can start work before their check comes back if someone supervises them. True or false?",
+      "options": [
+        {
+          "id": "q-wc-supervised-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-wc-supervised-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. Providers must not allow individuals to begin working or volunteering at the setting until they have received the applicant's enhanced criminal records and barred list check.",
+      "sourceRef": "EYFS 3.17",
+      "learnMore": [
+        {
+          "id": "eyfs-3-17-q-wc-supervised",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=26",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.17, page 26",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["what-changed"]
+    },
+    {
+      "id": "q-wc-regulated",
+      "type": "mcq",
+      "prompt": "Under the Crime and Policing Act 2026 change, when are paid or unpaid activities such as teaching, caring for or supervising children regulated activity?",
+      "options": [
+        {
+          "id": "q-wc-regulated-o1",
+          "text": "If carried out frequently, on more than 3 days in a 30-day period, or overnight",
+          "correct": true
+        },
+        {
+          "id": "q-wc-regulated-o2",
+          "text": "Only if the person is paid",
+          "correct": false
+        },
+        {
+          "id": "q-wc-regulated-o3",
+          "text": "Only if the person is alone with a child",
+          "correct": false
+        },
+        {
+          "id": "q-wc-regulated-o4",
+          "text": "Never for volunteers",
+          "correct": false
+        }
+      ],
+      "explanation": "The Crime and Policing Act 2026 removed the previous exemption for supervised unpaid activity. Activities are regulated activity if carried out frequently, on more than 3 days in a 30-day period, or overnight.",
+      "sourceRef": "EYFS 3.15",
+      "learnMore": [
+        {
+          "id": "eyfs-3-15-q-wc-regulated",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=26",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.15, page 26",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["what-changed"]
+    },
+    {
+      "id": "q-sc-wc-volunteer",
+      "type": "scenario",
+      "prompt": "A parent offers to help in the nursery every Tuesday and Thursday for the next month. They will read stories and help children at snack time.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-wc-volunteer-s1",
+            "text": "What should the manager do first?",
+            "choices": [
+              {
+                "id": "q-sc-wc-volunteer-s1-c1",
+                "text": "Treat it as possibly regulated activity and arrange the enhanced criminal records and barred list checks before they start",
+                "outcome": "best",
+                "feedback": "Yes. Helping on more than 3 days in a 30-day period counts as regulated activity, and checks must come back before they begin.",
+                "next": "q-sc-wc-volunteer-s2"
+              },
+              {
+                "id": "q-sc-wc-volunteer-s1-c2",
+                "text": "Let them start as they are a parent and only supervised",
+                "outcome": "poor",
+                "feedback": "The old exemption for supervised unpaid activity has been removed. Checks come first.",
+                "next": "q-sc-wc-volunteer-s2"
+              },
+              {
+                "id": "q-sc-wc-volunteer-s1-c3",
+                "text": "Let them start now and do the checks later",
+                "outcome": "poor",
+                "feedback": "Nobody may begin working or volunteering until the checks have been received.",
+                "next": "q-sc-wc-volunteer-s2"
+              }
+            ]
+          },
+          {
+            "id": "q-sc-wc-volunteer-s2",
+            "text": "The parent is waiting for their checks. A trip is planned tomorrow. What can they do?",
+            "choices": [
+              {
+                "id": "q-sc-wc-volunteer-s2-c1",
+                "text": "Wait until the checks have come back, and ask your manager about the trip",
+                "outcome": "best",
+                "feedback": "Right. They must not start until the checks are back. Occasional supervised trip helpers are an exception, so ask your manager."
+              },
+              {
+                "id": "q-sc-wc-volunteer-s2-c2",
+                "text": "Join as a regular helper with the children",
+                "outcome": "poor",
+                "feedback": "They must not start until the checks are back."
+              },
+              {
+                "id": "q-sc-wc-volunteer-s2-c3",
+                "text": "Do snack time help, as it is only eating and drinking",
+                "outcome": "poor",
+                "feedback": "Helping with eating or drinking counts as personal care."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Regular unpaid helpers can now count as regulated activity. Checks must be complete before anyone starts. Ask your manager when you are unsure.",
+      "sourceRef": "EYFS 3.17",
+      "learnMore": [
+        {
+          "id": "eyfs-3-17-q-sc-wc-volunteer",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=26",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.17, page 26",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["what-changed"]
+    },
+    {
+      "id": "q-sc-wc-dog",
+      "type": "scenario",
+      "prompt": "A visitor arrives at the nursery door with their dog, a large dog that looks like an XL Bully, and asks to come in to see their child's room.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-wc-dog-s1",
+            "text": "What do you do?",
+            "choices": [
+              {
+                "id": "q-sc-wc-dog-s1-c1",
+                "text": "Politely explain the dog cannot come onto the premises, and fetch your manager",
+                "outcome": "best",
+                "feedback": "Right. Banned breeds, including the XL Bully type, must not be present on the premises at any time.",
+                "next": "q-sc-wc-dog-s2"
+              },
+              {
+                "id": "q-sc-wc-dog-s1-c2",
+                "text": "Let the dog in as it seems friendly",
+                "outcome": "poor",
+                "feedback": "The rule applies however friendly the dog is.",
+                "next": "q-sc-wc-dog-s2"
+              },
+              {
+                "id": "q-sc-wc-dog-s1-c3",
+                "text": "Let it in if the owner shows an exemption certificate",
+                "outcome": "poor",
+                "feedback": "The requirement still applies with a certificate of exemption.",
+                "next": "q-sc-wc-dog-s2"
+              }
+            ]
+          },
+          {
+            "id": "q-sc-wc-dog-s2",
+            "text": "The visitor is upset. What next?",
+            "choices": [
+              {
+                "id": "q-sc-wc-dog-s2-c1",
+                "text": "Stay calm, offer to meet them outside, and tell your manager what happened",
+                "outcome": "best",
+                "feedback": "Good. Keep it calm and tell your manager."
+              },
+              {
+                "id": "q-sc-wc-dog-s2-c2",
+                "text": "Argue about the dog's breed",
+                "outcome": "poor",
+                "feedback": "Leave breed decisions to your manager."
+              },
+              {
+                "id": "q-sc-wc-dog-s2-c3",
+                "text": "Say nothing to anyone",
+                "outcome": "poor",
+                "feedback": "Tell your manager so it can be dealt with and recorded."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Banned breeds, including the XL Bully type, must never be on the premises, even with an exemption certificate.",
+      "sourceRef": "EYFS 3.82",
+      "learnMore": [
+        {
+          "id": "eyfs-3-82-q-sc-wc-dog",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.82, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "govuk-banned-dogs",
+          "title": "GOV.UK guidance on banned and restricted dog breeds",
+          "url": "https://www.gov.uk/controlling-your-dog-in-public/banned-or-restricted-dogs",
+          "publisher": "GOV.UK",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["what-changed"]
+    }
+  ],
+  "quiz": {
+    "mode": "mix",
+    "mixScenarioShare": 0.4,
+    "drawCount": 10,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "passMark": 80,
+    "maxRetakes": null,
+    "feedback": true,
+    "showSourceRef": true,
+    "notesInQuiz": "choice",
+    "learnMoreFor": "all"
+  },
+  "sourceAttribution": "Based on the Early Years Foundation Stage statutory framework for group and school-based providers (Department for Education, September 2026). Contains public sector information licensed under the Open Government Licence v3.0.",
+  "draftContent": true,
+  "verify": [
+    "Draft content: wording checked against the cached September 2026 EYFS PDF (paragraphs 3.15, 3.17, 3.82, 3.86, 3.94 and footnotes 20, 65, 66); page numbers are printed page numbers.",
+    "Which paragraphs are new or changed in September 2026 has not been checked against a change list from the DfE. The module teaches what the framework says, and the title assumes these are the headline changes.",
+    "The GOV.UK banned dogs URL (www.gov.uk/controlling-your-dog-in-public/banned-or-restricted-dogs) is from memory and could not be opened here. The screen use guidance link is not given because its address is not in the cached text; add it.",
+    "Regulated activity wording comes from footnote 20 of the framework. The Crime and Policing Act 2026 itself has not been read. The one-off trip helper exception in the scenario should be reviewed.",
+    "Open Government Licence attribution wording."
+  ]
+}

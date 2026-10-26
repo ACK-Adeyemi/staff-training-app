@@ -59,6 +59,15 @@ export default tseslint.config(
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
     },
   },
+  // Tests build fixtures and index into them; a wrong index fails the test, so non-null assertions are fine there.
+  // An underscore prefix marks a variable that is destructured only to leave it out of a copy.
+  {
+    files: ['**/*.test.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^_', argsIgnorePattern: '^_' }],
+    },
+  },
   { files: ['**/*.js', '**/*.mjs'], ...tseslint.configs.disableTypeChecked },
   {
     files: ['**/*.{ts,tsx}'],

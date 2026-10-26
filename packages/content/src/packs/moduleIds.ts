@@ -8,4 +8,5 @@ export const moduleIds = {
   whatChangedSeptember2026: contentId(204),
   newStarterInduction: contentId(205),
   foodHygiene: contentId(206),
+  saferSleep: contentId(207),
 } as const;

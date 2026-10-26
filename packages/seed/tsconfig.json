@@ -1,5 +1,5 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": { "types": ["node"], "noUncheckedIndexedAccess": false },
-  "include": ["src", "package.json"]
+  "include": ["src", "package.json", "../content/src/md-raw.d.ts"]
 }

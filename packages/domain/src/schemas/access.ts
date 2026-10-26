@@ -14,20 +14,41 @@ export type Permission = z.infer<typeof permissionSchema>;
 
 const level = z.enum(['none', 'view', 'manage']);
 
-export const roleSchema = z.object({
-  id: idSchema,
-  owner: z.union([z.literal('provider'), z.object({ clientId: idSchema })]),
-  name: z.string().min(1),
-  description: z.string(),
-  colour: z.string(),
-  permissionIds: z.array(z.string()),
-  system: z.boolean(),
-  version: z.number().int().positive(),
-  clientLevels: z.record(z.string(), level).optional(),
-  clientAllows: z.array(z.string()).optional(),
-  updatedBy: idSchema,
-  updatedAt: isoDateSchema,
-});
+export const providerRoleKeys = [
+  'providerOwner',
+  'providerCoOwner',
+  'providerAdmin',
+  'providerSupport',
+  'providerBilling',
+  'providerContentEditor',
+  'providerReadOnly',
+] as const;
+export const clientRoleKeys = ['accountOwner', 'groupAdmin', 'siteManager', 'supervisor', 'trainer', 'viewer'] as const;
+export const systemRoleKeySchema = z.enum([...providerRoleKeys, ...clientRoleKeys]);
+export type SystemRoleKey = z.infer<typeof systemRoleKeySchema>;
+/** The keys that mark the provider Owner and a client's Account Owner (never recognised by name). */
+export const OWNER_KEYS = { provider: 'providerOwner', client: 'accountOwner' } as const;
+
+export const roleSchema = z
+  .object({
+    id: idSchema,
+    owner: z.union([z.literal('provider'), z.object({ clientId: idSchema })]),
+    name: z.string().min(1),
+    description: z.string(),
+    colour: z.string(),
+    permissionIds: z.array(z.string()),
+    system: z.boolean(),
+    systemKey: systemRoleKeySchema.optional(),
+    version: z.number().int().positive(),
+    clientLevels: z.record(z.string(), level).optional(),
+    clientAllows: z.array(z.string()).optional(),
+    updatedBy: idSchema,
+    updatedAt: isoDateSchema,
+  })
+  .refine((r) => r.system === (r.systemKey !== undefined), {
+    message: 'systemKey is present if and only if system is true',
+    path: ['systemKey'],
+  });
 export type Role = z.infer<typeof roleSchema>;
 
 export const scopeSchema = z.discriminatedUnion('type', [

@@ -13,9 +13,13 @@ import {
   lastOwnerGuard,
   ulid,
   type AddOn,
+  type EffectiveEntitlements,
   type AddOnSubscription,
+  type Assignment,
   type AuditEvent,
   type Client,
+  OWNER_KEYS,
+  isAssignmentActive,
   type EffectivePermission,
   type Evidence,
   type EvidenceSubmission,
@@ -24,6 +28,7 @@ import {
   type Role,
   type RoleAssignment,
   type Scope,
+  type Subscription,
   type Site,
   type Target,
   type UserAccount,
@@ -48,7 +53,26 @@ const PROVIDER = 'provider';
 const UNKNOWN = '?';
 
 /** Stores whose records may be global (no clientId): pack-level and catalogue data. */
-const GLOBAL_STORES: ReadonlySet<StoreName> = new Set(['jobRoles', 'requirements', 'packages', 'addOns']);
+const GLOBAL_STORES: ReadonlySet<StoreName> = new Set(['jobRoles', 'requirements', 'packages', 'addOns', 'modules']);
+/** Learning stores actors can read but never write directly; writes go through the learning operations. */
+const READ_ONLY_STORES: ReadonlySet<StoreName> = new Set([
+  'modules',
+  'attachments',
+  'clientLinkOverlays',
+  'assignments',
+  'learningEvents',
+  'attempts',
+  'notifications',
+]);
+/** Readable by any client or staff actor of the owning client (record rules still apply). */
+const OPEN_TO_OWN_CLIENT: ReadonlySet<StoreName> = new Set([
+  'modules',
+  'attachments',
+  'clientLinkOverlays',
+  'notifications',
+]);
+/** Learning records that belong to one person; staff read only their own. */
+const PERSONAL_STORES: ReadonlySet<StoreName> = new Set(['assignments', 'learningEvents', 'attempts']);
 /** Stores only the provider writes (billing.write). */
 const PROVIDER_WRITE_ONLY: ReadonlySet<StoreName> = new Set([
   'subscriptions',
@@ -67,6 +91,13 @@ const STAFF_STORES: ReadonlySet<StoreName> = new Set([
   'evidenceSubmissions',
   'jobRoles',
   'requirements',
+  'modules',
+  'attachments',
+  'clientLinkOverlays',
+  'assignments',
+  'learningEvents',
+  'attempts',
+  'notifications',
 ]);
 
 const CLIENT_READ: Partial<Record<StoreName, string[]>> = {
@@ -84,6 +115,9 @@ const CLIENT_READ: Partial<Record<StoreName, string[]>> = {
   packages: ['billing.view'],
   addOns: ['billing.view'],
   audit: ['settings.view'],
+  assignments: ['assign.view'],
+  learningEvents: ['reports.view'],
+  attempts: ['reports.view'],
 };
 
 const PROVIDER_READ: Partial<Record<StoreName, string[]>> = {
@@ -99,6 +133,7 @@ const PROVIDER_READ: Partial<Record<StoreName, string[]>> = {
   packages: ['clients.read', 'billing.read'],
   addOns: ['clients.read', 'billing.read'],
   audit: ['audit.read'],
+  modules: ['content.read'],
   // evidence and evidenceSubmissions are never readable by the provider (Assumption 10)
   // users, roles and roleAssignments depend on whose they are (providerReadIds)
 };
@@ -130,7 +165,7 @@ const PROVIDER_REMOVE: Partial<Record<StoreName, string[]>> = {
   users: ['clients.delete'],
 };
 
-const forbid = (reason: ForbiddenReason): never => {
+export const forbid = (reason: ForbiddenReason): never => {
   throw new ForbiddenError(reason);
 };
 
@@ -211,10 +246,10 @@ export async function beginCall(backend: RawBackend, options: StoreOptions, ctx:
   return call;
 }
 
-const holds = (call: Call, ids: readonly string[]): boolean =>
+export const holds = (call: Call, ids: readonly string[]): boolean =>
   call.actor.perms.some((p) => ids.includes(p.permissionId));
 
-const canAny = (call: Call, ids: readonly string[], target: Target, mode: 'read' | 'write'): boolean =>
+export const canAny = (call: Call, ids: readonly string[], target: Target, mode: 'read' | 'write'): boolean =>
   ids.some((id) => can(call.actor.perms, id, target, mode));
 
 // ---------------------------------------------------------------- tenancy
@@ -235,6 +270,10 @@ export async function tenantOf(call: Call, store: StoreName, r: Rec): Promise<st
     case 'roleAssignments': {
       const user = await call.find<UserAccount>('users', r['userId'] as string);
       return user ? (user.clientId ?? PROVIDER) : UNKNOWN;
+    }
+    case 'modules': {
+      const owner = r['owner'] as 'provider' | { clientId: string };
+      return owner === 'provider' ? undefined : owner.clientId;
     }
     case 'packages':
     case 'addOns':
@@ -257,6 +296,13 @@ async function sitesOf(call: Call, store: StoreName, r: Rec): Promise<string[] |
       return [r['siteId'] as string];
     case 'evidence':
       return [r['siteIdAtTime'] as string];
+    case 'learningEvents':
+    case 'attempts':
+      return [r['siteId'] as string];
+    case 'assignments': {
+      const person = await call.find<Person>('people', r['personId'] as string);
+      return person ? [person.primarySiteId, ...person.additionalSiteIds] : undefined;
+    }
     case 'users': {
       const personId = r['personId'] as string | undefined;
       const person = personId ? await call.find<Person>('people', personId) : undefined;
@@ -290,8 +336,10 @@ export async function canReadStore(call: Call, store: StoreName): Promise<boolea
     case 'staff':
       return STAFF_STORES.has(store);
     case 'provider':
-      return holds(call, await providerReadIds(call, store, undefined));
+      // Everyone can look for their own notifications; the record filter keeps it to theirs.
+      return store === 'notifications' || holds(call, await providerReadIds(call, store, undefined));
     case 'client': {
+      if (OPEN_TO_OWN_CLIENT.has(store)) return true;
       if (store === 'clients' || store === 'jobRoles' || store === 'requirements') return true;
       const ids = CLIENT_READ[store];
       return ids !== undefined && holds(call, ids);
@@ -303,9 +351,12 @@ export async function canReadRecord(call: Call, store: StoreName, r: Rec): Promi
   const tenant = await tenantOf(call, store, r);
   if (!visibleToTenant(call, store, tenant)) return false;
   const { actor } = call;
+  if (store === 'notifications') return r['userId'] === actor.user.id;
+  if (store === 'modules' && call.side !== 'provider' && r['status'] !== 'published') return false;
   if (call.side === 'staff') {
     if (!STAFF_STORES.has(store)) return false;
     const personId = actor.user.personId;
+    if (PERSONAL_STORES.has(store)) return personId !== undefined && r['personId'] === personId;
     switch (store) {
       case 'people':
         return r['id'] === personId;
@@ -324,7 +375,9 @@ export async function canReadRecord(call: Call, store: StoreName, r: Rec): Promi
     ...(siteIds ? { siteIds } : {}),
   };
   if (call.side === 'provider') return canAny(call, await providerReadIds(call, store, r), target, 'read');
-  if (store === 'clients' || store === 'jobRoles' || store === 'requirements') return true;
+  if (store === 'clients' || store === 'jobRoles' || store === 'requirements' || OPEN_TO_OWN_CLIENT.has(store)) {
+    return true;
+  }
   const ids = CLIENT_READ[store];
   return ids !== undefined && canAny(call, ids, target, 'read');
 }
@@ -359,7 +412,7 @@ function requireWrite(
 }
 
 /** Account state for client-side writes: creating things is `authoring`; everything else needs full compliance use. */
-function checkAccountState(call: Call, isCreate: boolean): void {
+export function checkAccountState(call: Call, isCreate: boolean): void {
   const client = call.actor.client;
   if (!client) return;
   const feature = isCreate ? 'authoring' : 'coreCompliance';
@@ -372,7 +425,7 @@ const sortedKeys = (o: object): unknown => Object.fromEntries(Object.entries(o).
 
 const sameJson = (a: unknown, b: unknown): boolean => JSON.stringify(a) === JSON.stringify(b);
 
-function audit(
+export function audit(
   call: Call,
   clientId: string | undefined,
   action: string,
@@ -412,6 +465,7 @@ export async function authorizePut(
   if (store === 'roleAssignments') {
     return putAssignment(call, rec as unknown as RoleAssignment, existing as RoleAssignment | undefined);
   }
+  if (READ_ONLY_STORES.has(store)) return forbid('permission');
   // Evidence is written only by the approval flow (and seed loading through DemoAdmin.bulkPut).
   if (store === 'evidence') return forbid('permission');
   if (store === 'evidenceSubmissions') {
@@ -450,11 +504,26 @@ export async function authorizePut(
   if (call.side !== 'provider') {
     checkAccountState(call, isCreate && (store === 'people' || store === 'users'));
   }
-  return { record: rec, extra: [] };
+  return { record: rec, extra: store === 'people' ? await cancelOpenAssignments(call, rec) : [] };
+}
+
+/** Archiving a person cancels their open assignments in the same batch (plan Data package). */
+async function cancelOpenAssignments(call: Call, person: Rec): Promise<WriteOp[]> {
+  if (person['status'] !== 'archived') return [];
+  const open = (await call.all<Assignment>('assignments')).filter(
+    (a) => a.personId === person['id'] && a.status === 'open',
+  );
+  return open.map((a) => ({
+    type: 'put',
+    store: 'assignments',
+    key: a.id,
+    record: { ...a, status: 'cancelled' },
+  }));
 }
 
 export async function authorizeRemove(call: Call, store: StoreName, existing: Rec): Promise<WriteResult> {
   const tenant = await tenantOf(call, store, existing);
+  if (READ_ONLY_STORES.has(store)) return forbid('permission');
   if (store === 'evidence') return forbid('permission');
   if (store === 'roles') return removeRole(call, existing as unknown as Role);
   if (store === 'roleAssignments') return removeAssignment(call, existing as unknown as RoleAssignment);
@@ -519,10 +588,15 @@ function removeRole(call: Call, role: Role): WriteResult {
   };
 }
 
-async function checkCustomRoleLimit(call: Call, clientId: string): Promise<void> {
+/** The account's effective entitlements (package, active add-ons, account state), or undefined if it has no package. */
+export async function clientEntitlements(call: Call, clientId: string): Promise<EffectiveEntitlements | undefined> {
   const client = await call.find<Client>('clients', clientId);
-  const pkg = client ? await call.find<Package>('packages', client.packageId) : undefined;
-  if (!client || !pkg) throw new NotEntitledError('customClientRoles');
+  // The subscription is the billing record; the client's packageId is its copy, used when there is no subscription.
+  const subscription = client
+    ? (await call.all<Subscription>('subscriptions')).find((x) => x.clientId === clientId)
+    : undefined;
+  const pkg = client ? await call.find<Package>('packages', subscription?.packageId ?? client.packageId) : undefined;
+  if (!client || !pkg) return undefined;
   const packages = await call.all<Package>('packages');
   // The floor package is the cheapest one: what an account keeps when it is not on a full plan.
   const price = (p: Package): number => p.bands[0]?.pricePerSite ?? 0;
@@ -531,7 +605,12 @@ async function checkCustomRoleLimit(call: Call, clientId: string): Promise<void>
     (s) => s.clientId === clientId && s.status !== 'off',
   );
   const addOns = (await call.all<AddOn>('addOns')).filter((a) => addOnSubs.some((s) => s.addOnId === a.id));
-  const ents = entitlements(pkg, addOns, client.accountState, floor);
+  return entitlements(pkg, addOns, client.accountState, floor);
+}
+
+async function checkCustomRoleLimit(call: Call, clientId: string): Promise<void> {
+  const ents = await clientEntitlements(call, clientId);
+  if (!ents) throw new NotEntitledError('customClientRoles');
   const roles = await call.all<Role>('roles');
   const used = roles.filter((r) => r.owner !== 'provider' && r.owner.clientId === clientId && !r.system).length;
   if (!checkLimit(ents, { customClientRoles: used }, 'customClientRoles').allowed) {
@@ -658,18 +737,22 @@ async function putSubmission(
     const assignments = await call.all<RoleAssignment>('roleAssignments');
     const roles = await call.all<Role>('roles');
     const users = await call.all<UserAccount>('users');
-    const clientUsers = new Set(
-      users.filter((u) => u.clientId === base.clientId && u.side === 'client').map((u) => u.id),
+    const activeUsers = new Set(
+      users
+        .filter((u) => u.clientId === base.clientId && u.side === 'client' && u.status === 'active')
+        .map((u) => u.id),
     );
+    const now = new Date(actor.ctx.now);
     const activeAdmins = new Set(
-      assignments.filter((a) => a.status === 'active' && clientUsers.has(a.userId)).map((a) => a.userId),
+      assignments.filter((a) => activeUsers.has(a.userId) && isAssignmentActive(a, now)).map((a) => a.userId),
     );
     const isAccountOwner = assignments.some(
       (a) =>
         a.userId === actor.user.id &&
+        isAssignmentActive(a, now) &&
         a.roleIds.some((id) => {
           const r = roles.find((x) => x.id === id);
-          return r?.system === true && r.name === 'Account Owner';
+          return r?.system === true && r.systemKey === OWNER_KEYS.client;
         }),
     );
     const result = canApproveEvidence(

@@ -24,6 +24,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
+      - name: Install poppler-utils for the PDF checks in the end-to-end tests
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
       - name: Enable pnpm
         run: corepack enable
       - name: Install dependencies

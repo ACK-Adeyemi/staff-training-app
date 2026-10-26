@@ -3,7 +3,16 @@ import { useQuery } from '@tanstack/react-query';
 import type { ActorContext, DataStore } from '@sta/data';
 import type { Clock } from '@sta/domain';
 import type { TFunction } from '@sta/content';
-import { ActorCtx, ClockContext, DataStoreContext, DemoContext, I18nContext, type DemoApi } from './context';
+import type { Speech } from './speech';
+import {
+  ActorCtx,
+  ClockContext,
+  SpeechContext,
+  DataStoreContext,
+  DemoContext,
+  I18nContext,
+  type DemoApi,
+} from './context';
 
 function need<T>(value: T | null, name: string): T {
   if (value === null) throw new Error(`${name} is missing. Wrap the app in AppProviders.`);
@@ -14,6 +23,7 @@ export const useStore = (): DataStore => need(useContext(DataStoreContext), 'Dat
 export const useClock = (): Clock => need(useContext(ClockContext), 'Clock');
 export const useActor = (): ActorContext => need(useContext(ActorCtx), 'Actor');
 export const useT = (): TFunction => need(useContext(I18nContext), 'I18n');
+export const useSpeech = (): Speech => useContext(SpeechContext);
 export const useDemo = (): DemoApi => need(useContext(DemoContext), 'Demo');
 
 /** The acting persona's user record, loaded through the data layer. */

@@ -4,6 +4,30 @@ import { NotFound, Placeholder } from '../pages/pages';
 import { Landing } from '../demo/pages/Landing';
 import { Outbox } from '../demo/pages/Outbox';
 import { RootLayout } from '../demo/RootLayout';
+import { OrgDoc } from '../pages/doc/OrgDoc';
+import { Assign } from '../pages/client/Assign';
+import { Dashboard } from '../pages/client/Dashboard';
+import { Matrix } from '../pages/client/Matrix';
+import { ModuleStats } from '../pages/client/ModuleStats';
+import { Reports } from '../pages/client/Reports';
+import { People } from '../pages/client/People';
+import { PersonRecord } from '../pages/client/Person';
+import { Competitions } from '../pages/client/Competitions';
+import { Display } from '../pages/me/Display';
+import { Me } from '../pages/me/Me';
+import { Compete } from '../pages/staff/Compete';
+import { Certificate } from '../pages/staff/Certificate';
+import { Home } from '../pages/staff/Home';
+import { LessonPlayer } from '../pages/staff/LessonPlayer';
+import { ModuleOverview } from '../pages/staff/ModuleOverview';
+import { Quiz } from '../pages/staff/Quiz';
+import { Results } from '../pages/staff/Results';
+import { Learn } from '../pages/staff/Learn';
+import { MyNotes } from '../pages/staff/MyNotes';
+import { Notifications } from '../pages/staff/Notifications';
+import { TrainingRecord } from '../pages/staff/Record';
+import { Progress } from '../pages/staff/Progress';
+import { SignIn } from '../pages/staff/SignIn';
 import { RouteError } from './RouteError';
 
 const page = (path: string, title: MessageKey, body: MessageKey): RouteObject => ({
@@ -18,16 +42,27 @@ export const routes: RouteObject[] = [
     children: [
       { path: '/', element: <Landing /> },
       { path: '/demo/outbox', element: <Outbox /> },
+      { path: '/staff/signin', element: <SignIn /> },
+      // Outside the staff chrome: a certificate prints cleanly and an organisation document opens in its own tab.
+      { path: '/staff/module/:moduleId/certificate', element: <Certificate /> },
+      { path: '/staff/progress/record', element: <TrainingRecord /> },
+      { path: '/doc/:attachmentId', element: <OrgDoc /> },
       {
         path: '/staff',
         lazy: async () => ({ Component: (await import('../shells/shells')).StaffShell }),
         children: [
-          { index: true, element: <Placeholder titleKey="nav.staff.home" bodyKey="placeholder.staff.home" /> },
-          page('learn', 'nav.staff.learn', 'placeholder.staff.learn'),
-          page('progress', 'nav.staff.progress', 'placeholder.staff.progress'),
-          page('compete', 'nav.staff.compete', 'placeholder.staff.compete'),
-          page('me', 'nav.staff.me', 'placeholder.staff.me'),
-          page('notifications', 'shell.notifications', 'placeholder.staff.notifications'),
+          { index: true, element: <Home /> },
+          { path: 'learn', element: <Learn /> },
+          { path: 'module/:moduleId', element: <ModuleOverview /> },
+          { path: 'module/:moduleId/lesson/:lessonId', element: <LessonPlayer /> },
+          { path: 'module/:moduleId/quiz', element: <Quiz /> },
+          { path: 'module/:moduleId/done', element: <Results /> },
+          { path: 'notes', element: <MyNotes /> },
+          { path: 'progress', element: <Progress /> },
+          { path: 'compete', element: <Compete /> },
+          { path: 'me', element: <Me /> },
+          { path: 'me/display', element: <Display /> },
+          { path: 'notifications', element: <Notifications /> },
           page('help', 'shell.help', 'placeholder.staff.help'),
         ],
       },
@@ -35,14 +70,44 @@ export const routes: RouteObject[] = [
         path: '/client',
         lazy: async () => ({ Component: (await import('../shells/shells')).ClientShell }),
         children: [
-          {
-            index: true,
-            element: <Placeholder titleKey="nav.client.dashboard" bodyKey="placeholder.client.dashboard" />,
-          },
-          page('people', 'nav.client.people', 'placeholder.client.people'),
+          { index: true, element: <Dashboard /> },
+          { path: 'people', element: <People /> },
+          { path: 'people/:personId', element: <PersonRecord /> },
+          { path: 'assign', element: <Assign /> },
           page('modules', 'nav.client.training', 'placeholder.client.training'),
-          page('competitions', 'nav.client.engage', 'placeholder.client.engage'),
-          page('reports', 'nav.client.reports', 'placeholder.client.reports'),
+          { path: 'competitions', element: <Competitions /> },
+          {
+            path: 'competitions/new',
+            lazy: async () => ({
+              Component: (await import('../pages/client/CompetitionBuilder')).CompetitionBuilder,
+            }),
+          },
+          {
+            path: 'competitions/:id/edit',
+            lazy: async () => ({
+              Component: (await import('../pages/client/CompetitionBuilder')).CompetitionBuilder,
+            }),
+          },
+          {
+            path: 'competitions/:id',
+            lazy: async () => ({
+              Component: (await import('../pages/client/CompetitionDetail')).CompetitionDetail,
+            }),
+          },
+          {
+            path: 'leaderboards',
+            lazy: async () => ({
+              Component: (await import('../pages/client/LeaderboardSettings')).LeaderboardSettings,
+            }),
+          },
+          {
+            path: 'organise',
+            lazy: async () => ({ Component: (await import('../pages/client/Organise')).Organise }),
+          },
+          { path: 'reports', element: <Reports /> },
+          { path: 'reports/matrix', element: <Matrix /> },
+          { path: 'modules/:moduleId/stats', element: <ModuleStats /> },
+          { path: 'display', element: <Display /> },
           page('settings', 'nav.client.settings', 'placeholder.client.settings'),
           page('help', 'nav.client.help', 'placeholder.client.help'),
         ],

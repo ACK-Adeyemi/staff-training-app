@@ -1,5 +1,6 @@
 import type { NavItem } from '@sta/ui';
 import { useT } from '../app/hooks';
+import { useClientData } from '../pages/client/queries';
 import { Shell } from './Shell';
 
 const item = (path: string, label: string, icon: NavItem['icon']): NavItem => ({
@@ -34,6 +35,9 @@ export function StaffShell() {
 
 export function ClientShell() {
   const t = useT();
+  // Load the organisation data once, up front, so every client screen opens with its content rather than a spinner.
+  const data = useClientData();
+  if (data.isPending) return <p className="p-4">{t('shell.loading')}</p>;
   return (
     <Shell
       config={{
@@ -45,6 +49,7 @@ export function ClientShell() {
           item('/client/competitions', t('nav.client.engage'), 'trophy'),
         ],
         more: [
+          item('/client/organise', t('organise.title'), 'book'),
           item('/client/reports', t('nav.client.reports'), 'chart'),
           item('/client/settings', t('nav.client.settings'), 'more'),
           item('/client/help', t('nav.client.help'), 'help'),

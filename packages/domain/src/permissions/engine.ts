@@ -1,5 +1,5 @@
 // Permission engine: pure functions, no storage. Build pack section 6, brief 22.4 and 27.5.
-import type { Role, RoleAssignment, Scope } from '../schemas/access';
+import { OWNER_KEYS, type Role, type RoleAssignment, type Scope } from '../schemas/access';
 import { clientCatalogue, providerCatalogue } from './catalogue';
 
 /** An 'own' scope is bound to the user when permissions are computed, so can() needs no user id. */
@@ -19,8 +19,10 @@ const sensitiveOf = new Map([...clientCatalogue, ...providerCatalogue].map((p) =
 const clientIds = new Set(clientCatalogue.map((p) => p.id));
 const providerIds = new Set(providerCatalogue.map((p) => p.id));
 
-const isActive = (a: RoleAssignment, now: Date): boolean =>
+/** An assignment counts only while its status is active and any expiry is strictly in the future. */
+export const isAssignmentActive = (a: Pick<RoleAssignment, 'status' | 'expiresAt'>, now: Date): boolean =>
   a.status === 'active' && (a.expiresAt === undefined || new Date(a.expiresAt).getTime() > now.getTime());
+const isActive = isAssignmentActive;
 
 const bindScope = (scope: Scope, userId: string): EffectiveScope =>
   scope.type === 'own' ? { type: 'own', userId } : scope;
@@ -146,11 +148,11 @@ export type OwnerChange =
   | { type: 'setExpiry'; assignmentId: string; expiresAt: string }
   | { type: 'deleteUser'; userId: string };
 
-/** The provider Owner or a client's Account Owner: a system role with that name. Returns its group key. */
+/** The provider Owner or a client's Account Owner: a system role with that systemKey. Returns its group key. */
 const ownerGroup = (role: Role): string | undefined => {
   if (!role.system) return undefined;
-  if (role.owner === 'provider') return role.name === 'Owner' ? 'provider' : undefined;
-  return role.name === 'Account Owner' ? role.owner.clientId : undefined;
+  if (role.owner === 'provider') return role.systemKey === OWNER_KEYS.provider ? 'provider' : undefined;
+  return role.systemKey === OWNER_KEYS.client ? role.owner.clientId : undefined;
 };
 
 const applyChange = (change: OwnerChange, assignments: RoleAssignment[]): RoleAssignment[] => {

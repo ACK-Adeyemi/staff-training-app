@@ -2,12 +2,24 @@
 // copies) lives in createStore, so the memory and IndexedDB adapters enforce exactly the same rules.
 import {
   addOnSchema,
+  assignmentSchema,
+  attachmentSchema,
+  attemptSchema,
   addOnSubscriptionSchema,
   auditEventSchema,
+  clientLinkOverlaySchema,
+  categorySchema,
   clientSchema,
+  competitionSchema,
   evidenceSchema,
   evidenceSubmissionSchema,
   jobRoleSchema,
+  learningEventSchema,
+  moduleGroupSchema,
+  modulePlacementSchema,
+  moduleSchema,
+  noteSchema,
+  notificationSchema,
   outboxMessageSchema,
   packageSchema,
   paymentAttemptSchema,
@@ -16,6 +28,7 @@ import {
   roleAssignmentSchema,
   roleSchema,
   siteSchema,
+  standingBoardSettingsSchema,
   subscriptionSchema,
   teamSchema,
   userAccountSchema,
@@ -74,6 +87,19 @@ const parsers: Record<StoreName, Parser> = {
   audit: auditEventSchema,
   outbox: outboxMessageSchema,
   settings: settingsParser,
+  modules: moduleSchema,
+  attachments: attachmentSchema,
+  assignments: assignmentSchema,
+  learningEvents: learningEventSchema,
+  attempts: attemptSchema,
+  notifications: notificationSchema,
+  clientLinkOverlays: clientLinkOverlaySchema,
+  notes: noteSchema,
+  categories: categorySchema,
+  modulePlacements: modulePlacementSchema,
+  moduleGroups: moduleGroupSchema,
+  competitions: competitionSchema,
+  standingBoardSettings: standingBoardSettingsSchema,
 };
 
 /** Parses with the domain schema; throws ValidationError listing every issue. Returns the cleaned record. */
@@ -94,9 +120,12 @@ export function keyOf(store: StoreName, record: unknown): string {
   const r = record as Record<string, string>;
   switch (store) {
     case 'subscriptions':
+    case 'standingBoardSettings':
       return r['clientId'] as string;
     case 'addOnSubscriptions':
       return `${r['clientId'] as string}:${r['addOnId'] as string}`;
+    case 'modulePlacements':
+      return `${r['clientId'] as string}:${r['moduleId'] as string}`;
     case 'settings':
       return r['key'] as string;
     default:

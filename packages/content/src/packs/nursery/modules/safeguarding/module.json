@@ -1,0 +1,1118 @@
+{
+  "title": "Safeguarding and whistleblowing",
+  "description": "Your role, spotting and acting on concerns, allegations and whistleblowing, and everyday safety. Based on section 3 of the EYFS statutory framework.",
+  "estimatedMinutes": 10,
+  "language": "en-GB",
+  "status": "published",
+  "version": 1,
+  "roleTags": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "Your role and the DSL",
+      "minutes": 2
+    },
+    {
+      "id": "lesson-2",
+      "title": "Spotting and acting on concerns",
+      "minutes": 3
+    },
+    {
+      "id": "lesson-3",
+      "title": "Allegations and whistleblowing",
+      "minutes": 3
+    },
+    {
+      "id": "lesson-4",
+      "title": "Everyday safety",
+      "minutes": 2
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-dsl-role",
+      "type": "mcq",
+      "prompt": "What is the designated safeguarding lead (DSL) responsible for?",
+      "options": [
+        {
+          "id": "q-dsl-role-o1",
+          "text": "Taking lead responsibility for safeguarding children and liaising with local children's services and the Local Safeguarding Partners",
+          "correct": true
+        },
+        {
+          "id": "q-dsl-role-o2",
+          "text": "Checking the fire alarms and first aid kits",
+          "correct": false
+        },
+        {
+          "id": "q-dsl-role-o3",
+          "text": "Being the only person who needs to be alert to concerns about children",
+          "correct": false
+        },
+        {
+          "id": "q-dsl-role-o4",
+          "text": "Deciding which children can start at the setting",
+          "correct": false
+        }
+      ],
+      "explanation": "Every setting must designate a practitioner to take lead responsibility for safeguarding. The DSL liaises with local children's services and the Local Safeguarding Partners. Everyone else still has a duty to be alert.",
+      "sourceRef": "EYFS 3.4",
+      "learnMore": [
+        {
+          "id": "eyfs-3-4-1",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=23",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.4, page 23",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "working-together-2",
+          "title": "Working together to safeguard children: statutory guidance",
+          "url": "https://www.gov.uk/government/publications/working-together-to-safeguard-children--2",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding"]
+    },
+    {
+      "id": "q-everyone-alert",
+      "type": "trueFalse",
+      "prompt": "Only the DSL needs to be alert to worries about a child's life at home. True or false?",
+      "options": [
+        {
+          "id": "q-everyone-alert-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-everyone-alert-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. Every person looking after children must be alert to any issues of concern in the child's life at home or elsewhere. The DSL leads, but safeguarding is everyone's job.",
+      "sourceRef": "EYFS 3.4",
+      "learnMore": [
+        {
+          "id": "eyfs-3-4-3",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=23",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.4, page 23",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding"]
+    },
+    {
+      "id": "q-dsl-advice",
+      "type": "mcq",
+      "prompt": "You are unsure whether something you saw is a safeguarding concern. Who gives you advice and guidance?",
+      "options": [
+        {
+          "id": "q-dsl-advice-o1",
+          "text": "The designated safeguarding lead",
+          "correct": true
+        },
+        {
+          "id": "q-dsl-advice-o2",
+          "text": "The child's other parent",
+          "correct": false
+        },
+        {
+          "id": "q-dsl-advice-o3",
+          "text": "A colleague who has worked here the longest",
+          "correct": false
+        },
+        {
+          "id": "q-dsl-advice-o4",
+          "text": "Nobody, you must decide alone",
+          "correct": false
+        }
+      ],
+      "explanation": "The DSL must give support, advice and guidance to all practitioners on an ongoing basis, and on any specific safeguarding issue.",
+      "sourceRef": "EYFS 3.32",
+      "learnMore": [
+        {
+          "id": "eyfs-3-32-4",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=29",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.32, page 29",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "worried-5",
+          "title": "What to do if you're worried a child is being abused: advice for practitioners",
+          "url": "https://www.gov.uk/government/publications/what-to-do-if-youre-worried-a-child-is-being-abused--2",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding"]
+    },
+    {
+      "id": "q-policy-devices",
+      "type": "mcq",
+      "prompt": "Which of these must a setting's safeguarding policy include?",
+      "options": [
+        {
+          "id": "q-policy-devices-o1",
+          "text": "How mobile phones, cameras and other devices that can take and share images are used",
+          "correct": true
+        },
+        {
+          "id": "q-policy-devices-o2",
+          "text": "The weekly menu",
+          "correct": false
+        },
+        {
+          "id": "q-policy-devices-o3",
+          "text": "The staff holiday rota",
+          "correct": false
+        },
+        {
+          "id": "q-policy-devices-o4",
+          "text": "The prices of extra sessions",
+          "correct": false
+        }
+      ],
+      "explanation": "Safeguarding policies must cover how mobile phones, cameras and other electronic devices with imaging and sharing capabilities are used in the setting. They also cover the action for concerns, allegations against staff, checking new recruits and safeguarding training.",
+      "sourceRef": "EYFS 3.6",
+      "learnMore": [
+        {
+          "id": "eyfs-3-6-6",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=23",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.6, page 23",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding"]
+    },
+    {
+      "id": "q-notify-social-care",
+      "type": "mcq",
+      "prompt": "A provider has a concern about a child's safety or welfare. What must it do?",
+      "options": [
+        {
+          "id": "q-notify-social-care-o1",
+          "text": "Immediately tell its local authority children's social care team, and the police in an emergency",
+          "correct": true
+        },
+        {
+          "id": "q-notify-social-care-o2",
+          "text": "Wait a month to see whether things improve",
+          "correct": false
+        },
+        {
+          "id": "q-notify-social-care-o3",
+          "text": "Ask the family to sort it out themselves first",
+          "correct": false
+        },
+        {
+          "id": "q-notify-social-care-o4",
+          "text": "Only record it in the child's file",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers must immediately notify their local authority children's social care team, in line with local reporting procedures, and in emergencies the police. They must also take account of the Working Together statutory guidance.",
+      "sourceRef": "EYFS 3.9",
+      "learnMore": [
+        {
+          "id": "eyfs-3-9-7",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=24",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.9, page 24",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "working-together-8",
+          "title": "Working together to safeguard children: statutory guidance",
+          "url": "https://www.gov.uk/government/publications/working-together-to-safeguard-children--2",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding"]
+    },
+    {
+      "id": "q-absence-contact",
+      "type": "mcq",
+      "prompt": "A child has not arrived and nobody has told the setting why. What must the setting try to do?",
+      "options": [
+        {
+          "id": "q-absence-contact-o1",
+          "text": "Contact the parents or carers and, if needed, the emergency contacts",
+          "correct": true
+        },
+        {
+          "id": "q-absence-contact-o2",
+          "text": "Nothing, absences are the family's business",
+          "correct": false
+        },
+        {
+          "id": "q-absence-contact-o3",
+          "text": "Remove the child from the register straight away",
+          "correct": false
+        },
+        {
+          "id": "q-absence-contact-o4",
+          "text": "Wait until the child comes back",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers must follow up on absences in a timely manner. If a child is absent without notification, attempts must be made to contact the parents or carers and alternative emergency contacts. Concerns go to children's social care.",
+      "sourceRef": "EYFS 3.11",
+      "learnMore": [
+        {
+          "id": "eyfs-3-11-9",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=25",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.11, page 25",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding"]
+    },
+    {
+      "id": "q-ofsted-14-days",
+      "type": "mcq",
+      "prompt": "How soon must a registered provider tell Ofsted about an allegation of harm or abuse by someone working at the setting?",
+      "options": [
+        {
+          "id": "q-ofsted-14-days-o1",
+          "text": "As soon as reasonably practicable, and in any event within 14 days",
+          "correct": true
+        },
+        {
+          "id": "q-ofsted-14-days-o2",
+          "text": "Within 6 months",
+          "correct": false
+        },
+        {
+          "id": "q-ofsted-14-days-o3",
+          "text": "Only once the allegation has been proven",
+          "correct": false
+        },
+        {
+          "id": "q-ofsted-14-days-o4",
+          "text": "At the next inspection",
+          "correct": false
+        }
+      ],
+      "explanation": "Ofsted must be told as soon as is reasonably practicable, and in any event within 14 days of the allegation being made. The provider must also say what action it has taken.",
+      "sourceRef": "EYFS 3.10",
+      "learnMore": [
+        {
+          "id": "eyfs-3-10-10",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=24",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.10, page 24",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding"]
+    },
+    {
+      "id": "q-wb-everyone",
+      "type": "trueFalse",
+      "prompt": "The whistleblowing procedure covers students and volunteers as well as staff. True or false?",
+      "options": [
+        {
+          "id": "q-wb-everyone-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-wb-everyone-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. Providers must put whistleblowing procedures in place for all staff, including students and volunteers, so they can raise concerns about poor or unsafe practice.",
+      "sourceRef": "EYFS 3.7",
+      "learnMore": [
+        {
+          "id": "eyfs-3-7-11",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=24",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.7, page 24",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "whistleblowing-12",
+          "title": "Whistleblowing for employees: your rights and who to tell",
+          "url": "https://www.gov.uk/whistleblowing",
+          "publisher": "GOV.UK",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding"]
+    },
+    {
+      "id": "q-wb-outside",
+      "type": "mcq",
+      "prompt": "You have raised a genuine concern about unsafe practice but feel it is not being addressed. What can you do?",
+      "options": [
+        {
+          "id": "q-wb-outside-o1",
+          "text": "Use other routes, such as the NSPCC whistleblowing advice line or Ofsted's complaints process",
+          "correct": true
+        },
+        {
+          "id": "q-wb-outside-o2",
+          "text": "Stay quiet because it is not your place",
+          "correct": false
+        },
+        {
+          "id": "q-wb-outside-o3",
+          "text": "Wait until the person involved leaves",
+          "correct": false
+        },
+        {
+          "id": "q-wb-outside-o4",
+          "text": "Talk about it with other parents",
+          "correct": false
+        }
+      ],
+      "explanation": "Where a staff member feels unable to raise an issue with their employer, or feels their genuine concerns are not being addressed, they can use other channels. These include the NSPCC whistleblowing advice line and Ofsted's complaints process. Whistleblowing is protected, and concerns must be taken seriously.",
+      "sourceRef": "EYFS 3.8",
+      "learnMore": [
+        {
+          "id": "eyfs-3-8-13",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=24",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.8, page 24",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "nspcc-whistleblowing-14",
+          "title": "NSPCC whistleblowing advice line for people working with children",
+          "url": "https://www.nspcc.org.uk/keeping-children-safe/reporting-abuse/dedicated-helplines/whistleblowing-advice-line/",
+          "publisher": "NSPCC",
+          "kind": "organisation",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "whistleblowing-15",
+          "title": "Whistleblowing for employees: your rights and who to tell",
+          "url": "https://www.gov.uk/whistleblowing",
+          "publisher": "GOV.UK",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding"]
+    },
+    {
+      "id": "q-check-before-start",
+      "type": "trueFalse",
+      "prompt": "A new person may start work with children before their enhanced criminal records and barred list check comes back, as long as they are friendly. True or false?",
+      "options": [
+        {
+          "id": "q-check-before-start-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-check-before-start-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. Providers must not allow individuals to begin working or volunteering until the check has been received, and nobody whose suitability has not been checked may have unsupervised contact with children.",
+      "sourceRef": "EYFS 3.17",
+      "learnMore": [
+        {
+          "id": "eyfs-3-17-16",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=26",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.17, page 26",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding"]
+    },
+    {
+      "id": "q-disclose",
+      "type": "mcq",
+      "prompt": "Which of these must staff tell their employer about?",
+      "options": [
+        {
+          "id": "q-disclose-o1",
+          "text": "Anything that may affect their suitability to work with children, such as an arrest, charge, conviction or caution",
+          "correct": true
+        },
+        {
+          "id": "q-disclose-o2",
+          "text": "Their favourite activity with the children",
+          "correct": false
+        },
+        {
+          "id": "q-disclose-o3",
+          "text": "Which route they take to work",
+          "correct": false
+        },
+        {
+          "id": "q-disclose-o4",
+          "text": "Nothing, unless they are asked in writing",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers must tell staff and prospective staff that they must disclose any information that may affect their suitability to work with children, including arrests, charges, convictions, cautions, court orders, reprimands and warnings.",
+      "sourceRef": "EYFS 3.17",
+      "learnMore": [
+        {
+          "id": "eyfs-3-17-17",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=26",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.17, page 26",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding"]
+    },
+    {
+      "id": "q-renew-two-years",
+      "type": "mcq",
+      "prompt": "How often must safeguarding training be renewed?",
+      "options": [
+        {
+          "id": "q-renew-two-years-o1",
+          "text": "Every two years",
+          "correct": true
+        },
+        {
+          "id": "q-renew-two-years-o2",
+          "text": "Every ten years",
+          "correct": false
+        },
+        {
+          "id": "q-renew-two-years-o3",
+          "text": "Only when the DSL changes",
+          "correct": false
+        },
+        {
+          "id": "q-renew-two-years-o4",
+          "text": "Never, once is enough",
+          "correct": false
+        }
+      ],
+      "explanation": "Training must be renewed every two years. Providers may also consider annual refresher training in between, to keep skills up to date.",
+      "sourceRef": "EYFS 3.33",
+      "learnMore": [
+        {
+          "id": "eyfs-3-33-18",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=29",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.33, page 29",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding"]
+    },
+    {
+      "id": "q-sc-tired-child",
+      "type": "scenario",
+      "prompt": "Maya is three. She has arrived tired and hungry three mornings in a row, and today she tells you, \"It was very loud at home last night.\"",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-tired-child-s1",
+            "text": "What do you do first?",
+            "choices": [
+              {
+                "id": "q-sc-tired-child-s1-c1",
+                "text": "Write down exactly what you saw and heard, with the date and time, and tell the DSL today",
+                "outcome": "best",
+                "feedback": "Good. Facts and a quick handover to the DSL are what is needed.",
+                "next": "q-sc-tired-child-s2"
+              },
+              {
+                "id": "q-sc-tired-child-s1-c2",
+                "text": "Keep an eye on it and mention it at the end of the week",
+                "outcome": "ok",
+                "feedback": "Watching is useful, but a pattern like this should go to the DSL today, not at the end of the week.",
+                "next": "q-sc-tired-child-s2"
+              },
+              {
+                "id": "q-sc-tired-child-s1-c3",
+                "text": "Ask Maya a lot of questions about what happens at home",
+                "outcome": "poor",
+                "feedback": "Please do not question the child. Listen kindly, write down what they say, and leave questions to the people trained to ask them.",
+                "next": "q-sc-tired-child-s2"
+              }
+            ]
+          },
+          {
+            "id": "q-sc-tired-child-s2",
+            "text": "The DSL thanks you and says she will decide what happens next. Later, Maya's mum asks if you have said anything about her family. What do you say?",
+            "choices": [
+              {
+                "id": "q-sc-tired-child-s2-c1",
+                "text": "Explain that staff share any worries about a child's wellbeing with the DSL, and suggest she speaks to the DSL",
+                "outcome": "best",
+                "feedback": "Calm, honest and kind. You pass the conversation to the DSL, who knows what is appropriate to share."
+              },
+              {
+                "id": "q-sc-tired-child-s2-c2",
+                "text": "Say you have not said anything",
+                "outcome": "poor",
+                "feedback": "Please do not say something that is not true. It can damage trust, and the DSL needs to lead any conversation."
+              },
+              {
+                "id": "q-sc-tired-child-s2-c3",
+                "text": "Go into detail about what you wrote down",
+                "outcome": "poor",
+                "feedback": "What you recorded is for the DSL to handle. Leave the conversation to them."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Every person looking after children must be alert to concerns, and the DSL is the person who takes lead responsibility. Write down facts, do not question the child, and let the DSL decide what happens next.",
+      "sourceRef": "EYFS 3.4",
+      "learnMore": [
+        {
+          "id": "eyfs-3-4-19",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=23",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.4, page 23",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "worried-20",
+          "title": "What to do if you're worried a child is being abused: advice for practitioners",
+          "url": "https://www.gov.uk/government/publications/what-to-do-if-youre-worried-a-child-is-being-abused--2",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding", "scenario"]
+    },
+    {
+      "id": "q-sc-dsl-away",
+      "type": "scenario",
+      "prompt": "You are worried about a child's safety at the end of the session. The DSL is away today.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-dsl-away-s1",
+            "text": "What do you do?",
+            "choices": [
+              {
+                "id": "q-sc-dsl-away-s1-c1",
+                "text": "Tell the deputy DSL or the manager in charge today, as your procedure says",
+                "outcome": "best",
+                "feedback": "Right. A concern should never wait for someone to come back.",
+                "next": "q-sc-dsl-away-s2"
+              },
+              {
+                "id": "q-sc-dsl-away-s1-c2",
+                "text": "Wait until the DSL is back next week",
+                "outcome": "poor",
+                "feedback": "A child's safety cannot wait. Use the deputy DSL or manager in charge.",
+                "next": "q-sc-dsl-away-s2"
+              },
+              {
+                "id": "q-sc-dsl-away-s1-c3",
+                "text": "Write it down and leave it for the DSL to find",
+                "outcome": "ok",
+                "feedback": "Writing it down is important, but you also need to tell someone in person today.",
+                "next": "q-sc-dsl-away-s2"
+              }
+            ]
+          },
+          {
+            "id": "q-sc-dsl-away-s2",
+            "text": "The deputy DSL agrees the concern is serious. Who must the setting tell, and when?",
+            "choices": [
+              {
+                "id": "q-sc-dsl-away-s2-c1",
+                "text": "Its local authority children's social care team, immediately, and the police if it is an emergency",
+                "outcome": "best",
+                "feedback": "Yes. This follows local reporting procedures."
+              },
+              {
+                "id": "q-sc-dsl-away-s2-c2",
+                "text": "The parents first, and children's social care only if they agree",
+                "outcome": "poor",
+                "feedback": "The setting must tell children's social care immediately. It should not wait for anyone's agreement."
+              },
+              {
+                "id": "q-sc-dsl-away-s2-c3",
+                "text": "Children's social care, once the DSL is back",
+                "outcome": "poor",
+                "feedback": "Providers must tell them immediately, so the deputy or manager in charge acts now."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "A concern must be passed on and acted on straight away. Providers must immediately tell their local authority children's social care team, in line with local procedures, and the police in an emergency.",
+      "sourceRef": "EYFS 3.9",
+      "learnMore": [
+        {
+          "id": "eyfs-3-9-21",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=24",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.9, page 24",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "working-together-22",
+          "title": "Working together to safeguard children: statutory guidance",
+          "url": "https://www.gov.uk/government/publications/working-together-to-safeguard-children--2",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding", "scenario"]
+    },
+    {
+      "id": "q-sc-absent-child",
+      "type": "scenario",
+      "prompt": "Leo has not come in for three days. No one has called to say why. He is a child you know your setting has had some worries about.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-absent-child-s1",
+            "text": "What should happen first?",
+            "choices": [
+              {
+                "id": "q-sc-absent-child-s1-c1",
+                "text": "Try to contact his parents or carers, and then his emergency contacts, today",
+                "outcome": "best",
+                "feedback": "Yes. Follow up promptly and record every attempt.",
+                "next": "q-sc-absent-child-s2"
+              },
+              {
+                "id": "q-sc-absent-child-s1-c2",
+                "text": "Assume the family is on holiday",
+                "outcome": "poor",
+                "feedback": "It is not safe to assume. Always follow up.",
+                "next": "q-sc-absent-child-s2"
+              },
+              {
+                "id": "q-sc-absent-child-s1-c3",
+                "text": "Wait to see whether he is back on Monday",
+                "outcome": "poor",
+                "feedback": "Absences must be followed up in a timely manner.",
+                "next": "q-sc-absent-child-s2"
+              }
+            ]
+          },
+          {
+            "id": "q-sc-absent-child-s2",
+            "text": "Nobody answers any of the numbers. What next?",
+            "choices": [
+              {
+                "id": "q-sc-absent-child-s2-c1",
+                "text": "Tell the DSL, who follows the safeguarding procedure and can refer to children's social care or ask for a police welfare check",
+                "outcome": "best",
+                "feedback": "Correct. Any concerns must be referred."
+              },
+              {
+                "id": "q-sc-absent-child-s2-c2",
+                "text": "Try again in a fortnight",
+                "outcome": "poor",
+                "feedback": "Too long. With these worries, act now."
+              },
+              {
+                "id": "q-sc-absent-child-s2-c3",
+                "text": "Take Leo off the register and say nothing",
+                "outcome": "poor",
+                "feedback": "Never let a missing child go unreported."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Providers must follow up on absences in a timely manner. If a child is absent without notification, they must try the parents or carers and the emergency contacts. Concerns go to children's social care and a police welfare check can be requested.",
+      "sourceRef": "EYFS 3.11",
+      "learnMore": [
+        {
+          "id": "eyfs-3-11-23",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=25",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.11, page 25",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "working-together-24",
+          "title": "Working together to safeguard children: statutory guidance",
+          "url": "https://www.gov.uk/government/publications/working-together-to-safeguard-children--2",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding", "scenario"]
+    },
+    {
+      "id": "q-sc-allegation",
+      "type": "scenario",
+      "prompt": "A parent tells you she thinks a colleague spoke to her daughter very harshly during a trip last week.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-allegation-s1",
+            "text": "What do you do?",
+            "choices": [
+              {
+                "id": "q-sc-allegation-s1-c1",
+                "text": "Listen, write down what she says, and tell the DSL or manager straight away",
+                "outcome": "best",
+                "feedback": "Right. Record facts and pass it on at once.",
+                "next": "q-sc-allegation-s2"
+              },
+              {
+                "id": "q-sc-allegation-s1-c2",
+                "text": "Tell your colleague what the parent said so they can explain",
+                "outcome": "poor",
+                "feedback": "Please do not tell the colleague. This could harm the process.",
+                "next": "q-sc-allegation-s2"
+              },
+              {
+                "id": "q-sc-allegation-s1-c3",
+                "text": "Suggest the parent writes to the manager next month",
+                "outcome": "ok",
+                "feedback": "Pass it on yourself today, rather than leaving the parent to do it.",
+                "next": "q-sc-allegation-s2"
+              }
+            ]
+          },
+          {
+            "id": "q-sc-allegation-s2",
+            "text": "The manager decides this is an allegation of harm. When does Ofsted need to be told?",
+            "choices": [
+              {
+                "id": "q-sc-allegation-s2-c1",
+                "text": "As soon as reasonably practicable and within 14 days, along with what action the setting has taken",
+                "outcome": "best",
+                "feedback": "Correct."
+              },
+              {
+                "id": "q-sc-allegation-s2-c2",
+                "text": "Only if the allegation is proved",
+                "outcome": "poor",
+                "feedback": "No. Allegations must be reported, not just proven ones."
+              },
+              {
+                "id": "q-sc-allegation-s2-c3",
+                "text": "At the next inspection",
+                "outcome": "poor",
+                "feedback": "This is far too late. The limit is 14 days."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "The safeguarding policy must set out what to do about an allegation against a member of staff. A registered provider must tell Ofsted about any allegation of harm or abuse as soon as reasonably practicable, and in any event within 14 days.",
+      "sourceRef": "EYFS 3.10",
+      "learnMore": [
+        {
+          "id": "eyfs-3-10-25",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=24",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.10, page 24",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "working-together-26",
+          "title": "Working together to safeguard children: statutory guidance",
+          "url": "https://www.gov.uk/government/publications/working-together-to-safeguard-children--2",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding", "scenario"]
+    },
+    {
+      "id": "q-sc-photos",
+      "type": "scenario",
+      "prompt": "You notice a colleague using their own phone to take photos in the baby room. Your setting's policy says personal devices are not used with children.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-photos-s1",
+            "text": "What do you do?",
+            "choices": [
+              {
+                "id": "q-sc-photos-s1-c1",
+                "text": "Raise it with your manager or DSL, using the setting's whistleblowing procedure",
+                "outcome": "best",
+                "feedback": "Yes. Use the proper route.",
+                "next": "q-sc-photos-s2"
+              },
+              {
+                "id": "q-sc-photos-s1-c2",
+                "text": "Quietly mention it to your colleague only",
+                "outcome": "ok",
+                "feedback": "That is kind, but it may not stop the problem. Use the procedure as well.",
+                "next": "q-sc-photos-s2"
+              },
+              {
+                "id": "q-sc-photos-s1-c3",
+                "text": "Take a photo of your own to prove it",
+                "outcome": "poor",
+                "feedback": "No. Taking your own photos would break the same policy.",
+                "next": "q-sc-photos-s2"
+              }
+            ]
+          },
+          {
+            "id": "q-sc-photos-s2",
+            "text": "A few weeks later, nothing has changed and you feel your concern is not being taken seriously. What can you do?",
+            "choices": [
+              {
+                "id": "q-sc-photos-s2-c1",
+                "text": "Use other routes, such as the NSPCC whistleblowing advice line or Ofsted's complaints process",
+                "outcome": "best",
+                "feedback": "Yes. These channels are there for exactly this case."
+              },
+              {
+                "id": "q-sc-photos-s2-c2",
+                "text": "Let it go",
+                "outcome": "poor",
+                "feedback": "If the practice is unsafe, you should keep going. Other routes are open to you."
+              },
+              {
+                "id": "q-sc-photos-s2-c3",
+                "text": "Post about it online",
+                "outcome": "poor",
+                "feedback": "Please do not do this. It could harm children and families and does not help the concern get dealt with."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Providers must have whistleblowing procedures so staff can raise concerns about poor or unsafe practice. If concerns are not addressed, staff can use other channels such as the NSPCC whistleblowing advice line, and Ofsted's complaints process.",
+      "sourceRef": "EYFS 3.8",
+      "learnMore": [
+        {
+          "id": "eyfs-3-8-27",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=24",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.8, page 24",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "nspcc-whistleblowing-28",
+          "title": "NSPCC whistleblowing advice line for people working with children",
+          "url": "https://www.nspcc.org.uk/keeping-children-safe/reporting-abuse/dedicated-helplines/whistleblowing-advice-line/",
+          "publisher": "NSPCC",
+          "kind": "organisation",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "whistleblowing-29",
+          "title": "Whistleblowing for employees: your rights and who to tell",
+          "url": "https://www.gov.uk/whistleblowing",
+          "publisher": "GOV.UK",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding", "scenario"]
+    },
+    {
+      "id": "q-sc-party-photo",
+      "type": "scenario",
+      "prompt": "It is Alfie's birthday. His dad asks if he can photograph him blowing out the candles, with the other children in the shot.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-party-photo-s1",
+            "text": "What is the best reply?",
+            "choices": [
+              {
+                "id": "q-sc-party-photo-s1-c1",
+                "text": "Explain kindly that the setting has a policy on photos and devices, and check with the manager about what can be offered",
+                "outcome": "best",
+                "feedback": "Good. You protect the other children and stay friendly."
+              },
+              {
+                "id": "q-sc-party-photo-s1-c2",
+                "text": "Say yes, it is only one photo",
+                "outcome": "poor",
+                "feedback": "Other children could be in the picture. Always follow the policy first."
+              },
+              {
+                "id": "q-sc-party-photo-s1-c3",
+                "text": "Say no without any explanation",
+                "outcome": "ok",
+                "feedback": "Your answer is right but a kind explanation would be better."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Safeguarding policies must say how phones, cameras and other devices are used in the setting. Follow the policy and ask your manager.",
+      "sourceRef": "EYFS 3.6",
+      "learnMore": [
+        {
+          "id": "eyfs-3-6-30",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=23",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.6, page 23",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "working-together-31",
+          "title": "Working together to safeguard children: statutory guidance",
+          "url": "https://www.gov.uk/government/publications/working-together-to-safeguard-children--2",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding", "scenario"]
+    },
+    {
+      "id": "q-sc-new-volunteer",
+      "type": "scenario",
+      "prompt": "A new volunteer starts today. Her criminal records check has not come back yet. The room is busy and a colleague asks if she can watch the sleeping children for ten minutes.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-new-volunteer-s1",
+            "text": "What do you do?",
+            "choices": [
+              {
+                "id": "q-sc-new-volunteer-s1-c1",
+                "text": "Politely say she cannot be alone with the children until her checks are back, and tell your manager you need more cover",
+                "outcome": "best",
+                "feedback": "Right. Children come first and the manager can arrange cover."
+              },
+              {
+                "id": "q-sc-new-volunteer-s1-c2",
+                "text": "Let her do it, as you will be nearby",
+                "outcome": "poor",
+                "feedback": "Nearby is not the same as supervised. Checks come first."
+              },
+              {
+                "id": "q-sc-new-volunteer-s1-c3",
+                "text": "Let her do it for ten minutes only",
+                "outcome": "poor",
+                "feedback": "There is no safe short period without checks."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Nobody may begin working or volunteering until their enhanced criminal records and barred list check has been received, and unchecked people must not have unsupervised contact with the children.",
+      "sourceRef": "EYFS 3.17",
+      "learnMore": [
+        {
+          "id": "eyfs-3-17-32",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=26",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.17, page 26",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safeguarding", "scenario"]
+    }
+  ],
+  "quiz": {
+    "mode": "mix",
+    "mixScenarioShare": 0.4,
+    "drawCount": 10,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "passMark": 80,
+    "maxRetakes": null,
+    "feedback": true,
+    "showSourceRef": true,
+    "notesInQuiz": "choice",
+    "learnMoreFor": "all"
+  },
+  "sourceAttribution": "Based on the Early Years Foundation Stage statutory framework for group and school-based providers (Department for Education, September 2026). Contains public sector information licensed under the Open Government Licence v3.0.",
+  "draftContent": true,
+  "verify": [
+    "Open Government Licence attribution wording.",
+    "EYFS paragraph and page numbers were checked against the cached September 2026 PDF (pdftotext); re-check if the framework is reissued. Page numbers are the printed page numbers.",
+    "The NSPCC whistleblowing advice line page URL could not be fetched from the build environment (blocked by the site) and is from memory. Check it opens.",
+    "Working Together, What to do if you are worried and gov.uk/whistleblowing links resolve (checked) but their content has not been read in full.",
+    "Lesson 2 \"Noticing\" is general guidance, not EYFS text. Review wording with the setting DSL.",
+    "Annex C (safeguarding training criteria) not yet used. The 24-month refresher period on the requirement stays VERIFY; EYFS 3.33 says training must be renewed every two years."
+  ]
+}

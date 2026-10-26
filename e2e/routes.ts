@@ -16,7 +16,7 @@ export const clientBar: NavEntry[] = [
   { hash: '#/client', label: 'Dashboard' },
   { hash: '#/client/people', label: 'People' },
   { hash: '#/client/modules', label: 'Training' },
-  { hash: '#/client/competitions', label: 'Engage' },
+  { hash: '#/client/competitions', label: 'Competitions' },
 ];
 export const clientMore: NavEntry[] = [
   { hash: '#/client/reports', label: 'Reports' },
@@ -45,8 +45,37 @@ export const shellRoutes: NavEntry[] = [
   ...providerMore,
 ];
 
+/** M2 chunk 12 routes (display and Me). The full M2 route list is added to as chunks land. */
+export const displayRoutes: NavEntry[] = [
+  { hash: '#/staff/me', label: 'Me' },
+  { hash: '#/staff/me/display', label: 'Display and accessibility' },
+  { hash: '#/client/display', label: 'Display and accessibility' },
+];
+
 /** Narrow a possibly-null value or fail the test. */
 export function need<T>(value: T | null | undefined): T {
   if (value === null || value === undefined) throw new Error('Expected a value');
   return value;
 }
+
+/** M2 chunk 13 routes (Learn and organise). */
+export const organiseRoutes: NavEntry[] = [
+  { hash: '#/staff/learn', label: 'Learn' },
+  { hash: '#/client/organise', label: 'Organise modules' },
+];
+
+/** M2 chunk 16 routes (competitions and leaderboard settings). */
+export const competeRoutes: NavEntry[] = [
+  { hash: '#/staff/compete', label: 'Compete' },
+  { hash: '#/client/competitions', label: 'Competitions' },
+  { hash: '#/client/competitions/new', label: 'New competition' },
+  { hash: '#/client/leaderboards', label: 'Leaderboard settings' },
+];
+
+/** M2 chunk 17: every new M2 route without an id in it, once each (F-10). */
+export const m2Routes: NavEntry[] = [
+  { hash: '#/staff/notes', label: 'My notes' },
+  ...displayRoutes,
+  ...organiseRoutes,
+  ...competeRoutes,
+].filter((r, i, all) => all.findIndex((x) => x.hash === r.hash) === i);

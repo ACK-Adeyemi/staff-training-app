@@ -1,4 +1,5 @@
 // Client role templates and the category-to-permission compiler. Brief 22.5, 27.5. Placeholders (decisions.md).
+import type { clientRoleKeys } from '../schemas/access';
 export type Level = 'none' | 'view' | 'manage';
 export type ClientCategory =
   | 'staff'
@@ -65,7 +66,7 @@ export function compileClientRole(levels: ClientLevels, allows: string[]): strin
   return [...out];
 }
 
-export type ClientRoleKey = 'accountOwner' | 'groupAdmin' | 'siteManager' | 'supervisor' | 'trainer' | 'viewer';
+export type ClientRoleKey = (typeof clientRoleKeys)[number];
 
 export type ClientRoleTemplate = {
   key: ClientRoleKey;

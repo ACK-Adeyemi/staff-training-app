@@ -6,3 +6,7 @@ const dateTimeFormat = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', tim
 export const formatLondonDay = (date: Date): string => dayFormat.format(date);
 /** "19 October 2026 at 09:30", in London time. */
 export const formatLondonDateTime = (iso: string): string => dateTimeFormat.format(new Date(iso));
+
+const dateFormat = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: zone });
+/** "2 November 2026", in London time. */
+export const formatLondonDate = (iso: string): string => dateFormat.format(new Date(iso));

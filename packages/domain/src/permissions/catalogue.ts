@@ -1,6 +1,6 @@
 // Permission catalogues and provider system roles. Build pack section 6, brief 22.3 to 22.5.
 // Placeholders: M4 refines the provider list.
-import type { Permission } from '../schemas/access';
+import type { Permission, SystemRoleKey } from '../schemas/access';
 
 type Entry = readonly [id: string, description: string, opts?: { sensitive?: boolean; requires?: string[] }];
 
@@ -118,18 +118,26 @@ const closed = (ids: string[]): string[] => {
 const providerIds = providerCatalogue.map((p) => p.id);
 const reads = providerIds.filter((id) => id.endsWith('.read'));
 
-export type ProviderRoleTemplate = { key: string; name: string; description: string; permissionIds: string[] };
+export type ProviderRoleTemplate = {
+  key: string;
+  systemKey: SystemRoleKey;
+  name: string;
+  description: string;
+  permissionIds: string[];
+};
 
 export const providerRoleTemplates: ProviderRoleTemplate[] = [
-  { key: 'owner', name: 'Owner', description: 'Everything', permissionIds: providerIds },
+  { key: 'owner', systemKey: 'providerOwner', name: 'Owner', description: 'Everything', permissionIds: providerIds },
   {
     key: 'coOwner',
+    systemKey: 'providerCoOwner',
     name: 'Co-Owner',
     description: 'Everything except owner-only actions',
     permissionIds: providerIds.filter((id) => !id.startsWith('owner.')),
   },
   {
     key: 'admin',
+    systemKey: 'providerAdmin',
     name: 'Admin',
     description: 'Runs client accounts, content and support',
     permissionIds: closed([
@@ -149,6 +157,7 @@ export const providerRoleTemplates: ProviderRoleTemplate[] = [
   },
   {
     key: 'support',
+    systemKey: 'providerSupport',
     name: 'Support',
     description: 'Answers tickets and helps clients',
     permissionIds: closed([
@@ -162,6 +171,7 @@ export const providerRoleTemplates: ProviderRoleTemplate[] = [
   },
   {
     key: 'billing',
+    systemKey: 'providerBilling',
     name: 'Billing',
     description: 'Looks after billing',
     permissionIds: closed([
@@ -174,9 +184,16 @@ export const providerRoleTemplates: ProviderRoleTemplate[] = [
   },
   {
     key: 'contentEditor',
+    systemKey: 'providerContentEditor',
     name: 'Content Editor',
     description: 'Writes and edits content and packs',
     permissionIds: closed(['content.write', 'packs.write', 'feedback.read']),
   },
-  { key: 'readOnly', name: 'Read-only', description: 'Can look but not change', permissionIds: reads },
+  {
+    key: 'readOnly',
+    systemKey: 'providerReadOnly',
+    name: 'Read-only',
+    description: 'Can look but not change',
+    permissionIds: reads,
+  },
 ];

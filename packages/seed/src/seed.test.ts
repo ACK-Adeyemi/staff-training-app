@@ -494,7 +494,7 @@ describe('seed: validity and fictional data', () => {
 
   it('writes the seed metadata and leaves the audit log and outbox empty', async () => {
     const { admin, dump } = await seeded();
-    expect(await admin.getSeedMeta()).toEqual({ seedValue: 20261019, today: TODAY });
+    expect(await admin.getSeedMeta()).toEqual({ seedValue: 20261019, today: TODAY, seedVersion: 3 });
     expect(dump['audit']).toHaveLength(0);
     expect(dump['outbox']).toHaveLength(0);
   });

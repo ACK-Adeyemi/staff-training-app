@@ -28,6 +28,8 @@ pnpm e2e                              # Playwright (first: pnpm exec playwright 
 scripts/check.sh                      # every gate; add --install to fetch Chromium
 ```
 
+The end-to-end tests that read the printed matrix PDF need `pdftotext` and `pdfinfo` from poppler-utils (`apt-get install poppler-utils`).
+
 ## Build and preview
 
 ```sh

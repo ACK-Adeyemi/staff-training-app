@@ -1,0 +1,614 @@
+{
+  "title": "Safer eating, allergies and choking",
+  "description": "Allergies, weaning, preventing choking and food poisoning at mealtimes. Based on section 3 of the EYFS statutory framework.",
+  "estimatedMinutes": 8,
+  "language": "en-GB",
+  "status": "published",
+  "version": 1,
+  "roleTags": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "Allergies and dietary needs",
+      "minutes": 3
+    },
+    {
+      "id": "lesson-2",
+      "title": "Weaning, seating and choking",
+      "minutes": 3
+    },
+    {
+      "id": "lesson-3",
+      "title": "Food hygiene and food poisoning",
+      "minutes": 2
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-eat-info",
+      "type": "mcq",
+      "prompt": "What must the provider find out before a child is admitted to the setting?",
+      "options": [
+        {
+          "id": "q-eat-info-o1",
+          "text": "Any special dietary requirements, preferences, food allergies and intolerances, and any special health requirements",
+          "correct": true
+        },
+        {
+          "id": "q-eat-info-o2",
+          "text": "Only the child's favourite foods",
+          "correct": false
+        },
+        {
+          "id": "q-eat-info-o3",
+          "text": "Only whether the child eats meat",
+          "correct": false
+        },
+        {
+          "id": "q-eat-info-o4",
+          "text": "Nothing until the child's first meal",
+          "correct": false
+        }
+      ],
+      "explanation": "Before a child is admitted, the provider must obtain information about special dietary requirements, preferences, food allergies and intolerances, and special health requirements. It must be shared with all staff who prepare and handle food.",
+      "sourceRef": "EYFS 3.65",
+      "learnMore": [
+        {
+          "id": "eyfs-3-65-q-eat-info",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=37",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.65, page 37",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safer-eating"]
+    },
+    {
+      "id": "q-eat-checker",
+      "type": "mcq",
+      "prompt": "At snack time, who is responsible for checking that the food and drink meets each child's needs?",
+      "options": [
+        {
+          "id": "q-eat-checker-o1",
+          "text": "Whoever the setting has made clear is responsible at that mealtime or snack time",
+          "correct": true
+        },
+        {
+          "id": "q-eat-checker-o2",
+          "text": "Whoever happens to be nearest",
+          "correct": false
+        },
+        {
+          "id": "q-eat-checker-o3",
+          "text": "The child",
+          "correct": false
+        },
+        {
+          "id": "q-eat-checker-o4",
+          "text": "Nobody, if the menu was agreed last term",
+          "correct": false
+        }
+      ],
+      "explanation": "At each mealtime and snack time, providers must be clear about who is responsible for checking that the food and drink meets all the requirements for each child.",
+      "sourceRef": "EYFS 3.65",
+      "learnMore": [
+        {
+          "id": "eyfs-3-65-q-eat-checker",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=37",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.65, page 37",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safer-eating"]
+    },
+    {
+      "id": "q-eat-anytime",
+      "type": "trueFalse",
+      "prompt": "Children can develop allergies at any time, especially when solid foods are first introduced. True or false?",
+      "options": [
+        {
+          "id": "q-eat-anytime-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-eat-anytime-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. All staff must know that children can develop allergies at any time, especially during the introduction of solid foods, which is sometimes called weaning.",
+      "sourceRef": "EYFS 3.66",
+      "learnMore": [
+        {
+          "id": "eyfs-3-66-q-eat-anytime",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=37",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.66, page 37",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safer-eating"]
+    },
+    {
+      "id": "q-eat-plan",
+      "type": "mcq",
+      "prompt": "How should a setting manage a child's known allergy?",
+      "options": [
+        {
+          "id": "q-eat-plan-o1",
+          "text": "Develop an allergy action plan with parents and carers, and with health professionals where appropriate, keep it up to date and share it with all staff",
+          "correct": true
+        },
+        {
+          "id": "q-eat-plan-o2",
+          "text": "Keep it in the manager's head",
+          "correct": false
+        },
+        {
+          "id": "q-eat-plan-o3",
+          "text": "Ask the child to avoid the food themselves",
+          "correct": false
+        },
+        {
+          "id": "q-eat-plan-o4",
+          "text": "Wait for a reaction before making a plan",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers must have ongoing discussions with parents and carers, and where appropriate health professionals, to develop allergy action plans. The plans must be kept up to date and shared with all staff.",
+      "sourceRef": "EYFS 3.66",
+      "learnMore": [
+        {
+          "id": "eyfs-3-66-q-eat-plan",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=37",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.66, page 37",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safer-eating"]
+    },
+    {
+      "id": "q-eat-age",
+      "type": "trueFalse",
+      "prompt": "You can decide what textures a child can eat by their age alone. True or false?",
+      "options": [
+        {
+          "id": "q-eat-age-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-eat-age-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. Providers must talk with parents and carers about the stage the child is at with solid foods, including the textures they know. Assumptions must not be made based on age.",
+      "sourceRef": "EYFS 3.67",
+      "learnMore": [
+        {
+          "id": "eyfs-3-67-q-eat-age",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=37",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.67, page 37",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safer-eating"]
+    },
+    {
+      "id": "q-eat-choking-prep",
+      "type": "mcq",
+      "prompt": "What must providers do when preparing food for babies and young children?",
+      "options": [
+        {
+          "id": "q-eat-choking-prep-o1",
+          "text": "Prepare food in a way that prevents choking",
+          "correct": true
+        },
+        {
+          "id": "q-eat-choking-prep-o2",
+          "text": "Offer the same size pieces to every child",
+          "correct": false
+        },
+        {
+          "id": "q-eat-choking-prep-o3",
+          "text": "Leave preparation to the child's parents",
+          "correct": false
+        },
+        {
+          "id": "q-eat-choking-prep-o4",
+          "text": "Only worry about choking for babies",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers must prepare food in a way to prevent choking. The government's food safety guidance for early years providers explains what to avoid and how to reduce the risk.",
+      "sourceRef": "EYFS 3.68",
+      "learnMore": [
+        {
+          "id": "eyfs-3-68-q-eat-choking-prep",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=37",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.68, page 37",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "gov-food-safety-early-years",
+          "title": "Food safety: help for early years providers (GOV.UK)",
+          "url": "https://www.gov.uk/government/publications/food-safety-help-for-early-years-providers",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safer-eating"]
+    },
+    {
+      "id": "q-eat-sighthearing",
+      "type": "mcq",
+      "prompt": "Where must a member of staff be while children are eating?",
+      "options": [
+        {
+          "id": "q-eat-sighthearing-o1",
+          "text": "Children must always be within sight and hearing of a member of staff",
+          "correct": true
+        },
+        {
+          "id": "q-eat-sighthearing-o2",
+          "text": "In the next room, listening for noise",
+          "correct": false
+        },
+        {
+          "id": "q-eat-sighthearing-o3",
+          "text": "Anywhere in the building",
+          "correct": false
+        },
+        {
+          "id": "q-eat-sighthearing-o4",
+          "text": "Only in the room if a child is under one",
+          "correct": false
+        }
+      ],
+      "explanation": "Children must always be within sight and hearing of a member of staff while eating. Where possible, sit facing the children.",
+      "sourceRef": "EYFS 3.70",
+      "learnMore": [
+        {
+          "id": "eyfs-3-70-q-eat-sighthearing",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=37",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.70, page 37",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safer-eating"]
+    },
+    {
+      "id": "q-eat-silent",
+      "type": "trueFalse",
+      "prompt": "A child who is choking will always make a loud noise. True or false?",
+      "options": [
+        {
+          "id": "q-eat-silent-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-eat-silent-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. Choking can be completely silent, so staff must stay alert to a child who may be starting to choke.",
+      "sourceRef": "EYFS 3.70",
+      "learnMore": [
+        {
+          "id": "eyfs-3-70-q-eat-silent",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=37",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.70, page 37",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safer-eating"]
+    },
+    {
+      "id": "q-eat-choked-record",
+      "type": "mcq",
+      "prompt": "A child needed help after choking on a piece of food. What should the setting do afterwards?",
+      "options": [
+        {
+          "id": "q-eat-choked-record-o1",
+          "text": "Record where and how the child choked and make sure parents and carers know",
+          "correct": true
+        },
+        {
+          "id": "q-eat-choked-record-o2",
+          "text": "Nothing, as the child is fine now",
+          "correct": false
+        },
+        {
+          "id": "q-eat-choked-record-o3",
+          "text": "Tell only the manager",
+          "correct": false
+        },
+        {
+          "id": "q-eat-choked-record-o4",
+          "text": "Remove the child from lunch for a week",
+          "correct": false
+        }
+      ],
+      "explanation": "When a choking incident needs intervention, providers should record details of where and how it happened and make sure parents and carers are aware. Records should be reviewed from time to time to spot trends.",
+      "sourceRef": "EYFS 3.71",
+      "learnMore": [
+        {
+          "id": "eyfs-3-71-q-eat-choked-record",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=37",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.71, page 37",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safer-eating"]
+    },
+    {
+      "id": "q-eat-pfa",
+      "type": "mcq",
+      "prompt": "While children are eating, who should always be in the room?",
+      "options": [
+        {
+          "id": "q-eat-pfa-o1",
+          "text": "A member of staff with a valid paediatric first aid certificate",
+          "correct": true
+        },
+        {
+          "id": "q-eat-pfa-o2",
+          "text": "The cook",
+          "correct": false
+        },
+        {
+          "id": "q-eat-pfa-o3",
+          "text": "A parent volunteer",
+          "correct": false
+        },
+        {
+          "id": "q-eat-pfa-o4",
+          "text": "The manager, if they are free",
+          "correct": false
+        }
+      ],
+      "explanation": "Whilst children are eating there should always be a member of staff in the room with a valid paediatric first aid certificate for a full course.",
+      "sourceRef": "EYFS 3.64",
+      "learnMore": [
+        {
+          "id": "eyfs-3-64-q-eat-pfa",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=37",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.64, page 37",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safer-eating"]
+    },
+    {
+      "id": "q-eat-poisoning",
+      "type": "mcq",
+      "prompt": "Two children become ill with food poisoning after a meal at the setting. What must the registered provider do?",
+      "options": [
+        {
+          "id": "q-eat-poisoning-o1",
+          "text": "Tell Ofsted as soon as reasonably practicable, and within 14 days",
+          "correct": true
+        },
+        {
+          "id": "q-eat-poisoning-o2",
+          "text": "Nothing, if the children get better",
+          "correct": false
+        },
+        {
+          "id": "q-eat-poisoning-o3",
+          "text": "Tell Ofsted only after the next inspection",
+          "correct": false
+        },
+        {
+          "id": "q-eat-poisoning-o4",
+          "text": "Tell the other parents but nobody else",
+          "correct": false
+        }
+      ],
+      "explanation": "Registered providers must notify Ofsted (or the childminder agency) of any food poisoning affecting two or more children cared for on the premises, as soon as is reasonably practicable and in any event within 14 days.",
+      "sourceRef": "EYFS 3.73",
+      "learnMore": [
+        {
+          "id": "eyfs-3-73-q-eat-poisoning",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=38",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.73, page 38",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safer-eating"]
+    },
+    {
+      "id": "q-sc-new-snack",
+      "type": "scenario",
+      "prompt": "A new child, Sam, is about to start. His mum mentions he has a nut allergy and the doctor gave him an action plan.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-new-snack-s1",
+            "text": "What should the setting do before Sam's first day?",
+            "choices": [
+              {
+                "id": "q-sc-new-snack-s1-c1",
+                "text": "Get the allergy information and plan from Sam's parents, share it with all staff who prepare and handle food, and agree who checks his food",
+                "outcome": "best",
+                "feedback": "Yes. This must happen before a child is admitted.",
+                "next": "q-sc-new-snack-s2"
+              },
+              {
+                "id": "q-sc-new-snack-s1-c2",
+                "text": "Tell only the key person",
+                "outcome": "poor",
+                "feedback": "The information must be shared with all staff who prepare and handle food.",
+                "next": "q-sc-new-snack-s2"
+              },
+              {
+                "id": "q-sc-new-snack-s1-c3",
+                "text": "Ask the parents to bring a note on his first day",
+                "outcome": "poor",
+                "feedback": "The setting needs the information before he is admitted, not after.",
+                "next": "q-sc-new-snack-s2"
+              }
+            ]
+          },
+          {
+            "id": "q-sc-new-snack-s2",
+            "text": "On Sam's third day another child shares a snack that might contain nuts. Sam has not eaten any. What next?",
+            "choices": [
+              {
+                "id": "q-sc-new-snack-s2-c1",
+                "text": "Move the snack, check what Sam may have eaten, and follow his allergy action plan if you see any symptoms",
+                "outcome": "best",
+                "feedback": "Right. Stay close and follow the plan."
+              },
+              {
+                "id": "q-sc-new-snack-s2-c2",
+                "text": "Do nothing, since Sam has not eaten any",
+                "outcome": "poor",
+                "feedback": "Act now to stop the sharing. Sitting facing the children helps you prevent food sharing."
+              },
+              {
+                "id": "q-sc-new-snack-s2-c3",
+                "text": "Wait until the end of the day to mention it",
+                "outcome": "poor",
+                "feedback": "Act straight away and follow the action plan if symptoms appear."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Get the child's allergy information and action plan before they are admitted, share it with all staff, and prevent food sharing at mealtimes.",
+      "sourceRef": "EYFS 3.65",
+      "learnMore": [
+        {
+          "id": "eyfs-3-65-q-sc-new-snack",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=37",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.65, page 37",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safer-eating"]
+    },
+    {
+      "id": "q-sc-quiet-child",
+      "type": "scenario",
+      "prompt": "At lunch, Jo, aged 2, goes quiet and looks upset. There was no cough or noise. You are busy at the other table.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-quiet-child-s1",
+            "text": "What do you do?",
+            "choices": [
+              {
+                "id": "q-sc-quiet-child-s1-c1",
+                "text": "Go to Jo straight away and check, because choking can be silent",
+                "outcome": "best",
+                "feedback": "Right. Silence does not mean a child is fine."
+              },
+              {
+                "id": "q-sc-quiet-child-s1-c2",
+                "text": "Assume Jo is just tired",
+                "outcome": "poor",
+                "feedback": "Choking can be completely silent. Check straight away."
+              },
+              {
+                "id": "q-sc-quiet-child-s1-c3",
+                "text": "Wait to see if Jo makes a noise",
+                "outcome": "poor",
+                "feedback": "Children can choke without any noise. Go to them at once."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Choking can be completely silent, so staff must be within sight and hearing and ready to act. A trained first aider should be in the room while children eat.",
+      "sourceRef": "EYFS 3.70",
+      "learnMore": [
+        {
+          "id": "eyfs-3-70-q-sc-quiet-child",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=37",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.70, page 37",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["safer-eating"]
+    }
+  ],
+  "quiz": {
+    "mode": "mix",
+    "mixScenarioShare": 0.4,
+    "drawCount": 10,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "passMark": 80,
+    "maxRetakes": null,
+    "feedback": true,
+    "showSourceRef": true,
+    "notesInQuiz": "choice",
+    "learnMoreFor": "all"
+  },
+  "sourceAttribution": "Based on the Early Years Foundation Stage statutory framework for group and school-based providers (Department for Education, September 2026). Contains public sector information licensed under the Open Government Licence v3.0.",
+  "draftContent": true,
+  "verify": [
+    "Draft content: wording checked against the cached September 2026 EYFS PDF (paragraphs 3.64 to 3.73); page numbers are printed page numbers. Re-check if the framework is reissued.",
+    "The GOV.UK food safety page URL (food-safety-help-for-early-years-providers) is from memory; paragraph 3.68 names the page but not its address. Check it opens.",
+    "Lesson 3 food hygiene sentence follows 3.72. The cooking and cleaning detail belongs to the Food hygiene module (later).",
+    "Optional module with no requirement link (decisions.md M2 assumption 34). Confirm.",
+    "Open Government Licence attribution wording."
+  ]
+}

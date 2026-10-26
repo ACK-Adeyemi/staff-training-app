@@ -30,7 +30,8 @@ test('staff: each tab navigates and sets aria-current', async ({ page }) => {
 test('staff: the header bell and Help reach their routes', async ({ page }) => {
   await page.goto('./#/staff');
   for (const entry of staffExtra) {
-    await page.getByRole('banner').getByRole('link', { name: entry.label, exact: true }).click();
+    // Not exact: from chunk 8 the bell's name carries the unread count, for example "Notifications, 1 unread".
+    await page.getByRole('banner').getByRole('link', { name: entry.label }).click();
     await expectAt(page, entry);
   }
 });

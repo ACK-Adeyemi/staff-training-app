@@ -1,2 +1,34 @@
 @import '@sta/ui/tailwind.css';
 @source "../../../../packages/ui/src";
+
+/* The training matrix prints on A4 landscape. Other pages keep the browser's default page. */
+@page matrix {
+  size: A4 landscape;
+  margin: 12mm;
+}
+
+@media print {
+  .matrix-page {
+    page: matrix;
+  }
+  .matrix-page [role='region'] {
+    overflow: visible;
+  }
+  .matrix-page table {
+    table-layout: fixed;
+    width: 100%;
+    font-size: 8.5pt;
+  }
+  .matrix-page th,
+  .matrix-page td {
+    padding: 3px 4px;
+    overflow-wrap: anywhere;
+  }
+  .matrix-page th:first-child,
+  .matrix-page td:first-child {
+    width: 11rem;
+  }
+  .matrix-page [data-print='friendly'] svg {
+    flex: none;
+  }
+}

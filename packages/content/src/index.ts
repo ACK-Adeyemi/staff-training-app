@@ -4,4 +4,11 @@ export type { CreateTOptions, LanguageCode, MessageKey, Messages, Params, TFunct
 export { addOnIds, addOns, floorPackageId, packageIds, packages } from './packages';
 export { moduleIds } from './packs/moduleIds';
 export { nurseryPack } from './packs/nursery';
+export { nurseryModules } from './packs/nursery/modules';
 export { allPacks, luxuryRetailPlaceholder, stubPacks } from './packs/stubs';
+export { nurseryCategories, nurseryModuleCategory } from './packs/nursery/categories';
+export type { NurseryCategory } from './packs/nursery/categories';
+export { nurseryComingSoon } from './packs/nursery/comingSoon';
+export type { ComingSoonTopic } from './packs/nursery/comingSoon';
+export { default as levelConfig } from './engagement/levels.json';
+export { default as badgeDefinitions } from './engagement/badges.json';

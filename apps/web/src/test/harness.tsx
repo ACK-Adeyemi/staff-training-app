@@ -37,7 +37,7 @@ export function actorFor(side: Side, keys: SeedKeys): ActorContext {
   return { userId: need(keys.users.providerOwner), side, now: TODAY };
 }
 
-export function makeDemo(side: Side, keys: SeedKeys) {
+export function makeDemo(side: Side, keys: SeedKeys, handle?: StoreHandle) {
   const actor = actorFor(side, keys);
   return {
     state: { clockOffsetMs: 0, industry: 'nursery' as const, persona: { side, userId: actor.userId } },
@@ -45,16 +45,36 @@ export function makeDemo(side: Side, keys: SeedKeys) {
     fastForward: vi.fn(),
     backToToday: vi.fn(),
     setIndustry: vi.fn(),
+    // Chunk 8 contract: the sign-in screen lists staff and switches persona through these.
+    listStaffUsers: (clientId: string) => (handle ? handle.admin.listStaffUsers(clientId) : Promise.resolve([])),
+    signInAs: vi.fn(),
     listOutbox: () => Promise.resolve([] as OutboxMessage[]),
   };
 }
 
-export async function renderRoute(path: string, side: Side) {
+export async function renderRoute(
+  path: string,
+  side: Side,
+  opts: {
+    prepare?: (ctx: { handle: StoreHandle; keys: SeedKeys }) => Promise<void>;
+    /** Run as someone other than the side's default persona (chunk 10: client users other than Priya). */
+    actor?: (keys: SeedKeys) => ActorContext;
+  } = {},
+) {
   const { handle, keys } = await seededStore();
+  if (opts.prepare) await opts.prepare({ handle, keys });
   const router = createMemoryRouter(routes, { initialEntries: [path] });
-  const demo = makeDemo(side, keys);
+  const actor = opts.actor ? opts.actor(keys) : actorFor(side, keys);
+  const demo = makeDemo(side, keys, handle);
+  demo.state.persona.userId = actor.userId;
   const view = render(
-    <AppProviders store={handle.store} clock={fixedClock(TODAY)} actor={actorFor(side, keys)} demo={demo}>
+    <AppProviders
+      store={handle.store}
+      clock={fixedClock(TODAY)}
+      actor={actor}
+      demo={demo}
+      subscribe={(l) => handle.subscribe(l)}
+    >
       <RouterProvider router={router} />
     </AppProviders>,
   );

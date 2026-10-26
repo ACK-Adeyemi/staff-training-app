@@ -1,7 +1,8 @@
 import { createIndexedDbStore } from '@sta/data';
 import type { StoreHandle } from '@sta/data';
+import { wantsReset, withoutReset } from './resetParam';
 import { createRng, offsetClock, startOfLondonDay, systemClock, type Clock, type DemoState } from '@sta/domain';
-import { DEFAULT_SEED_VALUE, load, reset, seedKeys, type SeedKeys } from '@sta/seed';
+import { DEFAULT_SEED_VALUE, ensureCurrentSeed, load, reset, seedKeys, type SeedKeys } from '@sta/seed';
 
 export type Booted = {
   handle: StoreHandle;
@@ -12,7 +13,8 @@ export type Booted = {
 };
 
 /** Opens the IndexedDB store and seeds it on first load. The only place that reads the system clock for "today". */
-export async function bootstrap(search: string): Promise<Booted> {
+export async function bootstrap(search: string, hash = ''): Promise<Booted> {
+  const resetRequested = wantsReset(search, hash);
   let offsetMs = 0;
   const storeClock: Clock = { now: () => offsetClock(systemClock, offsetMs).now() };
   const rng = createRng(systemClock.now().getTime());
@@ -24,19 +26,17 @@ export async function bootstrap(search: string): Promise<Booted> {
   if (!meta) {
     meta = { seedValue: DEFAULT_SEED_VALUE, today: startOfLondonDay(systemClock.now()).toISOString() };
     keys = await load(admin, meta);
-  } else if (new URLSearchParams(search).get('reset') === '1') {
+  } else if (resetRequested) {
     keys = await reset(admin);
   } else {
-    keys = seedKeys(meta);
+    keys = (await ensureCurrentSeed(admin)) ?? seedKeys(meta);
   }
 
   let state = await admin.getDemoState();
-  if (new URLSearchParams(search).get('reset') === '1') {
-    const url = new URL(window.location.href);
-    url.searchParams.delete('reset');
-    window.history.replaceState(null, '', url);
+  if (resetRequested) {
+    window.history.replaceState(null, '', withoutReset(window.location.href));
   }
-  if (!state || new URLSearchParams(search).get('reset') === '1') {
+  if (!state || resetRequested) {
     state = {
       clockOffsetMs: 0,
       industry: state?.industry ?? 'nursery',

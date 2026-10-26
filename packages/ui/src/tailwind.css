@@ -25,4 +25,45 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
+  line-height: var(--line-height, 1.5);
+  letter-spacing: var(--letter-spacing, 0em);
+  word-spacing: var(--word-spacing, 0em);
+}
+
+/* Long words in headings and questions wrap instead of pushing the page sideways at large text sizes. */
+h1,
+h2,
+h3,
+legend,
+label {
+  overflow-wrap: anywhere;
+}
+
+fieldset {
+  min-width: 0;
+}
+
+/* Set by the Dyslexia-friendly font setting; the font file loads only when it is chosen. */
+html[data-reading-font='dyslexiaFriendly'] body {
+  font-family: 'OpenDyslexic', var(--font-sans);
+}
+
+@media print {
+  table[data-print='friendly'] {
+    color: #000;
+    background: #fff;
+    font-size: 11pt;
+  }
+  table[data-print='friendly'] th,
+  table[data-print='friendly'] td {
+    border: 1px solid #000;
+    background: #fff !important;
+    position: static !important;
+  }
+  table[data-print='friendly'] thead {
+    display: table-header-group;
+  }
+  table[data-print='friendly'] tr {
+    break-inside: avoid;
+  }
 }

@@ -7,7 +7,8 @@
 //   canEditRolesOf(actorUserId, targetUserId): boolean
 //   lastOwnerGuard(change, assignments, roles, now: Date): { ok: true } | { ok: false; reason: 'lastOwner' }
 //   canApproveEvidence(actor, submission, context): { allowed, selfApproved?, reason? }
-// Owner roles are recognised by `system: true` and name 'Owner' (provider) or 'Account Owner' (client).
+// Owner roles are recognised by `system: true` and `systemKey` 'providerOwner' (provider) or 'accountOwner' (client),
+// never by name (M1 chunk 1). System test roles therefore carry a systemKey.
 import { describe, expect, it } from 'vitest';
 import { idSchema } from '../schemas/primitives';
 import type { Role, RoleAssignment } from '../schemas/access';
@@ -367,8 +368,18 @@ describe('canEditRolesOf', () => {
 });
 
 describe('lastOwnerGuard: provider Owner', () => {
-  const owner = role('POWNER', ['owner.transfer'], { owner: 'provider', name: 'Owner', system: true });
-  const admin = role('PADMIN', ['clients.read'], { owner: 'provider', name: 'Admin', system: true });
+  const owner = role('POWNER', ['owner.transfer'], {
+    owner: 'provider',
+    name: 'Owner',
+    system: true,
+    systemKey: 'providerOwner',
+  });
+  const admin = role('PADMIN', ['clients.read'], {
+    owner: 'provider',
+    name: 'Admin',
+    system: true,
+    systemKey: 'providerAdmin',
+  });
   const only = assign(U_A, [owner], { type: 'all' });
   const second = assign(U_B, [owner], { type: 'all' });
   const roles = [owner, admin];
@@ -452,13 +463,18 @@ describe('lastOwnerGuard: provider Owner', () => {
 });
 
 describe('lastOwnerGuard: client Account Owner', () => {
-  const acctOwner = role('ACCTOWNER', ['staff.view'], { name: 'Account Owner', system: true });
+  const acctOwner = role('ACCTOWNER', ['staff.view'], {
+    name: 'Account Owner',
+    system: true,
+    systemKey: 'accountOwner',
+  });
   const otherClientOwner = role('ACCTOWNER2', ['staff.view'], {
     name: 'Account Owner',
     system: true,
+    systemKey: 'accountOwner',
     owner: { clientId: C2 },
   });
-  const trainer = role('TRAINER', ['modules.view'], { name: 'Trainer', system: true });
+  const trainer = role('TRAINER', ['modules.view'], { name: 'Trainer', system: true, systemKey: 'trainer' });
   const roles = [acctOwner, otherClientOwner, trainer];
 
   it('refuses removing, suspending or deleting the only Account Owner of a client', () => {

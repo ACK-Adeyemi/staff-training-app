@@ -1,0 +1,460 @@
+{
+  "title": "Paediatric first aid and accidents",
+  "description": "Who must hold a paediatric first aid certificate, and what to do and record when a child has an accident. Based on section 3 of the EYFS statutory framework.",
+  "estimatedMinutes": 6,
+  "language": "en-GB",
+  "status": "published",
+  "version": 1,
+  "roleTags": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "Paediatric first aid and first aiders",
+      "minutes": 3
+    },
+    {
+      "id": "lesson-2",
+      "title": "Accidents, records and telling people",
+      "minutes": 3
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-pfa-onsite",
+      "type": "mcq",
+      "prompt": "Who must be on the premises and available at all times when children are present?",
+      "options": [
+        {
+          "id": "q-pfa-onsite-o1",
+          "text": "At least one person with a current paediatric first aid certificate",
+          "correct": true
+        },
+        {
+          "id": "q-pfa-onsite-o2",
+          "text": "The manager, whether or not they hold a first aid certificate",
+          "correct": false
+        },
+        {
+          "id": "q-pfa-onsite-o3",
+          "text": "A first aider only when children are playing outside",
+          "correct": false
+        },
+        {
+          "id": "q-pfa-onsite-o4",
+          "text": "Any member of staff who has read the first aid policy",
+          "correct": false
+        }
+      ],
+      "explanation": "At least one person with a current paediatric first aid (PFA) certificate must be on the premises and available at all times when children are present. They must also go with children on outings.",
+      "sourceRef": "EYFS 3.37",
+      "learnMore": [
+        {
+          "id": "eyfs-3-37-q-pfa-onsite",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=30",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.37, page 30",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "hse-first-aid-training",
+          "title": "HSE guidance on choosing a first aid training provider",
+          "url": "https://www.hse.gov.uk/pubns/geis3.htm",
+          "publisher": "Health and Safety Executive",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["first-aid"]
+    },
+    {
+      "id": "q-pfa-outings",
+      "type": "trueFalse",
+      "prompt": "A paediatric first aider does not need to go on outings, as long as one stays at the setting. True or false?",
+      "options": [
+        {
+          "id": "q-pfa-outings-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-pfa-outings-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. The person with a current PFA certificate must accompany children on outings, as well as being on the premises whenever children are present.",
+      "sourceRef": "EYFS 3.37",
+      "learnMore": [
+        {
+          "id": "eyfs-3-37-q-pfa-outings",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=30",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.37, page 30",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["first-aid"]
+    },
+    {
+      "id": "q-pfa-renew",
+      "type": "mcq",
+      "prompt": "How often must paediatric first aid training be renewed?",
+      "options": [
+        {
+          "id": "q-pfa-renew-o1",
+          "text": "Every year",
+          "correct": false
+        },
+        {
+          "id": "q-pfa-renew-o2",
+          "text": "Every three years",
+          "correct": true
+        },
+        {
+          "id": "q-pfa-renew-o3",
+          "text": "Every five years",
+          "correct": false
+        },
+        {
+          "id": "q-pfa-renew-o4",
+          "text": "Only when the setting is inspected",
+          "correct": false
+        }
+      ],
+      "explanation": "PFA training must be renewed every three years. It must be a full course that suits people caring for young children and babies.",
+      "sourceRef": "EYFS 3.37",
+      "learnMore": [
+        {
+          "id": "eyfs-3-37-q-pfa-renew",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=30",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.37, page 30",
+          "language": "en-GB",
+          "showFor": "all"
+        },
+        {
+          "id": "hse-first-aid-training",
+          "title": "HSE guidance on choosing a first aid training provider",
+          "url": "https://www.hse.gov.uk/pubns/geis3.htm",
+          "publisher": "Health and Safety Executive",
+          "kind": "official",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["first-aid"]
+    },
+    {
+      "id": "q-pfa-new-staff",
+      "type": "mcq",
+      "prompt": "A member of staff gained a level 3 qualification in 2020. Within what time must they get a PFA qualification to be counted in the staff:child ratios?",
+      "options": [
+        {
+          "id": "q-pfa-new-staff-o1",
+          "text": "Within three months of starting work",
+          "correct": true
+        },
+        {
+          "id": "q-pfa-new-staff-o2",
+          "text": "Within one year of starting work",
+          "correct": false
+        },
+        {
+          "id": "q-pfa-new-staff-o3",
+          "text": "Before their first day",
+          "correct": false
+        },
+        {
+          "id": "q-pfa-new-staff-o4",
+          "text": "Only if the manager asks them to",
+          "correct": false
+        }
+      ],
+      "explanation": "Staff who gained a level 2 or level 3 qualification since 30 June 2016 must get a PFA qualification within three months of starting work to be included in the required ratios. A few exceptions apply, for example for a disability, so ask your manager.",
+      "sourceRef": "EYFS 3.39",
+      "learnMore": [
+        {
+          "id": "eyfs-3-39-q-pfa-new-staff",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=30",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.39, page 30",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["first-aid"]
+    },
+    {
+      "id": "q-pfa-display",
+      "type": "trueFalse",
+      "prompt": "Settings should display staff PFA certificates, or make them available to parents and carers, or share a list of staff with a current certificate. True or false?",
+      "options": [
+        {
+          "id": "q-pfa-display-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-pfa-display-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. Providers should display staff PFA certificates, or make them available to parents and carers, or a list of staff who have a current certificate.",
+      "sourceRef": "EYFS 3.40",
+      "learnMore": [
+        {
+          "id": "eyfs-3-40-q-pfa-display",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=31",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.40, page 31",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["first-aid"]
+    },
+    {
+      "id": "q-pfa-record",
+      "type": "mcq",
+      "prompt": "A child has a small fall and you give first aid. What must the setting do about parents and carers?",
+      "options": [
+        {
+          "id": "q-pfa-record-o1",
+          "text": "Tell them on the same day, or as soon as reasonably practicable after, and tell them about any first aid given",
+          "correct": true
+        },
+        {
+          "id": "q-pfa-record-o2",
+          "text": "Wait for them to ask at the next parents' evening",
+          "correct": false
+        },
+        {
+          "id": "q-pfa-record-o3",
+          "text": "Tell them only if the child needs to go to hospital",
+          "correct": false
+        },
+        {
+          "id": "q-pfa-record-o4",
+          "text": "Nothing, as long as the child seems happy",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers must keep a written record of accidents or injuries and first aid treatment, and inform parents and carers of any accident or injury on the same day, or as soon as reasonably practicable after, and of any first aid given.",
+      "sourceRef": "EYFS 3.78",
+      "learnMore": [
+        {
+          "id": "eyfs-3-78-q-pfa-record",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=39",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.78, page 39",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["first-aid"]
+    },
+    {
+      "id": "q-pfa-ofsted",
+      "type": "mcq",
+      "prompt": "A child is seriously injured while in the setting's care. Within how many days must the registered provider tell Ofsted?",
+      "options": [
+        {
+          "id": "q-pfa-ofsted-o1",
+          "text": "Within 14 days, but as soon as reasonably practicable",
+          "correct": true
+        },
+        {
+          "id": "q-pfa-ofsted-o2",
+          "text": "Within 6 months",
+          "correct": false
+        },
+        {
+          "id": "q-pfa-ofsted-o3",
+          "text": "Only if the parents complain",
+          "correct": false
+        },
+        {
+          "id": "q-pfa-ofsted-o4",
+          "text": "By the end of the term",
+          "correct": false
+        }
+      ],
+      "explanation": "A registered provider must tell Ofsted (or the childminder agency) of any serious accident, illness or injury to a child, and the action taken, as soon as reasonably practicable and in any event within 14 days. The provider must also tell local child protection agencies.",
+      "sourceRef": "EYFS 3.79",
+      "learnMore": [
+        {
+          "id": "eyfs-3-79-q-pfa-ofsted",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=39",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.79, page 39",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["first-aid"]
+    },
+    {
+      "id": "q-sc-bump-head",
+      "type": "scenario",
+      "prompt": "Mia, aged 3, trips on the step and bumps her head. She cries but settles quickly.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-bump-head-s1",
+            "text": "What do you do first?",
+            "choices": [
+              {
+                "id": "q-sc-bump-head-s1-c1",
+                "text": "Fetch the paediatric first aider, who checks Mia and gives any first aid",
+                "outcome": "best",
+                "feedback": "Right. Get a trained first aider to her straight away.",
+                "next": "q-sc-bump-head-s2"
+              },
+              {
+                "id": "q-sc-bump-head-s1-c2",
+                "text": "Give her a hug and carry on, as she seems fine",
+                "outcome": "poor",
+                "feedback": "She may need checking. Always ask the first aider.",
+                "next": "q-sc-bump-head-s2"
+              },
+              {
+                "id": "q-sc-bump-head-s1-c3",
+                "text": "Phone her parents before anyone has looked at her",
+                "outcome": "ok",
+                "feedback": "Parents must be told, but first make sure Mia has been looked at.",
+                "next": "q-sc-bump-head-s2"
+              }
+            ]
+          },
+          {
+            "id": "q-sc-bump-head-s2",
+            "text": "Mia has been checked and is happy. Pick-up time is at 5pm. What happens next?",
+            "choices": [
+              {
+                "id": "q-sc-bump-head-s2-c1",
+                "text": "The accident and first aid are written down, and her parents are told the same day",
+                "outcome": "best",
+                "feedback": "Yes. A written record is needed, and parents must be told the same day or as soon as reasonably practicable after."
+              },
+              {
+                "id": "q-sc-bump-head-s2-c2",
+                "text": "You tell her parents next week if they ask",
+                "outcome": "poor",
+                "feedback": "Parents must be told the same day or as soon as reasonably practicable after."
+              },
+              {
+                "id": "q-sc-bump-head-s2-c3",
+                "text": "You tell her parents but do not write anything down",
+                "outcome": "poor",
+                "feedback": "Providers must keep a written record of accidents, injuries and first aid treatment."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Get a trained first aider to the child, then keep a written record and tell parents or carers the same day, or as soon as reasonably practicable after.",
+      "sourceRef": "EYFS 3.78",
+      "learnMore": [
+        {
+          "id": "eyfs-3-78-q-sc-bump-head",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=39",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.78, page 39",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["first-aid"]
+    },
+    {
+      "id": "q-sc-outing",
+      "type": "scenario",
+      "prompt": "Your nursery has a trip to the park planned this morning. The only staff member with a current PFA certificate has called in sick.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-outing-s1",
+            "text": "What should the manager do?",
+            "choices": [
+              {
+                "id": "q-sc-outing-s1-c1",
+                "text": "Make sure someone with a current PFA certificate goes with the children, or change the plan",
+                "outcome": "best",
+                "feedback": "Right. A person with a current PFA certificate must go on outings."
+              },
+              {
+                "id": "q-sc-outing-s1-c2",
+                "text": "Go anyway, and take the first aid box",
+                "outcome": "poor",
+                "feedback": "A first aid box is needed, but it does not replace a person with a current PFA certificate on the outing."
+              },
+              {
+                "id": "q-sc-outing-s1-c3",
+                "text": "Go anyway, and ring the setting if there is an accident",
+                "outcome": "poor",
+                "feedback": "Someone with a current PFA certificate must be with the children on the outing."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "A person with a current PFA certificate must accompany children on outings. If nobody is available, the outing needs to change.",
+      "sourceRef": "EYFS 3.37",
+      "learnMore": [
+        {
+          "id": "eyfs-3-37-q-sc-outing",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=30",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.37, page 30",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["first-aid"]
+    }
+  ],
+  "quiz": {
+    "mode": "mix",
+    "mixScenarioShare": 0.4,
+    "drawCount": 10,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "passMark": 80,
+    "maxRetakes": null,
+    "feedback": true,
+    "showSourceRef": true,
+    "notesInQuiz": "choice",
+    "learnMoreFor": "all"
+  },
+  "sourceAttribution": "Based on the Early Years Foundation Stage statutory framework for group and school-based providers (Department for Education, September 2026). Contains public sector information licensed under the Open Government Licence v3.0.",
+  "draftContent": true,
+  "verify": [
+    "Draft content: wording checked against the cached September 2026 EYFS PDF (paragraphs 3.37, 3.39, 3.40, 3.78, 3.79); page numbers are printed page numbers. Re-check if the framework is reissued.",
+    "The HSE link (www.hse.gov.uk/pubns/geis3.htm) comes from footnote 32 of the framework. It could not be opened from the build environment; check it resolves.",
+    "The 36 month renewal period on the requirement matches EYFS 3.37 (three years); the 3.39 text also says renewed every 3 years.",
+    "3.39 exceptions (for example disability) are only mentioned briefly in the question. Review the wording.",
+    "Open Government Licence attribution wording."
+  ]
+}
