@@ -3,7 +3,7 @@
 # Dev container for this app: the toolchain plus Claude Code.
 # Built and started by scripts/agent. Trim or extend it once the app's stack is chosen.
 
-FROM node:24
+FROM node:26
 
 ARG CLAUDE_CODE_VERSION=latest
 ENV DEBIAN_FRONTEND=noninteractive
