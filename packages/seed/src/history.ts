@@ -67,7 +67,7 @@ function scenarioPaths(q: Question): string[][] {
 }
 
 /** An answer that is right (or wrong), checked with the same function the data layer uses. */
-function answerFor(q: Question, correct: boolean): Answer {
+export function answerFor(q: Question, correct: boolean): Answer {
   if (q.type === 'scenario') {
     const choiceIds = scenarioPaths(q).find((p) => checkAnswer(q, { choiceIds: p }).correct === correct);
     if (!choiceIds) throw new Error(`Seed: no ${correct ? 'best' : 'poor'} path in ${q.id}`);

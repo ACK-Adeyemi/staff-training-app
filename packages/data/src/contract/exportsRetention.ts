@@ -31,9 +31,11 @@ import {
   createRng,
   fixedClock,
   type Assignment,
+  type Attachment,
   type Attempt,
   type Client,
   type Evidence,
+  type EvidenceSubmission,
   type LearningEvent,
   type Note,
   type Person,
@@ -379,6 +381,59 @@ export function runExportsRetentionContract(
         expect((await dump<Attempt>(s.admin, 'attempts')).filter((x) => x.personId === s.jade)).toEqual(attemptsBefore);
       });
 
+      it('anonymise removes a rejected certificate file and a file a resubmission replaced, and keeps the approved one', async () => {
+        const s: S = await setup();
+        const last = await surname(s, s.jade);
+        const evidence = (await dump<Evidence>(s.admin, 'evidence')).find((e) => e.personId === s.jade)!;
+        const file = (n: number): Attachment => ({
+          id: freshId(8100 + n),
+          clientId: s.a,
+          kind: 'file',
+          purpose: 'certificate',
+          title: `Certificate ${n}`,
+          mime: 'application/pdf',
+          bytes: 5,
+          data: new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d]),
+          ownerUserId: s.ids.users.jade,
+          personId: s.jade,
+          redacted: false,
+          createdAt: '2026-10-01T09:00:00.000Z',
+        });
+        const [approvedFile, rejectedFile, replacedFile] = [file(1), file(2), file(3)] as [
+          Attachment,
+          Attachment,
+          Attachment,
+        ];
+        const submission = (n: number, fileId: string, status: EvidenceSubmission['status']): EvidenceSubmission => ({
+          id: freshId(8200 + n),
+          clientId: s.a,
+          siteId: evidence.siteIdAtTime,
+          personId: s.jade,
+          requirementId: evidence.requirementId,
+          uploadedBy: s.ids.users.jade,
+          fileAttachmentId: fileId,
+          providerName: 'Sample Training',
+          completedAt: '2026-09-01T09:00:00.000Z',
+          status,
+          createdAt: '2026-10-01T09:00:00.000Z',
+          ...(status === 'rejected' ? { reviewedAt: '2026-10-05T09:00:00.000Z' } : {}),
+        });
+        await s.admin.bulkPut('attachments', [approvedFile, rejectedFile, replacedFile]);
+        await s.admin.bulkPut('evidenceSubmissions', [
+          submission(1, approvedFile.id, 'approved'),
+          submission(2, rejectedFile.id, 'rejected'),
+        ]);
+        await s.store.people.erase(s.actors.priya, s.jade, {
+          mode: 'anonymise',
+          confirmName: `Jade ${last}`,
+          code: CODE,
+        });
+        const left = (await dump<Attachment>(s.admin, 'attachments')).map((a) => a.id);
+        expect(left).toContain(approvedFile.id);
+        expect(left).not.toContain(rejectedFile.id);
+        expect(left).not.toContain(replacedFile.id);
+      });
+
       it('leaves other people and other clients untouched', async () => {
         const s: S = await setup();
         const last = await surname(s, s.jade);
@@ -444,6 +499,16 @@ export function runExportsRetentionContract(
         expect(notes?.at.slice(0, 10)).toBe('2026-02-14'); // 30 days
         const times = schedule.map((d) => Date.parse(d.at));
         expect(times).toEqual([...times].sort((x, y) => x - y));
+      });
+
+      it('lists the deletion date of a Closed account, and none for an account that is not Closed', async () => {
+        const s: S = await setup();
+        const closed = await s.store.retention.schedule(s.actors.closedOwner);
+        const account = closed.filter((d) => d.category === 'account');
+        expect(account).toHaveLength(1);
+        expect(Date.parse(account[0]!.at)).toBeGreaterThan(Date.parse(TODAY));
+        const active = await s.store.retention.schedule(s.actors.priya);
+        expect(active.some((d) => d.category === 'account')).toBe(false);
       });
 
       it('updates the policy, moves the dates and audits it', async () => {

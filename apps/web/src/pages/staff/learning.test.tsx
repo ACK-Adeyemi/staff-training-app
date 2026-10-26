@@ -323,7 +323,7 @@ describe('S6 quiz', () => {
     const fb = feedbackRegion();
     const heading = within(fb).getByText('From your organisation');
     const org = within(fb).getByRole('link', { name: /Little Acorns Safeguarding policy/ });
-    const policy = (await dump(r.handle)).attachments![0]!;
+    const policy = (await dump(r.handle)).attachments!.find((a) => a['kind'] === 'document')!;
     expect(org.getAttribute('href')).toMatch(new RegExp(`#/doc/${String(policy['id'])}$`));
     expect(org.getAttribute('target')).toBe('_blank');
     expect(org.getAttribute('rel')).toBe('noopener noreferrer');
@@ -575,7 +575,7 @@ describe('certificate', () => {
 describe('organisation document page', () => {
   const policyId = async () => {
     const { handle } = await seededStore();
-    return String((await dump(handle)).attachments![0]!['id']);
+    return String((await dump(handle)).attachments!.find((a) => a['kind'] === 'document')!['id']);
   };
 
   it('renders the Little Acorns policy as Markdown for a same-client person, outside the shell navigation', async () => {

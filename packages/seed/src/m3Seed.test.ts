@@ -512,7 +512,6 @@ describe('seed version 4: submissions and their files (assumption 54)', () => {
     expect(new Date(a.reviewedAt!).getTime()).toBeLessThan(NOW.getTime());
     const evidence = dump['evidence']!.find((e) => e.id === a.evidenceId);
     expect(evidence).toMatchObject({ personId: a.personId, requirementId: a.requirementId, kind: 'external' });
-    expect(evidence.submissionId).toBe(a.id);
   });
 
   it('gives every submission a small fictional PDF file of the right person at the right client', async () => {

@@ -65,7 +65,7 @@ test('Priya adds a category, moves Safer sleep into it and puts it first; Jade f
     .getByTestId('learn-active-filters')
     .getByRole('button', { name: `Remove filter: ${NEW_CATEGORY}` })
     .click();
-  await expect(page.getByTestId('learn-count')).toHaveText('5 modules');
+  await expect(page.getByTestId('learn-count')).toHaveText('6 modules');
 });
 
 test('Maureen (Simple view) sees a plain Learn list with no path nodes', async ({ page }) => {

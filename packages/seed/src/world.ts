@@ -17,6 +17,17 @@ import {
   ulid,
   type AccountState,
   type AddOnSubscription,
+  type AppFeedback,
+  type AutoAssignRule,
+  type BillingProfile,
+  type Invoice,
+  type ModuleFeedback,
+  type ModuleVersion,
+  type OnboardingChecklist,
+  type ReminderLog,
+  type Theme,
+  type Ticket,
+  type TicketMessage,
   type Assignment,
   type Attachment,
   type Attempt,
@@ -50,6 +61,7 @@ import {
   type UserAccount,
 } from '@sta/domain';
 import { buildHistory } from './history';
+import { buildBilling, buildFeedback, buildM3History, buildSupport } from './m3';
 
 /** Well-known keys are declared properties, so reading one gives a string; any other key is looked up by index. */
 type KeyMap<K extends string> = Record<K, string> & Record<string, string>;
@@ -106,7 +118,9 @@ export type SeedKeys = {
     | 'joeBarlow'
   >;
   requirements: KeyMap<'safeguarding' | 'paediatricFirstAid' | 'foodHygiene' | 'whatChanged' | 'newStarterInduction'>;
-  submissions: KeyMap<'ben'>;
+  submissions: KeyMap<'ben' | 'ellie' | 'kasia'>;
+  /** Little Acorns' own modules (M3). */
+  modules: KeyMap<'fireEvacuation' | 'loneWorking'>;
   /** `${clientKey}.${roleKey}`, for example `littleAcorns.accountOwner`, and `provider.owner`. */
   roles: Record<string, string>;
 };
@@ -142,6 +156,18 @@ export type SeedData = {
   modulePlacements: ModulePlacement[];
   competitions: Competition[];
   standingBoardSettings: StandingBoardSettings[];
+  // Added in M3 (seed version 4).
+  moduleVersions: ModuleVersion[];
+  moduleFeedback: ModuleFeedback[];
+  appFeedback: AppFeedback[];
+  tickets: Ticket[];
+  ticketMessages: TicketMessage[];
+  autoAssignRules: AutoAssignRule[];
+  reminderLog: ReminderLog[];
+  themes: Theme[];
+  invoices: Invoice[];
+  billingProfiles: BillingProfile[];
+  onboarding: OnboardingChecklist[];
 };
 
 const POLICY_BODY = `## Little Acorns Safeguarding policy
@@ -615,6 +641,10 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     overlays: root.fork('overlays'),
     // Added in M2; its own stream so every earlier stream (and every Evidence record) is untouched.
     history: root.fork('history'),
+    // Added in M3; each draws only from its own stream so every earlier stream stays where it was.
+    m3history: root.fork('m3history'),
+    feedback: root.fork('feedback'),
+    support: root.fork('support'),
   };
   const newId = (rng: Rng) => (): string => ulid(clock, rng);
   const ago = (days: number): Date => addDays(today, -days);
@@ -627,6 +657,7 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     users: {},
     requirements: {},
     submissions: {},
+    modules: {},
     roles: {},
   } as unknown as SeedKeys;
   const data: SeedData = {
@@ -646,7 +677,7 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     subscriptions: [],
     addOnSubscriptions: [],
     paymentAttempts: [],
-    modules: nurseryModules,
+    modules: [...nurseryModules],
     assignments: [],
     notifications: [],
     attachments: [],
@@ -659,6 +690,17 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     modulePlacements: [],
     competitions: [],
     standingBoardSettings: [],
+    moduleVersions: [],
+    moduleFeedback: [],
+    appFeedback: [],
+    tickets: [],
+    ticketMessages: [],
+    autoAssignRules: [],
+    reminderLog: [],
+    themes: [],
+    invoices: [],
+    billingProfiles: [],
+    onboarding: [],
   };
 
   keys.requirements = {
@@ -1102,11 +1144,15 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
         result,
       });
     }
+    const paidInvoiceIds: Record<string, string> = {};
     for (const key of ['littleAcorns', 'oakTree']) {
+      const attemptId = id();
+      const invoiceId = id();
+      paidInvoiceIds[key] = invoiceId;
       data.paymentAttempts.push({
-        id: id(),
+        id: attemptId,
         clientId: must(keys.clients[key]),
-        invoiceId: id(),
+        invoiceId,
         at: iso(ago(40)),
         result: 'success',
       });
@@ -1120,10 +1166,17 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
         usageThisPeriod: 0,
       });
     }
+    // M3 invoices and billing profiles come after every M0 draw, so the M0 billing records do not move.
+    buildBilling({ data, keys, today, clock, rng, paidInvoiceIds, overdueInvoiceId: renewalInvoice });
   }
 
   // M2: six months of history, notes, organising data, competitions and board settings (Little Acorns only).
   buildHistory({ data, keys, today, clock, rng: streams.history });
+
+  // M3: own modules, six-month history for Oak Tree and Willow Lane, rules, files, themes, sign-in states, then feedback and tickets.
+  buildM3History({ data, keys, today, clock, rng: streams.m3history });
+  buildFeedback({ data, keys, today, clock, rng: streams.feedback });
+  buildSupport({ data, keys, today, clock, rng: streams.support });
 
   return { data, keys };
 }

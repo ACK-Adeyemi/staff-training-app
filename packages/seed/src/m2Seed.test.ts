@@ -107,8 +107,10 @@ describe('seed version (assumption 33; 4 after M3)', () => {
 
 describe('unchanged compliance (assumption 34 hard constraints)', () => {
   it('leaves every Evidence record and certificate submission exactly as the M1 seed had them', async () => {
-    const { dump } = await seeded();
-    const h = hashStores({ evidence: dump['evidence']!, evidenceSubmissions: dump['evidenceSubmissions']! });
+    const { dump, keys } = await seeded();
+    // M3 adds more submissions; Ben's is still the one the M1 seed had.
+    const ben = dump['evidenceSubmissions']!.filter((s) => s.personId === keys.personas['ben']);
+    const h = hashStores({ evidence: dump['evidence']!, evidenceSubmissions: ben });
     expect(h).toEqual({
       evidence: '13e63b3b3477c14d929b95a39adb6958f57139fe072f4b249f3f7da5bd085ca8',
       evidenceSubmissions: '913eb261cacbf6c01edf250c3307bcb7d24148adf5d569f176f6dd83b7e1c3b9',
@@ -140,6 +142,7 @@ describe('unchanged compliance (assumption 34 hard constraints)', () => {
 
   it('seeds a passed attempt of a requirement-linked module only where Evidence of kind module matches it', async () => {
     const w = await world();
+    const own = new Set(w.modules.filter((m) => m.owner !== 'provider').map((m) => m.id)); // M3 own modules
     const passed = w.attempts.filter((a) => a.passed === true && !a.abandoned);
     expect(passed.length).toBeGreaterThan(0);
     for (const a of passed) {
@@ -153,7 +156,10 @@ describe('unchanged compliance (assumption 34 hard constraints)', () => {
         );
         expect(match, `${a.id} has no matching Evidence`).toBeDefined();
       } else {
-        expect(optional.has(a.moduleId), `${a.id} passes a module that is neither linked nor optional`).toBe(true);
+        expect(
+          optional.has(a.moduleId) || own.has(a.moduleId),
+          `${a.id} passes a module that is neither linked nor optional`,
+        ).toBe(true);
       }
     }
     expect(passed.some((a) => optional.has(a.moduleId))).toBe(true);
@@ -163,16 +169,16 @@ describe('unchanged compliance (assumption 34 hard constraints)', () => {
 describe('history (assumption 34)', () => {
   it('is only for Little Acorns in M2, never in the future, and refers to real attempts and modules', async () => {
     const { dump, clientId } = await world();
-    const all = dump['learningEvents'] as LearningEvent[];
+    // M3 adds Oak Tree and Willow Lane history; this is still the Little Acorns part.
+    const all = (dump['learningEvents'] as LearningEvent[]).filter((e) => e.clientId === clientId);
     expect(all.length).toBeGreaterThan(300);
-    expect(all.every((e) => e.clientId === clientId)).toBe(true);
     expect(all.every((e) => new Date(e.at).getTime() <= NOW.getTime())).toBe(true);
     expect(new Set(all.map((e) => e.id)).size).toBe(all.length);
     const attemptIds = new Set((dump['attempts'] as Attempt[]).map((a) => a.id));
     for (const e of all.filter((x) => x.attemptId !== undefined)) expect(attemptIds.has(e.attemptId!)).toBe(true);
-    const moduleSet = new Set(nurseryModules.map((m) => m.id));
+    // M3 adds Little Acorns' own Fire evacuation module to the modules its history refers to.
+    const moduleSet = new Set((dump['modules'] as Module[]).map((m) => m.id));
     for (const e of all.filter((x) => x.moduleId !== undefined)) expect(moduleSet.has(e.moduleId!)).toBe(true);
-    expect((dump['attempts'] as Attempt[]).every((a) => a.clientId === clientId)).toBe(true);
   });
 
   it('spans about six months, with Jade frequent and accurate', async () => {

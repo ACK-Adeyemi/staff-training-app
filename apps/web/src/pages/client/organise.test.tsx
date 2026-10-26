@@ -140,7 +140,7 @@ describe('C10 Organise: reading', () => {
     });
     expect(rowFor('category-row', 'Sleep and wellbeing').textContent).toMatch(/1 module\b/);
     expect(rowFor('category-row', 'Induction').textContent).toMatch(/0 modules/);
-    expect(within(screen.getByRole('region', { name: 'Modules' })).getAllByTestId('module-row')).toHaveLength(5);
+    expect(within(screen.getByRole('region', { name: 'Modules' })).getAllByTestId('module-row')).toHaveLength(6); // M3 adds Little Acorns' own Fire evacuation module
     const groups = within(screen.getByRole('region', { name: 'Groups' })).getAllByTestId('group-row');
     expect(groups).toHaveLength(3);
     expect(rowFor('group-row', 'New starter induction').textContent).toMatch(/5 modules/);

@@ -2,7 +2,9 @@
 // returns. Business rules live in @sta/domain (scheduledDeletions, retentionPolicySchema, formerlyNote, the step-up
 // code); this file authorises, gathers the actor's scope and writes in one batch.
 import {
+  defaultDunningPolicy,
   demoTwoFactorCode,
+  nextTransition,
   formerlyNote,
   retentionPolicySchema,
   scheduledDeletions,
@@ -23,6 +25,7 @@ import {
   type Requirement,
   type RoleAssignment,
   type Site,
+  type Subscription,
   type Team,
   type Ticket,
   type TicketMessage,
@@ -254,6 +257,20 @@ export function createDataRightsOperations(backend: RawBackend, options: StoreOp
     )) {
       ops.push({ type: 'put', store: 'ticketMessages', key: m.id, record: { ...m, body: REMOVED_TEXT } });
     }
+    // Rejected certificate files, and files replaced by a resubmission (no submission or Evidence points at them), go
+    // in both modes. Approved files stay with their Evidence under Anonymise.
+    {
+      const submissions = await mine<EvidenceSubmission>(call, 'evidenceSubmissions');
+      const evidenceRows = await mine<Evidence>(call, 'evidence');
+      const inUse = new Set<string>();
+      for (const sub of submissions) if (sub.status !== 'rejected') inUse.add(sub.fileAttachmentId);
+      for (const e of evidenceRows) if (e.attachmentId) inUse.add(e.attachmentId);
+      for (const f of (await mine<Attachment>(call, 'attachments')).filter(
+        (x) => x.kind === 'file' && x.purpose === 'certificate' && x.personId === id && !inUse.has(x.id),
+      )) {
+        ops.push(del('attachments', f.id));
+      }
+    }
     if (input.mode === 'deleteEverything') {
       const own = <T extends { personId: string; id: string }>(rows: T[]) => rows.filter((r) => r.personId === id);
       for (const r of own(await mine<Evidence>(call, 'evidence'))) ops.push(del('evidence', r.id));
@@ -283,8 +300,19 @@ export function createDataRightsOperations(backend: RawBackend, options: StoreOp
       const files = (await mine<EvidenceSubmission>(call, 'evidenceSubmissions'))
         .filter((s) => s.status === 'rejected' && s.reviewedAt !== undefined)
         .map((s) => ({ id: s.fileAttachmentId, kind: 'rejected' as const, reviewedAt: s.reviewedAt as string }));
+      // A Closed account is deleted when Closed ends (derived from the subscription, so Fast-forward moves it).
+      const sub = (await call.all<Subscription>('subscriptions')).find((x) => x.clientId === client.id);
+      const next = sub ? nextTransition(sub, defaultDunningPolicy, call.actor.now) : null;
+      const accountDeletionAt =
+        call.actor.accountState === 'closed' && next?.state === 'deleted' ? next.at.toISOString() : undefined;
       return structuredClone(
-        scheduledDeletions({ now: call.actor.now, retention: client.settings.retention, people, files }),
+        scheduledDeletions({
+          now: call.actor.now,
+          retention: client.settings.retention,
+          people,
+          files,
+          ...(accountDeletionAt ? { accountDeletionAt } : {}),
+        }),
       );
     },
 

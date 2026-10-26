@@ -38,7 +38,9 @@ describe('modules in the seed', () => {
 
   it('stores every nursery module exactly once', async () => {
     const { dump } = await seeded();
-    expect((dump['modules'] as Module[]).map((m) => m.id).sort()).toEqual(nurseryModules.map((m) => m.id).sort());
+    // M3 adds Little Acorns' own modules; the provider modules are still exactly the nursery set.
+    const provider = (dump['modules'] as Module[]).filter((m) => m.owner === 'provider');
+    expect(provider.map((m) => m.id).sort()).toEqual(nurseryModules.map((m) => m.id).sort());
   });
 });
 
