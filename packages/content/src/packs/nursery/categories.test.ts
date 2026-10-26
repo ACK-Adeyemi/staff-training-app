@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { CATEGORY_COLOURS } from '@sta/domain';
 import { readFileSync } from 'node:fs';
 import { moduleIds } from '../moduleIds';
+import { contentId } from '../contentId';
 import enGB from '../../lang/en-GB.json' with { type: 'json' };
 import { nurseryCategories, nurseryModuleCategory } from './categories';
 import { nurseryComingSoon } from './comingSoon';
@@ -19,7 +20,7 @@ const lang = (key: string): string | undefined =>
 
 describe('moduleIds.saferSleep', () => {
   it('is the content id 207 and distinct from every other module id', () => {
-    expect(moduleIds.saferSleep).toBe('00000000-0000-4000-8000-000000000207');
+    expect(moduleIds.saferSleep).toBe(contentId(207));
     const all = Object.values(moduleIds);
     expect(new Set(all).size).toBe(all.length);
   });
