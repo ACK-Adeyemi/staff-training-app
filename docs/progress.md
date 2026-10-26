@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M2
 Milestone base commit: 7c4064d
-Next step: start M2: record base commit, then delegate docs/plans/m2.md to planner (build pack docs/build-pack/10-03-m2-engagement.md). Plan should schedule the other nursery modules (see M1 plan Risks). Nursery renewal periods still VERIFY.
+Next step: M2 chunk 1 (decisions and schemas) from docs/plans/m2.md, test-writer then implementer. Nursery renewal periods still VERIFY.
 
 ## Milestones
 - [x] M0 Foundations
@@ -17,7 +17,8 @@ Next step: start M2: record base commit, then delegate docs/plans/m2.md to plann
 - [ ] M7 Battle Room
 
 ## Current milestone chunks
-(M1 complete; M2 chunks will appear after planning)
+M2 (17 chunks, see docs/plans/m2.md 'Work chunks'); none done yet. Plan committed.
+M1 (all done):
 - [x] 1 M0 known issues and decisions
 - [x] 2 Learning schemas and quiz engine
 - [x] 3 Domain views
