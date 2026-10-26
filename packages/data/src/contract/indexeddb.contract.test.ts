@@ -1,6 +1,7 @@
 // Runs the shared contract suite against the IndexedDB adapter (plan chunk 9; BP-8).
 import 'fake-indexeddb/auto';
 import { createIndexedDbStore } from '../indexeddb/index';
+import { runBillingContract } from './billing';
 import { runAdminCountContract } from './adminCount';
 import { runCompetitionsContract } from './competitions';
 import { runEngagementContract } from './engagement';
@@ -30,3 +31,5 @@ runM3FoundationContract('indexeddb adapter', (options) =>
 runIdentityOrgContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );
+
+runBillingContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
