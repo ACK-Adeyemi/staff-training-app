@@ -4,12 +4,12 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M2
 Milestone base commit: 7c4064d
-Next step: M2 chunk 13 (Learn and organise; see docs/plans/m2.md work chunks): test-writer then implementer. Chunks 1-12 done (latest 32abca0).
+Next step: M2 chunk 14 (Notes and quiz modes; see docs/plans/m2.md work chunks): test-writer then implementer. Chunks 1-13 done (latest b17a9c2).
 
 ## Milestones
 - [x] M0 Foundations
 - [x] M1 Client story core
-- [ ] M2 Engagement (chunks 1-12 done)
+- [ ] M2 Engagement (chunks 1-13 done)
 - [ ] M3 Client admin depth
 - [ ] M4 Provider story
 - [ ] M5 Polish and demo readiness
@@ -17,7 +17,7 @@ Next step: M2 chunk 13 (Learn and organise; see docs/plans/m2.md work chunks): t
 - [ ] M7 Battle Room
 
 ## Current milestone chunks
-M2 (17 chunks, see docs/plans/m2.md 'Work chunks'): chunks 1-12 done; 13 to 17 pending.
+M2 (17 chunks, see docs/plans/m2.md 'Work chunks'): chunks 1-13 done; 14 to 17 pending.
 M1 (all done):
 - [x] 1 M0 known issues and decisions
 - [x] 2 Learning schemas and quiz engine
@@ -41,7 +41,7 @@ M1 (final commit 5b87b6d, scripts/check.sh fully green): BP-1 refresher on 390x8
 - e2e 'C1 updates in one tab when Jade passes the refresher in another tab' (client-dashboard.spec.ts) failed once, passed on rerun: possible flake, watch it.
 - Action versions in deploy.yml unconfirmed (VERIFY, in review checklist). Commit b6146c5 touched protected files (docs/questions-for-user.md).
 
-- e2e flakes seen once each and passing on rerun: client-dashboard.spec.ts (C1 two tabs), track-a.spec.ts desktop. Watch for timing races; investigate if they recur.
+- e2e flakes seen once each and passing on rerun: client-dashboard.spec.ts (C1 two tabs), track-a.spec.ts desktop. client-dashboard C1 two-tab flake has now recurred in 3 full runs (chunks 11, 13): investigate its cause (cross-tab update timing) at the start of chunk 14 or in M2 review.
 
 ## Session log
 - 2026-10-25: session started, created progress.md, M0 planning.
@@ -75,3 +75,4 @@ M1 (final commit 5b87b6d, scripts/check.sh fully green): BP-1 refresher on 390x8
 - 2026-10-26: M2 chunk 10 seed (version 3, history, notes, competitions) landed (f910f4d), check.sh green. Stopping at a clean point; chunk 11 next.
 - 2026-10-26: M2 chunk 11 UI components landed (f50b9c4), check.sh green. client-dashboard.spec.ts:67 flaked once more in a full run (passed on rerun). Stopping at a clean point; chunk 12 next.
 - 2026-10-26: M2 chunk 12 display and accessibility, Me landed (32abca0), check.sh green. Stopping at a clean point; chunk 13 next.
+- 2026-10-26: M2 chunk 13 learn and organise landed (b17a9c2), check.sh green. Stopping at a clean point; chunk 14 next.
