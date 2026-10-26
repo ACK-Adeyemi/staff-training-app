@@ -50,6 +50,7 @@ import {
   StatCard,
   StatusBar,
   TagPicker,
+  type AgendaGroup,
 } from '../index';
 
 afterEach(cleanup);
@@ -197,7 +198,7 @@ describe('Histogram', () => {
 });
 
 describe('Agenda', () => {
-  const groups = [
+  const groups: AgendaGroup[] = [
     {
       heading: 'Today',
       items: [
@@ -261,7 +262,7 @@ describe('MonthGrid', () => {
     expect(
       within(grid)
         .getAllByRole('gridcell')
-        .filter((c) => /^\d/.test(c.textContent ?? '')).length,
+        .filter((c) => /^\d/.test(c.textContent)).length,
     ).toBe(30);
   });
   it('exposes item counts in the accessible name, not by colour', () => {
@@ -365,7 +366,7 @@ describe('PhoneFrame', () => {
     const region = screen.getByRole('region', { name: 'Phone preview' });
     expect(region).toHaveTextContent('Lesson 1');
     expect(region.tabIndex).toBe(0);
-    const frame = region.closest('[data-phone-frame]') as HTMLElement | null;
+    const frame = region.closest<HTMLElement>('[data-phone-frame]');
     expect(frame).not.toBeNull();
     expect(frame!.style.width).toBe('390px');
   });

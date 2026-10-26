@@ -40,3 +40,21 @@ export {
   type ReadAloudLabels,
   type SpeechAdapter,
 } from './components/ReadAloudBar';
+export { Banner, type BannerProps, type BannerTone } from './components/Banner';
+export { Collapsible, type CollapsibleProps } from './components/Collapsible';
+export { StatCard, type StatCardProps } from './components/StatCard';
+export { StatusBar, type StatusBarProps, type StatusBarSegment, type StatusBarTone } from './components/StatusBar';
+export { Histogram, type HistogramProps } from './components/Histogram';
+export { Agenda, type AgendaProps, type AgendaGroup, type AgendaItem } from './components/Agenda';
+export { MonthGrid, type MonthGridProps } from './components/MonthGrid';
+export { RatingInput, type RatingInputProps } from './components/RatingInput';
+export { TagPicker, type TagPickerProps } from './components/TagPicker';
+export { PhoneFrame, type PhoneFrameProps } from './components/PhoneFrame';
+export { QrCode, type QrCodeProps } from './components/QrCode';
+export { CodeInput, type CodeInputProps } from './components/CodeInput';
+export { ColourField, type ColourFieldProps } from './components/ColourField';
+export { ContrastCheck, type ContrastCheckProps } from './components/ContrastCheck';
+export { FilePickerButtons, type FilePickerButtonsProps } from './components/FilePickerButtons';
+export { ImageRedactor, type ImageRedactorProps, type RedactBox } from './components/ImageRedactor';
+export { SiteSwitcher, type SiteSwitcherProps } from './components/SiteSwitcher';
+export { DescriptionList, type DescriptionListProps } from './components/DescriptionList';
