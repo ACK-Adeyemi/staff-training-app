@@ -68,6 +68,9 @@ function cells(view: ClientView): Cell[] {
   return out;
 }
 
+/** Every applicable (person, requirement) status for active and on-leave people, for roll-ups. */
+export const applicableCells = cells;
+
 export function needsAttention(view: ClientView): AttentionItem[] {
   const rank = { overdue: 0, expiringSoon: 1, notStarted: 2 } as const;
   const items: AttentionItem[] = [];

@@ -1,6 +1,6 @@
 // Which Learn more links show, and how they are labelled. Brief section 31.1; plan Assumptions 8 and 9.
 import { isSafeHttpsUrl } from '../schemas/learning';
-import type { ClientLinkOverlay, LearnMoreLink, Question, QuizSettings } from '../schemas/learning';
+import type { ClientLinkOverlay, LearnMoreLink, Module, Question, QuizSettings } from '../schemas/learning';
 
 export interface VisibleLearnMoreInput {
   question: Question;
@@ -40,4 +40,16 @@ export const displayDomain = (url: string): string => {
   const labels = host.split('.');
   const keep = TWO_PART_SUFFIXES.some((s) => host.endsWith(`.${s}`)) ? 3 : 2;
   return labels.slice(-keep).join('.');
+};
+
+/** Overlays for this module whose question or lesson is no longer in it (brief 31; M3 plan chunk 3). */
+export const orphanOverlays = (module: Module, overlays: readonly ClientLinkOverlay[]): ClientLinkOverlay[] => {
+  const questions = new Set(module.questions.map((q) => q.id));
+  const lessons = new Set(module.lessons.map((l) => l.id));
+  return overlays.filter(
+    (o) =>
+      o.moduleId === module.id &&
+      ((o.questionId !== undefined && !questions.has(o.questionId)) ||
+        (o.lessonId !== undefined && !lessons.has(o.lessonId))),
+  );
 };

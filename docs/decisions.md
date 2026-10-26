@@ -595,3 +595,13 @@ Copied from docs/plans/m3.md (chunk 1). Numbers match the plan, so other docs ca
 - **Site rollup completion rate** uses `dueCompletion` (per cent rounded down), the same rule as the team board. The Sites board `participation` and `compliance` values are rounded to whole per cents; `knowledge` to one decimal. `toNext` rounds the viewer's participating people to whole people and asks for the whole-person difference to reach the site directly above (at least 1).
 - **.ics UID** is a 53-bit non-cryptographic hash of the item id (not a security control; it only keeps raw ids out of the file).
 - **Test type fixes (no behaviour change).** In calendar/items.test.ts the `staffView` helper returns `never`, so `{ ...v, now }` did not typecheck; it now spreads `v as object`. In calendar/clusters.test.ts a redundant `as Item` was removed (lint: unnecessary assertion once `CalendarItem` exists). The `expect.objectContaining` at the assignmentDue test is cast `as unknown` to satisfy no-unsafe-assignment. Assertions are untouched.
+
+## M3 chunk 3 (domain: authoring, stats, feedback, evidence, support)
+
+- Ticket "Other" text: the 3-character minimum counts characters other than spaces (the acceptance test treats "a b" as too short); the 80-character maximum counts the normalised text.
+- Publish checklist quiz item: drawCount is checked against the whole bank (as the plan says); the mode check only needs at least one question of the kind the mode draws.
+- Markdown import: a "###" or deeper heading stays inside the current lesson as a text paragraph (the hashes are removed); a whole line containing an HTML tag is dropped with one `html` warning.
+- Module stats with a `version`: attempts and events must carry that exact `moduleVersion`; assignments are not version-specific. `peopleRows` shows "completed" for anyone with a done assignment or a passed attempt in scope.
+- `publishVersion` for a published module snapshots with `publishedAt` = the previous `updatedAt` (or `now` if unknown).
+- Provider feedback projection: `ownModules.moduleCount` counts client-own modules that have feedback.
+- `applicableCells` is exported from progress/client.ts for the overview breakdowns (same rule as the dashboard).
