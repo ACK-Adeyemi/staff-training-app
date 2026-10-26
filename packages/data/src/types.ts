@@ -12,6 +12,14 @@ import type {
   ModuleDraft,
   ModuleVersion,
   BoardId,
+  LeaderboardScope,
+  SiteBoardEntry,
+  SiteBoardPeriod,
+  SiteBoardRow,
+  SiteMeasure,
+  ScheduledDeletion,
+  Theme,
+  ManualSkipReason,
   Category,
   Client,
   ClientLinkOverlay,
@@ -234,6 +242,7 @@ export type RuleName =
   | 'usageCapReached'
   | 'invalidTemplate'
   | 'invalidTheme'
+  | 'invalidScope'
   | 'invalidName'
   | 'staffTicketsOff'
   | 'duplicateRule'
@@ -409,8 +418,32 @@ export interface CompetitionsService {
   entitlements(ctx: ActorContext): Promise<EffectiveEntitlements>;
 }
 
+/** A Sites board row. `small` marks a site with too few people for a fair percentage. */
+export type SitesBoardRow = SiteBoardRow & { small: boolean };
+export type SitesBoardView = {
+  rows: SitesBoardRow[];
+  own: SitesBoardRow | null;
+  toNext: { people: number } | null;
+  /** Site managers only: the measure details of their own site. */
+  detail?: SiteBoardEntry;
+};
+
 export interface LeaderboardsService {
-  standing(ctx: ActorContext, input: { board: BoardId; period: BoardPeriodId; siteId?: Id }): Promise<BoardView>;
+  /** The scopes that apply to the viewer (My site, My region, My country, All sites). [] without a person record. */
+  scopes(ctx: ActorContext): Promise<LeaderboardScope[]>;
+  /**
+   * `scope` defaults to My site. Staff may use a scope only when it applies and the client switched it on for the
+   * board; otherwise RuleError('invalidScope'). Client admins may use any scope that applies.
+   */
+  standing(
+    ctx: ActorContext,
+    input: { board: BoardId; period: BoardPeriodId; siteId?: Id; scope?: LeaderboardScope },
+  ): Promise<BoardView>;
+  /** The Sites board (brief 13.5, assumption 39). Staff never get person ids; site managers also get their site detail. */
+  sitesBoard(
+    ctx: ActorContext,
+    input: { measure: SiteMeasure; period: SiteBoardPeriod; scope: LeaderboardScope; region?: string },
+  ): Promise<SitesBoardView>;
   settings(ctx: ActorContext): Promise<StandingBoardSettings>;
   saveSettings(ctx: ActorContext, settings: StandingBoardSettings): Promise<StandingBoardSettings>;
 }
@@ -659,12 +692,68 @@ export interface AutoAssignService {
 }
 
 export interface RemindersService {
+  /** reminders.view and the `reminders` availability. Who is overdue and who has Evidence about to expire, in scope. Writes nothing. */
+  digestPreview(ctx: ActorContext): Promise<{ overdue: { personId: Id }[]; expiring: { personId: Id }[] }>;
+  /**
+   * reminders.manage. One reminder per person with something to chase: a Notification for their staff user and,
+   * except in Limited, an Outbox message. RuleError-free: people who cannot be reminded come back in `skipped`.
+   * A person outside the actor's scope is ForbiddenError('outOfScope') and nothing is sent.
+   */
+  send(
+    ctx: ActorContext,
+    personIds: Id[],
+  ): Promise<{ sent: Id[]; skipped: { personId: Id; reason: ManualSkipReason | 'noAccount' }[] }>;
   /** reminders.view */
   policy(ctx: ActorContext): Promise<ReminderPolicy>;
   /** reminders.manage */
   savePolicy(ctx: ActorContext, policy: ReminderPolicy): Promise<ReminderPolicy>;
   /** reminders.manage. Writes nothing. */
   chaseOverdue(ctx: ActorContext, options: { preview: true }): Promise<ChaseResult>;
+}
+
+export type EraseInput = { mode: 'anonymise' | 'deleteEverything'; confirmName: string; code: string };
+
+export interface ThemesService {
+  /** themes.view. This client's saved themes (no presets, no other client's). */
+  list(ctx: ActorContext): Promise<Theme[]>;
+  /** Any actor of the client. The domain activeTheme as at `ctx.now`. */
+  active(ctx: ActorContext, side: 'staff' | 'admin'): Promise<Theme | null>;
+  /** themes.manage and `themesEdit`. Upserts by id. RuleError('invalidTheme') on a contrast failure. */
+  save(ctx: ActorContext, theme: Theme): Promise<Theme>;
+  remove(ctx: ActorContext, id: Id): Promise<void>;
+  /** Sets (or clears, with null) the base theme. */
+  setBase(ctx: ActorContext, id: Id | null): Promise<Client['settings']>;
+}
+
+/** What an export holds. The app zips it. Never learner notes, display prefs, audit events or another client's records. */
+export type ExportBundle = {
+  exportedAt: string;
+  people: Omit<Person, 'prefs'>[];
+  evidence: Evidence[];
+  evidenceSubmissions: EvidenceSubmission[];
+  assignments: Assignment[];
+  attempts: Attempt[];
+  sites: Site[];
+  teams: Team[];
+  requirements: Requirement[];
+  modules: Module[];
+  rules: AutoAssignRule[];
+  competitions: Competition[];
+  formerlyNote: { old: string; changedAt: string } | null;
+};
+
+/** `code` is the step-up code. Needs reports.export and the `exports` availability. */
+export interface ExportsService {
+  clientData(ctx: ActorContext, code: string): Promise<ExportBundle>;
+  person(ctx: ActorContext, personId: Id, code: string): Promise<ExportBundle>;
+}
+
+export type RetentionPolicy = Client['settings']['retention'];
+export interface RetentionService {
+  /** settings.view. Dates only: nothing is deleted in the demo. */
+  schedule(ctx: ActorContext): Promise<ScheduledDeletion[]>;
+  /** settings.manage. Merges the patch; a value outside the bounds is a ValidationError. */
+  update(ctx: ActorContext, patch: Partial<RetentionPolicy>): Promise<RetentionPolicy>;
 }
 
 export interface DataStore {
@@ -676,6 +765,11 @@ export interface DataStore {
     add(ctx: ActorContext, input: PersonInput): Promise<Person>;
     /** Runs the `roleChanged` rules in the same batch when `jobRoleIds` changes. */
     update(ctx: ActorContext, id: Id, patch: Partial<PersonInput> & { pausedUntil?: string }): Promise<Person>;
+    /**
+     * staff.delete in scope and the step-up code. Leaves a shell named "Former staff member"; the nickname, prefs,
+     * notes and user account go. `deleteEverything` also removes Evidence, attempts, events and submissions.
+     */
+    erase(ctx: ActorContext, id: Id, input: EraseInput): Promise<void>;
   };
   autoAssign: AutoAssignService;
   reminders: RemindersService;
@@ -739,6 +833,9 @@ export interface DataStore {
   modulePlacements: ModulePlacementsService;
   competitions: CompetitionsService;
   leaderboards: LeaderboardsService;
+  themes: ThemesService;
+  exports: ExportsService;
+  retention: RetentionService;
   twoFactor: TwoFactorService;
   team: TeamService;
   organisation: OrganisationService;

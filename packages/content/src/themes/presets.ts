@@ -1,11 +1,8 @@
 // Theme presets (brief 19.4; M3 assumption 51). Each preset passes validateTheme against its own base. Names are
 // en-GB.json keys under themes.presets. The bases mirror the text, button text and background of the light and dark app.
-import type { ThemeBase, ThemeTokens } from '@sta/domain';
+import { themeBases, type ThemeTokens } from '@sta/domain';
 
-export const themeBases: { light: ThemeBase; dark: ThemeBase } = {
-  light: { text: '#1a1a1a', buttonText: '#ffffff', background: '#ffffff' },
-  dark: { text: '#f2f2f2', buttonText: '#101010', background: '#121212' },
-};
+export { themeBases };
 
 export interface ThemePreset {
   id: string;

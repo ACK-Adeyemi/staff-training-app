@@ -201,3 +201,111 @@ export function chasePreview(input: PlanInput): {
   }
   return { willSend, skipped };
 }
+
+// ---------------------------------------------------------------- digest and manual sends (M3 chunk 10b)
+
+type DigestInput = Omit<PlanInput, 'log' | 'accountState'>;
+
+type Chase = {
+  overdue: Assignment[];
+  expiring: { requirementId: string; daysLeft: number; waiting: boolean }[];
+};
+
+/** Open assignments past their due date, and Evidence that runs out within the policy's widest expiry offset. */
+function chaseItems(input: DigestInput, p: Person): Chase {
+  const overdue = input.assignments.filter(
+    (a) => a.personId === p.id && a.status === 'open' && new Date(a.dueAt).getTime() < input.now.getTime(),
+  );
+  const widest = Math.max(0, ...input.policy.expiringOffsetsDays);
+  const expiring: Chase['expiring'] = [];
+  const site = input.sites.find((s) => s.id === p.primarySiteId);
+  if (site) {
+    const ev = input.evidence.filter((e) => e.personId === p.id);
+    const subs = input.submissions.filter((s) => s.personId === p.id);
+    for (const r of input.requirements) {
+      const s = personRequirementStatus(r, p, site, ev, subs, input.now, 36500);
+      if (s.expiresAt === undefined || s.daysLeft === undefined || s.daysLeft <= 0 || s.daysLeft > widest) continue;
+      expiring.push({ requirementId: r.id, daysLeft: s.daysLeft, waiting: s.status === 'awaitingCheck' });
+    }
+  }
+  return { overdue, expiring };
+}
+
+/** Who has something overdue and who has Evidence about to expire, each person once per list. Sends nothing. */
+export function reminderDigest(input: DigestInput): {
+  overdue: { personId: string }[];
+  expiring: { personId: string }[];
+} {
+  const overdue: { personId: string }[] = [];
+  const expiring: { personId: string }[] = [];
+  for (const p of input.people) {
+    if (asleep(p, input.now) === 'ignored') continue;
+    const items = chaseItems(input, p);
+    if (items.overdue.length > 0) overdue.push({ personId: p.id });
+    if (items.expiring.length > 0) expiring.push({ personId: p.id });
+  }
+  return { overdue, expiring };
+}
+
+export type ManualSkipReason = SkipReason | 'nothingToChase';
+export type ManualReminder = {
+  personId: string;
+  kind: 'overdue' | 'expiring';
+  /** The assignment id (overdue) or requirement id (expiring) the reminder names. */
+  targetId: string;
+  /** Days overdue or days left. */
+  offset: number;
+};
+
+/**
+ * What a manager's "Remind" button does for the named people: one reminder each, for the first overdue assignment or
+ * else the first expiring requirement. People who are away, waiting on a check, in quiet hours or over the weekly cap
+ * are skipped with the reason. The caller sends and logs what comes back.
+ */
+export function planManualSend(
+  input: PlanInput,
+  personIds: readonly string[],
+): { send: ManualReminder[]; skipped: { personId: string; reason: ManualSkipReason }[] } {
+  const send: ManualReminder[] = [];
+  const skipped: { personId: string; reason: ManualSkipReason }[] = [];
+  const week = londonWeekKey(input.now);
+  for (const id of new Set(personIds)) {
+    const p = input.people.find((x) => x.id === id);
+    const state = p ? asleep(p, input.now) : 'ignored';
+    if (!p || state === 'ignored') {
+      skipped.push({ personId: id, reason: 'nothingToChase' });
+      continue;
+    }
+    const items = chaseItems(input, p);
+    const first = [...items.overdue].sort((a, b) =>
+      a.dueAt === b.dueAt ? (a.id < b.id ? -1 : 1) : a.dueAt < b.dueAt ? -1 : 1,
+    )[0];
+    const ready = items.expiring.filter((e) => !e.waiting);
+    const reason: ManualSkipReason | undefined =
+      !first && items.expiring.length === 0
+        ? 'nothingToChase'
+        : state
+          ? state
+          : !first && ready.length === 0
+            ? 'awaitingCheck'
+            : inQuietHours(input.now, rangesFor(input.policy, p))
+              ? 'quietHours'
+              : loggedThisWeek(input.log, p.id, week) >= input.policy.weeklyCapPerPerson
+                ? 'cap'
+                : undefined;
+    if (reason) {
+      skipped.push({ personId: id, reason });
+    } else if (first) {
+      send.push({
+        personId: id,
+        kind: 'overdue',
+        targetId: first.id,
+        offset: Math.max(1, -daysBetween(input.now, new Date(first.dueAt))),
+      });
+    } else {
+      const e = ready[0] as (typeof ready)[number];
+      send.push({ personId: id, kind: 'expiring', targetId: e.requirementId, offset: e.daysLeft });
+    }
+  }
+  return { send, skipped };
+}

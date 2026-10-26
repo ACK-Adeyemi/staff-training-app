@@ -3,6 +3,12 @@ import type { Theme } from './schemas/admin';
 
 export type ThemeTokens = Theme['tokens'];
 export type ThemeBase = { text: string; buttonText: string; background: string };
+/** The colours a theme sits on. Theme colours apply in light mode only, so the light base is what a save is checked against. */
+export const themeBases: { light: ThemeBase; dark: ThemeBase } = {
+  light: { text: '#1a1a1a', buttonText: '#ffffff', background: '#ffffff' },
+  dark: { text: '#f2f2f2', buttonText: '#101010', background: '#121212' },
+};
+
 export type ThemePair =
   'textOnBackground' | 'textOnTint' | 'buttonTextOnPrimary' | 'primaryOnBackground' | 'accentOnBackground';
 
@@ -39,7 +45,7 @@ export function validateTheme(
 /** The theme in force: the latest-starting scheduled theme for this side, else the base theme, else null. */
 export function activeTheme(
   themes: Theme[],
-  settings: { themeId?: string },
+  settings: { themeId?: string | undefined },
   now: Date,
   side: 'staff' | 'admin',
 ): Theme | null {

@@ -16,6 +16,8 @@ import { createIdentityOperations } from './identityOps';
 import { createAuthoringOperations } from './authoringOps';
 import { createEvidenceOperations } from './evidenceOps';
 import { createSupportOperations } from './supportOps';
+import { createThemesOperations } from './themesOps';
+import { createDataRightsOperations } from './dataRightsOps';
 import { createRulesOperations, newPersonPrefs } from './rulesOps';
 import { createBillingOperations, simulateFailedPayment } from './billingOps';
 import { keyOf, validate, type RawBackend, type SettingsRecord, type WriteOp } from './backend';
@@ -279,6 +281,8 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const evidenceFlow = createEvidenceOperations(backend, options);
   const support = createSupportOperations(backend, options);
   const rules = createRulesOperations(backend, options);
+  const themeOps = createThemesOperations(backend, options);
+  const dataRights = createDataRightsOperations(backend, options);
   const readOnly = (name: StoreName) => {
     const full = repo(backend, options, name);
     return { get: full.get, list: full.list };
@@ -294,7 +298,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     clients: withoutRemove('clients'),
     sites: r('sites'),
     teams: r('teams'),
-    people: { ...r('people'), ...rules.people },
+    people: { ...r('people'), ...rules.people, erase: dataRights.erase },
     autoAssign: rules.autoAssign,
     reminders: rules.reminders,
     users: r('users'),
@@ -337,6 +341,9 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     ...engagement,
     access: { ...engagement.access, features: (ctx: ActorContext) => billingOps.features(ctx) },
     ...competitionOps,
+    themes: themeOps.themes,
+    exports: dataRights.exports,
+    retention: dataRights.retention,
     ...identity,
     evidenceFlow,
     ...support,

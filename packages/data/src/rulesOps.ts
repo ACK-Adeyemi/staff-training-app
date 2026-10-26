@@ -13,11 +13,14 @@ import {
   londonDateString,
   londonWeekKey,
   personSchema,
+  planManualSend,
   planReminders,
+  reminderDigest,
   previewRule,
   reminderPolicySchema,
   renderReminder,
   ulid,
+  type AddOnSubscription,
   type Assignment,
   type AutoAssignRule,
   type Client,
@@ -31,6 +34,7 @@ import {
   type OutboxMessage,
   type Person,
   type PlanInput,
+  type ManualSkipReason,
   type Planned,
   type ReminderLog,
   type Requirement,
@@ -56,6 +60,7 @@ import {
   type Call,
 } from './policy';
 import {
+  AccountStateError,
   NotEntitledError,
   NotFoundError,
   RuleError,
@@ -207,6 +212,31 @@ async function clientData(all: Loader, client: Client, extra: Assignment[] = [])
   };
 }
 
+/** The training name and date a reminder talks about. */
+function reminderDetails(
+  kind: string,
+  targetId: string,
+  offset: number,
+  now: Date,
+  data: { requirements: Requirement[]; assignments: Assignment[] },
+  modules: Module[],
+  groups: ModuleGroup[],
+): { training: string; date: string } {
+  if (kind === 'expiring') {
+    return {
+      training: data.requirements.find((q) => q.id === targetId)?.name ?? '',
+      date: londonDateString(addDays(now, offset)),
+    };
+  }
+  const a = data.assignments.find((x) => x.id === targetId);
+  if (!a) return { training: '', date: '' };
+  const training =
+    'moduleId' in a.target
+      ? (modules.find((m) => m.id === (a.target as { moduleId: string }).moduleId)?.title ?? '')
+      : (groups.find((g) => g.id === (a.target as { groupId: string }).groupId)?.name ?? '');
+  return { training, date: londonDateString(new Date(a.dueAt)) };
+}
+
 const DEFAULT_TEXT = {
   dueSoon: 'Hi {firstName}, {training} is due on {date}.',
   overdue: 'Hi {firstName}, {training} was due on {date}. Please finish it when you can.',
@@ -237,6 +267,12 @@ export function createRulesOperations(backend: RawBackend, options: StoreOptions
     return call;
   };
   const clientOf = (call: Call): Client => call.actor.client as Client;
+  /** Reminders are off in Read-only and beyond (assumption 45); returns the derived state. */
+  const checkReminders = (call: Call) => {
+    const state = call.actor.accountState ?? clientOf(call).accountState;
+    if (featureAvailability(state, 'reminders') === 'no') throw new AccountStateError(state, 'reminders');
+    return state;
+  };
   const loaderOf =
     (call: Call): Loader =>
     (store) =>
@@ -249,13 +285,13 @@ export function createRulesOperations(backend: RawBackend, options: StoreOptions
     return rule;
   };
 
-  /** The enabled-rule count must stay inside the package (assumption 26). */
-  async function checkRuleLimit(call: Call, ruleId: string): Promise<void> {
+  /** Every stored rule of the client uses a place in the package (assumption 26); the rule being saved is not counted. */
+  async function checkRuleLimit(call: Call, ruleId: string, onlyEnabled = false): Promise<void> {
     const clientId = call.clientId as string;
     const ents = await clientEntitlements(call, clientId);
     if (!ents) throw new NotEntitledError('autoAssignRules');
     const used = (await call.all<AutoAssignRule>('autoAssignRules')).filter(
-      (r) => r.clientId === clientId && r.enabled && r.id !== ruleId,
+      (r) => r.clientId === clientId && (!onlyEnabled || r.enabled) && r.id !== ruleId,
     ).length;
     if (!checkLimit(ents, { autoAssignRules: used }, 'autoAssignRules').allowed) {
       throw new NotEntitledError('autoAssignRules');
@@ -434,7 +470,8 @@ export function createRulesOperations(backend: RawBackend, options: StoreOptions
         (r) => r.clientId === clientId && r.id !== rule.id,
       );
       if (others.some((r) => shapeOf(r) === shapeOf(rule))) throw new RuleError('duplicateRule');
-      if (rule.enabled) await checkRuleLimit(call, rule.id);
+      // Only a new rule needs a free place; changing one that is already stored never counts (assumption 26).
+      if (!existing) await checkRuleLimit(call, rule.id);
       await apply([
         put('autoAssignRules', rule),
         audit(call, clientId, 'autoAssign.saved', `rule:${rule.id}`, existing, rule),
@@ -446,7 +483,7 @@ export function createRulesOperations(backend: RawBackend, options: StoreOptions
       const call = await clientCall(ctx, 'assign.manage');
       const rule = await ruleOf(call, id);
       checkAccountState(call, enabled);
-      if (enabled) await checkRuleLimit(call, rule.id);
+      if (enabled) await checkRuleLimit(call, rule.id, true);
       const next = { ...rule, enabled };
       await apply([
         put('autoAssignRules', next),
@@ -517,6 +554,99 @@ export function createRulesOperations(backend: RawBackend, options: StoreOptions
       return structuredClone(next);
     },
 
+    async digestPreview(ctx) {
+      const call = await clientCall(ctx, 'reminders.view');
+      checkReminders(call);
+      const client = clientOf(call);
+      const data = await clientData(loaderOf(call), client);
+      const inScope = data.people.filter((p) =>
+        canAny(
+          call,
+          ['reminders.view'],
+          { clientId: client.id, siteIds: [p.primarySiteId, ...p.additionalSiteIds] },
+          'read',
+        ),
+      );
+      return structuredClone(
+        reminderDigest({ now: call.actor.now, policy: client.settings.reminderPolicy, ...data, people: inScope }),
+      );
+    },
+
+    async send(ctx, personIds) {
+      const call = await clientCall(ctx, 'reminders.manage');
+      const state = checkReminders(call);
+      const client = clientOf(call);
+      const wanted = [...new Set(Array.isArray(personIds) ? personIds : [])];
+      const data = await clientData(loaderOf(call), client);
+      // Every named person must be the caller's own and in their scope, or nothing is sent.
+      for (const id of wanted) {
+        const p = data.people.find((x) => x.id === id);
+        if (!p) throw new NotFoundError();
+        const target = { clientId: client.id, siteIds: [p.primarySiteId, ...p.additionalSiteIds] };
+        if (!canAny(call, ['reminders.manage'], target, 'write')) return forbid('outOfScope');
+      }
+      const plan = planManualSend(reminderInput(call.actor.now, client, state, data), wanted);
+      const users = await call.all<UserAccount>('users');
+      const modules = await call.all<Module>('modules');
+      const groups = (await call.all<ModuleGroup>('moduleGroups')).filter((g) => g.clientId === client.id);
+      const nowIso = call.actor.ctx.now;
+      const week = londonWeekKey(call.actor.now);
+      const skipped: { personId: string; reason: ManualSkipReason | 'noAccount' }[] = [...plan.skipped];
+      const sent: string[] = [];
+      const ops: WriteOp[] = [];
+      for (const r of plan.send) {
+        const person = data.people.find((p) => p.id === r.personId) as Person;
+        const user = users.find((u) => u.side === 'staff' && u.personId === r.personId && u.status === 'active');
+        if (!user) {
+          skipped.push({ personId: r.personId, reason: 'noAccount' });
+          continue;
+        }
+        const { training, date } = reminderDetails(r.kind, r.targetId, r.offset, call.actor.now, data, modules, groups);
+        sent.push(r.personId);
+        ops.push(
+          put('notifications', {
+            id: call.newId(),
+            clientId: client.id,
+            userId: user.id,
+            kind: 'reminder',
+            params: { reminderKind: r.kind, offset: r.offset, training, date },
+            createdAt: nowIso,
+          } satisfies Notification),
+          {
+            type: 'put',
+            store: 'reminderLog',
+            key: `${r.personId}:manual:${r.targetId}:${nowIso}`,
+            record: {
+              key: `${r.personId}:manual:${r.targetId}:${nowIso}`,
+              clientId: client.id,
+              personId: r.personId,
+              kind: 'manual',
+              sentAt: nowIso,
+              weekKey: week,
+            } satisfies ReminderLog,
+          },
+        );
+        // Limited accounts get the in-app notice only.
+        if (state !== 'limited') {
+          ops.push(
+            put('outbox', {
+              id: call.newId(),
+              channel: 'push',
+              to: user.id,
+              body: reminderText(client, r.kind, { firstName: person.firstName, training, date }),
+              at: nowIso,
+              reason: `reminder.${r.kind}`,
+            } satisfies OutboxMessage),
+          );
+        }
+      }
+      if (sent.length > 0) {
+        ops.push(audit(call, client.id, 'reminders.sent', `client:${client.id}`, undefined, { count: sent.length }));
+        await apply(ops);
+      }
+      return { sent, skipped };
+    },
+
     async chaseOverdue(ctx, opts) {
       const call = await clientCall(ctx, 'reminders.manage');
       if ((opts as { preview?: boolean }).preview !== true)
@@ -574,6 +704,22 @@ export function createRulesOperations(backend: RawBackend, options: StoreOptions
     const modules = await all<Module>('modules');
     const groups = await all<ModuleGroup>('moduleGroups');
 
+    // An add-on period that has ended turns the add-on off; its end date and usage stay for the record (assumption 27).
+    for (const sub of await all<AddOnSubscription>('addOnSubscriptions')) {
+      if (
+        (sub.status === 'on' || sub.status === 'trial') &&
+        sub.endsAt !== undefined &&
+        Date.parse(sub.endsAt) <= now.getTime()
+      ) {
+        ops.push({
+          type: 'put',
+          store: 'addOnSubscriptions',
+          key: `${sub.clientId}:${sub.addOnId}`,
+          record: { ...sub, status: 'off' },
+        });
+      }
+    }
+
     for (const client of clients) {
       const subscription = (await all<Subscription>('subscriptions')).find((s) => s.clientId === client.id);
       const state = derivedAccountState(client, subscription, now);
@@ -598,21 +744,7 @@ export function createRulesOperations(backend: RawBackend, options: StoreOptions
         const person = data.people.find((p) => p.id === r.personId);
         const user = users.find((u) => u.side === 'staff' && u.personId === r.personId && u.status === 'active');
         if (!person || !user) continue;
-        let training = '';
-        let date = '';
-        if (r.kind === 'expiring') {
-          training = data.requirements.find((q) => q.id === r.targetId)?.name ?? '';
-          date = londonDateString(addDays(now, r.offset));
-        } else {
-          const a = data.assignments.find((x) => x.id === r.targetId);
-          if (a) {
-            date = londonDateString(new Date(a.dueAt));
-            training =
-              'moduleId' in a.target
-                ? (modules.find((m) => m.id === (a.target as { moduleId: string }).moduleId)?.title ?? '')
-                : (groups.find((g) => g.id === (a.target as { groupId: string }).groupId)?.name ?? '');
-          }
-        }
+        const { training, date } = reminderDetails(r.kind, r.targetId, r.offset, now, data, modules, groups);
         ops.push(
           put('notifications', {
             id: newId(),

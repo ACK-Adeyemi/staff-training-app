@@ -234,6 +234,7 @@
       "usageCapReached": "The spending limit for this add-on has been reached.",
       "invalidTemplate": "The message can only use {firstName}, {training} and {date}, and must be 1 to 300 characters.",
       "invalidTheme": "Some colours don't have enough contrast. Fix the pairs listed.",
+      "invalidScope": "That view is not available to you.",
       "invalidName": "Use a name of 2 to 60 characters that is not only numbers or symbols.",
       "staffTicketsOff": "Your organisation has switched off support requests from staff.",
       "duplicateRule": "You already have a rule that does the same thing.",
