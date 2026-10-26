@@ -57,3 +57,9 @@ export function need<T>(value: T | null | undefined): T {
   if (value === null || value === undefined) throw new Error('Expected a value');
   return value;
 }
+
+/** M2 chunk 13 routes (Learn and organise). */
+export const organiseRoutes: NavEntry[] = [
+  { hash: '#/staff/learn', label: 'Learn' },
+  { hash: '#/client/organise', label: 'Organise modules' },
+];
