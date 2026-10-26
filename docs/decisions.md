@@ -407,3 +407,7 @@ Every number marked placeholder is engine config in packages/domain (`engagement
 - Seeded Learn more opens are on wrong answers in open attempts, always before today. The Safer eating last lesson is viewed by 10 people and finished by 5, which feeds the C8 drop-off view.
 - Conflict 11: m1.test.ts assertions about "the only assignment" now compare Safeguarding assignments only (Jade also has a Safer sleep one), and the "keeps local changes" test uses the Safeguarding assignment and compares counts to the seeded total.
 - Other tests adjusted for the seeded history (conflict 11, never deleted): the data contract world drops the new seeded stores like it already drops the M1 ones (the suite builds its own records); persistence tests expect seed version 3; the S6 and S7 web tests count Jade's Safeguarding records only; the C8 web test expects the seeded Safeguarding stats (average 70%, pass rate 0%, then 80% and 50% after Jade passes) and no unanswered questions.
+
+### M2 chunk 11
+
+- 15 new UI components in packages/ui (charts share ChartShell). Dialog gained an optional `className` and falls back to the `open` attribute when `showModal` is missing (jsdom). Celebration keyframes live in tokens.css under the existing reduced-motion rule. `--cat-N` category colour tokens do not exist yet, so Chip, CourseChip and Celebration use `var(--cat-N, fallback)`; add the tokens when categories are wired up (chunk 13). No 56px bigger-buttons variant exists yet; chunk 12 should add one on `--target-min`. ReadAloudBar has an optional `rateLabel` prop.
