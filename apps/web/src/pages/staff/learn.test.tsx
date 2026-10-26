@@ -379,7 +379,9 @@ describe('S3 Learn: Simple view', () => {
     await screen.findByTestId('learn-simple-list');
     expect(screen.queryByTestId('learn-path')).toBeNull();
     expect(screen.queryAllByTestId('path-node')).toHaveLength(0);
-    expect(titles()).toHaveLength(5);
+    await waitFor(() => {
+      expect(titles()).toHaveLength(5);
+    });
     expect(count()).toBe('5 modules');
     await search('sleep');
     await waitFor(() => {
