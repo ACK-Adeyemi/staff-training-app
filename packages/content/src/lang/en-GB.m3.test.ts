@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import enGB from './en-GB.json';
 
 const get = (path: string): unknown =>
-  path.split('.').reduce<unknown>((n, p) => (n && typeof n === 'object' ? (n as Record<string, unknown>)[p] : undefined), enGB);
+  path
+    .split('.')
+    .reduce<unknown>((n, p) => (n && typeof n === 'object' ? (n as Record<string, unknown>)[p] : undefined), enGB);
 
 const leaves = (node: unknown, prefix: string): { key: string; value: string }[] => {
   if (typeof node === 'string') return [{ key: prefix, value: node }];
@@ -13,16 +15,55 @@ const leaves = (node: unknown, prefix: string): { key: string; value: string }[]
 };
 
 const groups = [
-  'rules', 'reminders', 'calendar', 'evidenceFlow', 'feedback', 'tickets', 'help', 'faq', 'team', 'twoFactor', 'org',
-  'billing', 'addOns', 'account', 'retention', 'export', 'themes', 'builder', 'library', 'stats', 'sites', 'sitesBoard',
-  'ai', 'onboarding',
+  'rules',
+  'reminders',
+  'calendar',
+  'evidenceFlow',
+  'feedback',
+  'tickets',
+  'help',
+  'faq',
+  'team',
+  'twoFactor',
+  'org',
+  'billing',
+  'addOns',
+  'account',
+  'retention',
+  'export',
+  'themes',
+  'builder',
+  'library',
+  'stats',
+  'sites',
+  'sitesBoard',
+  'ai',
+  'onboarding',
 ];
 
 // Every RuleName added in M3 (packages/data/src/types.ts).
 const newRuleNames = [
-  'checklistFailed', 'providerModuleReadOnly', 'hasCompletions', 'storageFull', 'fileTooLarge', 'fileType', 'imageMetadata',
-  'notHttps', 'anonymousNoReply', 'openSubmission', 'notExternal', 'notApplicable', 'wrongCode', 'codeLocked',
-  'stepUpRequired', 'usageCapReached', 'invalidTemplate', 'invalidTheme', 'invalidName', 'staffTicketsOff', 'duplicateRule',
+  'checklistFailed',
+  'providerModuleReadOnly',
+  'hasCompletions',
+  'storageFull',
+  'fileTooLarge',
+  'fileType',
+  'imageMetadata',
+  'notHttps',
+  'anonymousNoReply',
+  'openSubmission',
+  'notExternal',
+  'notApplicable',
+  'wrongCode',
+  'codeLocked',
+  'stepUpRequired',
+  'usageCapReached',
+  'invalidTemplate',
+  'invalidTheme',
+  'invalidName',
+  'staffTicketsOff',
+  'duplicateRule',
 ];
 
 const PAYMENT =
@@ -58,7 +99,9 @@ describe('en-GB M3 key groups', () => {
   });
 
   it('keeps all staff-facing keys free of payment wording', () => {
-    const staff = leaves(get('staff'), 'staff').filter((l) => l.key.startsWith('staff.accountNotice') || l.key.startsWith('staff.help'));
+    const staff = leaves(get('staff'), 'staff').filter(
+      (l) => l.key.startsWith('staff.accountNotice') || l.key.startsWith('staff.help'),
+    );
     for (const l of staff) expect(l.value, l.key).not.toMatch(PAYMENT);
   });
 

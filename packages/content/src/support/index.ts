@@ -1,0 +1,10 @@
+export { supportFeatures } from './features';
+export type { SupportFeature } from './features';
+export { issueTypes } from './issueTypes';
+export type { IssueType } from './issueTypes';
+export { feedbackTags } from './feedbackTags';
+export type { FeedbackTag } from './feedbackTags';
+export { faqs } from './faqs';
+export type { Faq } from './faqs';
+export { releaseNotes } from './releaseNotes';
+export type { ReleaseNote } from './releaseNotes';

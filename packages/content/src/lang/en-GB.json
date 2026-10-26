@@ -671,6 +671,9 @@
       "print": "Print or save as PDF",
       "none": "There is no certificate yet. Pass the quiz to get one.",
       "back": "Back to the module"
+    },
+    "accountNotice": {
+      "speakToManager": "Some things are paused for now. Speak to your manager if you need something changed."
     }
   },
   "doc": {
@@ -1181,5 +1184,917 @@
       "behaviour": "Behaviour (Tier 3)",
       "inductionAndSupervision": "Induction and supervision (Tier 3)"
     }
+  },
+  "rules": {
+    "title": "Auto-assign rules",
+    "intro": "Rules give out training for you when something happens, such as a new person joining.",
+    "add": "Add a rule",
+    "edit": "Edit rule",
+    "name": "Rule name",
+    "enabled": "On",
+    "disabled": "Off",
+    "trigger": {
+      "label": "When",
+      "personAdded": "A new person is added",
+      "roleChanged": "A person's job role changes",
+      "requirementExpiring": "A requirement is about to expire"
+    },
+    "daysBefore": "Days before it expires",
+    "filters": "Who it applies to",
+    "allPeople": "Everyone",
+    "training": "Training to give",
+    "dueIn": "Due in (days)",
+    "sentence": "When {trigger}, give {training} to {who}, due in {days} days.",
+    "preview": "This would give training to {count} people now.",
+    "previewNone": "Nobody would be given training right now.",
+    "empty": "You have no rules yet.",
+    "save": "Save rule",
+    "delete": "Delete rule",
+    "limit": "You have reached the number of rules you can have.",
+    "duplicate": "You already have a rule that does the same thing.",
+    "defaultsNote": "These rules were set up for you. You can change or switch them off."
+  },
+  "reminders": {
+    "title": "Reminders",
+    "intro": "Reminders go to the Outbox in this demo. Nothing is sent to anyone.",
+    "when": "When to remind",
+    "offsets": "Remind people this many days before the due date",
+    "weekly": "Weekly summary for managers",
+    "quietHours": "Quiet hours",
+    "template": "Message",
+    "templateHelp": "You can use {firstName}, {training} and {date}.",
+    "preview": "Preview",
+    "save": "Save reminder settings",
+    "saved": "Reminder settings saved.",
+    "channelInApp": "In the app",
+    "channelEmail": "Email (shown in the Outbox)",
+    "defaultMessage": "Hi {firstName}, your {training} is due on {date}. It only takes a few minutes.",
+    "chase": "Chase now",
+    "chased": "Reminder added to the Outbox.",
+    "nothingToChase": "Nobody needs a reminder right now.",
+    "limitedNote": "Only in-app reminders are working at the moment."
+  },
+  "calendar": {
+    "title": "Calendar",
+    "today": "Today",
+    "week": "Week",
+    "month": "Month",
+    "list": "List",
+    "previous": "Previous",
+    "next": "Next",
+    "empty": "Nothing is happening in this period.",
+    "dueTraining": "Training due: {title}",
+    "expiring": "Expires: {title}",
+    "battle": "Battle Room: {title}",
+    "competitionEnds": "Competition ends: {title}",
+    "filters": "Filters",
+    "showAll": "Show everything",
+    "download": "Add to my calendar (.ics file)",
+    "downloaded": "Calendar file downloaded.",
+    "forecast": "First aiders forecast",
+    "forecastIntro": "See how many trained first aiders you will have each week.",
+    "firstAiders": "First aiders now: {count}",
+    "gap": "You will have no first aider in week {week}.",
+    "clusters": "Many expiring in the same week",
+    "staff": {
+      "intro": "Your training dates in one place.",
+      "myDue": "Due: {title}",
+      "myExpiring": "Your certificate for {title} runs out on {date}.",
+      "empty": "You have nothing coming up.",
+      "download": "Add my dates to my phone calendar"
+    }
+  },
+  "evidenceFlow": {
+    "title": "Certificates from outside courses",
+    "upload": "Upload a certificate",
+    "choose": "Choose a photo or PDF",
+    "date": "Date you finished the course",
+    "provider": "Course provider",
+    "expiry": "Expiry date on the certificate",
+    "submit": "Send for checking",
+    "submitted": "Sent. Your manager will check it.",
+    "waiting": "Waiting to be checked",
+    "approved": "Approved",
+    "needsBetterCopy": "Needs a better copy",
+    "rejected": "Not accepted",
+    "approve": "Approve",
+    "requestBetterCopy": "Ask for a better copy",
+    "reject": "Do not accept",
+    "note": "Note to the person",
+    "checklist": "Check these before you approve",
+    "waitingTooLong": "Waiting {days} working days",
+    "blurHint": "Cover anything private, such as an address, before you send.",
+    "statusLabel": "Status: {status}",
+    "historyTitle": "History",
+    "empty": "Nothing is waiting to be checked."
+  },
+  "feedback": {
+    "title": "Feedback",
+    "module": {
+      "title": "How was this training?",
+      "rating": "Your rating",
+      "tags": "What stood out?",
+      "comment": "Anything to add? (optional)",
+      "anonymous": "Send without my name",
+      "anonymousNote": "In a small team, people may still guess who sent it.",
+      "submit": "Send feedback",
+      "thanks": "Thank you for your feedback."
+    },
+    "lesson": {
+      "question": "Was this lesson helpful?",
+      "up": "Yes, it was helpful",
+      "down": "No, it was not helpful",
+      "thanks": "Thanks for letting us know."
+    },
+    "report": {
+      "title": "Report a problem with this question",
+      "what": "What is wrong?",
+      "submit": "Send report",
+      "thanks": "Thank you. This will be looked at."
+    },
+    "tags": {
+      "reallyUseful": "Really useful",
+      "clear": "Clear",
+      "unclear": "Unclear",
+      "tooLong": "Too long",
+      "outOfDate": "Out of date",
+      "mistakeInQuestion": "Mistake in a question",
+      "notRelevant": "Not relevant to my role",
+      "hardOnPhone": "Hard to use on my phone"
+    },
+    "status": {
+      "new": "New",
+      "reviewed": "Reviewed",
+      "actioned": "Actioned",
+      "noAction": "No action needed"
+    },
+    "reply": "Reply",
+    "replyPlaceholder": "Write a short reply",
+    "replySent": "Reply sent.",
+    "noReplyAnonymous": "This feedback is anonymous, so it cannot be replied to.",
+    "escalate": "Send to the provider",
+    "escalateNote": "Add a note for the provider",
+    "escalated": "Sent to the provider.",
+    "editModule": "Edit this module",
+    "empty": "No feedback yet.",
+    "app": {
+      "title": "Send feedback about the app",
+      "type": "What kind of feedback?",
+      "idea": "Idea",
+      "problem": "Problem",
+      "praise": "Praise",
+      "rating": "Rating (optional)",
+      "text": "Tell us more",
+      "goesTo": "This goes to the product team, not to your manager.",
+      "noNames": "Please do not include the names of children or colleagues.",
+      "context": "We also send the screen you are on and your device type. Nothing else about you.",
+      "submit": "Send feedback",
+      "thanks": "Thank you. The product team will read this.",
+      "stuck": "Need a reply? Raise a ticket instead."
+    },
+    "staff": {
+      "intro": "Your feedback helps make training better.",
+      "privacy": "Your manager can see your name unless you choose to send it without."
+    }
+  },
+  "tickets": {
+    "title": "Support tickets",
+    "mine": "My tickets",
+    "organisation": "Organisation tickets",
+    "raise": "Raise a ticket",
+    "empty": "You have no tickets.",
+    "number": "Ticket {number}",
+    "steps": {
+      "help": "Check Help first",
+      "feature": "Which part of the app?",
+      "issue": "What kind of problem?",
+      "impact": "How much does this affect you?",
+      "details": "Tell us what happened",
+      "screenshots": "Add screenshots (optional)",
+      "review": "Check and send"
+    },
+    "search": "Search for a feature",
+    "other": "Other",
+    "otherPlaceholder": "A few words",
+    "suggestions": "These answers might help",
+    "stopHere": "This answered my question",
+    "impact": {
+      "cantUse": "I can't use the app",
+      "workaround": "Something is broken but I can work around it",
+      "question": "Just a question"
+    },
+    "title_label": "Title",
+    "titlePrompt": "Short summary",
+    "whatHappened": "What happened?",
+    "whatExpected": "What did you expect?",
+    "context": {
+      "title": "Sent with your ticket",
+      "remove": "Remove",
+      "removed": "Removed",
+      "screen": "Screen",
+      "device": "Device and browser",
+      "role": "Your role",
+      "version": "App version"
+    },
+    "screenshots": {
+      "add": "Add a screenshot",
+      "max": "You can add up to 5 images.",
+      "blur": "Hide private details",
+      "blurHelp": "Draw over names, photos of children or other private details.",
+      "remove": "Remove image",
+      "altText": "Describe the image (optional)",
+      "reminder": "Do not include information about children.",
+      "metadata": "Location and camera details are removed from images."
+    },
+    "submit": "Send ticket",
+    "sent": "Your ticket {number} has been sent.",
+    "responseTime": "We usually reply within {hours} hours.",
+    "viewMine": "See my tickets",
+    "status": {
+      "received": "Received",
+      "inProgress": "In progress",
+      "waitingForYou": "Waiting for your reply",
+      "resolved": "Resolved",
+      "closed": "Closed",
+      "reopened": "Reopened"
+    },
+    "filters": {
+      "open": "Open",
+      "resolved": "Resolved",
+      "all": "All"
+    },
+    "thread": {
+      "reply": "Reply",
+      "send": "Send reply",
+      "markResolved": "Mark as resolved",
+      "reopen": "Reopen",
+      "rate": "Was this helpful?",
+      "up": "Yes",
+      "down": "No",
+      "comment": "Anything to add? (optional)",
+      "autoClose": "This will close in {days} days if there is no reply."
+    },
+    "features": {
+      "myTraining": "My training",
+      "lessons": "Lessons",
+      "quizzes": "Quizzes",
+      "notes": "Notes",
+      "competitions": "Competitions",
+      "leaderboards": "Leaderboards",
+      "battleRoom": "Battle Room",
+      "calendar": "Calendar",
+      "certificates": "Certificates",
+      "uploads": "Uploading a certificate",
+      "reports": "Reports",
+      "billing": "Plan and billing",
+      "signIn": "Signing in",
+      "themes": "Themes",
+      "display": "Display and text size"
+    },
+    "areas": {
+      "learning": "Learning",
+      "quizzes": "Quizzes",
+      "notes": "Notes",
+      "competitions": "Competitions",
+      "battleRoom": "Battle Room",
+      "calendar": "Calendar",
+      "certificates": "Certificates",
+      "reports": "Reports",
+      "billing": "Billing",
+      "login": "Login",
+      "themes": "Themes"
+    },
+    "issueTypes": {
+      "notWorking": "Something isn't working",
+      "cantSignIn": "I can't sign in",
+      "howTo": "Question or how-to",
+      "contentMistake": "Content or quiz mistake",
+      "billing": "Billing or payment",
+      "featureRequest": "Request a feature",
+      "accessibility": "Accessibility problem"
+    },
+    "staff": {
+      "intro": "Tell us what went wrong and we will help.",
+      "off": "Support requests from staff are switched off. Ask your manager.",
+      "privateNote": "Only you and the support team can see your tickets."
+    }
+  },
+  "help": {
+    "title": "Help",
+    "search": "Search help",
+    "noResults": "No answers found. Try different words, or raise a ticket.",
+    "categories": "Categories",
+    "all": "All topics",
+    "helpful": "Was this helpful?",
+    "yes": "Yes",
+    "no": "No",
+    "thanks": "Thanks for letting us know.",
+    "stuck": "Still stuck? Send feedback.",
+    "whatsNew": "What's new",
+    "sendFeedback": "Send feedback",
+    "raiseTicket": "Raise a ticket",
+    "myTickets": "My tickets",
+    "youSaid": "You said, we did",
+    "contextual": "Need help with this?",
+    "menuLabel": "Help and feedback",
+    "open": "Open help",
+    "staff": {
+      "intro": "Answers to common questions, and a way to ask us.",
+      "stillStuck": "Still stuck? Send feedback or ask your manager."
+    }
+  },
+  "faq": {
+    "categories": {
+      "training": "My training",
+      "progress": "XP and levels",
+      "learning": "Learning and quizzes",
+      "settings": "Settings",
+      "signIn": "Signing in",
+      "people": "People and roles",
+      "content": "Training content",
+      "engagement": "Competitions",
+      "reports": "Reports and exports",
+      "account": "Plan and billing"
+    },
+    "staff": {
+      "mustDo": {
+        "question": "How do I see what I must complete?",
+        "answer": "Open Home. Next up lists the training you need to do, with due dates. Overdue items show first. When Home says You are compliant, nothing is outstanding."
+      },
+      "renewals": {
+        "question": "How do renewals work?",
+        "answer": "Some training runs out after a set time, like a safeguarding refresher. Coming up on Home shows what runs out soon. Do the refresher before the date."
+      },
+      "xp": {
+        "question": "What are XP and levels?",
+        "answer": "XP are points you earn for learning, like finishing a lesson or passing a quiz. XP moves you up levels and earns badges. Going fast earns nothing extra."
+      },
+      "notes": {
+        "question": "How do notes work?",
+        "answer": "You can write private notes on any lesson. Only you can see them. Notes are locked while you take a closed-book quiz, and you can see them again afterwards."
+      },
+      "closedBook": {
+        "question": "What is a closed-book quiz?",
+        "answer": "In a closed-book quiz you cannot open your notes or the lessons until you have finished. It checks what you remember. Your results are saved as normal."
+      },
+      "leaderboards": {
+        "question": "How do leaderboards work, and can I hide myself?",
+        "answer": "Leaderboards show progress in friendly competitions. They never rank people by how fast they are. You can hide yourself from a leaderboard in Me, under Privacy."
+      },
+      "textSize": {
+        "question": "How do I change the text size?",
+        "answer": "Open Me, then Display and accessibility. Choose a bigger text size and you will see the change straight away. You can also switch on dark mode or high contrast there."
+      },
+      "cannotLogIn": {
+        "question": "What should I do if I cannot log in?",
+        "answer": "Check your PIN or password and try again. If it still does not work, ask your manager to reset it. They can do this in a moment."
+      },
+      "upload": {
+        "question": "How do I add a certificate from a course I did elsewhere?",
+        "answer": "Open the training and choose Upload a certificate. Add a photo or PDF and the date you finished. Your manager checks it and you get a message."
+      },
+      "reportMistake": {
+        "question": "I think there is a mistake in a question. What can I do?",
+        "answer": "Choose Report a problem under the question. Say what looks wrong. Your manager sees it, and mistakes in provider training are fixed for everyone."
+      }
+    },
+    "client": {
+      "inviteStaff": {
+        "question": "How do I add staff and invite them?",
+        "answer": "Open People, then Add people. Enter their name, job role and email. They get an invitation and choose a PIN when they first sign in."
+      },
+      "publishModule": {
+        "question": "How do I create and publish a module?",
+        "answer": "Open Modules, then New module. Paste your lessons and questions, check the preview on the phone frame, and fix anything the publish checklist lists. Then choose Publish."
+      },
+      "categories": {
+        "question": "How do I use categories and groups?",
+        "answer": "Categories help staff find training. Groups bundle several modules so you can give them out together, for example a new starter set. Manage both under Modules."
+      },
+      "autoAssign": {
+        "question": "How do I assign training and set up auto-assign rules?",
+        "answer": "Choose Assign to give training to chosen people. Under Rules, auto-assign rules do it for you, for example when a new person joins."
+      },
+      "competitions": {
+        "question": "How do I run a competition and choose prizes?",
+        "answer": "Open Competitions and choose a template. Set the dates, who can join and a prize. Competitions reward learning and never reward speed. Add a prize before you publish."
+      },
+      "themes": {
+        "question": "How do I change our theme?",
+        "answer": "Open Themes and pick a ready-made theme or build your own. Colours are checked so text stays readable. You can schedule a theme and preview it as staff."
+      },
+      "sitesRoles": {
+        "question": "How do sites and roles work?",
+        "answer": "Each site has its own people. Roles decide what each admin can do, and you can limit an admin to one site. Change them under Team and roles."
+      },
+      "inspectorExport": {
+        "question": "How do I produce an inspector-ready export?",
+        "answer": "Open Reports, then Exports, and choose the inspector-ready pack. You get training records and dates for the people and period you choose."
+      },
+      "billing": {
+        "question": "Where do I find plan and billing details?",
+        "answer": "Open Plan and billing to see your plan, invoices and add-ons. You need permission to view billing. If you cannot see it, ask the Account Owner."
+      },
+      "twoStep": {
+        "question": "What is two-step sign-in?",
+        "answer": "It asks for a code from an authenticator app as well as your password. Every admin needs it. Keep your recovery codes somewhere safe."
+      }
+    }
+  },
+  "whatsNew": {
+    "title": "What's new",
+    "empty": "There is nothing new yet.",
+    "calendarReminders": {
+      "title": "Calendar and reminders",
+      "body": "The calendar shows your training dates in one place, and you can add them to your phone. Reminders now arrive a few days before something is due."
+    },
+    "helpFeedback": {
+      "title": "Help and feedback",
+      "body": "The Help area has answers to common questions. You can send feedback about the app or a lesson, and raise a ticket if you need a reply."
+    },
+    "septemberUpdate": {
+      "title": "What changed in September 2026",
+      "body": "A short new module explains the changes to the early years framework. It is assigned to everyone and takes about six minutes."
+    }
+  },
+  "team": {
+    "title": "Team and roles",
+    "intro": "Choose who can do what.",
+    "members": "Admins",
+    "invite": "Invite an admin",
+    "email": "Email",
+    "roles": "Roles",
+    "role": "Role",
+    "scope": "Where it applies",
+    "allSites": "All sites",
+    "oneSite": "One site",
+    "save": "Save access",
+    "revoke": "Remove access",
+    "revoked": "Access removed.",
+    "invited": "Invitation sent. It appears in the Outbox in this demo.",
+    "customRole": "Custom role",
+    "newRole": "Create a role",
+    "roleName": "Role name",
+    "permissions": "Permissions",
+    "saveRole": "Save role",
+    "removeRole": "Remove role",
+    "roleInUse": "This role is in use, so it cannot be removed.",
+    "activity": "Activity",
+    "activityEmpty": "No activity yet.",
+    "owner": "Account Owner",
+    "ownerNote": "The Account Owner always keeps full access.",
+    "limit": "You have reached the number of custom roles you can have."
+  },
+  "twoFactor": {
+    "title": "Two-step sign-in",
+    "intro": "This adds a second check when you sign in.",
+    "daysLeft": "Set up two-step sign-in, {days} days left",
+    "daysLeftOne": "Set up two-step sign-in, 1 day left",
+    "limited": "Set up two-step sign-in to carry on.",
+    "start": "Start set-up",
+    "scan": "Scan this with your authenticator app",
+    "secret": "Or type this key: {secret}",
+    "code": "6-digit code",
+    "confirm": "Confirm",
+    "enrolled": "Two-step sign-in is on.",
+    "recovery": {
+      "title": "Your recovery codes",
+      "intro": "Keep these somewhere safe. Each works once. We show them only now.",
+      "copy": "Copy codes",
+      "saved": "I have saved my codes"
+    },
+    "verify": "Enter the code from your app",
+    "useRecovery": "Use a recovery code instead",
+    "demoNote": "Demo: this is simulated, so any app that follows the standard will give the right code.",
+    "wrong": "That code isn't right. Check it and try again.",
+    "locked": "Too many wrong codes. Wait 15 minutes and try again.",
+    "stepUp": "Enter a fresh code to do this."
+  },
+  "org": {
+    "title": "Your organisation",
+    "displayName": "Display name",
+    "shortName": "Short name",
+    "nameHelp": "This is the name staff see in the app.",
+    "save": "Save",
+    "saved": "Saved.",
+    "pendingReview": "The provider will review the new name.",
+    "formerly": "Formerly {name}",
+    "formerlyNote": "Staff see \"{name}\" for {days} more days.",
+    "staffPreview": "Preview as staff",
+    "settings": {
+      "title": "Settings",
+      "staffTickets": "Let staff raise support tickets",
+      "pulse": "Pulse survey (off by default)",
+      "quietHours": "Quiet hours for notifications",
+      "saved": "Settings saved."
+    },
+    "sites": {
+      "title": "Sites",
+      "name": "Site name",
+      "region": "Region",
+      "rename": "Rename site"
+    }
+  },
+  "billing": {
+    "title": "Plan and billing",
+    "plan": "Your plan",
+    "price": "{amount} a month",
+    "nextInvoice": "Next invoice on {date}",
+    "invoices": "Invoices",
+    "invoice": "Invoice {number}",
+    "download": "Download",
+    "status": {
+      "paid": "Paid",
+      "due": "Due",
+      "failed": "Failed",
+      "refunded": "Refunded"
+    },
+    "total": "Total",
+    "tax": "VAT",
+    "subtotal": "Subtotal",
+    "usage": "Usage against your plan",
+    "used": "{used} of {limit} used",
+    "unlimited": "Unlimited",
+    "changePlan": "Change plan",
+    "preview": "What would change",
+    "confirmChange": "Change plan",
+    "changed": "Your plan has been changed.",
+    "payNow": "Pay now",
+    "paid": "Payment received. Thank you.",
+    "demoNote": "Demo: no real payment is taken.",
+    "details": "Billing details",
+    "contact": "Billing contact email",
+    "updateContact": "Update contact",
+    "requestChange": "Ask to change billing details",
+    "requested": "Your request has been sent.",
+    "noAccess": "You do not have access to billing. Ask the Account Owner.",
+    "pastDue": "Your last payment did not go through.",
+    "empty": "No invoices yet."
+  },
+  "addOns": {
+    "title": "Add-ons",
+    "intro": "Extra things you can switch on.",
+    "on": "On",
+    "off": "Off",
+    "turnOn": "Turn on",
+    "turnOff": "Turn off",
+    "trial": "Try it free",
+    "request": "Ask the Account Owner",
+    "requested": "Your request has been sent.",
+    "cap": "Spending limit",
+    "capHelp": "We stop the add-on when it reaches this limit.",
+    "capSet": "Limit saved.",
+    "usage": "Used this month: {used}",
+    "perUnit": "{amount} each",
+    "whatItDoes": "What it does",
+    "forExample": "For example",
+    "requests": "Requests",
+    "approve": "Approve",
+    "decline": "Decline",
+    "copy": {
+      "aiAssistant": {
+        "what": "Explains a quiz answer in simple words when someone asks, using only the lesson and the official source.",
+        "example": "A new starter is unsure why a baby must sleep in a cot. They tap Explain and get a short, plain answer."
+      },
+      "translation": {
+        "what": "Shows lessons and questions in other languages, marked as machine translated until someone checks them.",
+        "example": "A cook who reads Polish more easily can read the food allergy module in Polish."
+      },
+      "reminders": {
+        "what": "Sends reminders by text message or WhatsApp as well as in the app.",
+        "example": "A bank practitioner gets a text two days before their safeguarding refresher is due."
+      },
+      "extraContentPack": {
+        "what": "Adds a second industry pack of ready-made training.",
+        "example": "A nursery group that also runs a cafe adds the hospitality pack."
+      },
+      "onboarding": {
+        "what": "Our team sets up your account, loads your people and applies your branding.",
+        "example": "A group of eight nurseries has all its staff, teams and sites set up before the first day."
+      }
+    }
+  },
+  "account": {
+    "title": "Account",
+    "state": {
+      "active": "Active",
+      "trial": "Trial",
+      "pastDue": "Payment overdue",
+      "limited": "Limited",
+      "readOnly": "Read-only",
+      "paused": "Paused",
+      "closed": "Closed",
+      "deleted": "Deleted"
+    },
+    "since": "Since {date}",
+    "nextChange": "Next change: {change} on {date}",
+    "whatWorks": "What works now",
+    "fixNow": "Fix this now",
+    "trialDays": "{days} days left in your trial",
+    "allGood": "Everything is working.",
+    "banner": {
+      "pastDue": "Your last payment did not go through. Everything still works while we try again.",
+      "limited": "Your account is limited. Existing training and records still work.",
+      "readOnly": "Your account is read-only. You can look and export, but not change things.",
+      "paused": "Your account is paused. You can look and export, but not change things.",
+      "closed": "Your account is closed. You can still export your records.",
+      "trial": "You are on a trial."
+    },
+    "works": {
+      "yes": "Working",
+      "no": "Not available",
+      "viewOnly": "View only",
+      "exportOnly": "Export only",
+      "withinAllowance": "Within your allowance",
+      "inAppOnly": "In the app only",
+      "continueToEnd": "Running ones carry on to the end",
+      "frozen": "Frozen",
+      "displayOnly": "Display only",
+      "coreCompliance": {
+        "label": "Training and compliance",
+        "yes": "Training, assigning and records all work.",
+        "viewOnly": "You can look at training and records, but not change them.",
+        "exportOnly": "You can export your compliance records.",
+        "no": "Not available."
+      },
+      "exports": {
+        "label": "Exports",
+        "yes": "You can export your records.",
+        "no": "Exports are not available."
+      },
+      "authoring": {
+        "label": "Writing your own training",
+        "yes": "You can create and edit your own modules.",
+        "no": "You cannot create or edit modules."
+      },
+      "liveCompetitions": {
+        "label": "Running competitions",
+        "yes": "Competitions run as normal.",
+        "continueToEnd": "Competitions already running carry on to the end.",
+        "frozen": "Competitions are frozen where they are.",
+        "no": "Competitions are not available."
+      },
+      "newCompetitions": {
+        "label": "New competitions",
+        "yes": "You can start new competitions.",
+        "no": "You cannot start new competitions."
+      },
+      "battleRoom": {
+        "label": "Battle Room",
+        "yes": "Battle Room works as normal.",
+        "no": "Battle Room is not available."
+      },
+      "usageAddOns": {
+        "label": "Add-ons that are used as you go",
+        "yes": "These work as normal.",
+        "withinAllowance": "These work until you reach your allowance.",
+        "no": "These are not available."
+      },
+      "reminders": {
+        "label": "Reminders",
+        "yes": "Reminders work as normal.",
+        "inAppOnly": "Reminders appear in the app only.",
+        "no": "Reminders are not sent."
+      },
+      "themesEdit": {
+        "label": "Changing themes",
+        "yes": "You can change and save themes.",
+        "no": "You cannot change themes."
+      },
+      "themesDisplay": {
+        "label": "Showing your theme",
+        "yes": "Your theme is shown to staff.",
+        "no": "Your theme is not shown."
+      }
+    }
+  },
+  "retention": {
+    "title": "Keeping and deleting records",
+    "intro": "See when records are due to be deleted.",
+    "scheduled": "Scheduled deletions",
+    "empty": "Nothing is due to be deleted.",
+    "on": "Deleted on {date}",
+    "what": "What will be deleted",
+    "exportFirst": "Export your records before they are deleted.",
+    "eraseTitle": "Erase a person",
+    "eraseHelp": "This removes the person and keeps your compliance totals.",
+    "eraseConfirm": "Erase this person",
+    "erased": "The person has been erased.",
+    "exportBefore": "You can export your records at any time, before deletion too."
+  },
+  "export": {
+    "title": "Export your data",
+    "intro": "Download your records as files.",
+    "inspector": "Inspector-ready pack",
+    "matrix": "Training matrix",
+    "people": "People",
+    "completions": "Training completions",
+    "audit": "Audit history",
+    "all": "Everything (ZIP)",
+    "build": "Build export",
+    "building": "Building your export",
+    "ready": "Your export is ready.",
+    "fileList": "Files in this export",
+    "period": "Period",
+    "demoNote": "Demo: the download is simulated.",
+    "failed": "The export could not be built. Please try again."
+  },
+  "themes": {
+    "title": "Themes",
+    "intro": "Choose how the app looks for your staff.",
+    "presets": {
+      "defaultLight": "Default light",
+      "defaultDark": "Default dark",
+      "christmas": "Christmas",
+      "halloween": "Halloween",
+      "easter": "Easter",
+      "newYear": "New Year",
+      "spring": "Spring",
+      "summer": "Summer",
+      "bonfireNight": "Bonfire Night",
+      "diwali": "Diwali",
+      "eid": "Eid"
+    },
+    "custom": "Build your own",
+    "name": "Theme name",
+    "primary": "Main colour",
+    "accent": "Accent colour",
+    "tint": "Background tint",
+    "radius": "Corners",
+    "radiusSm": "Square",
+    "radiusMd": "Rounded",
+    "radiusLg": "Very round",
+    "schedule": "Show only between these dates",
+    "start": "Starts",
+    "end": "Ends",
+    "appliesTo": "Where to use it",
+    "staffApp": "Staff app",
+    "adminApp": "Admin app",
+    "preview": "Preview as staff",
+    "save": "Save theme",
+    "saved": "Theme saved.",
+    "use": "Use this theme",
+    "inUse": "In use",
+    "contrastTitle": "Some colours need fixing",
+    "contrastFail": "{pair} is {ratio} to 1. It needs {required} to 1.",
+    "contrastOk": "Colours are easy to read.",
+    "pairs": {
+      "textOnTint": "Text on the background tint",
+      "buttonTextOnPrimary": "Button text on the main colour",
+      "primaryOnBackground": "Main colour on the page",
+      "accentOnBackground": "Accent colour on the page"
+    },
+    "accessibilityNote": "A person's own display settings always override a theme.",
+    "limit": "You have saved as many themes as you can.",
+    "readOnlyNote": "This theme is read-only."
+  },
+  "builder": {
+    "title": "Module builder",
+    "new": "New module",
+    "paste": "Paste your lessons",
+    "pasteHelp": "Use headings for lessons. Separate screens with a line of three dashes.",
+    "questions": "Questions",
+    "addQuestion": "Add a question",
+    "preview": "Phone preview",
+    "checklist": "Before you publish",
+    "checklistOk": "Ready to publish.",
+    "publish": "Publish",
+    "publishAs": "Publish as version {version}",
+    "saveDraft": "Save draft",
+    "saved": "Draft saved.",
+    "published": "Published.",
+    "discard": "Discard draft",
+    "versions": "Versions",
+    "newVersion": "Start a new version",
+    "duplicate": "Make a copy",
+    "delete": "Delete",
+    "archive": "Archive",
+    "optional": "This module is optional",
+    "readOnly": "This training belongs to the provider, so you cannot change it. You can make your own copy.",
+    "requirements": "Counts towards",
+    "roleTags": "For these job roles",
+    "titleLabel": "Title",
+    "descriptionLabel": "Description",
+    "check": {
+      "title": "Give it a title",
+      "lessons": "Add at least one lesson",
+      "questions": "Add at least five questions",
+      "correct": "Each question needs one correct answer",
+      "explanation": "Each question needs an explanation",
+      "pass": "Set a pass mark"
+    }
+  },
+  "library": {
+    "title": "Modules",
+    "search": "Search modules",
+    "filters": "Filters",
+    "owner": "Owner",
+    "provider": "From the provider",
+    "mine": "Ours",
+    "status": "Status",
+    "published": "Published",
+    "draft": "Draft",
+    "archived": "Archived",
+    "sort": "Sort by",
+    "rating": "Rating",
+    "empty": "No modules match.",
+    "viewStats": "Stats",
+    "assign": "Assign",
+    "new": "New version available",
+    "details": "Details",
+    "links": "Learn more links",
+    "addLink": "Add a link",
+    "addPdf": "Add a PDF",
+    "checkLinks": "Check links",
+    "brokenLinks": "Links to fix",
+    "categories": "Categories",
+    "groups": "Groups"
+  },
+  "stats": {
+    "title": "Stats",
+    "started": "Started",
+    "completed": "Completed",
+    "passRate": "Pass rate",
+    "averageTime": "Average time to complete",
+    "statusBar": "Where people are",
+    "lessonFunnel": "Lessons",
+    "dropOff": "Where people stop",
+    "scores": "Quiz scores",
+    "retakes": "Retakes",
+    "people": "People",
+    "byWeek": "Completions by week",
+    "hardQuestions": "Hardest questions",
+    "feedback": "Feedback",
+    "notStarted": "Not started",
+    "inProgress": "In progress",
+    "done": "Completed",
+    "overdue": "Overdue",
+    "tableView": "Show as a table",
+    "chartView": "Show as a chart",
+    "trend": "Compliance over time",
+    "days30": "30 days",
+    "days90": "90 days",
+    "byRequirement": "By requirement",
+    "byRole": "By job role",
+    "byTeam": "By room",
+    "bySite": "By site",
+    "expiring": "Expiring soon",
+    "mostCompleted": "Most completed",
+    "leastCompleted": "Least completed",
+    "noData": "No data yet.",
+    "adminOnlyNote": "This is for managers and is never used to rank staff."
+  },
+  "sites": {
+    "title": "Sites",
+    "switcher": "Switch site",
+    "all": "All sites",
+    "current": "Showing {name}",
+    "compare": "Compare sites",
+    "people": "{count} people",
+    "compliance": "{percent}% compliant",
+    "empty": "No sites yet.",
+    "groupedBy": "People grouped by site",
+    "scope": "Show",
+    "scopeSite": "This site",
+    "scopeGroup": "The whole group"
+  },
+  "sitesBoard": {
+    "title": "Sites board",
+    "intro": "A fair view of how sites are doing, whatever their size.",
+    "measure": "Measure",
+    "completion": "Training completion",
+    "engagement": "Learning activity",
+    "fairNote": "Sites are compared by the share of people, not by the number, and never by speed.",
+    "rank": "Position {rank}",
+    "empty": "The board needs at least two sites."
+  },
+  "ai": {
+    "explain": "Explain",
+    "title": "Explain this answer",
+    "intro": "A short explanation, based only on this lesson and the official source.",
+    "loading": "Thinking",
+    "demoLabel": "Demo AI. Answers are written in advance.",
+    "error": "We could not explain that right now. Please try again.",
+    "off": "The AI assistant is not switched on for your organisation.",
+    "sourceLine": "Source: {source}",
+    "close": "Close",
+    "disclaimer": "Check anything important with your manager."
+  },
+  "onboarding": {
+    "title": "Getting started",
+    "intro": "A few steps to set things up.",
+    "progress": "{done} of {total} done",
+    "done": "All done",
+    "markDone": "Mark as done",
+    "steps": {
+      "people": "Add your people",
+      "assign": "Give out your first training",
+      "rules": "Set up a rule",
+      "theme": "Choose a theme",
+      "twoStep": "Set up two-step sign-in",
+      "export": "Try an export"
+    },
+    "dismiss": "Hide this list",
+    "hidden": "You can find this list again under Help."
   }
 }

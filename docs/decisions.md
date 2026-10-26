@@ -605,3 +605,12 @@ Copied from docs/plans/m3.md (chunk 1). Numbers match the plan, so other docs ca
 - `publishVersion` for a published module snapshots with `publishedAt` = the previous `updatedAt` (or `now` if unknown).
 - Provider feedback projection: `ownModules.moduleCount` counts client-own modules that have feedback.
 - `applicableCells` is exported from progress/client.ts for the overview breakdowns (same rule as the dashboard).
+
+## M3 chunk 5
+
+- Fire evacuation cites no EYFS paragraph. The plan allowed paragraph 3.58, but in `.sources-cache/eyfs-group.txt` 3.58 is about before and after school care, not fire safety, so the module has no `sourceRef` and no Learn more links. The module is marked Draft content with a `verify` note.
+- The committed tests used ids such as `client-test` and `rule-test`, which `idSchema` (ULIDs) rejects, so the tests could not pass. Fixed minimally by using valid ULID constants in `fireEvacuation.test.ts` and `nurseryM3.test.ts`; no assertion was weakened.
+- `errors.rule.*` and `errors.twoFactorRequired` for the new rule names were already in en-GB.json, so only the missing key groups were added. The error key is `errors.twoFactorRequired` (the test contract), not `errors.forbidden.twoFactorRequired` as the plan said.
+- `supportFeatures` carry an extra `areaKey` for the display label; `area` stays a plain lower-case name as the tests require. Release notes use `whatsNew.*` keys (the plan did not name a group). Staff-side groups `help.staff`, `faq.staff`, `tickets.staff`, `calendar.staff` and `feedback.staff` exist and hold no payment words.
+- Default auto-assign rules use `dueInDays` 14 for the induction and 30 for the other two (placeholders, VERIFY). "What changed in September 2026" is assigned on `personAdded` for everyone.
+- FAQ answers are 30 words or fewer to satisfy the existing en-GB wording test.

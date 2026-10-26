@@ -6,9 +6,23 @@ import { themeTokensSchema, validateTheme } from '@sta/domain';
 import enGB from '../lang/en-GB.json';
 import { themeBases, themePresets } from './presets';
 
-const names = ['Default light', 'Default dark', 'Christmas', 'Halloween', 'Easter', 'New Year', 'Spring', 'Summer', 'Bonfire Night', 'Diwali', 'Eid'];
+const names = [
+  'Default light',
+  'Default dark',
+  'Christmas',
+  'Halloween',
+  'Easter',
+  'New Year',
+  'Spring',
+  'Summer',
+  'Bonfire Night',
+  'Diwali',
+  'Eid',
+];
 const nameOf = (key: string): unknown =>
-  key.split('.').reduce<unknown>((n, p) => (n && typeof n === 'object' ? (n as Record<string, unknown>)[p] : undefined), enGB);
+  key
+    .split('.')
+    .reduce<unknown>((n, p) => (n && typeof n === 'object' ? (n as Record<string, unknown>)[p] : undefined), enGB);
 
 describe('theme presets', () => {
   it('has the eleven presets with unique ids and real names', () => {

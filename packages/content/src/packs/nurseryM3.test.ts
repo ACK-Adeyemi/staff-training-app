@@ -21,7 +21,7 @@ describe('nursery pack: first aid key', () => {
 
 describe('nursery pack: default auto-assign rules (build pack 7.4)', () => {
   const parse = (r: (typeof nurseryDefaultRules)[number]) =>
-    autoAssignRuleSchema.safeParse({ ...r, id: 'rule-test', clientId: 'client-test' });
+    autoAssignRuleSchema.safeParse({ ...r, id: '01HZZZZZZZZZZZZZZZZZZZZZZ3', clientId: '01HZZZZZZZZZZZZZZZZZZZZZZ2' });
 
   it('has three rules that each pass autoAssignRuleSchema', () => {
     expect(nurseryDefaultRules).toHaveLength(3);

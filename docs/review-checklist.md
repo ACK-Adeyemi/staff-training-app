@@ -59,3 +59,10 @@ Things only the user can check, by milestone.
 ### Awaiting review (M2)
 
 - [ ] Draft modules awaiting your review: Paediatric first aid and accidents, Safer eating, allergies and choking, Safer sleep, and What changed in September 2026 (details above under Awaiting content review).
+
+## M3
+
+### Awaiting review
+
+- [ ] M3 content (Draft): the Fire evacuation at Little Acorns module (`packages/content/src/packs/nursery/modules/fire-evacuation/`, fictional site details, no EYFS reference), the staff and client FAQs and the three release notes in `lang/en-GB.json`, the accepted providers (generic names) and approver checklists for Paediatric first aid, Safeguarding and Food hygiene in `packs/nursery.ts` (VERIFY), the default auto-assign rule due dates, and the theme preset colours.
+

@@ -5,7 +5,9 @@ import { addOnIds, addOns } from './packages';
 import { addOnCopy } from './addOnCopy';
 
 const lookup = (key: string): string | undefined => {
-  const v = key.split('.').reduce<unknown>((n, p) => (n && typeof n === 'object' ? (n as Record<string, unknown>)[p] : undefined), enGB);
+  const v = key
+    .split('.')
+    .reduce<unknown>((n, p) => (n && typeof n === 'object' ? (n as Record<string, unknown>)[p] : undefined), enGB);
   return typeof v === 'string' ? v : undefined;
 };
 

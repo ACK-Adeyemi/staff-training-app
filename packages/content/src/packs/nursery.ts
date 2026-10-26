@@ -1,5 +1,5 @@
 // The nursery industry pack: terminology, job roles and the M0 requirements. Build pack 2.4 and 9.
-import type { IndustryPack, JobRole, Requirement } from '@sta/domain';
+import type { AutoAssignRule, IndustryPack, JobRole, Requirement } from '@sta/domain';
 import { contentId } from './contentId';
 import { moduleIds } from './moduleIds';
 import prizes from './nursery/prizes.json';
@@ -35,9 +35,19 @@ const requirements: Requirement[] = [
     satisfiedByModuleIds: [moduleIds.safeguardingAndWhistleblowing],
     sourceRef: 'EYFS statutory framework (DfE), safeguarding section',
     acceptsExternal: true,
-    acceptedProviders: [],
+    acceptedProviders: [
+      { name: 'DfE early years safeguarding course' },
+      { name: 'Local safeguarding partnership level 2 course' },
+      { name: 'Approved designated safeguarding lead training provider' },
+    ], // VERIFY: fictional or generic provider names
     expiryMode: 'fromRenewalPeriod',
-    approverChecklist: [],
+    approverChecklist: [
+      // VERIFY: checklist wording
+      'The certificate shows the full name of the person and it matches their name on file.',
+      'The course covers safeguarding children in the early years, not a different subject.',
+      'The date the course was completed is shown and is not in the future.',
+      'The training provider is named on the certificate.',
+    ],
   },
   {
     id: contentId(602),
@@ -49,9 +59,19 @@ const requirements: Requirement[] = [
     satisfiedByModuleIds: [moduleIds.paediatricFirstAid],
     sourceRef: 'EYFS statutory framework (DfE), first aid section',
     acceptsExternal: true,
-    acceptedProviders: [],
+    acceptedProviders: [
+      { name: 'Approved paediatric first aid training provider' },
+      { name: 'Local authority paediatric first aid course' },
+      { name: 'Approved 12-hour paediatric first aid course' },
+    ], // VERIFY: fictional or generic provider names
     expiryMode: 'fromCertificate',
-    approverChecklist: [],
+    approverChecklist: [
+      // VERIFY: checklist wording
+      'The certificate shows the full name of the person and it matches their name on file.',
+      'The course is a paediatric first aid course covering babies, infants and children.',
+      'The date the course was completed is shown, and the certificate is still in date.',
+      'The training provider is named, and the course was taught face to face or blended with a practical assessment.',
+    ],
   },
   {
     id: contentId(603),
@@ -63,9 +83,19 @@ const requirements: Requirement[] = [
     satisfiedByModuleIds: [moduleIds.foodHygiene],
     sourceRef: 'Food Standards Agency guidance for food handlers',
     acceptsExternal: true,
-    acceptedProviders: [],
+    acceptedProviders: [
+      { name: 'Level 2 food hygiene and safety course' },
+      { name: 'Local authority food hygiene course' },
+      { name: 'Online level 2 food safety provider' },
+    ], // VERIFY: fictional or generic provider names
     expiryMode: 'fromRenewalPeriod',
-    approverChecklist: [],
+    approverChecklist: [
+      // VERIFY: checklist wording
+      'The certificate shows the full name of the person and it matches their name on file.',
+      'The course is food hygiene or food safety at level 2 or above.',
+      'The date the course was completed is shown and is not in the future.',
+      'The training provider is named on the certificate.',
+    ],
   },
   {
     id: contentId(604),
@@ -94,6 +124,44 @@ const requirements: Requirement[] = [
   },
 ];
 
+/** The Paediatric first aid requirement id, used by the first aiders forecast. */
+export const firstAidRequirementKey: string = contentId(602);
+
+const practitioner = jobRoles.find((r) => r.name === 'Practitioner') as JobRole;
+
+/** Default auto-assign rules (build pack 7.4): a rule without id, clientId or siteId. VERIFY the due dates. */
+export type DefaultAutoAssignRule = Omit<AutoAssignRule, 'id' | 'clientId' | 'siteId'> & { key: string };
+
+export const nurseryDefaultRules: DefaultAutoAssignRule[] = [
+  {
+    key: 'new-starter-induction',
+    name: 'New starter induction for new Practitioners',
+    enabled: true,
+    trigger: { type: 'personAdded' },
+    filters: { jobRoleIds: [practitioner.id] },
+    action: { moduleId: moduleIds.newStarterInduction },
+    dueInDays: 14,
+  },
+  {
+    key: 'safeguarding-refresher',
+    name: 'Safeguarding refresher 60 days before expiry',
+    enabled: true,
+    trigger: { type: 'requirementExpiring', days: 60, requirementId: contentId(601) },
+    filters: {},
+    action: { moduleId: moduleIds.safeguardingAndWhistleblowing },
+    dueInDays: 30,
+  },
+  {
+    key: 'what-changed-september-2026',
+    name: 'What changed in September 2026 for everyone',
+    enabled: true,
+    trigger: { type: 'personAdded' },
+    filters: {},
+    action: { moduleId: moduleIds.whatChangedSeptember2026 },
+    dueInDays: 30,
+  },
+];
+
 export const nurseryPack: IndustryPack = {
   id: packId,
   name: 'Nurseries and early years',
@@ -107,7 +175,7 @@ export const nurseryPack: IndustryPack = {
   jobRoles,
   requirements,
   defaultCategoryIds: [],
-  defaultRules: [],
+  defaultRules: nurseryDefaultRules,
   faqIds: [],
   supportFeatureIds: [],
   prizeSuggestions: prizes,

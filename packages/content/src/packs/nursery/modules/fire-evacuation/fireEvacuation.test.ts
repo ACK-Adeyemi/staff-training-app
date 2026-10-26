@@ -5,7 +5,11 @@ import { moduleSchema } from '@sta/domain';
 import { nurseryModules } from '../index';
 import { buildFireEvacuationModule } from './index';
 
-const mod = buildFireEvacuationModule({ id: 'fire-evac-test', clientId: 'client-test' });
+// Ids are ULIDs because moduleSchema validates them with idSchema.
+const MODULE_ID = '01HZZZZZZZZZZZZZZZZZZZZZZ1';
+const CLIENT_ID = '01HZZZZZZZZZZZZZZZZZZZZZZ2';
+const SITE_ID = '01HZZZZZZZZZZZZZZZZZZZZZZ4';
+const mod = buildFireEvacuationModule({ id: MODULE_ID, clientId: CLIENT_ID });
 const size = (i: number): number => JSON.stringify(mod.lessons[i]?.blocks ?? []).length;
 
 describe('Fire evacuation sample module', () => {
@@ -16,15 +20,15 @@ describe('Fire evacuation sample module', () => {
   });
 
   it('is owned by the client it is built for, is published and is not optional-flagged', () => {
-    expect(mod.owner).toEqual({ clientId: 'client-test' });
-    expect(mod.id).toBe('fire-evac-test');
+    expect(mod.owner).toEqual({ clientId: CLIENT_ID });
+    expect(mod.id).toBe(MODULE_ID);
     expect(mod.status).toBe('published');
     expect(mod.title).toMatch(/fire/i);
   });
 
   it('keeps the site when one is given', () => {
-    const m = buildFireEvacuationModule({ id: 'x', clientId: 'c', siteId: 's' });
-    expect(m.owner).toEqual({ clientId: 'c', siteId: 's' });
+    const m = buildFireEvacuationModule({ id: MODULE_ID, clientId: CLIENT_ID, siteId: SITE_ID });
+    expect(m.owner).toEqual({ clientId: CLIENT_ID, siteId: SITE_ID });
   });
 
   it('has three lessons', () => {
@@ -66,6 +70,8 @@ describe('Fire evacuation sample module', () => {
   });
 
   it('uses fictional site details only (no real company or phone numbers)', () => {
-    expect(JSON.stringify(mod)).not.toMatch(/\b0\d{9,10}\b|https?:\/\/(?!www\.gov\.uk|www\.legislation\.gov\.uk|www\.hse\.gov\.uk|assets\.publishing\.service\.gov\.uk)/);
+    expect(JSON.stringify(mod)).not.toMatch(
+      /\b0\d{9,10}\b|https?:\/\/(?!www\.gov\.uk|www\.legislation\.gov\.uk|www\.hse\.gov\.uk|assets\.publishing\.service\.gov\.uk)/,
+    );
   });
 });

@@ -1,0 +1,204 @@
+{
+  "title": "Fire evacuation at Little Acorns",
+  "description": "What to do if the fire alarm sounds at Little Acorns: raising the alarm, getting the children out, including babies in cots, and what happens at the assembly point.",
+  "estimatedMinutes": 8,
+  "language": "en-GB",
+  "status": "published",
+  "version": 1,
+  "roleTags": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "Raising the alarm",
+      "minutes": 2
+    },
+    {
+      "id": "lesson-2",
+      "title": "Getting the children out, including babies and cots",
+      "minutes": 4
+    },
+    {
+      "id": "lesson-3",
+      "title": "The assembly point, registers and roll call",
+      "minutes": 2
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-fire-alarm",
+      "type": "mcq",
+      "prompt": "You see smoke coming from the kitchen. What do you do first?",
+      "options": [
+        {
+          "id": "q-fire-alarm-o1",
+          "text": "Press the nearest call point and tell the person in charge",
+          "correct": true
+        },
+        {
+          "id": "q-fire-alarm-o2",
+          "text": "Finish the activity you are doing",
+          "correct": false
+        },
+        {
+          "id": "q-fire-alarm-o3",
+          "text": "Open the kitchen door to see how big the fire is",
+          "correct": false
+        },
+        {
+          "id": "q-fire-alarm-o4",
+          "text": "Collect the children's coats",
+          "correct": false
+        }
+      ],
+      "explanation": "Raise the alarm straight away by pressing the nearest call point, then tell the person in charge. Do not wait to be sure and do not open a door to check.",
+      "tags": ["fire"],
+      "learnMore": []
+    },
+    {
+      "id": "q-fire-belongings",
+      "type": "trueFalse",
+      "prompt": "If you left the register in the office, it is fine to go back inside for it. True or false?",
+      "options": [
+        {
+          "id": "q-fire-belongings-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-fire-belongings-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. Nobody goes back inside for any reason, not even for the register. Only the fire brigade goes back in.",
+      "tags": ["fire"],
+      "learnMore": []
+    },
+    {
+      "id": "q-fire-babies",
+      "type": "mcq",
+      "prompt": "How do you get babies who cannot walk out of the baby room?",
+      "options": [
+        {
+          "id": "q-fire-babies-o1",
+          "text": "Carry them, or place them in the evacuation cots and wheel them out",
+          "correct": true
+        },
+        {
+          "id": "q-fire-babies-o2",
+          "text": "Ask them to follow you",
+          "correct": false
+        },
+        {
+          "id": "q-fire-babies-o3",
+          "text": "Leave them until the others are outside",
+          "correct": false
+        },
+        {
+          "id": "q-fire-babies-o4",
+          "text": "Wait for the fire brigade to carry them",
+          "correct": false
+        }
+      ],
+      "explanation": "Babies are carried or wheeled out in the evacuation cots, youngest first. Never leave a baby behind.",
+      "tags": ["fire"],
+      "learnMore": []
+    },
+    {
+      "id": "q-fire-assembly",
+      "type": "mcq",
+      "prompt": "Where does everyone go once they are outside Little Acorns?",
+      "options": [
+        {
+          "id": "q-fire-assembly-o1",
+          "text": "The assembly point in the front garden, by the blue gate",
+          "correct": true
+        },
+        {
+          "id": "q-fire-assembly-o2",
+          "text": "Home",
+          "correct": false
+        },
+        {
+          "id": "q-fire-assembly-o3",
+          "text": "Across the road",
+          "correct": false
+        },
+        {
+          "id": "q-fire-assembly-o4",
+          "text": "Back to the classroom",
+          "correct": false
+        }
+      ],
+      "explanation": "Go straight to the assembly point and stay there. Keep the road clear for the fire engines.",
+      "tags": ["fire"],
+      "learnMore": []
+    },
+    {
+      "id": "q-fire-roll",
+      "type": "trueFalse",
+      "prompt": "A Room Leader calls the names on the register at the assembly point. True or false?",
+      "options": [
+        {
+          "id": "q-fire-roll-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-fire-roll-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. Each Room Leader takes the register for their room and tells the person in charge straight away if anyone is missing.",
+      "tags": ["fire"],
+      "learnMore": []
+    },
+    {
+      "id": "q-fire-missing",
+      "type": "mcq",
+      "prompt": "At roll call a child is missing. What do you do?",
+      "options": [
+        {
+          "id": "q-fire-missing-o1",
+          "text": "Tell the person in charge who is missing and where they were last seen",
+          "correct": true
+        },
+        {
+          "id": "q-fire-missing-o2",
+          "text": "Go back in to look for them",
+          "correct": false
+        },
+        {
+          "id": "q-fire-missing-o3",
+          "text": "Wait to see if they turn up",
+          "correct": false
+        },
+        {
+          "id": "q-fire-missing-o4",
+          "text": "Ask the other children to look",
+          "correct": false
+        }
+      ],
+      "explanation": "Tell the person in charge straight away and pass the information to the fire brigade. Never go back in to look.",
+      "tags": ["fire"],
+      "learnMore": []
+    }
+  ],
+  "quiz": {
+    "mode": "mcq",
+    "drawCount": 6,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "passMark": 80,
+    "maxRetakes": null,
+    "feedback": true,
+    "showSourceRef": false,
+    "notesInQuiz": "choice",
+    "learnMoreFor": "wrong"
+  },
+  "draftContent": true,
+  "verify": [
+    "Draft content written for the demo. Little Acorns site details (assembly point, evacuation cots, red cards, drill frequency) are fictional. Check the wording against the setting's real fire risk assessment and the Regulatory Reform (Fire Safety) Order 2005 before real use. No sourceRef is given because EYFS paragraph 3.58 (the number in the plan) is about before and after school care, not fire safety."
+  ]
+}

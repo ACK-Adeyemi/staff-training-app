@@ -41,8 +41,23 @@ describe('support features', () => {
 
   it('covers the brief 25.3 areas', () => {
     const areas = supportFeatures.map((f) => f.area.toLowerCase());
-    for (const a of ['learning', 'quizzes', 'notes', 'competitions', 'battle room', 'calendar', 'certificates', 'reports', 'billing', 'login', 'themes'])
-      expect(areas.some((x) => x.includes(a)), a).toBe(true);
+    for (const a of [
+      'learning',
+      'quizzes',
+      'notes',
+      'competitions',
+      'battle room',
+      'calendar',
+      'certificates',
+      'reports',
+      'billing',
+      'login',
+      'themes',
+    ])
+      expect(
+        areas.some((x) => x.includes(a)),
+        a,
+      ).toBe(true);
   });
 
   it('does not include Other (the picker adds it)', () => {
@@ -65,7 +80,16 @@ describe('feedback tags', () => {
   it('has the eight quick tags from brief 19.1', () => {
     expect(unique(feedbackTags.map((t) => t.id))).toBe(true);
     const labels = feedbackTags.map((t) => text(t.labelKey));
-    for (const l of ['Really useful', 'Clear', 'Unclear', 'Too long', 'Out of date', 'Mistake in a question', 'Not relevant to my role', 'Hard to use on my phone'])
+    for (const l of [
+      'Really useful',
+      'Clear',
+      'Unclear',
+      'Too long',
+      'Out of date',
+      'Mistake in a question',
+      'Not relevant to my role',
+      'Hard to use on my phone',
+    ])
       expect(labels).toContain(l);
   });
 
@@ -114,12 +138,23 @@ describe('FAQs', () => {
 
   it('covers the brief 19.2 staff topics', () => {
     const all = staff.map((f) => `${text(f.questionKey)} ${text(f.answerKey)}`.toLowerCase()).join(' | ');
-    for (const w of ['renew', 'xp', 'notes', 'closed-book', 'leaderboard', 'text size', 'log in']) expect(all, w).toContain(w);
+    for (const w of ['renew', 'xp', 'notes', 'closed-book', 'leaderboard', 'text size', 'log in'])
+      expect(all, w).toContain(w);
   });
 
   it('covers the brief 19.2 client admin topics', () => {
     const all = client.map((f) => `${text(f.questionKey)} ${text(f.answerKey)}`.toLowerCase()).join(' | ');
-    for (const w of ['invite', 'publish', 'categories', 'auto-assign', 'competition', 'theme', 'roles', 'inspector', 'billing'])
+    for (const w of [
+      'invite',
+      'publish',
+      'categories',
+      'auto-assign',
+      'competition',
+      'theme',
+      'roles',
+      'inspector',
+      'billing',
+    ])
       expect(all, w).toContain(w);
   });
 });
