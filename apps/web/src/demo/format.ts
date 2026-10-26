@@ -1,0 +1,8 @@
+const zone = 'Europe/London';
+const dayFormat = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeZone: zone });
+const dateTimeFormat = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeStyle: 'short', timeZone: zone });
+
+/** "Monday 19 October 2026", in London time. */
+export const formatLondonDay = (date: Date): string => dayFormat.format(date);
+/** "19 October 2026 at 09:30", in London time. */
+export const formatLondonDateTime = (iso: string): string => dateTimeFormat.format(new Date(iso));

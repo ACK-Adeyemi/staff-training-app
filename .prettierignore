@@ -1,0 +1,15 @@
+node_modules
+dist
+coverage
+playwright-report
+test-results
+pnpm-lock.yaml
+.agent-logs
+.claude
+.devcontainer
+docs/brief.md
+docs/build-pack.md
+# Prose and workflow files are written by hand and reviewed by the user; Prettier does not reflow them.
+*.md
+.github
+.vitest

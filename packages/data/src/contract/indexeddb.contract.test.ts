@@ -1,0 +1,8 @@
+// Runs the shared contract suite against the IndexedDB adapter (plan chunk 9; BP-8).
+import 'fake-indexeddb/auto';
+import { createIndexedDbStore } from '../indexeddb/index';
+import { runContractSuite } from './suite';
+
+let counter = 0;
+// A fresh database name per store, so tests never see each other's data.
+runContractSuite('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));

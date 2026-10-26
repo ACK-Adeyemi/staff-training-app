@@ -1,0 +1,7 @@
+packages:
+  - 'packages/*'
+  - 'apps/*'
+
+# The data package's contract suite loads the seed, and the seed uses the data types (plan chunk 8). The cycle is
+# deliberate: the seed imports only types from the data package at runtime.
+ignoreWorkspaceCycles: true

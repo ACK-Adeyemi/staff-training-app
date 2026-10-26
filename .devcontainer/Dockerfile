@@ -9,13 +9,14 @@ ARG CLAUDE_CODE_VERSION=latest
 ENV DEBIAN_FRONTEND=noninteractive
 
 # The VM's proxy only allows HTTPS, so point Debian's package sources at https.
+# poppler-utils gives agents pdftotext, so official PDFs can be read as plain text cheaply.
 RUN set -eux; \
     for f in /etc/apt/sources.list.d/*.sources /etc/apt/sources.list; do \
       if [ -f "$f" ]; then sed -i 's#http://deb.debian.org#https://deb.debian.org#g' "$f"; fi; \
     done; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-      git ripgrep jq less procps postgresql-client \
+      git ripgrep jq less procps postgresql-client poppler-utils \
       python3 python3-venv python3-pip; \
     rm -rf /var/lib/apt/lists/*
 
