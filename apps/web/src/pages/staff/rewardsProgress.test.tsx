@@ -21,6 +21,8 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
 });
+// Jade has no Safeguarding history by design (plan M2 assumption 34), so the module filter uses a module she has done.
+const firstAidModule = nurseryModules.find((m) => m.id === '01M0C0N7000000000000000203')!;
 type Dump = Record<string, Record<string, unknown>[]>;
 
 async function expectedXp(handle: StoreHandle) {
@@ -65,11 +67,11 @@ describe('S8 History tab', () => {
     await renderRoute('/staff/progress', 'staff');
     const user = await openTab('History');
     const all = (await screen.findAllByTestId('timeline-item')).length;
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Module' }), sgModule.title);
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Module' }), firstAidModule.title);
     const some = screen.getAllByTestId('timeline-item');
     expect(some.length).toBeGreaterThan(0);
     expect(some.length).toBeLessThan(all);
-    for (const i of some) expect(i.textContent).toContain(sgModule.title);
+    for (const i of some) expect(i.textContent).toContain(firstAidModule.title);
   });
 
   it('filters by year', async () => {

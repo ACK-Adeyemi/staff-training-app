@@ -4,24 +4,30 @@ import { useT } from '../../app/hooks';
 import { formatLondonDate } from '../../demo/format';
 import { focusLink } from './styles';
 import { useStaffData } from './queries';
+import { ProgressHistory } from './ProgressHistory';
+import { ProgressXp } from './ProgressXp';
+import { useRewards } from './rewardsQueries';
 
-type Tab = 'compliance' | 'completed';
+type Tab = 'compliance' | 'completed' | 'history' | 'xp';
 
-/** S8. History, trend and XP tabs arrive with later milestones. */
+/** S8. */
 export function Progress() {
   const t = useT();
   const q = useStaffData();
+  const rewards = useRewards();
   const [tab, setTab] = useState<Tab>('compliance');
   if (q.isError) return <p role="alert">{t('staff.progress.loadError')}</p>;
   const tabs: { id: Tab; label: string }[] = [
     { id: 'compliance', label: t('staff.progress.myCompliance') },
     { id: 'completed', label: t('staff.progress.completed') },
+    { id: 'history', label: t('staff.progress.history') },
+    { id: 'xp', label: t('staff.progress.xpAndLevel') },
   ];
   const data = q.data;
   return (
     <>
       <PageHeader title={t('staff.progress.title')} />
-      <div role="tablist" aria-label={t('staff.progress.tabs')} className="mb-4 flex gap-2">
+      <div role="tablist" aria-label={t('staff.progress.tabs')} className="mb-4 flex flex-wrap gap-2">
         {tabs.map((x) => (
           <button
             key={x.id}
@@ -41,6 +47,14 @@ export function Progress() {
       </div>
       <div role="tabpanel" id="progress-panel" aria-labelledby={`progress-tab-${tab}`}>
         {!data ? <p>{t('shell.loading')}</p> : null}
+        {data && tab === 'history' ? (
+          rewards.data ? (
+            <ProgressHistory data={rewards.data} />
+          ) : (
+            <p>{t('shell.loading')}</p>
+          )
+        ) : null}
+        {data && tab === 'xp' ? rewards.data ? <ProgressXp data={rewards.data} /> : <p>{t('shell.loading')}</p> : null}
         {data && tab === 'compliance' ? (
           data.summary.rows.length === 0 ? (
             <p>{t('staff.progress.noRows')}</p>

@@ -7,6 +7,7 @@ import type { MessageKey } from '@sta/content';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { useDisplayPrefs } from '../../app/display/context';
 import { celebrate } from '../../app/feedback';
+import { RewardsPanel } from './RewardsPanel';
 import { LearnMoreGroups } from './LearnMoreList';
 import { LearningFrame } from './LearningFrame';
 import { useModuleId } from './learningQueries';
@@ -101,6 +102,7 @@ export function Results() {
                 })}
               </p>
             </Card>
+            {passed ? <RewardsPanel attempt={attempt} module={module} /> : null}
             <div className="mb-4 flex flex-wrap items-center gap-3">
               {passed ? (
                 <LinkButton href={`${base}/certificate`}>{t('staff.results.viewCertificate')}</LinkButton>

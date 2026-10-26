@@ -23,6 +23,7 @@ import { Results } from '../pages/staff/Results';
 import { Learn } from '../pages/staff/Learn';
 import { MyNotes } from '../pages/staff/MyNotes';
 import { Notifications } from '../pages/staff/Notifications';
+import { TrainingRecord } from '../pages/staff/Record';
 import { Progress } from '../pages/staff/Progress';
 import { SignIn } from '../pages/staff/SignIn';
 import { RouteError } from './RouteError';
@@ -42,6 +43,7 @@ export const routes: RouteObject[] = [
       { path: '/staff/signin', element: <SignIn /> },
       // Outside the staff chrome: a certificate prints cleanly and an organisation document opens in its own tab.
       { path: '/staff/module/:moduleId/certificate', element: <Certificate /> },
+      { path: '/staff/progress/record', element: <TrainingRecord /> },
       { path: '/doc/:attachmentId', element: <OrgDoc /> },
       {
         path: '/staff',

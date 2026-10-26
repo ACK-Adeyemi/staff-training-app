@@ -1,8 +1,19 @@
-import { Badge, Card, LinkButton, PageHeader, ProgressRing } from '@sta/ui';
-import { staffRingPercent, type Assignment, type ComingUpItem, type Module, type StaffSummary } from '@sta/domain';
-import { useT } from '../../app/hooks';
+import { useState } from 'react';
+import { Badge, Button, Card, GoalRing, LinkButton, PageHeader, ProgressRing } from '@sta/ui';
+import {
+  competitionStatus,
+  staffRingPercent,
+  type Assignment,
+  type ComingUpItem,
+  type Module,
+  type StaffSummary,
+} from '@sta/domain';
+import type { MessageKey } from '@sta/content';
+import { useClock, useT } from '../../app/hooks';
 import { formatLondonDate } from '../../demo/format';
 import { useStaffData } from './queries';
+import { badgeDefinitionFor, latestBadge, useRewards, type RewardsData } from './rewardsQueries';
+import { focusLink } from './styles';
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -58,10 +69,87 @@ function comingUpText(
   return t('staff.home.requirementExpiry', { name });
 }
 
+function WeeklyGoalSection({ goal }: { goal: RewardsData['goal'] }) {
+  const t = useT();
+  const { done, goal: target, met } = goal.thisWeek;
+  const text = met ? t('weeklyGoal.met') : t('weeklyGoal.progress', { done, goal: target });
+  return (
+    <Section id="home-goal" title={t('weeklyGoal.title')}>
+      <GoalRing
+        label={text}
+        percent={Math.min(100, Math.round((done / Math.max(1, target)) * 100))}
+        valueText={`${Math.min(done, target)}/${target}`}
+        description={text}
+        completeLabel={t('weeklyGoal.met')}
+        size={96}
+      />
+    </Section>
+  );
+}
+
+function CompetitionBanners({ competitions }: { competitions: RewardsData['competitions'] }) {
+  const t = useT();
+  const now = useClock().now();
+  const [dismissed, setDismissed] = useState<ReadonlySet<string>>(new Set());
+  const live = competitions.filter((c) => competitionStatus(c, now) === 'live' && !dismissed.has(c.id));
+  return (
+    <Section id="home-competitions" title={t('staff.home.competitions')}>
+      {live.length === 0 ? (
+        <p className="m-0">{t('staff.home.noCompetitions')}</p>
+      ) : (
+        <ul className="m-0 flex list-none flex-col gap-2 p-0">
+          {live.map((c) => (
+            <li
+              key={c.id}
+              data-testid="competition-banner"
+              className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius-md)] border-2 border-[var(--color-border)] p-2"
+            >
+              <span>
+                <span className="block font-semibold">{c.name}</span>
+                <span className="block text-sm">
+                  {t('staff.home.competitionEnds', { date: formatLondonDate(c.endAt) })}
+                </span>
+              </span>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setDismissed(new Set([...dismissed, c.id]));
+                }}
+              >
+                {t('staff.home.dismiss', { name: c.name })}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Section>
+  );
+}
+
+function LatestBadge({ badges }: { badges: RewardsData['badges'] }) {
+  const t = useT();
+  const latest = latestBadge(badges);
+  const def = latest ? badgeDefinitionFor(latest.badgeId) : undefined;
+  return (
+    <Section id="home-badge" title={t('staff.home.latestBadge')}>
+      {latest && def ? (
+        <p className="m-0">
+          <span className="font-semibold">{t(def.nameKey as MessageKey)}</span>
+          {': '}
+          {t('staff.home.badgeEarnedOn', { date: formatLondonDate(latest.at) })}
+        </p>
+      ) : (
+        <p className="m-0">{t('staff.home.noBadge')}</p>
+      )}
+    </Section>
+  );
+}
+
 /** S2. */
 export function Home() {
   const t = useT();
   const q = useStaffData();
+  const rewards = useRewards();
   if (q.isError) return <p role="alert">{t('staff.home.loadError')}</p>;
   if (!q.data) return <p>{t('shell.loading')}</p>;
   const { summary, modules, assignments, personName } = q.data;
@@ -86,6 +174,7 @@ export function Home() {
       <Section id="home-next" title={t('staff.home.nextUp')}>
         <NextUp summary={summary} modules={modules} />
       </Section>
+      {rewards.data ? <WeeklyGoalSection goal={rewards.data.goal} /> : null}
       <Section id="home-coming" title={t('staff.home.comingUp')}>
         {summary.comingUp.length === 0 ? (
           <p className="m-0">{t('staff.home.nothingComing')}</p>
@@ -101,6 +190,15 @@ export function Home() {
           </ul>
         )}
       </Section>
+      {rewards.data ? (
+        <>
+          <CompetitionBanners competitions={rewards.data.competitions} />
+          <LatestBadge badges={rewards.data.badges} />
+        </>
+      ) : null}
+      <a href="#/staff/notes" className={`inline-flex min-h-[var(--target-min)] items-center underline ${focusLink}`}>
+        {t('staff.home.myNotes')}
+      </a>
     </>
   );
 }

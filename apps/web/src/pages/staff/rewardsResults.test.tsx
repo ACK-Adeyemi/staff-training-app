@@ -45,7 +45,9 @@ describe('S7 XP earned and why', () => {
     expect(sum).toBeGreaterThan(0);
     expect(within(region).getByTestId('xp-total').textContent).toBe(`+${sum} XP`);
     for (const r of rows) {
-      expect(r.getAttribute('data-kind')).toMatch(/^(lesson|correct|closedBookBonus|passed|mastery|earlyRefresher|weeklyGoal)$/);
+      expect(r.getAttribute('data-kind')).toMatch(
+        /^(lesson|correct|closedBookBonus|passed|mastery|earlyRefresher|weeklyGoal)$/,
+      );
       expect(r.textContent).toMatch(/\d+ XP/);
     }
   });
