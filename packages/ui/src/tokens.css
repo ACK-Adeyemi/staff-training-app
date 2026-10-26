@@ -50,7 +50,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-colour-mode]) {
+  :root:not([data-colour-mode='light']):not([data-colour-mode='dark']) {
     --color-bg: #0f1820;
     --color-surface: #1a2631;
     --color-text: #f1f5f8;
@@ -76,6 +76,85 @@
     animation: none !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* The Reduce motion setting (and Simple view, which implies it) does the same. */
+[data-reduce-motion='true'] *,
+[data-reduce-motion='true'] *::before,
+[data-reduce-motion='true'] *::after {
+  transition: none !important;
+  animation: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* Bigger buttons: the minimum touch target grows from 44px to 56px. */
+:root[data-bigger-buttons='true'] {
+  --target-min: 56px;
+}
+/* Switches size themselves with a fixed 44px class; this follows the setting. */
+[role='switch'] {
+  min-height: var(--target-min);
+  min-width: var(--target-min);
+}
+
+/* High contrast: pure text and border colours. The device setting prefers-contrast: more turns it on too. */
+:root[data-contrast='high'] {
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-text: #000000;
+  --color-text-muted: #000000;
+  --color-border: #000000;
+  --color-accent: #00394f;
+  --color-focus: #000000;
+  --status-current: #0d4a24;
+  --status-expiring: #5c3700;
+  --status-overdue: #8a0f08;
+  --status-not-assigned: #000000;
+  --status-awaiting: #3d2477;
+}
+:root[data-contrast='high'][data-colour-mode='dark'] {
+  --color-bg: #000000;
+  --color-surface: #000000;
+  --color-text: #ffffff;
+  --color-text-muted: #ffffff;
+  --color-border: #ffffff;
+  --color-accent: #9fd8ee;
+  --color-on-accent: #000000;
+  --color-focus: #ffffff;
+  --status-current: #8ff0b0;
+  --status-expiring: #ffd08a;
+  --status-overdue: #ffb3ad;
+  --status-not-assigned: #ffffff;
+  --status-awaiting: #dccfff;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-contrast='high'][data-colour-mode='auto'] {
+    --color-bg: #000000;
+    --color-surface: #000000;
+    --color-text: #ffffff;
+    --color-text-muted: #ffffff;
+    --color-border: #ffffff;
+    --color-accent: #9fd8ee;
+    --color-on-accent: #000000;
+    --color-focus: #ffffff;
+    --status-current: #8ff0b0;
+    --status-expiring: #ffd08a;
+    --status-overdue: #ffb3ad;
+    --status-not-assigned: #ffffff;
+    --status-awaiting: #dccfff;
+  }
+}
+@media (prefers-contrast: more) {
+  :root {
+    --color-text-muted: var(--color-text);
+    --color-border: var(--color-text);
+  }
+}
+
+/* Text size scales the root font size; Display zoom scales the whole interface. */
+html {
+  font-size: calc(var(--text-scale, 1) * 100%);
+  zoom: var(--ui-scale, 1);
 }
 
 /* Celebration: ring fill, tick pop and a confetti burst. Reduce motion turns all of this off (rule above). */

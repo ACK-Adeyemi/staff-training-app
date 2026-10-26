@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createT, languages } from '@sta/content';
 import type { ActorContext, DataStore, StoreHandle } from '@sta/data';
 import type { Clock } from '@sta/domain';
+import { DisplayPrefsProvider } from './display/DisplayPrefsProvider';
 import { connectLiveUpdates } from './liveUpdates';
 import { ActorCtx, ClockContext, DataStoreContext, DemoContext, I18nContext, type DemoApi } from './context';
 
@@ -40,7 +41,9 @@ export function AppProviders({
         <ActorCtx value={actor}>
           <I18nContext value={t}>
             <DemoContext value={demo}>
-              <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+              <QueryClientProvider client={queryClient}>
+                <DisplayPrefsProvider>{children}</DisplayPrefsProvider>
+              </QueryClientProvider>
             </DemoContext>
           </I18nContext>
         </ActorCtx>

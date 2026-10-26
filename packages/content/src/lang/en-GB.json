@@ -348,7 +348,8 @@
       "wrongPin": "That PIN is not right. In the demo the PIN is 1234.",
       "choosePerson": "Choose who you are first.",
       "loadError": "We could not load the list of people. Please try again.",
-      "signInError": "We could not sign you in. Please try again."
+      "signInError": "We could not sign you in. Please try again.",
+      "displayLink": "Display and accessibility"
     },
     "home": {
       "greeting": "Hello, {name}",
@@ -674,26 +675,66 @@
     "moveDown": "Move down"
   },
   "display": {
-    "title": "Display settings",
+    "title": "Display and accessibility",
     "simpleView": "Simple view",
     "textSize": "Text size",
     "contrast": "Contrast",
     "colourMode": "Colour mode",
-    "spacing": "Spacing"
+    "spacing": "Spacing",
+    "intro": "These settings change how the app looks and sounds on this device. They apply straight away.",
+    "on": "On",
+    "off": "Off",
+    "displayZoom": "Display zoom",
+    "contrastStandard": "Standard",
+    "contrastHigh": "High",
+    "colourAuto": "Auto",
+    "colourLight": "Light",
+    "colourDark": "Dark",
+    "reduceMotion": "Reduce motion",
+    "sound": "Sound",
+    "haptics": "Haptics",
+    "spacingStandard": "Standard",
+    "spacingWide": "Wide",
+    "dyslexiaFont": "Dyslexia-friendly font",
+    "biggerButtons": "Bigger buttons",
+    "readAloud": "Read aloud",
+    "readAloudSpeed": "Read aloud speed",
+    "reset": "Reset to defaults",
+    "saveError": "We could not save that setting. Your settings were not changed.",
+    "previewTitle": "Preview",
+    "previewHeading": "Staying safe at work",
+    "previewBody": "This is how lesson text will look with your settings. Short sentences and clear spacing make it easier to read.",
+    "previewButton": "Example button",
+    "back": "Back to Me",
+    "simpleViewHelp": "Shows plain lists, no animation, one column and larger text."
   },
   "readAloud": {
     "title": "Read aloud",
     "play": "Read this aloud",
-    "stop": "Stop reading"
+    "stop": "Stop reading",
+    "unavailable": "Read aloud is not available on this device"
   },
   "me": {
     "title": "Me",
     "nickname": "Nickname",
-    "hideFromLeaderboards": "Hide me from leaderboards"
+    "hideFromLeaderboards": "Hide me from leaderboards",
+    "saveNickname": "Save nickname",
+    "nicknameHelp": "Other people see your nickname instead of your name on leaderboards.",
+    "nicknameError": "Use 1 to 30 letters, numbers, spaces, hyphens or apostrophes, starting with a letter or number.",
+    "nicknameSaveError": "We could not save your nickname. Try again.",
+    "nicknameSaved": "Nickname saved.",
+    "displayNameTitle": "Display name",
+    "displayNameHelp": "This is the name other people see.",
+    "profileSaveError": "We could not save that change. Try again.",
+    "loadError": "We could not load your details. Try again.",
+    "displayLink": "Display and accessibility",
+    "notificationsLink": "Notifications",
+    "hideHelp": "When this is on, your name does not appear on leaderboards."
   },
   "celebration": {
     "levelUp": "You reached level {level}",
-    "badge": "You earned the {name} badge"
+    "badge": "You earned the {name} badge",
+    "quizPassed": "Well done"
   },
   "comingSoon": {
     "nursery": {

@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/opendyslexic": "5.3.0",
     "@sta/content": "workspace:*",
     "@sta/data": "workspace:*",
     "@sta/domain": "workspace:*",

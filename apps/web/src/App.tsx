@@ -53,6 +53,7 @@ function Inner({ booted }: { booted: Booted }) {
       listOutbox: () => handle.admin.listOutbox(),
       listStaffUsers: (clientId) => handle.admin.listStaffUsers(clientId),
       signInAs: (userId) => save({ ...state, persona: { side: 'staff', userId } }),
+      setDisplayPrefs: (displayPrefs) => save({ ...state, displayPrefs }),
       setIndustry: (industry) => save({ ...state, industry }),
     };
   }, [handle, keys.users, setOffset, state]);

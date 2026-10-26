@@ -47,7 +47,10 @@ describe('S11 Me', () => {
     expect(screen.getByRole('link', { name: 'Display and accessibility' }).getAttribute('href')).toMatch(
       /\/staff\/me\/display$/,
     );
-    expect(screen.getByRole('link', { name: 'Notifications' }).getAttribute('href')).toMatch(/\/staff\/notifications$/);
+    // The shell's header bell has the same name, so look inside the page itself.
+    expect(within(screen.getByRole('main')).getByRole('link', { name: 'Notifications' }).getAttribute('href')).toMatch(
+      /\/staff\/notifications$/,
+    );
   });
 
   it('saves a nickname for the learner and shows it in the preview', async () => {
@@ -87,11 +90,12 @@ describe('S11 Me', () => {
       );
     });
     const people = await handle.admin.dumpAll();
-    const jade = (people.people as { id: string; hideFromLeaderboards?: boolean; firstName?: string }[]).find(
+    const jade = (people.people as { id: string; prefs?: { hideFromLeaderboards?: boolean } }[]).find(
       (p) =>
         p.id === (people.users as { id: string; personId: string }[]).find((u) => u.id === keys.users.jade)?.personId,
     );
-    expect(jade?.hideFromLeaderboards).toBe(true);
+    // The flag lives in the person's prefs (personSchema.prefs.hideFromLeaderboards).
+    expect(jade?.prefs?.hideFromLeaderboards).toBe(true);
     await userEvent.click(screen.getByRole('switch', { name: 'Hide me from leaderboards' }));
     await waitFor(() => {
       expect(screen.getByRole('switch', { name: 'Hide me from leaderboards' }).getAttribute('aria-checked')).toBe(

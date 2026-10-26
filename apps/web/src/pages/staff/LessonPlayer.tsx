@@ -4,6 +4,7 @@ import { Button, Markdown, PageHeader, Stepper } from '@sta/ui';
 import type { ContentBlock, Lesson } from '@sta/domain';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { LearnMoreGroups } from './LearnMoreList';
+import { ReadAloud } from './ReadAloud';
 import { LearningFrame } from './LearningFrame';
 import { useModuleId } from './learningQueries';
 import { focusLink } from './styles';
@@ -59,6 +60,23 @@ function Block({
   }
 }
 
+/** What a block says, for Read aloud. */
+function blockText(block: ContentBlock | undefined): string {
+  if (!block) return '';
+  switch (block.kind) {
+    case 'text':
+      return block.markdown;
+    case 'keyPoints':
+      return block.items.join('. ');
+    case 'callout':
+      return block.markdown;
+    case 'acknowledge':
+      return block.statement;
+    case 'image':
+      return block.alt;
+  }
+}
+
 function Player({
   moduleId,
   lesson,
@@ -102,6 +120,9 @@ function Player({
         label={t('staff.lesson.step', { current: step + 1, total })}
         progressLabel={t('staff.lesson.progress')}
       />
+      <div className="mt-4">
+        <ReadAloud text={blockText(block)} />
+      </div>
       <div className="my-4 min-h-40">
         {block ? (
           <Block

@@ -2,7 +2,7 @@
 // Contract: S12 controls as listed in apps/web/src/pages/me/me.test.tsx. Read aloud button is named "Read this aloud".
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { answerQuestion, type QuizQuestion } from './helpers/quiz';
+import { answerQuestion, finishLessons, type QuizQuestion } from './helpers/quiz';
 import { installSpeechRecorder, readSpeechLog } from './helpers/speech';
 
 const bank = JSON.parse(
@@ -35,6 +35,7 @@ async function passQuiz(page: Page) {
     .getByRole('link', { name: new RegExp(bank.title) })
     .first()
     .click();
+  await finishLessons(page);
   await page.getByRole('link', { name: /Start quiz/ }).click();
   await page.getByRole('button', { name: /Start quiz/ }).click();
   for (let n = 1; n <= 10; n++) {

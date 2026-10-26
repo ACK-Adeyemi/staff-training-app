@@ -2,7 +2,7 @@
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { expectNoClipOrOverlap } from './helpers/layout';
-import { answerQuestion, type QuizQuestion } from './helpers/quiz';
+import { answerQuestion, finishLessons, type QuizQuestion } from './helpers/quiz';
 import { need, staffTabs } from './routes';
 
 test.use({ viewport: { width: 390, height: 844 } });
@@ -93,6 +93,7 @@ test('Jade at 200% text: Home, a lesson, a quiz question with feedback and the s
   }
   // S6: a question with feedback open.
   await page.goBack();
+  await finishLessons(page);
   await page.getByRole('link', { name: /Start quiz/ }).click();
   await page.getByRole('button', { name: /Start quiz/ }).click();
   const prompt = ((await page.getByTestId('question-prompt').textContent()) ?? '').trim();

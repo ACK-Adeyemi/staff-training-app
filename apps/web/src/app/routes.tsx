@@ -12,6 +12,8 @@ import { ModuleStats } from '../pages/client/ModuleStats';
 import { Reports } from '../pages/client/Reports';
 import { People } from '../pages/client/People';
 import { PersonRecord } from '../pages/client/Person';
+import { Display } from '../pages/me/Display';
+import { Me } from '../pages/me/Me';
 import { Certificate } from '../pages/staff/Certificate';
 import { Home } from '../pages/staff/Home';
 import { LessonPlayer } from '../pages/staff/LessonPlayer';
@@ -52,7 +54,8 @@ export const routes: RouteObject[] = [
           { path: 'module/:moduleId/done', element: <Results /> },
           { path: 'progress', element: <Progress /> },
           page('compete', 'nav.staff.compete', 'placeholder.staff.compete'),
-          page('me', 'nav.staff.me', 'placeholder.staff.me'),
+          { path: 'me', element: <Me /> },
+          { path: 'me/display', element: <Display /> },
           { path: 'notifications', element: <Notifications /> },
           page('help', 'shell.help', 'placeholder.staff.help'),
         ],
@@ -70,6 +73,7 @@ export const routes: RouteObject[] = [
           { path: 'reports', element: <Reports /> },
           { path: 'reports/matrix', element: <Matrix /> },
           { path: 'modules/:moduleId/stats', element: <ModuleStats /> },
+          { path: 'display', element: <Display /> },
           page('settings', 'nav.client.settings', 'placeholder.client.settings'),
           page('help', 'nav.client.help', 'placeholder.client.help'),
         ],

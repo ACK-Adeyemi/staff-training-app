@@ -1,14 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Badge, Button, Card, LinkButton, PageHeader } from '@sta/ui';
 import { missedQuestionIds, retakesLeft, visibleLearnMore, type LearnMoreLink } from '@sta/domain';
 import { RuleError } from '@sta/data';
 import type { MessageKey } from '@sta/content';
 import { useActor, useStore, useT } from '../../app/hooks';
+import { useDisplayPrefs } from '../../app/display/context';
+import { celebrate } from '../../app/feedback';
 import { LearnMoreGroups } from './LearnMoreList';
 import { LearningFrame } from './LearningFrame';
 import { useModuleId } from './learningQueries';
 import { focusLink } from './styles';
+
+/** Vibration and sound for a pass, once the person's settings have loaded. Draws nothing. */
+function CelebrateOnPass() {
+  const { prefs, ready } = useDisplayPrefs();
+  const done = useRef(false);
+  useEffect(() => {
+    if (!ready || done.current) return;
+    done.current = true;
+    celebrate(prefs);
+  }, [ready, prefs]);
+  return null;
+}
 
 /** S7. */
 export function Results() {
@@ -72,6 +86,7 @@ export function Results() {
         };
         return (
           <>
+            {passed ? <CelebrateOnPass /> : null}
             <PageHeader title={passed ? t('staff.results.passed') : t('staff.results.failed')}>
               {module.draftContent ? <Badge>{t('staff.module.draft')}</Badge> : null}
             </PageHeader>

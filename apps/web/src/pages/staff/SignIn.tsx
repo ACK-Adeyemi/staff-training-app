@@ -94,6 +94,14 @@ export function SignIn() {
           </p>
         ) : null}
         <Button type="submit">{t('staff.signin.submit')}</Button>
+        <p>
+          <a
+            href="#/staff/me/display"
+            className="inline-flex min-h-[var(--target-min)] items-center underline focus-visible:outline-[length:3px] focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+          >
+            {t('staff.signin.displayLink')}
+          </a>
+        </p>
       </form>
     </Standalone>
   );

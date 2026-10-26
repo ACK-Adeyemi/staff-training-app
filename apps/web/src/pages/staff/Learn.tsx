@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Badge, Card, PageHeader } from '@sta/ui';
 import { useT } from '../../app/hooks';
+import { useDisplayPrefs } from '../../app/display/context';
 import { useStaffData } from './queries';
 
 /** S3. */
 export function Learn() {
   const t = useT();
   const q = useStaffData();
+  const { prefs } = useDisplayPrefs();
   const [search, setSearch] = useState('');
   if (q.isError) return <p role="alert">{t('staff.learn.loadError')}</p>;
   const data = q.data;
@@ -35,26 +37,46 @@ export function Learn() {
       {!data ? <p>{t('shell.loading')}</p> : null}
       {data && published.length === 0 ? <p>{t('staff.learn.empty')}</p> : null}
       {data && published.length > 0 && shown.length === 0 ? <p role="status">{t('staff.learn.noResults')}</p> : null}
-      <ul className="m-0 flex list-none flex-col gap-3 p-0">
-        {shown.map((m) => (
-          <li key={m.id}>
-            <Card>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <a
-                  href={`#/staff/module/${m.id}`}
-                  className="inline-flex min-h-[var(--target-min)] items-center text-lg font-semibold underline focus-visible:outline-[length:3px] focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
-                >
-                  {m.title}
-                </a>
-                <Badge tone={required.has(m.id) ? 'demo' : 'neutral'}>
-                  {required.has(m.id) ? t('staff.learn.required') : t('staff.learn.optional')}
-                </Badge>
-              </div>
-              <p className="mt-1 mb-0">{t('staff.learn.minutes', { count: m.estimatedMinutes })}</p>
-            </Card>
-          </li>
-        ))}
-      </ul>
+      {prefs.simpleView ? (
+        <ul data-testid="learn-simple-list" className="m-0 flex list-none flex-col gap-4 p-0">
+          {shown.map((m) => (
+            <li key={m.id} className="border-b-2 border-[var(--color-border)] pb-3">
+              <a
+                href={`#/staff/module/${m.id}`}
+                className="inline-flex min-h-[var(--target-min)] items-center text-xl font-semibold underline focus-visible:outline-[length:3px] focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+              >
+                {m.title}
+              </a>
+              <p className="m-0">
+                {required.has(m.id) ? t('staff.learn.required') : t('staff.learn.optional')}
+                {'. '}
+                {t('staff.learn.minutes', { count: m.estimatedMinutes })}
+              </p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <ul className="m-0 flex list-none flex-col gap-3 p-0">
+          {shown.map((m) => (
+            <li key={m.id}>
+              <Card>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <a
+                    href={`#/staff/module/${m.id}`}
+                    className="inline-flex min-h-[var(--target-min)] items-center text-lg font-semibold underline focus-visible:outline-[length:3px] focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                  >
+                    {m.title}
+                  </a>
+                  <Badge tone={required.has(m.id) ? 'demo' : 'neutral'}>
+                    {required.has(m.id) ? t('staff.learn.required') : t('staff.learn.optional')}
+                  </Badge>
+                </div>
+                <p className="mt-1 mb-0">{t('staff.learn.minutes', { count: m.estimatedMinutes })}</p>
+              </Card>
+            </li>
+          ))}
+        </ul>
+      )}
     </>
   );
 }

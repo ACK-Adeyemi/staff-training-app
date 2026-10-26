@@ -14,7 +14,7 @@ export interface SwitchProps {
 export function Switch({ label, checked, onChange, onLabel, offLabel, disabled }: SwitchProps) {
   const labelId = useId();
   return (
-    <div className="flex items-center justify-between gap-3">
+    <div className="flex flex-wrap items-center justify-between gap-3">
       <span id={labelId} className="font-semibold">
         {label}
       </span>
