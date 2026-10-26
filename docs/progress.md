@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M3
 Milestone base commit: bb460c4
-Next step: M3 chunk 10b (Data E second half: leaderboard scopes and Sites board, themes ops, exports, erase, retention; also reminders.send/digestPreview, add-on period ends in runJobs, autoAssignRules cap) per docs/plans/m3.md: test-writer then implementer.
+Next step: M3 chunk 11 (Seed version 4) per docs/plans/m3.md: test-writer then implementer. Carry-over from 10b: anonymise does not yet remove rejected/superseded certificate files, and retention.schedule lacks the Closed-account deletion date (see docs/decisions.md 'M3 chunk 10b').
 
 ## Milestones
 - [x] M0 Foundations
@@ -27,7 +27,7 @@ M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 7 Data B: billing and account states
 - [x] 8 Data C: authoring and files
 - [x] 9 Data D: evidence, feedback, tickets, FAQs
-- [ ] 10 Data E: 10a rules, jobs, reminders, snooze DONE (9db2b4f); 10b leaderboards, themes, exports, erase, retention TODO
+- [x] 10 Data E: 10a rules, jobs, reminders, snooze (9db2b4f); 10b leaderboards, themes, exports, erase, retention (tests 40535d7, impl 204209c)
 - [ ] 11 Seed version 4
 - [ ] 12 UI components
 - [ ] 13 Client foundations UI
@@ -121,3 +121,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-26: M3 chunk 8 data C landed (e94d15f); check.sh fully green (run by implementer).
 - 2026-10-26: M3 chunk 9 data D landed (tests 74c65dc, impl 7b42f2c), check.sh fully green. Stopping at a clean point; chunk 10 next.
 - 2026-10-26: M3 chunk 10a landed (tests 041bb4f, impl 9db2b4f), check.sh green. Three test fixtures adjusted without changing assertions (explained in commit). runJobs writes no audit; requirementExpiring assignedBy = first active admin. Stopping at a clean point; chunk 10b next.
+- 2026-10-26: M3 chunk 10b data E (leaderboards, themes, exports, erase, retention, reminders send) landed (204209c), check.sh green. Stopping at a clean point; chunk 11 next.
