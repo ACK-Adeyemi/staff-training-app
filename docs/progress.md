@@ -4,12 +4,12 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M2
 Milestone base commit: 7c4064d
-Next step: M2 chunk 10 (see docs/plans/m2.md work chunks): test-writer then implementer. Chunks 1-9 done (latest 0ce5b81).
+Next step: M2 chunk 11 (UI components, see docs/plans/m2.md work chunks): test-writer then implementer. Chunks 1-10 done (latest f910f4d).
 
 ## Milestones
 - [x] M0 Foundations
 - [x] M1 Client story core
-- [ ] M2 Engagement (chunks 1-9 done)
+- [ ] M2 Engagement (chunks 1-10 done)
 - [ ] M3 Client admin depth
 - [ ] M4 Provider story
 - [ ] M5 Polish and demo readiness
@@ -17,7 +17,7 @@ Next step: M2 chunk 10 (see docs/plans/m2.md work chunks): test-writer then impl
 - [ ] M7 Battle Room
 
 ## Current milestone chunks
-M2 (17 chunks, see docs/plans/m2.md 'Work chunks'): chunks 1-9 done; 10 to 17 pending.
+M2 (17 chunks, see docs/plans/m2.md 'Work chunks'): chunks 1-10 done; 11 to 17 pending.
 M1 (all done):
 - [x] 1 M0 known issues and decisions
 - [x] 2 Learning schemas and quiz engine
@@ -70,3 +70,4 @@ M1 (final commit 5b87b6d, scripts/check.sh fully green): BP-1 refresher on 390x8
 - 2026-10-26: M2 chunk 7 nursery modules B landed (b25994f), check.sh green. Stopping at a clean point; chunk 8 next.
 - 2026-10-26: M2 chunk 8 data layer A landed (dd628aa), check.sh green. Stopping at a clean point; chunk 9 next.
 - 2026-10-26: M2 chunk 9 data layer B landed (0ce5b81), check.sh green. Stopping at a clean point; chunk 10 next.
+- 2026-10-26: M2 chunk 10 seed (version 3, history, notes, competitions) landed (f910f4d), check.sh green. Stopping at a clean point; chunk 11 next.
