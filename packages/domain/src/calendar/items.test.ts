@@ -100,7 +100,7 @@ describe('staff items', () => {
         kind: 'assignmentDue',
         date: day(12),
         moduleId: mod.id,
-        params: expect.objectContaining({ training: 'Fire evacuation' }),
+        params: expect.objectContaining({ training: 'Fire evacuation' }) as unknown,
       }),
     );
   });
@@ -220,10 +220,10 @@ describe('staff items', () => {
   it('re-derives after the clock moves on', () => {
     const v = staffView(me, { assignments: [assignment(me, mod.id, 20)] });
     const later = addDays(NOW, 25);
-    const items = calendarItems(
-      { ...v, now: later },
-      { from: londonDateString(later), to: londonDateString(addDays(later, 90)) },
-    );
+    const items = calendarItems({ ...(v as object), now: later } as never, {
+      from: londonDateString(later),
+      to: londonDateString(addDays(later, 90)),
+    });
     expect(items.filter((i) => i.kind === 'assignmentDue')).toEqual([]); // it is now 5 days overdue, not "coming up"
   });
 });

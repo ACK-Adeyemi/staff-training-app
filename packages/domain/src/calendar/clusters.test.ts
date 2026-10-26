@@ -12,17 +12,16 @@ import { expiryClusters } from './clusters';
 
 type Item = Parameters<typeof expiryClusters>[0][number];
 let n = 0;
-const expiry = (requirementId: string, personId: string, date: string, over: Partial<Item> = {}): Item =>
-  ({
-    id: `i${n++}`,
-    kind: 'expiry',
-    date,
-    titleKey: 'calendar.expiry',
-    params: {},
-    requirementId,
-    personId,
-    ...over,
-  }) as Item;
+const expiry = (requirementId: string, personId: string, date: string, over: Partial<Item> = {}): Item => ({
+  id: `i${n++}`,
+  kind: 'expiry',
+  date,
+  titleKey: 'calendar.expiry',
+  params: {},
+  requirementId,
+  personId,
+  ...over,
+});
 
 describe('expiryClusters', () => {
   it('groups expiries of one requirement in the same Monday-to-Sunday week', () => {

@@ -1,6 +1,9 @@
 // The six standing boards (brief 13.5; plan M2 assumptions 8, 10). XP is never an input.
 // Active people only. Hiding people who opted out is the caller's job (see leaderboardView).
 import { BOARD_IDS, standingBoardSettingsSchema, type BoardId, type StandingBoardSettings } from './schemas/engagement';
+import type { LeaderboardScope } from './schemas/engagement';
+import type { Site } from './schemas/tenancy';
+import { peopleInScope } from './leaderboards/scopes';
 import { fromLondonWall, londonDateString } from './dates';
 import {
   ALL_TIME,
@@ -19,7 +22,11 @@ import {
 import type { MetricInput, MetricResult } from './competitions/metrics';
 
 export type BoardPeriod = 'allTime' | 'thisMonth' | 'thisQuarter';
-export type BoardInput = Omit<MetricInput, 'competition'> & { now: Date };
+export type BoardInput = Omit<MetricInput, 'competition'> & {
+  now: Date;
+  /** Narrows the people on every board to the viewer's site, region, country or all sites (brief 13.5). */
+  scope?: { scope: LeaderboardScope; viewerSiteId: string; sites: Site[] };
+};
 
 const monthStart = (y: number, m: number): number => {
   const year = y + Math.floor((m - 1) / 12);
@@ -38,7 +45,10 @@ export function boardWindow(period: BoardPeriod, now: Date): Window {
 
 export function standingBoard(board: BoardId, period: BoardPeriod, input: BoardInput): MetricResult {
   const window = boardWindow(period, input.now);
-  const active = input.people.filter((p) => p.status === 'active');
+  const pool = input.scope
+    ? peopleInScope(input.scope.scope, input.scope.viewerSiteId, input.scope.sites, input.people)
+    : input.people;
+  const active = pool.filter((p) => p.status === 'active');
   const ids = new Set(active.map((p) => p.id));
   const events = scopedEvents(input.events, { window, people: ids, closedOnly: false, attempts: input.attempts });
   const person = (counts: ReadonlyMap<string, number>): MetricResult => ({

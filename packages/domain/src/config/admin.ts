@@ -14,4 +14,14 @@ export const defaultDunningPolicy: DunningPolicy = {
 export const adminConfig = {
   /** Days a client admin may use the app before two-step sign-in is required (assumption 3). */
   twoFactorGraceDays: 7,
+  /** Sites with fewer eligible people than this are marked small on the Sites board (brief 13.5). */
+  smallSiteMinimum: 3,
+  /** New starters are left out of the Sites board for this many days (brief 13.5). */
+  newStarterDays: 14,
+  /** More than this many working days waiting is highlighted (assumption 22). */
+  waitingHighlightWorkingDays: 3,
+  /** Weeks in the first aiders forecast (assumption 23). */
+  firstAiderForecastWeeks: 12,
+  /** "formerly {old name}" shows for this many days after a rename (BP-8). */
+  formerlyNameDays: 90,
 } as const;
