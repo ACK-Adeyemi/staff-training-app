@@ -132,7 +132,9 @@ describe('demoStateSchema.displayPrefs', () => {
 
   it('does not carry non-display prefs such as leaderboard hiding', () => {
     const r = demoStateSchema.safeParse({ ...state, displayPrefs: { hideFromLeaderboards: true } });
-    expect(r.success ? (r.data.displayPrefs as Record<string, unknown>)['hideFromLeaderboards'] : undefined).toBeUndefined();
+    expect(
+      r.success ? (r.data.displayPrefs as Record<string, unknown>)['hideFromLeaderboards'] : undefined,
+    ).toBeUndefined();
   });
 });
 

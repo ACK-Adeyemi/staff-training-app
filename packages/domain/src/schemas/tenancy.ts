@@ -37,6 +37,8 @@ export const clientSettingsSchema = z.object({
   defaultLanguage: z.string().min(1).default('en-GB'),
   amberWindowDays: countSchema.default(60),
   allowSelfApproval: z.boolean().default(false),
+  /** Lessons per London week for the weekly goal (M2 assumption 7). */
+  weeklyGoalLessons: z.number().int().min(1).max(7).default(1),
   battles: battleSettingsSchema.prefault({}),
   reminderPolicy: reminderPolicySchema.default({
     dueOffsetsDays: [7, 1],
@@ -111,11 +113,20 @@ export const learnerPrefsSchema = z.object({
   haptics: z.boolean(),
   readingFont: z.enum(['default', 'dyslexiaFriendly']),
   biggerButtons: z.boolean(),
+  spacing: z.enum(['standard', 'wide']).default('standard'),
+  readAloud: z.boolean().default(true),
+  readAloudRate: z.union([z.literal(0.75), z.literal(1), z.literal(1.25), z.literal(1.5)]).default(1),
   language: z.string().min(1),
   quietHours: z.object({ from: hhmm, to: hhmm }).optional(),
   battleExtraTimePercent: z.union([z.literal(0), z.literal(50), z.literal(100)]),
 });
 export type LearnerPrefs = z.infer<typeof learnerPrefsSchema>;
+
+/** Letters, digits, spaces, hyphen and apostrophe; 1 to 30 characters after trimming (M2 plan Design). */
+export const nicknameSchema = z
+  .string()
+  .trim()
+  .regex(/^[\p{L}\p{N}][\p{L}\p{N} '-]{0,29}$/u, 'Not a valid nickname');
 
 export const personSchema = z.object({
   id: idSchema,
@@ -125,7 +136,7 @@ export const personSchema = z.object({
   teamIds: z.array(idSchema),
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  nickname: z.string().optional(),
+  nickname: nicknameSchema.optional(),
   jobRoleIds: z.array(idSchema),
   qualificationLevel: z.string().optional(),
   startDate: isoDateSchema,

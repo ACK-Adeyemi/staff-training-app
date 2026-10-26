@@ -226,38 +226,43 @@ export const assignmentSchema = z.object({
 });
 export type Assignment = z.infer<typeof assignmentSchema>;
 
-export const learningEventSchema = z.object({
-  id: idSchema,
-  clientId: idSchema,
-  siteId: idSchema,
-  personId: idSchema,
-  at: isoDateSchema,
-  type: z.enum([
-    'lessonViewed',
-    'lessonCompleted',
-    'attemptStarted',
-    'questionAnswered',
-    'attemptFinished',
-    'moduleCompleted',
-    'noteCreated',
-    'badgeEarned',
-    'login',
-    'learnMoreOpened',
-  ]),
-  moduleId: idSchema.optional(),
-  moduleVersion: z.number().int().min(1).optional(),
-  lessonId: localKeySchema.optional(),
-  questionId: localKeySchema.optional(),
-  attemptId: idSchema.optional(),
-  correct: z.boolean().optional(),
-  scenarioOutcome: z.enum(['best', 'ok', 'poor']).optional(),
-  notesVisible: z.boolean().optional(),
-  attemptMode: z.enum(['open', 'closed']).optional(),
-  competitionId: idSchema.optional(),
-  linkId: localKeySchema.optional(),
-  optionId: localKeySchema.optional(),
-  choiceIds: z.array(localKeySchema).optional(),
-});
+export const learningEventSchema = z
+  .object({
+    id: idSchema,
+    clientId: idSchema,
+    siteId: idSchema,
+    personId: idSchema,
+    at: isoDateSchema,
+    type: z.enum([
+      'lessonViewed',
+      'lessonCompleted',
+      'attemptStarted',
+      'questionAnswered',
+      'attemptFinished',
+      'moduleCompleted',
+      'noteCreated',
+      'badgeEarned',
+      'login',
+      'learnMoreOpened',
+    ]),
+    moduleId: idSchema.optional(),
+    moduleVersion: z.number().int().min(1).optional(),
+    lessonId: localKeySchema.optional(),
+    questionId: localKeySchema.optional(),
+    attemptId: idSchema.optional(),
+    correct: z.boolean().optional(),
+    scenarioOutcome: z.enum(['best', 'ok', 'poor']).optional(),
+    notesVisible: z.boolean().optional(),
+    attemptMode: z.enum(['open', 'closed']).optional(),
+    competitionId: idSchema.optional(),
+    linkId: localKeySchema.optional(),
+    optionId: localKeySchema.optional(),
+    choiceIds: z.array(localKeySchema).optional(),
+  })
+  .refine((e) => e.type !== 'questionAnswered' || e.notesVisible !== undefined, {
+    message: 'An answer records whether notes were visible',
+    path: ['notesVisible'],
+  });
 export type LearningEvent = z.infer<typeof learningEventSchema>;
 
 export const attemptSchema = z.object({
@@ -274,6 +279,8 @@ export const attemptSchema = z.object({
   finishedAt: isoDateSchema.optional(),
   score: z.number().int().min(0).max(100).optional(),
   passed: z.boolean().optional(),
+  /** Ended by the person without a score; never counts towards retakes or competitions (M2 assumption 20). */
+  abandoned: z.boolean().optional(),
 });
 export type Attempt = z.infer<typeof attemptSchema>;
 

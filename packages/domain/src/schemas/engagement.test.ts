@@ -70,8 +70,7 @@ describe('noteSchema', () => {
   });
 
   it.each(['clientId', 'personId', 'moduleId', 'starred', 'createdAt', 'updatedAt'])('requires %s', (key) => {
-    const copy: Record<string, unknown> = { ...note };
-    delete copy[key];
+    const { [key]: _omitted, ...copy } = note as Record<string, unknown>;
     expect(noteSchema.safeParse(copy).success).toBe(false);
   });
 });
@@ -279,11 +278,17 @@ describe('competitionSchema', () => {
     }
     expect(ok({ ...builtIn, templateId: 'learningStreak', winnerSelection: 'draw', closedBookOnly: true })).toBe(false);
     expect(ok({ ...builtIn, templateId: 'beatTheExpiry', winnerSelection: 'draw', closedBookOnly: true })).toBe(false);
+    expect(ok({ ...builtIn, templateId: 'teamShowdown', winnerSelection: 'teamTarget', closedBookOnly: true })).toBe(
+      false,
+    );
     expect(
-      ok({ ...builtIn, templateId: 'teamShowdown', winnerSelection: 'teamTarget', closedBookOnly: true }),
-    ).toBe(false);
-    expect(
-      ok({ ...builtIn, templateId: 'completeAndWin', winnerSelection: 'draw', moduleIds: [id(9)], closedBookOnly: true }),
+      ok({
+        ...builtIn,
+        templateId: 'completeAndWin',
+        winnerSelection: 'draw',
+        moduleIds: [id(9)],
+        closedBookOnly: true,
+      }),
     ).toBe(false);
   });
 
@@ -338,8 +343,10 @@ describe('standingBoardSettingsSchema', () => {
 
   it('refuses an unknown board id and an unknown scope', () => {
     expect(
-      standingBoardSettingsSchema.safeParse({ ...settings, boards: { speedBoard: { enabled: true, staffScopes: ['site'] } } })
-        .success,
+      standingBoardSettingsSchema.safeParse({
+        ...settings,
+        boards: { speedBoard: { enabled: true, staffScopes: ['site'] } },
+      }).success,
     ).toBe(false);
     expect(
       standingBoardSettingsSchema.safeParse({

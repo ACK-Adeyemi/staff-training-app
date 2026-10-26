@@ -201,6 +201,7 @@ export function createOperations(backend: RawBackend, options: StoreOptions): Op
           moduleVersion: attempt.moduleVersion,
           questionId: question.id,
           correct: result.correct,
+          notesVisible: false,
           attemptMode: attempt.mode,
           ...(result.outcome ? { scenarioOutcome: result.outcome } : {}),
           ...('optionId' in answer ? { optionId: answer.optionId } : { choiceIds: answer.choiceIds }),

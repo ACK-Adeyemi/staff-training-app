@@ -1,5 +1,6 @@
 // Outbox, seed metadata and demo shell state. Build pack sections 6 and 9.
 import { z } from 'zod';
+import { learnerPrefsSchema } from './tenancy';
 import { idSchema, isoDateSchema, sideSchema } from './primitives';
 
 export const outboxMessageSchema = z.object({
@@ -21,9 +22,30 @@ export const seedMetaSchema = z.object({
 });
 export type SeedMeta = z.infer<typeof seedMetaSchema>;
 
+/** The display subset of LearnerPrefs, kept on the device for the provider side and S1 (M2 assumption 29). */
+export const displayPrefsSchema = learnerPrefsSchema
+  .pick({
+    simpleView: true,
+    textScale: true,
+    uiScale: true,
+    contrast: true,
+    colourMode: true,
+    reduceMotion: true,
+    sound: true,
+    haptics: true,
+    readingFont: true,
+    biggerButtons: true,
+    spacing: true,
+    readAloud: true,
+    readAloudRate: true,
+  })
+  .partial();
+export type DisplayPrefs = z.infer<typeof displayPrefsSchema>;
+
 export const demoStateSchema = z.object({
   clockOffsetMs: z.number(),
   industry: z.enum(['nursery', 'luxuryRetail']),
   persona: z.object({ side: sideSchema, userId: idSchema }),
+  displayPrefs: displayPrefsSchema.optional(),
 });
 export type DemoState = z.infer<typeof demoStateSchema>;
