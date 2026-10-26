@@ -5,10 +5,12 @@ export interface DialogProps {
   title: string;
   onClose: () => void;
   children?: ReactNode;
+  /** Replaces the default centred-box layout classes (used by Sheet). */
+  className?: string;
 }
 
 /** Native modal dialog. Escape closes it and focus goes back to whatever opened it. */
-export function Dialog({ open, title, onClose, children }: DialogProps) {
+export function Dialog({ open, title, onClose, children, className }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const opener = useRef<Element | null>(null);
   const titleId = useId();
@@ -18,13 +20,16 @@ export function Dialog({ open, title, onClose, children }: DialogProps) {
     if (!dlg) return;
     if (open && !dlg.hasAttribute('open')) {
       opener.current = document.activeElement;
-      dlg.showModal();
+      // Fall back to the plain open attribute where showModal is missing (older engines, jsdom).
+      if (typeof dlg.showModal === 'function') dlg.showModal();
+      else dlg.setAttribute('open', '');
       // Browsers do this themselves; be explicit so keyboard users always land inside.
       if (!dlg.contains(document.activeElement)) {
         (dlg.querySelector<HTMLElement>('button, [href], input, select, textarea, [tabindex]') ?? dlg).focus();
       }
     } else if (!open && dlg.hasAttribute('open')) {
-      dlg.close();
+      if (typeof dlg.close === 'function') dlg.close();
+      else dlg.removeAttribute('open');
     }
     if (!open && opener.current instanceof HTMLElement) {
       opener.current.focus();
@@ -49,7 +54,7 @@ export function Dialog({ open, title, onClose, children }: DialogProps) {
         e.preventDefault();
         onClose();
       }}
-      className="m-auto max-w-[min(32rem,calc(100vw-2rem))] rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-bg)] p-6 text-[var(--color-text)] backdrop:bg-black/60"
+      className={`${className ?? 'm-auto max-w-[min(32rem,calc(100vw-2rem))] rounded-[var(--radius-lg)]'} border-2 border-[var(--color-border)] bg-[var(--color-bg)] p-6 text-[var(--color-text)] backdrop:bg-black/60`}
     >
       <h2 id={titleId} className="mb-4 text-xl font-bold">
         {title}

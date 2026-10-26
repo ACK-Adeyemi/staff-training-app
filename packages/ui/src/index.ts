@@ -19,3 +19,24 @@ export { Stepper, type StepperProps } from './components/Stepper';
 export { ChoiceList, type ChoiceListProps, type ChoiceOption } from './components/ChoiceList';
 export { LearnMoreLink, isSafeExternalUrl, type LearnMoreLinkProps } from './components/LearnMoreLink';
 export { DataTable, type DataTableProps, type DataTableColumn, type DataTableRow } from './components/DataTable';
+export { Sheet, type SheetProps } from './components/Sheet';
+export { Switch, type SwitchProps } from './components/Switch';
+export { SegmentedControl, type SegmentedControlProps, type SegmentedOption } from './components/SegmentedControl';
+export { Chip, type ChipProps } from './components/Chip';
+export { SearchField, type SearchFieldProps } from './components/SearchField';
+export { Highlight, type HighlightProps, type HighlightRange } from './components/Highlight';
+export { BarChart, type BarChartProps } from './components/BarChart';
+export { LineChart, type LineChartProps } from './components/LineChart';
+export type { ChartPoint } from './components/ChartShell';
+export { LevelBar, type LevelBarProps } from './components/LevelBar';
+export { GoalRing, type GoalRingProps } from './components/GoalRing';
+export { BadgeTile, type BadgeTileProps } from './components/BadgeTile';
+export { CourseChip, type CourseChipProps } from './components/CourseChip';
+export { LeaderboardList, type LeaderboardListProps, type LeaderboardRow } from './components/LeaderboardList';
+export { Celebration, type CelebrationProps } from './components/Celebration';
+export {
+  ReadAloudBar,
+  type ReadAloudBarProps,
+  type ReadAloudLabels,
+  type SpeechAdapter,
+} from './components/ReadAloudBar';

@@ -77,3 +77,42 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Celebration: ring fill, tick pop and a confetti burst. Reduce motion turns all of this off (rule above). */
+@keyframes celebrate-ring {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes celebrate-pop {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes celebrate-burst {
+  from {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--dx), var(--dy));
+    opacity: 0;
+  }
+}
+.celebrate-ring {
+  animation: celebrate-ring 400ms ease-out both;
+}
+.celebrate-tick {
+  animation: celebrate-pop 300ms 300ms ease-out both;
+}
+.celebrate-confetti {
+  animation: celebrate-burst 900ms 400ms ease-out both;
+}

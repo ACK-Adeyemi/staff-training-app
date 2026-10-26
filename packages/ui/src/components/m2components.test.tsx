@@ -30,7 +30,13 @@ describe('Sheet', () => {
     const [open, setOpen] = useState(false);
     return (
       <>
-        <button onClick={() => setOpen(true)}>Open notes</button>
+        <button
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Open notes
+        </button>
         <Sheet
           open={open}
           title="Add note"
@@ -105,7 +111,7 @@ describe('Switch', () => {
     render(<Switch label="Closed book" checked={false} onChange={onChange} onLabel="On" offLabel="Off" disabled />);
     await userEvent.click(screen.getByRole('switch', { name: 'Closed book' }));
     expect(onChange).not.toHaveBeenCalled();
-    expect((screen.getByRole('switch') as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByRole<HTMLButtonElement>('switch').disabled).toBe(true);
   });
 
   it('has a touch target of at least 44px', () => {
@@ -148,7 +154,7 @@ describe('SegmentedControl', () => {
     render(<Host onChange={onChange} />);
     await userEvent.click(screen.getByRole('radio', { name: 'Light' }));
     expect(onChange).toHaveBeenCalledWith('light');
-    expect((screen.getByRole('radio', { name: 'Light' }) as HTMLInputElement).checked).toBe(true);
+    expect(screen.getByRole<HTMLInputElement>('radio', { name: 'Light' }).checked).toBe(true);
   });
 
   it('moves selection with the arrow keys', async () => {
@@ -191,7 +197,7 @@ describe('SearchField', () => {
 
   it('is a search input with an accessible name', () => {
     render(<Host />);
-    const input = screen.getByRole('searchbox', { name: 'Search courses' }) as HTMLInputElement;
+    const input = screen.getByRole<HTMLInputElement>('searchbox', { name: 'Search courses' });
     expect(input.type).toBe('search');
   });
 
@@ -199,14 +205,14 @@ describe('SearchField', () => {
     render(<Host />);
     expect(screen.queryByRole('button', { name: 'Clear search' })).toBeNull();
     await userEvent.type(screen.getByRole('searchbox'), 'fire');
-    expect((screen.getByRole('searchbox') as HTMLInputElement).value).toBe('fire');
+    expect(screen.getByRole<HTMLInputElement>('searchbox').value).toBe('fire');
     expect(screen.getByRole('button', { name: 'Clear search' })).toBeTruthy();
   });
 
   it('clears the text and puts focus back in the field', async () => {
     render(<Host start="fire" />);
     await userEvent.click(screen.getByRole('button', { name: 'Clear search' }));
-    const input = screen.getByRole('searchbox') as HTMLInputElement;
+    const input = screen.getByRole<HTMLInputElement>('searchbox');
     expect(input.value).toBe('');
     expect(document.activeElement).toBe(input);
     expect(screen.queryByRole('button', { name: 'Clear search' })).toBeNull();
@@ -337,7 +343,9 @@ describe('GoalRing', () => {
   });
 
   it('shows the complete word at 100 percent', () => {
-    render(<GoalRing label="Weekly goal" percent={100} valueText="5 of 5" description="Done" completeLabel="Goal met" />);
+    render(
+      <GoalRing label="Weekly goal" percent={100} valueText="5 of 5" description="Done" completeLabel="Goal met" />,
+    );
     expect(screen.getByText('Goal met')).toBeTruthy();
   });
 });
@@ -352,7 +360,13 @@ describe('BadgeTile', () => {
 
   it('shows the next goal text and a Locked state word (not colour alone) when not earned', () => {
     const { container } = render(
-      <BadgeTile name="Fire expert" icon="trophy" earned={false} detail="Next goal: pass 3 fire quizzes" stateLabel="Locked" />,
+      <BadgeTile
+        name="Fire expert"
+        icon="trophy"
+        earned={false}
+        detail="Next goal: pass 3 fire quizzes"
+        stateLabel="Locked"
+      />,
     );
     expect(screen.getByText('Next goal: pass 3 fire quizzes')).toBeTruthy();
     expect(screen.getByText('Locked')).toBeTruthy();
@@ -368,14 +382,24 @@ describe('BadgeTile', () => {
 
 describe('CourseChip', () => {
   it('is a link to the course with its name when available', () => {
-    render(<CourseChip name="Fire safety" icon="alert" colour="cat-2" href="#/staff/course/fire" unavailableLabel="Course no longer available" />);
+    render(
+      <CourseChip
+        name="Fire safety"
+        icon="alert"
+        colour="cat-2"
+        href="#/staff/course/fire"
+        unavailableLabel="Course no longer available"
+      />,
+    );
     const link = screen.getByRole('link', { name: /Fire safety/ });
     expect(link.getAttribute('href')).toBe('#/staff/course/fire');
     expect(screen.queryByText('Course no longer available')).toBeNull();
   });
 
   it('is plain text with "Course no longer available" and no link when there is no href', () => {
-    const { container } = render(<CourseChip name="Old course" icon="alert" colour="cat-2" unavailableLabel="Course no longer available" />);
+    const { container } = render(
+      <CourseChip name="Old course" icon="alert" colour="cat-2" unavailableLabel="Course no longer available" />,
+    );
     expect(screen.queryByRole('link')).toBeNull();
     expect(screen.getByText(/Old course/)).toBeTruthy();
     expect(screen.getByText('Course no longer available')).toBeTruthy();
@@ -461,17 +485,20 @@ describe('Celebration', () => {
   });
 
   it('is static when the device prefers reduced motion', () => {
+    // eslint-disable-next-line @typescript-eslint/unbound-method -- restored as-is below
     const original = window.matchMedia;
-    window.matchMedia = ((q: string) => ({
+    window.matchMedia = (q: string) => ({
       matches: q.includes('prefers-reduced-motion'),
       media: q,
       addEventListener() {},
       removeEventListener() {},
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- old MediaQueryList shape
       addListener() {},
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- old MediaQueryList shape
       removeListener() {},
       onchange: null,
       dispatchEvent: () => false,
-    })) as unknown as typeof window.matchMedia;
+    });
     try {
       const { container } = render(<Celebration {...props} />);
       expect(container.querySelectorAll('[data-confetti]').length).toBe(0);
@@ -539,7 +566,9 @@ describe('ReadAloudBar', () => {
     const speech = setup();
     await userEvent.click(screen.getByRole('button', { name: 'Read aloud' }));
     const { act } = await import('@testing-library/react');
-    act(() => speech.calls[0]!.onEnd());
+    act(() => {
+      speech.calls[0]!.onEnd();
+    });
     expect(speech.calls[1]!.text).toBe('Second paragraph.');
     expect(current()).toBe('Second paragraph.');
   });
@@ -548,9 +577,15 @@ describe('ReadAloudBar', () => {
     const speech = setup();
     await userEvent.click(screen.getByRole('button', { name: 'Read aloud' }));
     const { act } = await import('@testing-library/react');
-    act(() => speech.calls[0]!.onEnd());
-    act(() => speech.calls[1]!.onEnd());
-    act(() => speech.calls[2]!.onEnd());
+    act(() => {
+      speech.calls[0]!.onEnd();
+    });
+    act(() => {
+      speech.calls[1]!.onEnd();
+    });
+    act(() => {
+      speech.calls[2]!.onEnd();
+    });
     expect(speech.calls.length).toBe(3);
     expect(screen.getByRole('button', { name: 'Read aloud' })).toBeTruthy();
   });
@@ -575,10 +610,10 @@ describe('ReadAloudBar', () => {
 
   it('does not go past the first or last paragraph', async () => {
     setup();
-    expect((screen.getByRole('button', { name: 'Previous paragraph' }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Previous paragraph' }).disabled).toBe(true);
     await userEvent.click(screen.getByRole('button', { name: 'Next paragraph' }));
     await userEvent.click(screen.getByRole('button', { name: 'Next paragraph' }));
-    expect((screen.getByRole('button', { name: 'Next paragraph' }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Next paragraph' }).disabled).toBe(true);
     expect(current()).toBe('Third paragraph.');
   });
 
