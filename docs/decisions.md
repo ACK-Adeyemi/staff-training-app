@@ -328,3 +328,11 @@ Every number marked placeholder is engine config in packages/domain (`engagement
 11. **M1 e2e and seed tests assumed no learning history** (for example C8 "Learn more opened 1"). Chunk 10 changes those assertions to before-and-after deltas or seed-derived expectations. This is not a weakening: the same behaviour is checked against the new seed. The Track A pinned instant may also need re-choosing if new writes before the quiz change the attempt id (the spec already fails with instructions).
 12. **Build pack 6 `Attempt` has no abandon state.** Adds `abandoned?: boolean` (assumption 20).
 13. **Competition record** gains `teamUnit?: 'team' | 'site'` and `teamTarget?: number`; stored `status` is limited to draft, scheduled and cancelled (assumption 12); `finalStandings` holds the admin projection captured when winners are recorded.
+
+### M2 chunk 2: where the tests differ from the plan
+
+- `xpForAttempt(ledger, attemptId, events)` takes the events (ledger lines carry only `sourceEventId`) and leaves out kinds that earned 0.
+- Ledger lines are `XpLedgerEntry` (`XpEntry` without `id`): derived lines are identified by `sourceEventId` and `kind`. `xpLedger` takes an optional `personId` (default: the person with most events) and `config`.
+- The line that crosses the daily cap is reduced and also flagged `capped: true`.
+- Badge definitions are `{ id, kind, moduleId? }`; Mastery gives one badge `mastery:<moduleId>` per module. Rest weeks before a leave end are looked for at most `maxRestWeeks` (8, placeholder) back, because the leave start is not stored.
+- All numbers live in `engagementConfig` (packages/domain/src/engagement/config.ts).

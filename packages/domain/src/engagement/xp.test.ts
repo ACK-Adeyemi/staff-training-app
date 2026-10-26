@@ -126,7 +126,7 @@ describe('closed-book bonus per question', () => {
 
 describe('passing a module', () => {
   const m = bankModule(1, 3);
-  const m2 = { ...m, version: 2 } as Module;
+  const m2 = { ...m, version: 2 };
 
   it('gives 20 for the first pass of a version and 0 for a later pass of the same version', () => {
     const l = run([passed(m, day(20)), passed(m, day(22))], [m]);
