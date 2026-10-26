@@ -1,5 +1,6 @@
-// M2 chunk 6 (F-8): Paediatric first aid and Safer eating meet build pack 9.1, 9.3, 9.5 and 2.4 (shorter standard).
-// Plan docs/plans/m2.md work chunk 6. Folders: paediatric-first-aid and safer-eating, beside safeguarding.
+// M2 chunks 6 and 7 (F-8): Paediatric first aid, Safer eating, Safer sleep and What changed in September 2026 meet build pack 9.1, 9.3, 9.5 and 2.4 (shorter standard).
+// Plan docs/plans/m2.md work chunks 6 and 7. Folders: paediatric-first-aid, safer-eating, safer-sleep and
+// what-changed-2026, beside safeguarding.
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -50,6 +51,33 @@ const specs: Spec[] = [
     paragraphs: [64, 65, 66, 67, 68, 69, 70, 71, 72, 73],
     mustCite: [64, 65, 66, 67, 68, 70, 71, 73],
     facts: [/sight and hearing/i, /silent/i, /allergy action plan/i, /weaning|solid food/i, /food poisoning/i],
+  },
+  {
+    name: 'Safer sleep',
+    folder: 'safer-sleep',
+    id: moduleIds.saferSleep,
+    requirementIds: [], // optional module (decisions.md M2 assumption 34), no requirement link
+    titleHints: [/safe sleep|sleep space|back/i, /check|sight|record/i],
+    paragraphs: [86],
+    mustCite: [86],
+    facts: [/12 months/i, /feet-to-foot/i, /six months/i, /sight and hearing/i, /bumpers/i, /room temperature/i],
+  },
+  {
+    name: 'What changed in September 2026',
+    folder: 'what-changed-2026',
+    id: moduleIds.whatChangedSeptember2026,
+    requirementIds: [contentId(604)], // the nursery pack requirement "What changed in September 2026"
+    titleHints: [/sleep|screen/i, /dog|regulated|volunteer|safeguarding/i],
+    paragraphs: [15, 17, 82, 86, 94],
+    mustCite: [15, 17, 82, 86, 94],
+    facts: [
+      /XL Bully/i,
+      /Dangerous Dogs Act/i,
+      /screen use/i,
+      /regulated activity/i,
+      /Crime and Policing Act 2026/i,
+      /30-day/i,
+    ],
   },
 ];
 
@@ -246,6 +274,18 @@ describe.each(specs)('$name module', (spec) => {
       const checks: Record<string, RegExp[]> = {
         'paediatric-first-aid': [/renewed every three years/, /within 14 days/, /accompany children on outings/],
         'safer-eating': [/within sight and hearing/, /Choking can be completely silent/, /allergy action plans/],
+        'safer-sleep': [
+          /Babies aged 12 months and under must only be placed to sleep in a cot/,
+          /feet-to-foot at the bottom of the cot/,
+          /under six months of age must always have an adult with them in the same room/,
+          /within sight and hearing of staff when sleeping/,
+        ],
+        'what-changed-2026': [
+          /including the XL Bully type/,
+          /Crime and Policing Act 2026 amended the Safeguarding Vulnerable Groups Act 2006/,
+          /more than 3 days in a 30-day period/,
+          /children’s screen use in early years settings/,
+        ],
       };
       for (const re of checks[spec.folder]!) expect(text).toMatch(re);
       for (const re of spec.facts) expect(allText()).toMatch(re);
