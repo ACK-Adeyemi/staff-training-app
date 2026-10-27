@@ -125,3 +125,6 @@ export const m3CalendarRoutes: NavEntry[] = [
   { hash: '#/staff/calendar', label: 'Calendar' },
   { hash: '#/client/calendar', label: 'Calendar' },
 ];
+
+/** M3 chunk 19b routes (themes). */
+export const m3ThemeRoutes: NavEntry[] = [{ hash: '#/client/themes', label: 'Themes' }];
