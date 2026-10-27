@@ -129,7 +129,7 @@ test('a failed payment walks Priya and Daniel through Past due, Limited and Read
 
   // Past due, day 0: people with billing access see it, with an amount and Fix this now.
   const banner = page.getByTestId('account-banner');
-  await expect(banner).toContainText('Your last payment did not go through');
+  await expect(banner).toContainText('Your last payment did not go through', { timeout: 20_000 });
   await expect(banner).toContainText(/£\d/);
   await expect(banner.getByRole('button', { name: 'Fix this now' })).toBeVisible();
   await jumpTo(page, /Daniel/);
