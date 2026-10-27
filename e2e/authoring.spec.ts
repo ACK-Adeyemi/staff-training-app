@@ -52,6 +52,7 @@ test('Duplicate on a provider module makes an own draft with the responsibility 
 }) => {
   await pinClock(page);
   await page.goto('./#/client/modules');
+  await expect(item(page, PROVIDER_MODULE)).toBeVisible();
   const before = await ownItems(page).count();
   await item(page, PROVIDER_MODULE).getByRole('button', { name: 'Duplicate' }).click();
   await expect(page.getByRole('status').filter({ hasText: NOTE })).toBeVisible();

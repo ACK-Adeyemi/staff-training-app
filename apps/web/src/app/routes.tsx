@@ -85,7 +85,15 @@ export const routes: RouteObject[] = [
           { path: 'people', element: <People /> },
           { path: 'people/:personId', element: <PersonRecord /> },
           { path: 'assign', element: <Assign /> },
-          page('modules', 'nav.client.training', 'placeholder.client.training'),
+          {
+            path: 'modules',
+            lazy: async () => ({ Component: (await import('../pages/client/ModuleLibrary')).ModuleLibrary }),
+          },
+          page('modules/:moduleId/edit', 'client.library.title', 'client.library.builderSoon'),
+          {
+            path: 'modules/:moduleId/preview',
+            lazy: async () => ({ Component: (await import('../pages/client/ModulePreview')).ModulePreview }),
+          },
           { path: 'competitions', element: <Competitions /> },
           {
             path: 'competitions/new',
