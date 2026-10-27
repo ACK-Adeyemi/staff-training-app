@@ -821,3 +821,12 @@ Copied from docs/plans/m3.md (chunk 1). Numbers match the plan, so other docs ca
 ## M3 chunk 20b: fflate dependency
 
 - **fflate 0.8.3** (exact pin) is added to apps/web for the ZIP export (`app/zip.ts`) and to the root devDependencies so e2e tests can read the ZIP back with `unzipSync`. Registry check on 27 October 2026: package name `fflate`, version 0.8.3, MIT, tarball from registry.npmjs.org/fflate (not `fflate-unzip` or another lookalike). 0.8.3 includes the `unzipSync` denial-of-service fix.
+
+## M3 chunk 20b
+
+- Test correction (no assertion weakened): the C22 "has one h1 and the five sections" test looked for the "Account status" link across the whole screen, but the client More menu has a link with the same name, so the query found two. It now looks for the link inside the `main` landmark (the page's own link) and asserts the same href.
+- Certificate files are not added to `ExportBundle`. The app reads each approved certificate file (approved submissions and Evidence with an attachment) through `store.attachments.get` with the actor's own access, so a file the actor may not see is left out, and the bundle contract stays unchanged. The seed already holds an approved certificate file for Kasia at Little Acorns, so no seed change was needed.
+- `certificates/module/` holds one small HTML certificate per module Evidence record (all text escaped), built in `app/zip.ts` from language-file text. Duplicate file names get `-2`, `-3` before the extension.
+- The step-up code is checked in the data layer; a blank code is also caught in the dialog before the call, with the same message. The person export file name is `<organisation> <person>-export-<date>.zip`.
+- After an erase the app goes to `#/client/people` and passes the "was anonymised/deleted" message as router navigation state, so the status line shows on the people list.
+- The "Data and retention" More-menu entry shows for anyone holding `settings.view` anywhere. The Export all data button uses `reports.export` held anywhere (the data layer limits a site-scoped manager to their own sites).

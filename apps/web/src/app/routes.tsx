@@ -15,6 +15,7 @@ import { PersonRecord } from '../pages/client/Person';
 import { Competitions } from '../pages/client/Competitions';
 import { AccountStatus } from '../pages/client/AccountStatus';
 import { Onboarding } from '../pages/client/Onboarding';
+import { DataRetention } from '../pages/client/DataRetention';
 import { Settings } from '../pages/client/Settings';
 import { SignIn as ClientSignIn } from '../pages/client/SignIn';
 import { Team } from '../pages/client/Team';
@@ -207,6 +208,7 @@ export const routes: RouteObject[] = [
           },
           { path: 'display', element: <Display /> },
           { path: 'settings', element: <Settings /> },
+          { path: 'data', element: <DataRetention /> },
           { path: 'team', element: <Team /> },
           { path: 'account-status', element: <AccountStatus /> },
           { path: 'onboarding', element: <Onboarding /> },

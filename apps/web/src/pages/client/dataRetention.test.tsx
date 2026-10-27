@@ -125,7 +125,9 @@ describe('C22 page and gate', () => {
     for (const name of ['Retention settings', 'Scheduled deletions', 'Export all data', 'If you cancel']) {
       expect(await screen.findByRole('heading', { level: 2, name })).toBeTruthy();
     }
-    expect(screen.getByRole('link', { name: 'Account status' }).getAttribute('href')).toBe('#/client/account-status');
+    // The More menu has an Account status link too, so look inside the page itself.
+    const link = within(screen.getByRole('main')).getByRole('link', { name: 'Account status' });
+    expect(link.getAttribute('href')).toBe('#/client/account-status');
   });
 
   it('shows Daniel (no settings access) the no-access message and no export button', async () => {

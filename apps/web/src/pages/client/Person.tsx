@@ -5,6 +5,7 @@ import { Button, Card, Dialog, PageHeader, StatusBadge } from '@sta/ui';
 import { can, personRequirementRows, type Person } from '@sta/domain';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { formatLondonDate } from '../../demo/format';
+import { PersonDataActions } from './PersonDataActions';
 import { UploadForm } from '../evidence/UploadForm';
 import { focusLink } from '../staff/styles';
 import { fullName, orEmpty, useClientData, usePermissions } from './queries';
@@ -71,6 +72,12 @@ export function PersonRecord() {
           {reminder ? <p role={reminder.role}>{reminder.text}</p> : null}
         </div>
       ) : null}
+      <PersonDataActions
+        key={`data-${person.id}`}
+        person={person}
+        mayExport={!!perms.data && can(perms.data, 'reports.export', target)}
+        mayErase={!!perms.data && can(perms.data, 'staff.delete', target)}
+      />
       {mayManage ? <JobRoles key={person.id} person={person} /> : null}
       <section aria-labelledby="c3-reqs">
         <h2 id="c3-reqs" className="mb-3 text-lg font-bold">

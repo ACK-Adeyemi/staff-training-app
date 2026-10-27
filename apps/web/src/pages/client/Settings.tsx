@@ -9,6 +9,7 @@ import { useActor, useStore, useT } from '../../app/hooks';
 import { formatLondonDate } from '../../demo/format';
 import { foundationsErrorKey, inputClass } from './foundationsErrors';
 import { useOrganisation, useSites } from './foundationsQueries';
+import { focusLink } from '../staff/styles';
 import { usePermissions } from './queries';
 
 type Notice = { kind: 'ok' | 'error'; text: string } | null;
@@ -358,6 +359,11 @@ export function Settings() {
           ))}
         </ul>
       </Section>
+      <p>
+        <a href="#/client/data" className={`inline-flex min-h-[var(--target-min)] items-center underline ${focusLink}`}>
+          {t('dataPage.linkFrom')}
+        </a>
+      </p>
     </>
   );
 }

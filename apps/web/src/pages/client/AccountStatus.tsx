@@ -6,6 +6,7 @@ import type { MessageKey } from '@sta/content';
 import { useActor, useT } from '../../app/hooks';
 import { formatLondonDate, formatPounds } from '../../demo/format';
 import { useAccountStatus } from './foundationsQueries';
+import { focusLink } from '../staff/styles';
 import { usePermissions } from './queries';
 
 const STEPS: AccountState[] = ['active', 'pastDue', 'limited', 'readOnly', 'closed'];
@@ -111,6 +112,11 @@ export function AccountStatus() {
           <p className="mt-3 mb-0">{t('account.exportsNote')}</p>
         </Card>
       </section>
+      <p>
+        <a href="#/client/data" className={`inline-flex min-h-[var(--target-min)] items-center underline ${focusLink}`}>
+          {t('dataPage.linkFrom')}
+        </a>
+      </p>
     </>
   );
 }

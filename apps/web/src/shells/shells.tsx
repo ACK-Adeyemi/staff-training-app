@@ -100,6 +100,9 @@ function ClientFrame({ twoFactor }: { twoFactor: TwoFactorStatus }) {
                 : []),
               item('/client/team', t('team.title'), 'user'),
               item('/client/settings', t('nav.client.settings'), 'more'),
+              ...(perms.data && holdsAnywhere(perms.data, 'settings.view')
+                ? [item('/client/data', t('dataPage.title'), 'more')]
+                : []),
               ...(perms.data && holdsAnywhere(perms.data, 'billing.view')
                 ? [
                     item('/client/billing', t('nav.client.billing'), 'chart'),

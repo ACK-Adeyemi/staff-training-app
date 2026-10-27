@@ -1,5 +1,6 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'react-router';
 import { Button, Card, Dialog, PageHeader, SegmentedControl, StatusBadge } from '@sta/ui';
 import { can, londonDateString, overallStatus, siteRollup, type ClientView, type Person, type Site } from '@sta/domain';
 import { useActor, useClock, useStore, useT } from '../../app/hooks';
@@ -117,6 +118,7 @@ export function People() {
   const [search, setSearch] = useState('');
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
+  const erasedNotice = (useLocation().state as { notice?: string } | null)?.notice;
   const [mode, setMode] = useState<'bySite' | 'oneList'>('bySite');
   const [folded, setFolded] = useState<Record<string, boolean>>({});
   const site = useSiteScope();
@@ -161,6 +163,7 @@ export function People() {
         </div>
       ) : null}
       {added ? <p role="status">{t('client.people.added')}</p> : null}
+      {erasedNotice ? <p role="status">{erasedNotice}</p> : null}
       <div className="mb-4 flex max-w-md flex-col gap-1">
         <label htmlFor="people-search" className="font-semibold">
           {t('client.people.search')}
