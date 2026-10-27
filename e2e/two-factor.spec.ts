@@ -31,6 +31,7 @@ async function enrol(page: Page): Promise<string[]> {
   await expect(codes.getByRole('listitem')).toHaveCount(10);
   const shown = await codes.getByRole('listitem').allInnerTexts();
   await page.getByRole('button', { name: 'I have saved my codes' }).click();
+  await expect(page).toHaveURL(/#\/client$/);
   return shown.map((c) => c.trim());
 }
 
@@ -93,6 +94,7 @@ test('an admin past the grace period is sent to enrolment from every client page
   await pinClock(page);
   await page.goto('./');
   await jumpTo(page, /Colin/);
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await page.goto('./#/client/people');
   await expect(page).toHaveURL(/#\/client\/signin/);
   await expect(page.getByText('Set up two-step sign-in to carry on.')).toBeVisible();
@@ -113,6 +115,7 @@ test('Fast-forward past the 7-day grace limits an unenrolled admin', async ({ pa
   await page.keyboard.press('Shift+Alt+KeyP');
   await panel(page).getByRole('button', { name: 'Fast-forward 7 days' }).click();
   await page.keyboard.press('Escape');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await page.goto('./#/client/people');
   await expect(page).toHaveURL(/#\/client\/signin/);
   await expect(page.getByRole('button', { name: 'Start set-up' })).toBeVisible();
