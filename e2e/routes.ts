@@ -98,3 +98,11 @@ export const m3BillingRoutes: NavEntry[] = [
   { hash: '#/client/billing/add-ons', label: 'Add-ons' },
   { hash: '#/client/billing/pay', label: 'Pay now' },
 ];
+
+/** M3 chunk 16 routes (stats and feedback). P5 (Content) is already a shell route; Content now also holds module feedback. */
+export const m3StatsRoutes: NavEntry[] = [
+  { hash: '#/client/stats', label: 'Stats' },
+  { hash: '#/client/module-feedback', label: 'Module feedback' },
+  { hash: '#/provider/content', label: 'Content' },
+  { hash: '#/provider/feedback', label: 'App feedback' },
+];
