@@ -3,7 +3,7 @@ Status: IN PROGRESS
 Mode: unattended
 Branch: agent/poc-build
 Current milestone: M4
-Milestone base commit: bb460c4
+Milestone base commit: c7160e2
 Next step: M4 Provider story: write docs/plans/m4.md with the planner (record the M4 base commit first).
 
 ## Milestones
@@ -146,3 +146,4 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - 2026-10-27: M3 chunk 21 Track A steps, F-5 audit, demo script and review checklist landed. Screenshot review of C7, C8, C19, C27, S17, S18, C28 at 390x844 and desktop done: two layout fixes (C7 PDF input overflow, tab bar label wrap), see decisions. M3 chunks complete.
 - 2026-10-27: M3 chunk 21 Track A steps and docs landed; all 21 chunks done. Reviews next.
 - 2026-10-27: M3 security and code reviews done, fixes landed, full check.sh green. M3 complete. M4 next.
+- 2026-10-27: M4 started, base c7160e2, planning.
