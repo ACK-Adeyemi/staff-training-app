@@ -1,6 +1,7 @@
 // F-10: at 390px with the root font size doubled, D1 and the staff shell do not scroll sideways and every tab label is reachable.
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import { readStore } from './helpers/idb';
 import { expectNoClipOrOverlap } from './helpers/layout';
 import { answerQuestion, finishLessons, type QuizQuestion } from './helpers/quiz';
 import { need, staffTabs } from './routes';
@@ -171,6 +172,44 @@ test('S18 and C28 Calendar do not clip or overlap at 200% text', async ({ page }
       await expect(page.getByRole('grid')).toBeVisible();
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    await expectNoClipOrOverlap(page);
+  }
+});
+
+// M3 chunk 21 (F-5): C7, C8 and C19 at 200% text on the 390 px phone.
+test('C7 Module builder does not clip or overlap at 200% text, with lessons and a question added', async ({ page }) => {
+  await page.goto('./#/client/modules/new');
+  await expect(page.getByRole('heading', { level: 1, name: 'Module builder' })).toBeVisible();
+  await scale(page);
+  await expectNoClipOrOverlap(page);
+  await page.getByRole('textbox', { name: 'Title', exact: true }).fill('Fire drill for new starters');
+  await page
+    .getByRole('textbox', { name: 'Paste your lessons' })
+    .fill('# Raise the alarm\nShout fire.\n\n# Leave\nWalk out.');
+  await page.getByRole('button', { name: 'Turn into lessons' }).click();
+  await page.getByRole('button', { name: 'Add multiple choice question' }).click();
+  await expect(page.getByTestId('builder-question')).toHaveCount(1);
+  await expectNoClipOrOverlap(page);
+});
+
+test('C8 Module stats does not clip or overlap at 200% text', async ({ page }) => {
+  await page.goto('./#/client');
+  await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+  const fire = (await readStore(page, 'modules')).find((m) => m['title'] === 'Fire evacuation at Little Acorns');
+  await page.goto(`./#/client/modules/${String(fire?.['id'])}/stats`);
+  await expect(page.getByRole('heading', { level: 1, name: /^Results for Fire evacuation/ })).toBeVisible();
+  await scale(page);
+  await expectNoClipOrOverlap(page);
+});
+
+test('C19 Plan and billing and C20 Add-ons do not clip or overlap at 200% text', async ({ page }) => {
+  for (const [hash, heading] of [
+    ['#/client/billing', 'Plan and billing'],
+    ['#/client/billing/add-ons', 'Add-ons'],
+  ] as const) {
+    await page.goto(`./${hash}`);
+    await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
+    await scale(page);
     await expectNoClipOrOverlap(page);
   }
 });

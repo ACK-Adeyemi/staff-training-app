@@ -139,3 +139,22 @@ export const m3HelpRoutes: NavEntry[] = [
 
 /** M3 chunk 20b routes (data and retention). */
 export const m3DataRoutes: NavEntry[] = [{ hash: '#/client/data', label: 'Data and retention' }];
+
+/** M3 chunk 21 (F-5): the Module Builder without an id. Routes with an id (edit, preview, evidence review) are resolved in smoke.spec.ts. */
+export const m3AuthoringRoutes: NavEntry[] = [{ hash: '#/client/modules/new', label: 'Module builder' }];
+
+/** Every M3 route without an id in it, once each, for the high contrast checks. */
+export const m3AllRoutes: NavEntry[] = [
+  ...[
+    ...m3Routes,
+    ...m3BillingRoutes,
+    ...m3StatsRoutes,
+    ...m3EvidenceRoutes,
+    ...m3RulesRoutes,
+    ...m3CalendarRoutes,
+    ...m3ThemeRoutes,
+    ...m3HelpRoutes,
+    ...m3DataRoutes,
+    ...m3AuthoringRoutes,
+  ],
+].filter((r, i, all) => all.findIndex((x) => x.hash === r.hash) === i);

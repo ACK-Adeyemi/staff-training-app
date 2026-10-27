@@ -160,7 +160,7 @@ export function LinkPanel({
           <Button variant="secondary" disabled={busy} onClick={add}>
             {t('client.builder.links.add')}
           </Button>
-          <label htmlFor={`${uid}-pdf`} className="flex flex-col gap-1 font-semibold">
+          <label htmlFor={`${uid}-pdf`} className="flex min-w-0 max-w-full flex-col gap-1 font-semibold">
             {t('client.builder.links.pdf')}
             <input
               id={`${uid}-pdf`}
@@ -172,7 +172,7 @@ export function LinkPanel({
                 e.target.value = '';
                 upload(file);
               }}
-              className="min-h-[var(--target-min)] max-w-full text-[var(--color-text)]"
+              className="min-h-[var(--target-min)] w-full min-w-0 max-w-full text-[var(--color-text)]"
             />
           </label>
         </div>

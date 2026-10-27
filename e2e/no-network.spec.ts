@@ -1,5 +1,6 @@
 // F-9: no requests leave the preview origin, and the built index.html carries the CSP meta tag.
 import { expect, test } from '@playwright/test';
+import { exifJpeg } from './helpers/files';
 import { installSpeechRecorder, readSpeechLog } from './helpers/speech';
 import { m2Routes } from './routes';
 
@@ -86,4 +87,74 @@ test('F-5: Export all data (ZIP) and the person export make no request outside t
   expect(download.suggestedFilename()).toMatch(/\.zip$/);
   const outside = urls.filter((u) => !u.startsWith(origin) && !u.startsWith('data:') && !u.startsWith('blob:'));
   expect(outside).toEqual([]);
+});
+
+// M3 chunk 21 (F-5): upload, .ics download, QR enrolment and Demo AI make no request outside the origin.
+const PINNED = new Date('2026-10-19T09:00:00.000Z');
+const offOrigin = (urls: string[]) =>
+  urls.filter((u) => !u.startsWith(origin) && !u.startsWith('data:') && !u.startsWith('blob:'));
+async function jump(page: import('@playwright/test').Page, name: RegExp) {
+  await page.keyboard.press('Shift+Alt+KeyP');
+  const panel = page.getByRole('dialog', { name: 'Presenter panel' });
+  await panel.getByRole('group', { name: 'Jump to persona' }).getByRole('button', { name }).click();
+  await expect(panel).toBeHidden();
+}
+
+test('F-5: a certificate upload, a .ics download and the Demo AI make no request outside the origin', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await page.clock.install({ time: PINNED });
+  const urls: string[] = [];
+  page.on('request', (r) => urls.push(r.url()));
+  await page.goto('./');
+  await jump(page, /Mark/);
+  await page.goto('./#/staff/progress');
+  await page.getByRole('link', { name: 'Upload certificate: Paediatric first aid' }).click();
+  await page.locator('input[type="file"]:not([capture])').setInputFiles({
+    name: 'certificate.jpg',
+    mimeType: 'image/jpeg',
+    buffer: await exifJpeg(page),
+  });
+  await page
+    .getByRole('combobox', { name: 'Course provider' })
+    .selectOption('Approved paediatric first aid training provider');
+  await page.getByLabel('Date you finished the course').fill('2026-10-12');
+  await page.getByLabel('Expiry date on the certificate').fill('2029-10-12');
+  await page.getByRole('button', { name: 'Send for checking' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Sent. Your manager will check it.' })).toBeVisible();
+
+  await jump(page, /Jade/);
+  await page.goto('./#/staff/calendar');
+  const [ics] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Download all (.ics)' }).click(),
+  ]);
+  expect(ics.suggestedFilename()).toMatch(/\.ics$/);
+
+  await jump(page, /Priya/);
+  await page.goto('./#/client/billing/add-ons');
+  await page.getByRole('region', { name: 'AI Assistant' }).getByRole('button', { name: 'Turn on' }).click();
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: /confirm/i })
+    .click();
+  await expect(page.getByRole('region', { name: 'AI Assistant' })).toContainText('On');
+  await page.goto('./#/client/modules/01M0C0N7000000000000000201/preview/lesson-1');
+  await page.getByRole('button', { name: /explain this in simpler words/i }).click();
+  await expect(page.getByTestId('explain-result')).toContainText('Demo AI');
+  expect(offOrigin(urls)).toEqual([]);
+});
+
+test('F-5: the QR code on two-step enrolment makes no request outside the origin', async ({ page }) => {
+  await page.clock.install({ time: PINNED });
+  const urls: string[] = [];
+  page.on('request', (r) => urls.push(r.url()));
+  await page.goto('./');
+  await jump(page, /Daniel/);
+  await page.getByTestId('two-factor-banner').getByRole('link').click();
+  await page.getByRole('button', { name: 'Start set-up' }).click();
+  await expect(page.getByLabel('6-digit code')).toBeVisible();
+  await expect(page.locator('main svg, main img, main canvas').first()).toBeVisible();
+  expect(offOrigin(urls)).toEqual([]);
 });
