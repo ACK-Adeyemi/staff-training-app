@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M3
 Milestone base commit: bb460c4
-Next step: M3 chunk 20b (C22 Data and retention with ZIP export via fflate, cancellation summary; C3 person export and erase UI; data-export.spec.ts) per docs/plans/m3.md. Open: Default dark theme preset cannot be saved; thread shows screenshot count only.
+Next step: M3 chunk 21 (Track A steps 2, 5 upload, 6, 8, 9 in e2e/track-a.spec.ts; routes/axe/text-scale/no-network audit; docs/demo-script.md; review-checklist M3 entries; screenshot review; final check). Then security-reviewer and code-reviewer on git diff bb460c4...HEAD against docs/plans/m3.md.
 
 ## Milestones
 - [x] M0 Foundations
@@ -37,7 +37,7 @@ M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 17 Evidence UI (tests 52bb2d1, impl fe3d7c0)
 - [x] 18 Rules, reminders, notifications and calendars UI (18a tests 91a1552, impl 0e8eb76; 18b tests ebdc820, impl f7d4d08)
 - [x] 19 Multi-site, leaderboards and themes UI (19a tests 8f0a7f2, impl 37184f2; 19b tests 88ce68b, impl bf2a636)
-- [ ] 20 Help, tickets and data UI: 20a help and tickets done (tests fcf7a8a, impl 1970ac7); 20b data (C22 ZIP, C3 person export and erase) next
+- [x] 20 Help, tickets and data UI (20a tests fcf7a8a, impl 1970ac7; 20b tests 1542571, impl c548430)
 - [ ] 21 Track A and docs
 M2: all 17 chunks done.
 M1 (all done):
@@ -138,3 +138,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-27: M3 chunk 19a multi-site and leaderboards landed (37184f2), check.sh green. Chunk 19b next.
 - 2026-10-27: M3 chunk 19b themes and eligibility pickers landed (bf2a636), check.sh green. Chunk 20 next.
 - 2026-10-27: M3 chunk 20a help and tickets landed (1970ac7). Chunk 20b next.
+- 2026-10-27: M3 chunk 20b data and retention landed (c548430), check.sh green. Chunk 21 next.
