@@ -64,6 +64,12 @@ const tariq = clientActor('riversideManager', 'oakTree');
 const failPayment = async ({ handle, keys }: { handle: StoreHandle; keys: SeedKeys }) => {
   await handle.admin.simulateFailedPayment(need(keys.clients['littleAcorns']), TODAY);
 };
+// Daniel's two-step grace (7 days from 17 Oct) ends before the later days below, which would send him to sign-in.
+// These tests are about the account banner, so he is enrolled first (see docs/decisions.md, M3 chunk 13).
+const failPaymentEnrolled = async (ctx: { handle: StoreHandle; keys: SeedKeys }) => {
+  await failPayment(ctx);
+  await ctx.handle.store.twoFactor.confirmEnrolment(daniel(ctx.keys), '123456');
+};
 const londonDate = (iso: string) =>
   new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', timeZone: 'Europe/London' }).format(new Date(iso));
 
@@ -147,7 +153,7 @@ describe('account status banner', () => {
     await screen.findByRole('heading', { level: 1 });
     expect(screen.queryByTestId('account-banner')).toBeNull();
     day0.unmount();
-    await renderRoute('/client', 'client', { actor: daniel, prepare: failPayment, now: at(8) });
+    await renderRoute('/client', 'client', { actor: daniel, prepare: failPaymentEnrolled, now: at(8) });
     const banner = await screen.findByTestId('account-banner');
     expect(banner.textContent).toContain(t('account.banner.pastDue'));
     expect(banner.textContent).toMatch(/billing access/i);
@@ -160,7 +166,7 @@ describe('account status banner', () => {
     [32, 'readOnly'],
     [62, 'closed'],
   ] as const)('after %i days of non-payment every admin sees the %s banner', async (days, state) => {
-    await renderRoute('/client', 'client', { actor: daniel, prepare: failPayment, now: at(days) });
+    await renderRoute('/client', 'client', { actor: daniel, prepare: failPaymentEnrolled, now: at(days) });
     const banner = await screen.findByTestId('account-banner');
     expect(banner.textContent).toContain(t(`account.banner.${state}`));
   });

@@ -68,8 +68,13 @@ function Inner({ booted }: { booted: Booted }) {
       signInAs: (userId) => save({ ...state, persona: { side: 'staff', userId } }),
       setDisplayPrefs: (displayPrefs) => save({ ...state, displayPrefs }),
       setIndustry: (industry) => save({ ...state, industry }),
+      simulateFailedPayment: async () => {
+        const chosen = state.clientPersona?.userId ?? keys.users['priya'];
+        const clientId = personas.find((p) => p.userId === chosen && p.side === 'client')?.clientId;
+        if (clientId) await handle.admin.simulateFailedPayment(clientId, clock.now().toISOString());
+      },
     };
-  }, [handle, keys.users, setOffset, state]);
+  }, [handle, keys.users, setOffset, state, personas, clock]);
 
   const subscribe = useCallback<StoreHandle['subscribe']>((l) => handle.subscribe(l), [handle]);
 

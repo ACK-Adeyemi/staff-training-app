@@ -21,6 +21,8 @@ export type DemoApi = {
   /** Device display settings for the provider side (no person to hold them). */
   setDisplayPrefs?: (prefs: NonNullable<DemoState['displayPrefs']>) => void | Promise<void>;
   setIndustry: (industry: DemoState['industry']) => void | Promise<void>;
+  /** Puts the selected client's account into Past due from now (D2). The demo shell knows which client. */
+  simulateFailedPayment?: () => void | Promise<void>;
 };
 
 export const DataStoreContext = createContext<DataStore | null>(null);

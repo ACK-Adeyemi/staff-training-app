@@ -70,6 +70,12 @@ const daniel = clientActor('daniel', 'littleAcorns');
 const failPayment = async ({ handle, keys }: { handle: StoreHandle; keys: SeedKeys }) => {
   await handle.admin.simulateFailedPayment(need(keys.clients['littleAcorns']), TODAY);
 };
+// Daniel's two-step grace ends before day 8, which would send him to sign-in; enrol him so the account screens open
+// (see docs/decisions.md, M3 chunk 13).
+const failPaymentEnrolled = async (ctx: { handle: StoreHandle; keys: SeedKeys }) => {
+  await failPayment(ctx);
+  await ctx.handle.store.twoFactor.confirmEnrolment(daniel(ctx.keys), '123456');
+};
 const dump = async <R,>(handle: StoreHandle, store: string): Promise<R[]> =>
   ((await handle.admin.dumpAll()) as unknown as Record<string, unknown[]>)[store] as R[];
 
@@ -210,7 +216,7 @@ describe('C21 Account status', () => {
     expect(screen.getByRole('button', { name: t('account.fixNow') })).toBeTruthy();
     expect(document.body.textContent).toMatch(/£\d/);
     priyaView.unmount();
-    await renderRoute('/client/account-status', 'client', { actor: daniel, prepare: failPayment, now: at(8) });
+    await renderRoute('/client/account-status', 'client', { actor: daniel, prepare: failPaymentEnrolled, now: at(8) });
     await screen.findByTestId('account-timeline');
     expect(screen.queryByRole('button', { name: t('account.fixNow') })).toBeNull();
     expect(screen.queryByRole('link', { name: t('account.fixNow') })).toBeNull();

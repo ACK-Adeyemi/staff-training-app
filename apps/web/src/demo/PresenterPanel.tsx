@@ -7,7 +7,7 @@ import type { MessageKey } from '@sta/content';
 import { useAppDate, useDemo, useT } from '../app/hooks';
 import { formatLondonDay } from './format';
 
-const later: MessageKey[] = ['demo.simulateFailedPayment', 'demo.toggleSystemStatus', 'demo.clearProspectBranding'];
+const later: MessageKey[] = ['demo.toggleSystemStatus', 'demo.clearProspectBranding'];
 const jumps: { to: string; label: MessageKey }[] = [
   { to: '/staff', label: 'demo.surfaceStaff' },
   { to: '/client', label: 'demo.surfaceClient' },
@@ -118,6 +118,20 @@ export function PresenterPanel({ open, onClose }: { open: boolean; onClose: () =
                 </div>
               </div>
             ) : null}
+          </div>
+          <div className="mb-4">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                void (async () => {
+                  await demo.simulateFailedPayment?.();
+                  // The account state changed, so anything already loaded is stale.
+                  await queryClient.invalidateQueries();
+                })();
+              }}
+            >
+              {t('demo.simulateFailedPayment')}
+            </Button>
           </div>
           <ul className="m-0 mb-4 flex list-none flex-col gap-2 p-0">
             {later.map((key) => (

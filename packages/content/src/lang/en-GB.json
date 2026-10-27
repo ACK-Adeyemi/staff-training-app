@@ -1650,7 +1650,112 @@
     "activityEmpty": "No activity yet.",
     "owner": "Account Owner",
     "ownerNote": "The Account Owner always keeps full access.",
-    "limit": "You have reached the number of custom roles you can have."
+    "limit": "You have reached the number of custom roles you can have.",
+    "permission": {
+      "staff": {
+        "view": "See staff, teams and sites",
+        "manage": "Add and edit staff, teams and sites",
+        "delete": "Delete staff records"
+      },
+      "team": {
+        "manageRoles": "Manage who can do what"
+      },
+      "evidence": {
+        "view": "See evidence and certificates",
+        "uploadForOthers": "Upload evidence for other people",
+        "approve": "Approve evidence"
+      },
+      "assign": {
+        "view": "See assigned training",
+        "manage": "Assign training"
+      },
+      "modules": {
+        "view": "See modules",
+        "manage": "Edit modules",
+        "addLinks": "Add links to modules"
+      },
+      "reports": {
+        "view": "See reports",
+        "export": "Export reports and records"
+      },
+      "competitions": {
+        "view": "See competitions",
+        "manage": "Run competitions"
+      },
+      "battles": {
+        "host": "Host Battle Rooms"
+      },
+      "themes": {
+        "view": "See themes",
+        "manage": "Edit themes"
+      },
+      "reminders": {
+        "view": "See reminders",
+        "manage": "Edit reminders"
+      },
+      "settings": {
+        "view": "See settings",
+        "manage": "Change settings"
+      },
+      "org": {
+        "editName": "Change the organisation name"
+      },
+      "billing": {
+        "view": "See billing",
+        "manage": "Manage billing",
+        "manageAddOns": "Turn add-ons on and off"
+      },
+      "support": {
+        "raise": "Raise support tickets",
+        "viewOrgTickets": "See everyone's support tickets",
+        "allowStaffTickets": "Let staff raise tickets"
+      },
+      "moduleFeedback": {
+        "view": "See module feedback",
+        "respond": "Respond to module feedback"
+      }
+    },
+    "whatCanDo": "What can {name} do?",
+    "canDoTitle": "What {name} can do",
+    "canYes": "Can do this",
+    "canNo": "Cannot do this",
+    "previewRole": "Preview as this role",
+    "previewRoleNamed": "Preview as this role: {name}",
+    "previewTitle": "What someone with {name} sees in the menu",
+    "previewSee": "Can open",
+    "previewNoSee": "Cannot open",
+    "startFrom": "Start from",
+    "startFromNothing": "No access",
+    "roleSaved": "Role saved.",
+    "accessSaved": "Access saved.",
+    "memberRole": "Role for {name}",
+    "revokeNamed": "Remove access: {name}",
+    "you": "You",
+    "loadError": "We could not load your team. Please try again.",
+    "noRoles": "There are no roles yet.",
+    "scopeSite": "Site: {names}",
+    "scopeAll": "All sites",
+    "scopeOwn": "Own records only",
+    "inviteTitle": "Invite an admin",
+    "where": "Where it applies",
+    "activityLine": "{name}: {action}",
+    "removeRoleNamed": "Remove role: {name}",
+    "customRoleSection": "Custom roles",
+    "templateHelp": "The new role starts with the same access as the one you choose.",
+    "systemRole": "Built in",
+    "activityActions": {
+      "invite": "Invited an admin",
+      "setAccess": "Changed access",
+      "revoke": "Removed access",
+      "saveCustomRole": "Saved a custom role",
+      "removeCustomRole": "Removed a custom role",
+      "updateProfile": "Changed the organisation name",
+      "updateSettings": "Changed settings",
+      "updateSite": "Changed a site",
+      "enrolled": "Set up two-step sign-in",
+      "markDone": "Ticked a getting started step",
+      "other": "Made a change"
+    }
   },
   "twoFactor": {
     "title": "Two-step sign-in",
@@ -1675,7 +1780,19 @@
     "demoNote": "Demo: this is simulated, so any app that follows the standard will give the right code.",
     "wrong": "That code isn't right. Check it and try again.",
     "locked": "Too many wrong codes. Wait 15 minutes and try again.",
-    "stepUp": "Enter a fresh code to do this."
+    "stepUp": "Enter a fresh code to do this.",
+    "demoOnly": "Demo only: any email and password will do.",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "cantAccess": "Can't access your account?",
+    "cantAccessHelp": "Ask the Account Owner at your organisation. They can help you get back in.",
+    "recoveryCodeLabel": "Recovery code",
+    "useAppCode": "Use the code from my app instead",
+    "setupIntro": "Two-step sign-in keeps your organisation safe. Setting it up takes a minute.",
+    "qrAlt": "QR code to scan with your authenticator app",
+    "loadError": "We could not check your sign-in. Please try again.",
+    "stepCode": "Step 2 of 2"
   },
   "org": {
     "title": "Your organisation",
@@ -1693,14 +1810,44 @@
       "staffTickets": "Let staff raise support tickets",
       "pulse": "Pulse survey (off by default)",
       "quietHours": "Quiet hours for notifications",
-      "saved": "Settings saved."
+      "saved": "Settings saved.",
+      "amberWindow": "Amber window (days)",
+      "weeklyGoal": "Weekly goal (lessons)",
+      "firstAider": "First aider threshold",
+      "saveSettings": "Save settings",
+      "invalid": "Check the numbers and try again.",
+      "amberHelp": "How many days before something runs out it shows as amber.",
+      "noAccess": "You do not have access to settings.",
+      "heading": "Organisation settings"
     },
     "sites": {
       "title": "Sites",
       "name": "Site name",
       "region": "Region",
       "rename": "Rename site"
-    }
+    },
+    "nameHistory": "Name history",
+    "nameHistoryEmpty": "The name has not changed.",
+    "nameHistoryLine": "{old} became {new} on {date}",
+    "staffPreviewLine": "Staff will see: {name}",
+    "loadError": "We could not load your settings. Please try again.",
+    "invalidName": "Use a name of 2 to 60 characters that is not only numbers or symbols.",
+    "siteSaved": "Site saved.",
+    "regions": {
+      "eastMidlands": "East Midlands",
+      "eastOfEngland": "East of England",
+      "london": "London",
+      "northEast": "North East",
+      "northWest": "North West",
+      "northernIreland": "Northern Ireland",
+      "scotland": "Scotland",
+      "southEast": "South East",
+      "southWest": "South West",
+      "wales": "Wales",
+      "westMidlands": "West Midlands",
+      "yorkshire": "Yorkshire and the Humber"
+    },
+    "noRegion": "Not set"
   },
   "billing": {
     "title": "Plan and billing",
@@ -1878,7 +2025,26 @@
         "yes": "Your theme is shown to staff.",
         "no": "Your theme is not shown."
       }
-    }
+    },
+    "statusTitle": "Account status",
+    "statusIntro": "See how your account is doing and what still works.",
+    "timeline": "Where your account is",
+    "current": "Now",
+    "days": {
+      "trial": "During your trial",
+      "active": "No problems",
+      "pastDue": "Days 0 to 14",
+      "limited": "From day 15",
+      "readOnly": "From day 31",
+      "paused": "Paused for now",
+      "closed": "From day 61"
+    },
+    "amountDue": "Amount due: {amount}",
+    "askBilling": "Ask someone with billing access to fix this.",
+    "changesOn": "{change} from {date}.",
+    "loadError": "We could not load your account details. Please try again.",
+    "noChange": "No change is planned.",
+    "exportsNote": "You can always export your records, whatever state your account is in."
   },
   "retention": {
     "title": "Keeping and deleting records",
@@ -2104,9 +2270,19 @@
       "rules": "Set up a rule",
       "theme": "Choose a theme",
       "twoStep": "Set up two-step sign-in",
-      "export": "Try an export"
+      "export": "Try an export",
+      "inviteStaff": "Invite your team",
+      "reminderSettings": "Check your reminder settings",
+      "assignTraining": "Give out some training",
+      "setUpCompetition": "Set up a competition",
+      "exportMatrix": "Export your compliance matrix"
     },
     "dismiss": "Hide this list",
-    "hidden": "You can find this list again under Help."
+    "hidden": "You can find this list again under More, in Getting started.",
+    "stepDone": "Done",
+    "stepNotDone": "Not done yet",
+    "loadError": "We could not load your checklist. Please try again.",
+    "show": "Show this list",
+    "go": "Go there"
   }
 }

@@ -176,10 +176,10 @@ test.describe('Presenter panel (D2)', () => {
   test('the later-build items are shown disabled', async ({ page }) => {
     await page.goto('./#/staff');
     await page.keyboard.press('Shift+Alt+KeyP');
-    for (const name of ['Simulate failed payment', 'Toggle system status', 'Clear prospect branding']) {
+    for (const name of ['Toggle system status', 'Clear prospect branding']) {
       await expect(panel(page).getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true');
     }
-    await expect(panel(page).getByText('Arrives in a later build')).toHaveCount(3);
+    await expect(panel(page).getByText('Arrives in a later build')).toHaveCount(2);
   });
 
   test('Jump to Client admin and Open the outbox navigate and close the panel', async ({ page }) => {

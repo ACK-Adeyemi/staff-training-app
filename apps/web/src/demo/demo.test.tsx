@@ -208,14 +208,14 @@ describe('Presenter panel (D2 skeleton)', () => {
     expect(demo.reset).toHaveBeenCalledTimes(1);
   });
 
-  it('shows Simulate failed payment, Toggle system status and Clear prospect branding as disabled with the later-build text', async () => {
+  it('shows Toggle system status and Clear prospect branding as disabled with the later-build text', async () => {
     const { panel, demo } = await openPanel();
-    for (const name of ['Simulate failed payment', 'Toggle system status', 'Clear prospect branding']) {
+    for (const name of ['Toggle system status', 'Clear prospect branding']) {
       const item = within(panel).getByRole('button', { name });
       expect(item.getAttribute('aria-disabled')).toBe('true');
       await userEvent.click(item);
     }
-    expect(within(panel).getAllByText('Arrives in a later build')).toHaveLength(3);
+    expect(within(panel).getAllByText('Arrives in a later build')).toHaveLength(2);
     expect(demo.reset).not.toHaveBeenCalled();
   });
 

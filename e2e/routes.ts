@@ -20,7 +20,10 @@ export const clientBar: NavEntry[] = [
 ];
 export const clientMore: NavEntry[] = [
   { hash: '#/client/reports', label: 'Reports' },
+  { hash: '#/client/team', label: 'Team and roles' },
   { hash: '#/client/settings', label: 'Settings' },
+  { hash: '#/client/account-status', label: 'Account status' },
+  { hash: '#/client/onboarding', label: 'Getting started' },
   { hash: '#/client/help', label: 'Help' },
 ];
 export const providerBar: NavEntry[] = [
@@ -79,3 +82,12 @@ export const m2Routes: NavEntry[] = [
   ...organiseRoutes,
   ...competeRoutes,
 ].filter((r, i, all) => all.findIndex((x) => x.hash === r.hash) === i);
+
+/** M3 chunk 13 routes (client foundations). Sign-in sits outside the client shell. */
+export const m3Routes: NavEntry[] = [
+  { hash: '#/client/team', label: 'Team and roles' },
+  { hash: '#/client/settings', label: 'Settings' },
+  { hash: '#/client/account-status', label: 'Account status' },
+  { hash: '#/client/onboarding', label: 'Getting started' },
+  { hash: '#/client/signin', label: 'Two-step sign-in' },
+];

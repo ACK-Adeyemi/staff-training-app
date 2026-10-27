@@ -13,6 +13,11 @@ import { Reports } from '../pages/client/Reports';
 import { People } from '../pages/client/People';
 import { PersonRecord } from '../pages/client/Person';
 import { Competitions } from '../pages/client/Competitions';
+import { AccountStatus } from '../pages/client/AccountStatus';
+import { Onboarding } from '../pages/client/Onboarding';
+import { Settings } from '../pages/client/Settings';
+import { SignIn as ClientSignIn } from '../pages/client/SignIn';
+import { Team } from '../pages/client/Team';
 import { Display } from '../pages/me/Display';
 import { Me } from '../pages/me/Me';
 import { Compete } from '../pages/staff/Compete';
@@ -43,6 +48,8 @@ export const routes: RouteObject[] = [
       { path: '/', element: <Landing /> },
       { path: '/demo/outbox', element: <Outbox /> },
       { path: '/staff/signin', element: <SignIn /> },
+      // Outside the client shell, so an admin who must set up two-step sign-in can still reach it.
+      { path: '/client/signin', element: <ClientSignIn /> },
       // Outside the staff chrome: a certificate prints cleanly and an organisation document opens in its own tab.
       { path: '/staff/module/:moduleId/certificate', element: <Certificate /> },
       { path: '/staff/progress/record', element: <TrainingRecord /> },
@@ -108,7 +115,10 @@ export const routes: RouteObject[] = [
           { path: 'reports/matrix', element: <Matrix /> },
           { path: 'modules/:moduleId/stats', element: <ModuleStats /> },
           { path: 'display', element: <Display /> },
-          page('settings', 'nav.client.settings', 'placeholder.client.settings'),
+          { path: 'settings', element: <Settings /> },
+          { path: 'team', element: <Team /> },
+          { path: 'account-status', element: <AccountStatus /> },
+          { path: 'onboarding', element: <Onboarding /> },
           page('help', 'nav.client.help', 'placeholder.client.help'),
         ],
       },
