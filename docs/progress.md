@@ -139,3 +139,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-27: M3 chunk 19b themes and eligibility pickers landed (bf2a636), check.sh green. Chunk 20 next.
 - 2026-10-27: M3 chunk 20a help and tickets landed (1970ac7). Chunk 20b next.
 - 2026-10-27: M3 chunk 20b data and retention landed (c548430), check.sh green. Chunk 21 next.
+- 2026-10-27: M3 chunk 21 Track A steps, F-5 audit, demo script and review checklist landed. Screenshot review of C7, C8, C19, C27, S17, S18, C28 at 390x844 and desktop done: two layout fixes (C7 PDF input overflow, tab bar label wrap), see decisions. M3 chunks complete.

@@ -66,3 +66,22 @@ Things only the user can check, by milestone.
 
 - [ ] M3 content (Draft): the Fire evacuation at Little Acorns module (`packages/content/src/packs/nursery/modules/fire-evacuation/`, fictional site details, no EYFS reference), the staff and client FAQs and the three release notes in `lang/en-GB.json`, the accepted providers (generic names) and approver checklists for Paediatric first aid, Safeguarding and Food hygiene in `packs/nursery.ts` (VERIFY), the default auto-assign rule due dates, and the theme preset colours.
 
+### M3 phone checks
+
+- [ ] As Mark: upload a photo of a certificate with the phone camera (also try a HEIC photo from an iPhone), then as Priya approve it and print the first aiders list.
+- [ ] As Jade: raise a ticket with two screenshots, blur one, and check the context list; add a calendar item and the .ics file to the phone calendar (iPhone and Android); give module feedback at the end of a module.
+- [ ] As Priya: paste a procedure into the Module Builder and check the phone preview; change the organisation name and check the staff app; try a theme that fails contrast; switch on the Christmas schedule with Fast-forward.
+- [ ] As Daniel: see the 2FA prompt, request the AI Assistant; as Priya approve it and check Explain this in simpler words (Demo AI).
+- [ ] Simulate failed payment and Fast-forward through the states; check each banner and the staff message; Pay now. Seeded billing amounts are fake.
+- [ ] As Fiona (Oak Tree): site switcher, grouped people, site comparison, Sites board regions.
+- [ ] Export all data and open the ZIP on a computer.
+- [ ] Live site only (not checkable here): the app opens at the base path /staff-training-app/, hash routes survive a reload and a shared link, the ZIP downloads on a phone and on a desktop, the .ics opens in a calendar app, and file upload (camera and file picker) works on a real phone.
+- [ ] Review placeholders, accepted provider names (VERIFY, generic), the Fire evacuation module text and reminder templates.
+
+### Awaiting review (M3, Draft content)
+
+- [ ] Fire evacuation at Little Acorns (new, `packages/content/src/packs/nursery/modules/fire-evacuation/`): three lessons, questions, fictional site details, no EYFS reference.
+- [ ] Staff and client FAQs and the three release notes in `packages/content/src/lang/en-GB.json`.
+- [ ] Nursery pack additions in `packs/nursery.ts`: accepted providers and approver checklists (Paediatric first aid, Safeguarding, Food hygiene), default auto-assign rule due dates, theme preset colours.
+- [ ] No other module text was changed in M3.
+

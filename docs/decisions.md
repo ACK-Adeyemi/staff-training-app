@@ -830,3 +830,11 @@ Copied from docs/plans/m3.md (chunk 1). Numbers match the plan, so other docs ca
 - The step-up code is checked in the data layer; a blank code is also caught in the dialog before the call, with the same message. The person export file name is `<organisation> <person>-export-<date>.zip`.
 - After an erase the app goes to `#/client/people` and passes the "was anonymised/deleted" message as router navigation state, so the status line shows on the people list.
 - The "Data and retention" More-menu entry shows for anyone holding `settings.view` anywhere. The Export all data button uses `reports.export` held anywhere (the data layer limits a site-scoped manager to their own sites).
+
+## M3 chunk 21
+
+- Track A steps 2, 5 (upload), 6, 8 and 9 live in `e2e/track-a.spec.ts`, desktop project, each starting on the landing page and moving between people through the Presenter panel. The helpers are local to the spec (the other specs keep their own copies, unchanged), so no shared helper file was extracted.
+- Step 6 uses the title "Fire drill for new starters" for the new module so it does not collide with the seeded "Fire evacuation at Little Acorns", whose stats are then opened. Priya (not Daniel) approves in step 5, as in the build pack.
+- F-5 audit: `smoke.spec.ts` was missing Auto-assign rules, Reminders and the Module builder, plus the id routes (builder edit, lesson preview, evidence review); added. High contrast now runs over `m3AllRoutes` (new in `e2e/routes.ts`). Text-scale gained C7, C8, C19/C20. `no-network.spec.ts` gained upload, .ics, Demo AI and the QR step of two-step enrolment (ZIP was already covered).
+- Layout fixes from the 200% text check and screenshot review: the native PDF file input in the C7 link panel overflowed the card and made the page scroll sideways (now `w-full min-w-0`); the phone bottom bar broke "Competitions" mid-word at 390 px (label size now 0.6875rem with no side padding; still wraps safely at 200% text).
+- Screenshot review (390x844 and 1440x900, throwaway script, images under test-results/shots, not committed): C7, C8, C19, C27, S17, S18, C28 read well after the two fixes. The sticky phone preview and the fixed tab bar appear mid-page in full-page captures only because of how full-page screenshots are stitched.
