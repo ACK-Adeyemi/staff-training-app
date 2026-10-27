@@ -126,3 +126,31 @@ test('the 200% text setting is still applied after a reload', async ({ page }) =
   await page.reload();
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).fontSize)).toBe('32px');
 });
+
+// M3 chunk 17 (F-5): C27 and S17 at 200% text on the 390 px phone.
+test('C27 Evidence to check does not clip or overlap at 200% text', async ({ page }) => {
+  await page.goto('./#/client/evidence');
+  await expect(page.getByRole('heading', { level: 1, name: 'Evidence to check' })).toBeVisible();
+  await scale(page);
+  await expectNoClipOrOverlap(page);
+  await page.getByRole('link', { name: 'Ben Carter' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Check a certificate' })).toBeVisible();
+  await expectNoClipOrOverlap(page);
+});
+
+test('S17 Upload certificate does not clip or overlap at 200% text, before and after choosing a file', async ({
+  page,
+}) => {
+  await page.goto('./#/staff/progress');
+  await page.getByRole('link', { name: 'Upload certificate: Paediatric first aid' }).first().click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Upload certificate' })).toBeVisible();
+  await scale(page);
+  await expectNoClipOrOverlap(page);
+  await page.locator('input[type="file"]:not([capture])').setInputFiles({
+    name: 'certificate.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from('%PDF-1.4\n% Fictional.\n%%EOF\n'),
+  });
+  await expect(page.getByRole('button', { name: 'Send for checking' })).toBeVisible();
+  await expectNoClipOrOverlap(page);
+});

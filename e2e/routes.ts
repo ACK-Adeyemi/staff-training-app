@@ -106,3 +106,9 @@ export const m3StatsRoutes: NavEntry[] = [
   { hash: '#/provider/content', label: 'Content' },
   { hash: '#/provider/feedback', label: 'App feedback' },
 ];
+
+/** M3 chunk 17 routes (evidence). Routes with an id in them (#/staff/progress/upload/:requirementId, #/client/evidence/:id) are covered in evidence.spec.ts. */
+export const m3EvidenceRoutes: NavEntry[] = [
+  { hash: '#/client/evidence', label: 'Evidence to check' },
+  { hash: '#/print/first-aiders', label: 'First aiders' },
+];
