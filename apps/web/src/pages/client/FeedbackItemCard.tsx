@@ -40,7 +40,12 @@ export function FeedbackItemCard({ item, module, personName, perms, showModule }
 
   const canRespond =
     actor.clientId !== undefined &&
-    can(perms, 'moduleFeedback.respond', { clientId: actor.clientId, siteIds: [item.siteId] }, 'write');
+    can(
+      perms,
+      'moduleFeedback.respond',
+      { clientId: actor.clientId, siteIds: item.siteId === undefined ? [] : [item.siteId] },
+      'write',
+    );
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['moduleFeedback'] });
   const run = async (action: () => Promise<unknown>): Promise<boolean> => {
     setFailed(false);

@@ -3,8 +3,11 @@
 // event at all for anonymous feedback, because an actor id would name the person).
 import { faqs, feedbackTags, issueTypes, supportFeatures } from '@sta/content';
 import {
+  adminConfig,
   impactPriority,
   providerProjection,
+  startOfLondonDay,
+  twoFactorStatus,
   ticketNumber,
   validateTicket,
   type AppFeedback,
@@ -58,6 +61,12 @@ const ISSUE_IDS = new Set(issueTypes.map((t) => t.id));
 
 const byCreated = (a: { createdAt: string; id: string }, b: { createdAt: string; id: string }): number =>
   a.createdAt === b.createdAt ? (a.id < b.id ? -1 : 1) : a.createdAt < b.createdAt ? -1 : 1;
+const ID_ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+/** An id from the seeded stream alone, with no time component, for items that must not be linkable by time. */
+const randomId = (options: StoreOptions): string =>
+  Array.from({ length: 26 }, (_, i) => ID_ALPHABET[options.rng.int(0, i === 0 ? 7 : 31)]).join('');
+const isLimited = (call: Call): boolean =>
+  call.side === 'client' && twoFactorStatus(call.actor.user, call.actor.now).kind === 'limited';
 const text = (v: unknown): string => (typeof v === 'string' ? v.trim() : '');
 
 /** Context items are short plain strings; the app has already removed anything the person took off. */
@@ -91,7 +100,12 @@ export function createSupportOperations(backend: RawBackend, options: StoreOptio
 
   const inScope = (call: Call, f: ModuleFeedback): boolean =>
     f.clientId === call.clientId &&
-    canAny(call, ['moduleFeedback.view'], { clientId: f.clientId, siteIds: [f.siteId] }, 'read');
+    canAny(
+      call,
+      ['moduleFeedback.view'],
+      { clientId: f.clientId, siteIds: f.siteId === undefined ? [] : [f.siteId] },
+      'read',
+    );
 
   async function visibleFeedback(call: Call, id: string): Promise<ModuleFeedback> {
     const f = await call.find<ModuleFeedback>('moduleFeedback', id);
@@ -107,7 +121,14 @@ export function createSupportOperations(backend: RawBackend, options: StoreOptio
     const f = await call.find<ModuleFeedback>('moduleFeedback', id);
     if (!f || f.clientId !== call.clientId) throw new NotFoundError();
     if (!inScope(call, f)) throw new NotFoundError();
-    if (!canAny(call, ['moduleFeedback.respond'], { clientId: f.clientId, siteIds: [f.siteId] }, 'write')) {
+    if (
+      !canAny(
+        call,
+        ['moduleFeedback.respond'],
+        { clientId: f.clientId, siteIds: f.siteId === undefined ? [] : [f.siteId] },
+        'write',
+      )
+    ) {
       return forbid('permission');
     }
     checkAccountState(call, false);
@@ -150,10 +171,19 @@ export function createSupportOperations(backend: RawBackend, options: StoreOptio
       }
 
       // Anonymous items carry no person at all; the write touches this one store and nothing else.
+      // They also carry nothing that links them to an attempt: a random id, the London day instead of the moment, and
+      // no site when the site is small enough for a few people to be picked out.
+      let siteId: string | undefined = person.primarySiteId;
+      if (input.anonymous) {
+        const here = (await call.all<Person>('people')).filter(
+          (p) => p.clientId === person.clientId && p.primarySiteId === person.primarySiteId && p.status === 'active',
+        );
+        if (here.length < adminConfig.smallSiteMinimum) siteId = undefined;
+      }
       const item = validate('moduleFeedback', {
-        id: call.newId(),
+        id: input.anonymous ? randomId(options) : call.newId(),
         clientId: person.clientId,
-        siteId: person.primarySiteId,
+        ...(siteId !== undefined ? { siteId } : {}),
         ...(input.anonymous ? {} : { personId: person.id }),
         anonymous: input.anonymous,
         moduleId: m.id,
@@ -166,7 +196,7 @@ export function createSupportOperations(backend: RawBackend, options: StoreOptio
         tags,
         ...(body !== '' ? { text: body } : {}),
         status: 'new',
-        createdAt: ctx.now,
+        createdAt: input.anonymous ? startOfLondonDay(new Date(ctx.now)).toISOString() : ctx.now,
       }) as ModuleFeedback;
       await apply([put('moduleFeedback', item)]);
       return structuredClone(item);
@@ -262,7 +292,7 @@ export function createSupportOperations(backend: RawBackend, options: StoreOptio
 
   const appFeedback: AppFeedbackService = {
     async submit(ctx, input) {
-      const call = await beginCall(backend, options, ctx, { allowLimited: true });
+      const call = await beginCall(backend, options, ctx);
       if (call.side === 'provider') return forbid('permission');
       if (!APP_KINDS.includes(input.kind)) return invalidFeedback();
       const body = text(input.text);
@@ -324,7 +354,11 @@ export function createSupportOperations(backend: RawBackend, options: StoreOptio
   async function visibleTicket(call: Call, id: string): Promise<Ticket> {
     const t = await call.find<Ticket>('tickets', id);
     if (!t || t.clientId !== call.clientId) throw new NotFoundError();
-    if (t.raisedBy !== call.actor.user.id && !orgReadable(call, t)) throw new NotFoundError();
+    if (t.raisedBy !== call.actor.user.id) {
+      // A limited admin (two-step sign-in overdue) may use only their own tickets.
+      if (isLimited(call)) return forbid('twoFactorRequired');
+      if (!orgReadable(call, t)) throw new NotFoundError();
+    }
     return t;
   }
 
@@ -447,6 +481,7 @@ export function createSupportOperations(backend: RawBackend, options: StoreOptio
       const call = await ownTicket(ctx);
       const all = await call.all<Ticket>('tickets');
       if (filter?.organisation === true) {
+        if (isLimited(call)) return forbid('twoFactorRequired');
         if (call.side !== 'client' || !holds(call, ['support.viewOrgTickets'])) return forbid('permission');
         return structuredClone(all.filter((t) => orgReadable(call, t)).sort(byCreated));
       }

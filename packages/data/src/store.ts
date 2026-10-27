@@ -64,6 +64,12 @@ const matches = (record: Rec, filter: Filter | undefined): boolean =>
 
 /** Another person's personal settings are theirs alone: everyone else reads a person without `prefs`. */
 function shape(call: Call, store: StoreName, record: Rec): Rec {
+  // Another account's recovery-code hashes and lock counters are internal to the two-step flow.
+  if (store === 'users' && record['id'] !== call.actor.user.id && record['twoFactor']) {
+    const safe = { ...(record['twoFactor'] as Rec) };
+    for (const key of ['recoveryCodeHashes', 'failedCodes', 'lockedUntil']) Reflect.deleteProperty(safe, key);
+    return { ...record, twoFactor: safe };
+  }
   if (store !== 'people' || call.actor.user.personId === record['id']) return record;
   const rest = { ...record };
   delete rest['prefs'];

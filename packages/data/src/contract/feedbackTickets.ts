@@ -43,6 +43,7 @@ import {
   type ModuleFeedback,
   type Notification,
   type ProviderFeedbackProjection,
+  type Person,
   type Ticket,
   type TicketMessage,
   type UserAccount,
@@ -341,6 +342,34 @@ export function runFeedbackTicketsContract(
         expect(text).not.toContain(s.fx.ids.users.jade);
         expect(text).not.toContain('Jade');
         expect(stored).toMatchObject({ clientId: s.fx.ids.clients.a, siteId: s.fx.ids.sites.main });
+      });
+
+      it('keeps anonymous items unlinkable: day-only createdAt, a time-free id, no site for a small site', async () => {
+        const s = await setup();
+        const input = {
+          moduleId: s.lf.moduleId,
+          kind: 'moduleCard' as const,
+          rating: 3,
+          tags: [],
+          anonymous: true,
+        };
+        const item = await s.store.moduleFeedback.submit(s.actors.jade, input);
+        expect(item.createdAt).not.toBe(TODAY);
+        expect(item.createdAt.endsWith('T00:00:00.000Z') || item.createdAt.endsWith('T23:00:00.000Z')).toBe(true);
+        expect(Date.parse(TODAY) - Date.parse(item.createdAt)).toBeLessThan(86_400_000);
+        const named = await s.store.moduleFeedback.submit(s.actors.jade, { ...input, anonymous: false });
+        expect(named.createdAt).toBe(TODAY);
+        expect(item.id.slice(0, 10)).not.toBe(named.id.slice(0, 10));
+        // A site with fewer than three active people loses the site on anonymous items.
+        const people = await dump<Person>(s.admin, 'people');
+        const others = people.filter((p) => p.primarySiteId === s.fx.ids.sites.main && p.id !== s.jadePerson);
+        await s.admin.bulkPut(
+          'people',
+          others.map((p) => ({ ...p, status: 'archived' as const })),
+        );
+        const small = await s.store.moduleFeedback.submit(s.actors.jade, input);
+        expect('siteId' in small).toBe(false);
+        expect((await s.store.moduleFeedback.get(s.actors.priya, small.id)).id).toBe(small.id);
       });
 
       it('takes a lesson thumb and a question report with their targets', async () => {
@@ -1062,6 +1091,27 @@ export function runFeedbackTicketsContract(
         expect((await s.store.faqs.vote(s.actors.riverMgr, faq, true)).helpful).toBe(true);
         expect((await s.store.faqs.myVotes(s.actors.riverMgr)).map((v) => v.faqId)).toEqual([faq]);
         expect(await reasonOf(s.store.moduleFeedback.list(s.actors.riverMgr))).toBe('twoFactorRequired');
+      });
+
+      it('refuses organisation tickets, shared staff tickets and app feedback while limited', async () => {
+        const s = await limited();
+        expect(await reasonOf(s.store.tickets.list(s.actors.riverMgr, { organisation: true }))).toBe(
+          'twoFactorRequired',
+        );
+        const own = await s.store.tickets.raise(s.actors.riverMgr, s.ticketInput({ context: {} }));
+        expect((await s.store.tickets.get(s.actors.riverMgr, own.id)).id).toBe(own.id);
+        const others = (await dump<Ticket>(s.admin, 'tickets')).filter(
+          (t) => t.clientId === s.fx.ids.clients.ot && t.raisedBy !== s.fx.ids.users.riverMgr,
+        );
+        for (const t of others) {
+          expect(await reasonOf(s.store.tickets.get(s.actors.riverMgr, t.id))).toBe('twoFactorRequired');
+          expect(await reasonOf(s.store.tickets.messages(s.actors.riverMgr, t.id))).toBe('twoFactorRequired');
+        }
+        expect(
+          await reasonOf(
+            s.store.appFeedback.submit(s.actors.riverMgr, { kind: 'idea', text: 'More colours', context: {} }),
+          ),
+        ).toBe('twoFactorRequired');
       });
     });
   });

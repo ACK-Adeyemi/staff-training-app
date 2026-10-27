@@ -363,5 +363,95 @@ export function runM3FoundationContract(
         expect(error).toBeInstanceOf(AccountStateError);
       });
     });
+
+    describe('users.put keeps security fields (M3 security review)', () => {
+      const rejected = async (p: Promise<unknown>): Promise<unknown> =>
+        p.then(
+          () => undefined,
+          (e: unknown) => e,
+        );
+      async function withTwoFactor() {
+        const s = await setup();
+        const all = ((await s.admin.dumpAll()) as Record<string, UserAccount[]>)['users']!;
+        const tariq = all.find((u) => u.id === s.fx.ids.users.riverMgr)!;
+        const daniel = all.find((u) => u.id === s.fx.ids.users.daniel)!;
+        await s.admin.bulkPut('users', [
+          { ...tariq, twoFactor: { enrolledAt: at, recoveryCodesLeft: 3, recoveryCodeHashes: ['x'] } },
+          { ...daniel, twoFactorRequiredSince: at },
+        ]);
+        return s;
+      }
+      const stored = async (s: Awaited<ReturnType<typeof setup>>, id: string): Promise<UserAccount> =>
+        ((await s.admin.dumpAll()) as Record<string, UserAccount[]>)['users']!.find((u) => u.id === id)!;
+
+      it('a manager cannot clear their own two-step sign-in or edit their own account', async () => {
+        const s = await withTwoFactor();
+        const tariq = client(s.fx.ids.users.riverMgr, s.fx.ids.clients.ot);
+        const before = await stored(s, s.fx.ids.users.riverMgr);
+        const copy = { ...before };
+        delete copy.twoFactor;
+        const error = await rejected(s.store.users.put(tariq, copy));
+        expect(error === undefined || error instanceof ForbiddenError).toBe(true);
+        expect(await stored(s, s.fx.ids.users.riverMgr)).toEqual(before);
+      });
+
+      it("Priya cannot clear Daniel's twoFactorRequiredSince, change his status, email or login", async () => {
+        const s = await withTwoFactor();
+        const priya = client(s.fx.ids.users.priya, s.fx.ids.clients.a);
+        const before = await stored(s, s.fx.ids.users.daniel);
+        const patched = {
+          ...before,
+          status: 'suspended' as const,
+          email: 'other@example.test',
+          login: { method: 'emailPassword' as const, pinSet: false },
+          displayName: 'Daniel Renamed',
+        };
+        delete (patched as Partial<UserAccount>).twoFactorRequiredSince;
+        const error = await rejected(s.store.users.put(priya, patched));
+        if (error === undefined) {
+          expect(await stored(s, s.fx.ids.users.daniel)).toEqual({ ...before, displayName: 'Daniel Renamed' });
+        } else expect(error).toBeInstanceOf(ForbiddenError);
+        const now = await stored(s, s.fx.ids.users.daniel);
+        expect(now.twoFactorRequiredSince).toBe(at);
+        expect(now.status).toBe(before.status);
+        expect(now.email).toBe(before.email);
+        expect(now.login).toEqual(before.login);
+      });
+
+      it("Tariq cannot change Gina's email or status", async () => {
+        const s = await withTwoFactor();
+        const tariq = client(s.fx.ids.users.riverMgr, s.fx.ids.clients.ot);
+        const before = await stored(s, s.fx.ids.users.gina);
+        const error = await rejected(
+          s.store.users.put(tariq, { ...before, email: 'x@example.test', status: 'suspended' }),
+        );
+        expect(error).toBeInstanceOf(ForbiddenError);
+        expect(await stored(s, s.fx.ids.users.gina)).toEqual(before);
+      });
+
+      it('Rory (no team.manageRoles) cannot write an admin account at all', async () => {
+        const s = await withTwoFactor();
+        const rory = client(s.fx.ids.users.rory, s.fx.ids.clients.ot);
+        const before = await stored(s, s.fx.ids.users.gina);
+        const error = await rejected(s.store.users.put(rory, { ...before, displayName: 'Changed' }));
+        expect(error).toBeInstanceOf(ForbiddenError);
+        expect(await stored(s, s.fx.ids.users.gina)).toEqual(before);
+      });
+
+      it("another person's two-step internals are not returned on reads", async () => {
+        const s = await withTwoFactor();
+        const gina = client(s.fx.ids.users.gina, s.fx.ids.clients.ot);
+        const seen = await s.store.users.get(gina, s.fx.ids.users.riverMgr);
+        expect(seen.twoFactor?.recoveryCodeHashes).toBeUndefined();
+        expect(seen.twoFactor?.failedCodes).toBeUndefined();
+        expect(seen.twoFactor?.lockedUntil).toBeUndefined();
+        expect(seen.twoFactor?.enrolledAt).toBe(at);
+        const own = await s.store.users.get(
+          client(s.fx.ids.users.riverMgr, s.fx.ids.clients.ot),
+          s.fx.ids.users.riverMgr,
+        );
+        expect(own.twoFactor?.recoveryCodeHashes).toEqual(['x']);
+      });
+    });
   });
 }

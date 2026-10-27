@@ -29,7 +29,7 @@ const jpegHasMetadata = (b: Uint8Array): boolean => {
       i += 1; // fill byte
       continue;
     }
-    if (marker === 0xe1) return true; // APP1: Exif or XMP
+    if (marker === 0xe1 || marker === 0xed || marker === 0xfe) return true; // APP1 Exif/XMP, APP13 Photoshop, COM comment
     if (marker === 0xda || marker === 0xd9) return false; // scan data or end: headers are over
     if (marker === 0x01 || (marker >= 0xd0 && marker <= 0xd8)) {
       i += 2; // no length

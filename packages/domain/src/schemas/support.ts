@@ -7,7 +7,8 @@ export const moduleFeedbackSchema = z
   .object({
     id: idSchema,
     clientId: idSchema,
-    siteId: idSchema,
+    /** Absent on anonymous items from a small site, so a few people cannot be picked out (client-wide admins only). */
+    siteId: idSchema.optional(),
     /** Absent when anonymous: no name and no user id is stored at all (assumption 18). */
     personId: idSchema.optional(),
     anonymous: z.boolean(),
@@ -30,6 +31,7 @@ export const moduleFeedbackSchema = z
       ctx.addIssue({ code: 'custom', path: [path], message });
     };
     if (f.anonymous && f.personId !== undefined) fail('personId', 'Anonymous feedback has no person');
+    if (!f.anonymous && f.siteId === undefined) fail('siteId', 'Named feedback needs a site');
     if (f.kind === 'lessonThumb' && (f.lessonId === undefined || f.thumb === undefined))
       fail('lessonId', 'A lesson thumb needs a lesson and a thumb');
     if (f.kind === 'questionReport' && f.questionId === undefined)

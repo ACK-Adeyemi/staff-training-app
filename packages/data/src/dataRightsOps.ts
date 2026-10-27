@@ -213,6 +213,10 @@ export function createDataRightsOperations(backend: RawBackend, options: StoreOp
       throw new ValidationError(['mode: choose anonymise or deleteEverything']);
     }
     checkAccountState(call, false);
+    // An admin login is removed through team.revoke, which holds the last-owner and role-editing guards.
+    if ((await mine<UserAccount>(call, 'users')).some((u) => u.personId === id && u.side === 'client')) {
+      throw new RuleError('revokeAccessFirst');
+    }
     checkStepUp(input.code);
     const typed = typeof input.confirmName === 'string' ? input.confirmName.trim() : '';
     if (typed !== `${person.firstName} ${person.lastName}`) throw new RuleError('invalidName');

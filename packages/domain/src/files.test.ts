@@ -103,6 +103,11 @@ describe('hasImageMetadata: JPEG', () => {
     expect(hasImageMetadata(jpeg(xmpSeg), 'image/jpeg')).toBe(true);
   });
 
+  it('is true for a Photoshop APP13 segment and a COM comment segment', () => {
+    expect(hasImageMetadata(jpeg(seg(0xed, [...ascii('Photoshop 3.0'), 0])), 'image/jpeg')).toBe(true);
+    expect(hasImageMetadata(jpeg(seg(0xfe, [...ascii('taken at home')])), 'image/jpeg')).toBe(true);
+  });
+
   it('finds the segment wherever it is among the headers', () => {
     expect(hasImageMetadata(u8([0xff, 0xd8], jfif, dqt, exifSeg, sof, sos, [0x01], [0xff, 0xd9]), 'image/jpeg')).toBe(
       true,

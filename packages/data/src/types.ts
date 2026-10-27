@@ -244,6 +244,7 @@ export type RuleName =
   | 'invalidTheme'
   | 'invalidScope'
   | 'invalidName'
+  | 'revokeAccessFirst'
   | 'staffTicketsOff'
   | 'duplicateRule'
   | 'invalidSubmission'

@@ -469,6 +469,41 @@ export function runExportsRetentionContract(
         expect((await dump<UserAccount>(s.admin, 'users')).map((u) => u.id)).not.toContain(s.keys.users['hannah']);
       });
 
+      it('refuses to erase a person who has an admin login: access is revoked first (self, last owner, others)', async () => {
+        const s: S = await setup();
+        const users = await dump<UserAccount>(s.admin, 'users');
+        const before = await s.admin.dumpAll();
+        for (const [actor, userId] of [
+          [s.actors.priya, s.ids.users.priya],
+          [s.actors.priya, s.ids.users.daniel],
+          [s.actors.rory, s.ids.users.priya],
+        ] as const) {
+          const target = users.find((u) => u.id === userId)!;
+          const person = (await dump<Person>(s.admin, 'people')).find((p) => p.id === target.personId)!;
+          const error = await refusal(
+            s.store.people.erase(actor, person.id, {
+              mode: 'anonymise',
+              confirmName: `${person.firstName} ${person.lastName}`,
+              code: CODE,
+            }),
+          );
+          expect(error).toBeInstanceOf(Error);
+        }
+        const priyaPerson = users.find((u) => u.id === s.ids.users.priya)!.personId!;
+        const p = (await dump<Person>(s.admin, 'people')).find((x) => x.id === priyaPerson)!;
+        expect(
+          await ruleOf(
+            s.store.people.erase(s.actors.priya, priyaPerson, {
+              mode: 'deleteEverything',
+              confirmName: `${p.firstName} ${p.lastName}`,
+              code: CODE,
+            }),
+          ),
+        ).toBe('revokeAccessFirst');
+        expect((await dump<UserAccount>(s.admin, 'users')).map((u) => u.id)).toContain(s.ids.users.priya);
+        expect(await s.admin.dumpAll()).toEqual(before);
+      });
+
       it('audits the erase with the mode and without the name', async () => {
         const s: S = await setup();
         const last = await surname(s, s.jade);

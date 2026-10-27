@@ -517,6 +517,16 @@ export function audit(
 const clientIdOf = (tenant: string | undefined): string | undefined =>
   tenant === undefined || tenant === PROVIDER || tenant === UNKNOWN ? undefined : tenant;
 
+const SECURITY_FIELDS = [
+  'twoFactorRequiredSince',
+  'twoFactor',
+  'status',
+  'email',
+  'login',
+  'side',
+  'clientId',
+] as const;
+
 export async function authorizePut(
   call: Call,
   store: StoreName,
@@ -566,10 +576,28 @@ export async function authorizePut(
       forbid('permission');
     }
   }
+  let record = rec;
+  if (store === 'users' && call.side !== 'provider') {
+    const u = rec as unknown as UserAccount;
+    const old = existing as unknown as UserAccount | undefined;
+    // Admin logins change only through the team operations, which hold the owner and role-editing guards.
+    if (u.side === 'client' || old?.side === 'client') {
+      if (!holds(call, ['team.manageRoles']) || !canEditRolesOf(call.actor.user.id, u.id)) forbid('selfEdit');
+    }
+    // Security fields are never writable through a generic put: stored values stay, new accounts start without them.
+    const kept: Rec = { ...rec };
+    const from = old as unknown as Rec | undefined;
+    for (const key of SECURITY_FIELDS) {
+      const value = from ? from[key] : undefined;
+      if (value === undefined) Reflect.deleteProperty(kept, key);
+      else kept[key] = value;
+    }
+    record = kept;
+  }
   if (call.side !== 'provider') {
     checkAccountState(call, isCreate && (store === 'people' || store === 'users'));
   }
-  return { record: rec, extra: store === 'people' ? await cancelOpenAssignments(call, rec) : [] };
+  return { record, extra: store === 'people' ? await cancelOpenAssignments(call, rec) : [] };
 }
 
 /** Archiving a person cancels their open assignments in the same batch (plan Data package). */

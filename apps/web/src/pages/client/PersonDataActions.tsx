@@ -40,6 +40,7 @@ function EraseForm({ person, onClose }: { person: Person; onClose: () => void })
     } catch (err) {
       if (err instanceof RuleError && err.rule === 'wrongCode') setError(t('dataPage.codeWrong'));
       else if (err instanceof RuleError && err.rule === 'stepUpRequired') setError(t('dataPage.codeNeeded'));
+      else if (err instanceof RuleError && err.rule === 'revokeAccessFirst') setError(t('dataPage.erase.revokeFirst'));
       else if (err instanceof RuleError && err.rule === 'invalidName') setError(t('dataPage.erase.nameWrong'));
       else setError(t('dataPage.erase.error'));
     } finally {
