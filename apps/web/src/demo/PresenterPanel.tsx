@@ -40,8 +40,9 @@ export function PresenterPanel({ open, onClose }: { open: boolean; onClose: () =
       await navigate(p.side === 'client' ? '/client' : '/staff');
       // The actor changed, so anything already loaded belongs to someone else.
       await queryClient.invalidateQueries();
+      // Closing last means "the panel is gone" also means "the jump is done", so nothing navigates a moment later.
+      close();
     })();
-    close();
   };
   const close = () => {
     setConfirming(false);

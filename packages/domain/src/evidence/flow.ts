@@ -124,3 +124,13 @@ export function londonWorkingDaysBetween(from: Date, to: Date): number {
 /** Highlight a submission that has waited more than `limit` working days. */
 export const isWaitingTooLong = (createdAt: string | Date, now: Date, limit = 3): boolean =>
   londonWorkingDaysBetween(new Date(createdAt), now) > limit;
+
+/**
+ * True when the person looking at a submission uploaded it or is the person it is about. The screen then switches the
+ * decision buttons off; the data layer applies the full approval rule (including the single-admin exception).
+ */
+export const isOwnOrAboutSelf = (
+  submission: Pick<EvidenceSubmission, 'uploadedBy' | 'personId'>,
+  viewer: { userId: string; personId?: string },
+): boolean =>
+  submission.uploadedBy === viewer.userId || (viewer.personId !== undefined && submission.personId === viewer.personId);

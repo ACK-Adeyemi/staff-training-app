@@ -21,7 +21,7 @@
 import { describe, expect, it } from 'vitest';
 import type { EvidenceSubmission } from '../schemas/evidence';
 import { person, requirement, submissionWaiting } from '../progress/testFixtures';
-import { expiryFor, isWaitingTooLong, londonWorkingDaysBetween, reviewTransition } from './flow';
+import { expiryFor, isOwnOrAboutSelf, isWaitingTooLong, londonWorkingDaysBetween, reviewTransition } from './flow';
 
 const REVIEWER = '01HZX0000000000000000000R1';
 const NOW = new Date('2026-10-19T09:00:00.000Z');
@@ -239,5 +239,19 @@ describe('isWaitingTooLong', () => {
   it('accepts a Date and a custom limit', () => {
     expect(isWaitingTooLong(new Date(created), new Date('2026-10-21T10:00:00Z'), 1)).toBe(true);
     expect(isWaitingTooLong(new Date(created), new Date('2026-10-20T10:00:00Z'), 1)).toBe(false);
+  });
+});
+
+describe('isOwnOrAboutSelf', () => {
+  const sub = { uploadedBy: 'u1', personId: 'p1' };
+  it('is true for the uploader', () => {
+    expect(isOwnOrAboutSelf(sub, { userId: 'u1' })).toBe(true);
+  });
+  it('is true for the person it is about', () => {
+    expect(isOwnOrAboutSelf(sub, { userId: 'u2', personId: 'p1' })).toBe(true);
+  });
+  it('is false for anyone else, and when the viewer has no person record', () => {
+    expect(isOwnOrAboutSelf(sub, { userId: 'u2', personId: 'p2' })).toBe(false);
+    expect(isOwnOrAboutSelf(sub, { userId: 'u2' })).toBe(false);
   });
 });

@@ -437,7 +437,8 @@ describe('C27 Evidence to check: review', () => {
     const o = await open({ actor: as('daniel') });
     await go(o, o.sub().id);
     await userEvent.click(screen.getByRole('button', { name: 'Approve' }));
-    await screen.findByRole('status');
+    // Daniel is in the two-step grace period, so the shell also shows a status banner: look for the message itself.
+    await screen.findByText('Approved.');
     expect((await stored(o.c, o.sub().id)).reviewerId).toBe(o.c.keys.users['daniel']);
   });
 
@@ -523,13 +524,16 @@ describe('First aiders print page', () => {
 
 describe('C3 upload on behalf and Send reminder', () => {
   const markPage = (keys: SeedKeys) => `/client/people/${need(keys.personas['mark'])}`;
-  const open = async (opts: { actor?: (k: SeedKeys) => ActorContext; perms?: string[] } = {}) => {
+  const open = async (
+    opts: { actor?: (k: SeedKeys) => ActorContext; perms?: string[]; prepare?: (c: Ctx) => Promise<void> } = {},
+  ) => {
     let c!: Ctx;
     const r = await renderRoute('/client', 'client', {
       ...(opts.actor ? { actor: opts.actor } : {}),
       prepare: async (x) => {
         c = x;
         if (opts.perms) await addUser(x, opts.perms);
+        if (opts.prepare) await opts.prepare(x);
       },
     });
     await r.router.navigate(markPage(c.keys));
@@ -569,7 +573,26 @@ describe('C3 upload on behalf and Send reminder', () => {
   });
 
   it('sends Mark a reminder', async () => {
-    const { c } = await open();
+    // Mark's first aid certificate has already run out, which the reminder rules do not chase on their own (only an
+    // open assignment past its due date, or a certificate about to run out, is chased). So Mark is given one.
+    const { c } = await open({
+      prepare: async ({ handle, keys }) => {
+        const module = need((await dump<{ id: string }>(handle, 'modules'))[0]);
+        await handle.admin.bulkPut('assignments', [
+          {
+            id: '01ZZ0C170000000000000000A2',
+            clientId: need(keys.clients['littleAcorns']),
+            personId: need(keys.personas['mark']),
+            target: { moduleId: module.id },
+            dueAt: '2026-10-01T00:00:00.000Z',
+            source: 'manual',
+            assignedBy: need(keys.users['priya']),
+            createdAt: '2026-09-20T00:00:00.000Z',
+            status: 'open',
+          },
+        ]);
+      },
+    });
     await userEvent.click(await screen.findByRole('button', { name: 'Send reminder' }));
     expect((await screen.findByRole('status')).textContent).toContain('Reminder sent.');
     const notes = (await dump<Notification>(c.handle, 'notifications')).filter(

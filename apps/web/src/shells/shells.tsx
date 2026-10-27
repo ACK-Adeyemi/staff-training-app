@@ -82,6 +82,9 @@ function ClientFrame({ twoFactor }: { twoFactor: TwoFactorStatus }) {
             ...(perms.data && holdsAnywhere(perms.data, 'moduleFeedback.view')
               ? [item('/client/module-feedback', t('feedback.inbox.title'), 'help')]
               : []),
+            ...(perms.data && holdsAnywhere(perms.data, 'evidence.view')
+              ? [item('/client/evidence', t('evidenceFlow.queueTitle'), 'check')]
+              : []),
             item('/client/team', t('team.title'), 'user'),
             item('/client/settings', t('nav.client.settings'), 'more'),
             ...(perms.data && holdsAnywhere(perms.data, 'billing.view')

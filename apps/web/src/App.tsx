@@ -15,6 +15,8 @@ const DAY_MS = 86_400_000;
 type Side = 'staff' | 'client' | 'provider';
 const sideOf = (pathname: string): Side => {
   const first = pathname.split('/')[1];
+  // /print/... pages (the first aiders list) are client pages outside the client chrome.
+  if (first === 'print') return 'client';
   return first === 'client' || first === 'provider' ? first : 'staff';
 };
 

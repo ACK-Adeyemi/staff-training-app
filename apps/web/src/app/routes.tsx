@@ -59,6 +59,10 @@ export const routes: RouteObject[] = [
       },
       { path: '/doc/:attachmentId', element: <OrgDoc /> },
       {
+        path: '/print/first-aiders',
+        lazy: async () => ({ Component: (await import('../pages/client/FirstAiders')).FirstAiders }),
+      },
+      {
         path: '/staff',
         lazy: async () => ({ Component: (await import('../shells/shells')).StaffShell }),
         children: [
@@ -70,6 +74,12 @@ export const routes: RouteObject[] = [
           { path: 'module/:moduleId/done', element: <Results /> },
           { path: 'notes', element: <MyNotes /> },
           { path: 'progress', element: <Progress /> },
+          {
+            path: 'progress/upload/:requirementId',
+            lazy: async () => ({
+              Component: (await import('../pages/staff/UploadCertificate')).UploadCertificate,
+            }),
+          },
           { path: 'compete', element: <Compete /> },
           { path: 'me', element: <Me /> },
           { path: 'me/display', element: <Display /> },
@@ -129,6 +139,14 @@ export const routes: RouteObject[] = [
           {
             path: 'organise',
             lazy: async () => ({ Component: (await import('../pages/client/Organise')).Organise }),
+          },
+          {
+            path: 'evidence',
+            lazy: async () => ({ Component: (await import('../pages/client/Evidence')).Evidence }),
+          },
+          {
+            path: 'evidence/:id',
+            lazy: async () => ({ Component: (await import('../pages/client/EvidenceReview')).EvidenceReview }),
           },
           { path: 'reports', element: <Reports /> },
           {
