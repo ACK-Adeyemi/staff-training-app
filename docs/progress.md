@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M3
 Milestone base commit: bb460c4
-Next step: M3 chunk 15b (Module Builder C7: routes modules/new and modules/:id/edit replace the placeholder page; authoring.spec.ts builder tests) per docs/plans/m3.md. Open: nothing filters by site switcher yet (chunk 19); onboarding hide not persisted; two-tab seed race.
+Next step: M3 chunk 16 (Stats and feedback UI: C8 full, C9, C29, S5 thumbs, S6 report, S7 card, minimal P5 and P10, feedback.spec.ts) per docs/plans/m3.md per docs/plans/m3.md. Open: nothing filters by site switcher yet (chunk 19); onboarding hide not persisted; two-tab seed race.
 
 ## Milestones
 - [x] M0 Foundations
@@ -32,7 +32,7 @@ M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 12 UI components
 - [x] 13 Client foundations UI (tests b623e08, impl 3f00424)
 - [x] 14 Billing UI and Demo AI (tests f1de9c8, impl b25fa65)
-- [ ] 15 Module Library and Builder UI: 15a library, preview, C4 group done (tests, impl ccc3e09); 15b builder C7 next
+- [x] 15 Module Library and Builder UI (15a tests/impl ccc3e09; 15b tests 818c1c0, impl f01ee4d)
 - [ ] 16 Stats and feedback UI
 - [ ] 17 Evidence UI
 - [ ] 18 Rules, reminders, notifications and calendars UI
@@ -130,3 +130,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-27: M3 chunk 14 billing UI and Demo AI landed (tests f1de9c8, impl b25fa65), check.sh green. Stopping at a clean point; chunk 15 next.
 - 2026-10-27: M3 chunk 15a module library, preview and group assign landed (ccc3e09); billing.spec.ts:120 flaked twice under load (first banner wait now 20s). Chunk 15b next.
 - 2026-10-27: M3 chunk 15b module builder landed; check.sh green except the known billing.spec.ts:120 load flake (passes alone). Chunk 16 next.
+- 2026-10-27: M3 chunk 15b module builder landed (f01ee4d). Full e2e green on rerun (465 passed); billing.spec.ts:120 flake appeared only in runs overlapping other load. Chunk 16 next.
