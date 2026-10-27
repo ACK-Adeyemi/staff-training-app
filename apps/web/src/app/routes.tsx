@@ -53,6 +53,10 @@ export const routes: RouteObject[] = [
       // Outside the staff chrome: a certificate prints cleanly and an organisation document opens in its own tab.
       { path: '/staff/module/:moduleId/certificate', element: <Certificate /> },
       { path: '/staff/progress/record', element: <TrainingRecord /> },
+      {
+        path: '/client/billing/invoices/:invoiceId/print',
+        lazy: async () => ({ Component: (await import('../pages/client/InvoicePrint')).InvoicePrint }),
+      },
       { path: '/doc/:attachmentId', element: <OrgDoc /> },
       {
         path: '/staff',
@@ -114,6 +118,22 @@ export const routes: RouteObject[] = [
           { path: 'reports', element: <Reports /> },
           { path: 'reports/matrix', element: <Matrix /> },
           { path: 'modules/:moduleId/stats', element: <ModuleStats /> },
+          {
+            path: 'billing',
+            lazy: async () => ({ Component: (await import('../pages/client/Billing')).Billing }),
+          },
+          {
+            path: 'billing/add-ons',
+            lazy: async () => ({ Component: (await import('../pages/client/AddOns')).AddOns }),
+          },
+          {
+            path: 'billing/pay',
+            lazy: async () => ({ Component: (await import('../pages/client/PayNow')).PayNow }),
+          },
+          {
+            path: 'modules/:moduleId/preview/:lessonId',
+            lazy: async () => ({ Component: (await import('../pages/client/ModulePreview')).ModulePreview }),
+          },
           { path: 'display', element: <Display /> },
           { path: 'settings', element: <Settings /> },
           { path: 'team', element: <Team /> },

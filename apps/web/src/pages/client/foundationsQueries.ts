@@ -5,7 +5,7 @@ import { ForbiddenError } from '@sta/data';
 import { useActor, useClock, useStore } from '../../app/hooks';
 
 /** A key that changes with the person and the demo day, so Fast-forward and persona changes show straight away. */
-function useScopeKey(name: string): string[] {
+export function useScopeKey(name: string): string[] {
   const actor = useActor();
   const clock = useClock();
   return [name, actor.userId, actor.clientId ?? '', londonDateString(clock.now())];

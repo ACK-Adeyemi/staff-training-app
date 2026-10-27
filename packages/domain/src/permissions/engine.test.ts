@@ -13,7 +13,15 @@ import { describe, expect, it } from 'vitest';
 import { idSchema } from '../schemas/primitives';
 import type { Role, RoleAssignment } from '../schemas/access';
 import { clientCatalogue, providerCatalogue } from './catalogue';
-import { can, canApproveEvidence, canEditRolesOf, canGrant, effectivePermissions, lastOwnerGuard } from './engine';
+import {
+  can,
+  canApproveEvidence,
+  canEditRolesOf,
+  canGrant,
+  effectivePermissions,
+  holdsAnywhere,
+  lastOwnerGuard,
+} from './engine';
 
 const id = (tag: string): string => {
   // Ids use Crockford base32 (no I, L, O or U), so readable tags are mapped onto valid letters.
@@ -646,5 +654,15 @@ describe('canApproveEvidence', () => {
     const result = canApproveEvidence(actor, submission(), ctx(1, true));
     expect(result.allowed).toBe(true);
     expect(result.selfApproved).toBeUndefined();
+  });
+});
+
+describe('holdsAnywhere', () => {
+  const perms = [{ permissionId: 'billing.view', scopes: [{ type: 'sites' as const, ids: ['s1'] }], sources: [] }];
+  it('is true for a held permission whatever its scope', () => {
+    expect(holdsAnywhere(perms, 'billing.view')).toBe(true);
+  });
+  it('is false for a permission that is not held', () => {
+    expect(holdsAnywhere(perms, 'billing.manage')).toBe(false);
   });
 });

@@ -4,13 +4,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Button, Markdown, PageHeader, Stepper } from '@sta/ui';
 import type { ContentBlock, Lesson, Module } from '@sta/domain';
 import { useActor, useStore, useT } from '../../app/hooks';
+import { ExplainThis } from '../ExplainThis';
 import { LearnMoreGroups } from './LearnMoreList';
 import { ReadAloud } from './ReadAloud';
 import { LearningFrame } from './LearningFrame';
 import { NoteSheet, NotesButton } from './Notes';
 import { focusLink } from './styles';
 
-function Block({
+export function Block({
   block,
   acknowledged,
   onAcknowledge,
@@ -144,6 +145,7 @@ function Player({ module, lesson, organisationName }: { module: Module; lesson: 
           />
         ) : null}
       </div>
+      <ExplainThis moduleId={moduleId} lessonId={lesson.id} admin={false} />
       {failed ? <p role="alert">{t('staff.lesson.saveError')}</p> : null}
       <div className="flex gap-3">
         <Button

@@ -91,7 +91,8 @@
       "engage": "Competitions",
       "reports": "Reports",
       "settings": "Settings",
-      "help": "Help"
+      "help": "Help",
+      "billing": "Billing"
     },
     "provider": {
       "overview": "Overview",
@@ -680,7 +681,7 @@
       "back": "Back to the module"
     },
     "accountNotice": {
-      "speakToManager": "Some things are paused for now. Speak to your manager if you need something changed."
+      "speakToManager": "Your organisation's account needs attention. Please speak to your manager."
     }
   },
   "doc": {
@@ -1861,7 +1862,8 @@
       "paid": "Paid",
       "due": "Due",
       "failed": "Failed",
-      "refunded": "Refunded"
+      "refunded": "Refunded",
+      "overdue": "Overdue"
     },
     "total": "Total",
     "tax": "VAT",
@@ -1879,11 +1881,57 @@
     "details": "Billing details",
     "contact": "Billing contact email",
     "updateContact": "Update contact",
-    "requestChange": "Ask to change billing details",
+    "requestChange": "Request a change",
     "requested": "Your request has been sent.",
     "noAccess": "You do not have access to billing. Ask the Account Owner.",
     "pastDue": "Your last payment did not go through.",
-    "empty": "No invoices yet."
+    "empty": "No invoices yet.",
+    "addOnUsage": "Add-on usage",
+    "renews": "Renews on {date}",
+    "planName": "Plan: {name}",
+    "pending": "Changing to {name} on {date}.",
+    "limit": {
+      "ownModules": "Your own modules",
+      "savedThemes": "Saved themes",
+      "admins": "Administrators",
+      "autoAssignRules": "Automatic assigning rules",
+      "liveCompetitions": "Live competitions",
+      "customClientRoles": "Custom roles",
+      "battlesPerMonth": "Battle Rooms each month"
+    },
+    "paymentMethod": "Payment method",
+    "cardEnding": "{brand} ending {last4}",
+    "cardExpires": "Expires {month}/{year}",
+    "newPlan": "New plan",
+    "choosePlan": "Choose a plan",
+    "stepUpCode": "Step-up code",
+    "previewTitle": "What would change",
+    "newPrice": "New price: {amount} a month",
+    "appliesNow": "This starts straight away.",
+    "appliesAtRenewal": "This starts on {date}. Until then you keep your current plan.",
+    "readOnlyItems": "These would become read-only: {items}",
+    "billingName": "Billing name",
+    "address": "Address",
+    "vatNumber": "VAT number",
+    "notSet": "Not set",
+    "sendRequest": "Send request",
+    "requestTitle": "Request a change to your billing details",
+    "requestHelp": "We will check the change and update your details. Your invoices stay as they were issued.",
+    "nothingChanged": "Change at least one detail first.",
+    "print": "Print",
+    "backToBilling": "Back to plan and billing",
+    "invoiceFor": "Invoice for {name}",
+    "issued": "Issued {date}",
+    "dueOn": "Due {date}",
+    "line": "Item",
+    "amount": "Amount",
+    "payTitle": "Pay your invoice",
+    "payIntro": "Pay what is outstanding to bring your account back to normal.",
+    "amountDue": "Amount due: {amount}",
+    "fakeCard": "Demo card ending 4242",
+    "nothingToPay": "There is nothing to pay right now.",
+    "paying": "Paying",
+    "viewInvoices": "See your invoices"
   },
   "addOns": {
     "title": "Add-ons",
@@ -1893,7 +1941,7 @@
     "turnOn": "Turn on",
     "turnOff": "Turn off",
     "trial": "Try it free",
-    "request": "Ask the Account Owner",
+    "request": "Request this add-on",
     "requested": "Your request has been sent.",
     "cap": "Spending limit",
     "capHelp": "We stop the add-on when it reaches this limit.",
@@ -1931,7 +1979,28 @@
         "what": "Our team sets up your account, loads your people and applies your branding.",
         "example": "A group of eight nurseries has all its staff, teams and sites set up before the first day."
       }
-    }
+    },
+    "locked": "Not switched on. People with billing access can turn it on.",
+    "requestTitle": "Request {name}",
+    "requestHelp": "We will let the people with billing access know.",
+    "noteLabel": "Note (optional, up to 300 characters)",
+    "sendRequest": "Send request",
+    "noRequests": "No requests waiting.",
+    "requestLine": "{person} asked for {addOn}",
+    "requestNote": "Note: {note}",
+    "someone": "A colleague",
+    "onUntil": "On until {date}",
+    "turnOnTitle": "Turn on {name}?",
+    "turnOffTitle": "Turn off {name}?",
+    "confirmPriceFlat": "Price: {price} a month.",
+    "confirmPriceUsage": "Price: {price} for each {unit} after the first {included} each month.",
+    "confirmStart": "Billing starts today.",
+    "confirmProrationFlat": "The first month is charged in proportion to the days left in this billing period.",
+    "confirmProrationUsage": "You only pay for what you use, so nothing is split across the month.",
+    "confirmInvoice": "It will show on your next invoice on {date}.",
+    "turnOffNote": "It stays on until {date}, then switches off. You can turn it on again before then.",
+    "confirm": "Confirm",
+    "unitCount": "{used} used"
   },
   "account": {
     "title": "Account",
@@ -2256,7 +2325,11 @@
     "off": "The AI assistant is not switched on for your organisation.",
     "sourceLine": "Source: {source}",
     "close": "Close",
-    "disclaimer": "Check anything important with your manager."
+    "disclaimer": "Check anything important with your manager.",
+    "explainButton": "Explain this in simpler words",
+    "basedOn": "Based on this lesson only",
+    "resultTitle": "In simpler words",
+    "staffError": "We could not explain that right now. Please try again."
   },
   "onboarding": {
     "title": "Getting started",
@@ -2284,5 +2357,15 @@
     "loadError": "We could not load your checklist. Please try again.",
     "show": "Show this list",
     "go": "Go there"
+  },
+  "preview": {
+    "title": "Preview as a learner",
+    "intro": "This is how the lesson looks on a phone.",
+    "lessonTitle": "Lesson: {title}",
+    "notFound": "We could not find that lesson.",
+    "explainLocked": "Explain this in simpler words is an extra feature. Ask someone with billing access to turn it on.",
+    "explainLockedManage": "You can turn it on from Add-ons.",
+    "goToAddOns": "Go to Add-ons",
+    "requestSent": "Your request has been sent."
   }
 }

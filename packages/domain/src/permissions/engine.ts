@@ -93,6 +93,13 @@ export function can(perms: EffectivePermission[], permissionId: string, target: 
   return p !== undefined && p.scopes.some((s) => scopeMatches(s, target, mode));
 }
 
+/**
+ * Is the permission held at all, whatever its scope? For organisation-wide things such as billing, where the data layer
+ * also asks only whether the person holds it. Use `can` when a particular site or person matters.
+ */
+export const holdsAnywhere = (perms: EffectivePermission[], permissionId: string): boolean =>
+  perms.some((p) => p.permissionId === permissionId);
+
 /** Does one of the granter's scopes (or their union, for sites and clients) cover the requested scope? */
 const covers = (held: EffectiveScope[], requested: Scope, clientId?: string): boolean => {
   if (held.some((s) => s.type === 'all')) return true;

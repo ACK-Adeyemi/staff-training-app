@@ -550,6 +550,10 @@ export type BillingOverview = {
   pendingPackageId?: Id;
   billingContact: string;
   paymentMethod?: { brand: string; last4: string; expMonth: number; expYear: number };
+  /** What the invoices are made out to. The profile itself only changes through a request. */
+  profile?: { billingName: string; address: string; vatNumber?: string };
+  /** How much of each limit is used now (the same counts the plan change preview uses). */
+  usage: Record<string, number>;
 };
 
 /** Billing for client admins: `billing.view` to read, `billing.manage` to change (M3 assumptions 40, 41). */
@@ -565,6 +569,8 @@ export interface BillingService {
   /** Needs the step-up code. */
   updateContact(ctx: ActorContext, email: string, code: string): Promise<void>;
   previewPlanChange(ctx: ActorContext, packageId: Id): Promise<PlanPreview>;
+  /** The packages the organisation could move to (name only; prices come from the preview). Needs `billing.view`. */
+  plans(ctx: ActorContext): Promise<{ id: Id; name: string }[]>;
   /** Needs the step-up code. An upgrade applies now, a downgrade at renewal. */
   changePlan(ctx: ActorContext, packageId: Id, code: string): Promise<void>;
   /** Mock payment: pays everything owed and returns the account to Active. */
@@ -579,6 +585,8 @@ export type AddOnListing = {
   endsAt?: string;
   usageCapPence?: number;
   usageThisPeriod: number;
+  /** The catalogue price, so the screen can say what turning it on costs. */
+  pricing: AddOn['pricing'];
 };
 
 /** The add-on catalogue (get, put) plus the billing-aware operations. `list` is per client and needs `billing.view`. */

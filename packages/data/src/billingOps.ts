@@ -199,6 +199,16 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
         ...(sub.pendingPackageId ? { pendingPackageId: sub.pendingPackageId } : {}),
         billingContact: sub.billingContact,
         ...(profile?.paymentMethod ? { paymentMethod: { ...profile.paymentMethod } } : {}),
+        ...(profile
+          ? {
+              profile: {
+                billingName: profile.billingName,
+                address: profile.address,
+                ...(profile.vatNumber ? { vatNumber: profile.vatNumber } : {}),
+              },
+            }
+          : {}),
+        usage: await limitCounts(call, clientId),
       };
       return structuredClone(result);
     },
@@ -217,6 +227,13 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
       const found = (await call.all<Invoice>('invoices')).find((i) => i.id === id && i.clientId === call.clientId);
       if (!found) throw new NotFoundError();
       return structuredClone(found);
+    },
+
+    async plans(ctx) {
+      const call = await clientCall(ctx, 'billing.view');
+      return (await call.all<Package>('packages'))
+        .map((p) => ({ id: p.id, name: p.name }))
+        .sort((a, b) => (a.id < b.id ? -1 : 1));
     },
 
     async requestDetailsChange(ctx, proposed) {
@@ -387,6 +404,7 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
           ...(active && sub.endsAt ? { endsAt: sub.endsAt } : {}),
           ...(sub?.usageCapPence !== undefined ? { usageCapPence: sub.usageCapPence } : {}),
           usageThisPeriod: sub?.usageThisPeriod ?? 0,
+          pricing: structuredClone(a.pricing),
         };
       });
       return structuredClone(listings.sort((a, b) => (a.addOnId < b.addOnId ? -1 : 1)));

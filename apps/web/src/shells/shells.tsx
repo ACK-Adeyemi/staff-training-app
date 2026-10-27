@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Navigate } from 'react-router';
 import type { NavItem } from '@sta/ui';
 import type { TwoFactorStatus } from '@sta/domain';
+import { holdsAnywhere } from '@sta/domain';
 import { useT } from '../app/hooks';
 import { SiteScopeContext } from '../app/siteScope';
 import { useTwoFactorStatus } from '../pages/client/foundationsQueries';
-import { useClientData } from '../pages/client/queries';
+import { useClientData, usePermissions } from '../pages/client/queries';
 import { AccountBannerView, SiteSwitch, TwoFactorBanner } from './clientChrome';
 import { Shell } from './Shell';
 
@@ -59,6 +60,7 @@ function ClientFrame({ twoFactor }: { twoFactor: TwoFactorStatus }) {
   const [site, setSite] = useState('all');
   // Load the organisation data once, up front, so every client screen opens with its content rather than a spinner.
   const data = useClientData();
+  const perms = usePermissions();
   if (data.isPending) return <p className="p-4">{t('shell.loading')}</p>;
   return (
     <SiteScopeContext value={site}>
@@ -76,6 +78,12 @@ function ClientFrame({ twoFactor }: { twoFactor: TwoFactorStatus }) {
             item('/client/reports', t('nav.client.reports'), 'chart'),
             item('/client/team', t('team.title'), 'user'),
             item('/client/settings', t('nav.client.settings'), 'more'),
+            ...(perms.data && holdsAnywhere(perms.data, 'billing.view')
+              ? [
+                  item('/client/billing', t('nav.client.billing'), 'chart'),
+                  item('/client/billing/add-ons', t('addOns.title'), 'more'),
+                ]
+              : []),
             item('/client/account-status', t('account.statusTitle'), 'clock'),
             item('/client/onboarding', t('onboarding.title'), 'check'),
             item('/client/help', t('nav.client.help'), 'help'),
