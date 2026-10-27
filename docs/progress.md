@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M4
 Milestone base commit: c7160e2
-Next step: M4 chunk 1 (decisions, schemas, seed additions) per docs/plans/m4.md: test-writer then implementer.
+Next step: M4 chunk 2 (domain price engine) per docs/plans/m4.md: test-writer then implementer.
 
 ## Milestones
 - [x] M0 Foundations
@@ -17,7 +17,10 @@ Next step: M4 chunk 1 (decisions, schemas, seed additions) per docs/plans/m4.md:
 - [ ] M7 Battle Room
 
 ## Current milestone chunks
-M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list): none done yet.
+M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list): 
+- [x] 1 Decisions, schemas and seed additions (tests 8bd8188, impl 125c3aa)
+- [ ] 2 Domain: price engine (next)
+- [ ] 3-18 see the plan
 M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 1 Decisions, schemas, stores and personas
 - [x] 2 Domain: sites, leaderboards, calendar, rules, reminders
@@ -148,3 +151,4 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - 2026-10-27: M3 chunk 21 Track A steps and docs landed; all 21 chunks done. Reviews next.
 - 2026-10-27: M3 security and code reviews done, fixes landed, full check.sh green. M3 complete. M4 next.
 - 2026-10-27: M4 started, base c7160e2, planning.
+- 2026-10-27: M4 plan committed (ab5d4cc); chunk 1 done (125c3aa). Planner agents hit API errors on long runs, so plan was written in three small parts.
