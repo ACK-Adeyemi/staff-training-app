@@ -74,6 +74,9 @@ function ClientFrame({ twoFactor }: { twoFactor: TwoFactorStatus }) {
             item('/client/competitions', t('nav.client.engage'), 'trophy'),
           ],
           more: [
+            ...(perms.data && holdsAnywhere(perms.data, 'assign.view')
+              ? [item('/client/calendar', t('calendar.title'), 'clock')]
+              : []),
             item('/client/organise', t('organise.title'), 'book'),
             item('/client/reports', t('nav.client.reports'), 'chart'),
             ...(perms.data && holdsAnywhere(perms.data, 'reports.view')

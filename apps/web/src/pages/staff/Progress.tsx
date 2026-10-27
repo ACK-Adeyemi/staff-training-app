@@ -28,6 +28,12 @@ export function Progress() {
   return (
     <>
       <PageHeader title={t('staff.progress.title')} />
+      <a
+        href="#/staff/calendar"
+        className={`mb-4 inline-flex min-h-[var(--target-min)] items-center underline ${focusLink}`}
+      >
+        {t('calendar.title')}
+      </a>
       <div role="tablist" aria-label={t('staff.progress.tabs')} className="mb-4 flex flex-wrap gap-2">
         {tabs.map((x) => (
           <button

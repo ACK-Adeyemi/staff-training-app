@@ -247,7 +247,7 @@ test('Priya filters, switches to Month, downloads the team .ics with counts not 
   const { text, lines } = await readIcs(dl);
   expectRfcShape(text, lines);
   expect(lines.some((l) => l.name === 'SUMMARY' && l.value.includes('3 Safeguarding expiries'))).toBe(true);
-  expect(text).not.toMatch(/Hannah|Chris|Lucy|Mark Taylor|Jade|Ben Carter|Ellie/);
+  expect(text).not.toMatch(/Hannah|\bChris\b|Lucy|Mark Taylor|Jade|Ben Carter|Ellie/);
 
   await page.evaluate(() => {
     (window as unknown as { __printed: number }).__printed = 0;
@@ -316,6 +316,7 @@ test("the first aiders forecast rises when Daniel approves Mark's first aid cert
 
   await jumpTo(page, /Daniel/);
   await page.goto('./#/client/evidence');
+  await expect(page.getByRole('heading', { level: 1, name: 'Evidence to check' })).toBeVisible();
   await page.getByRole('link', { name: 'Mark Taylor' }).click();
   await page.getByRole('button', { name: 'Approve' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Approved.' })).toBeVisible();

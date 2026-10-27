@@ -220,6 +220,42 @@ describe('Agenda', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Open Fire safety' }));
     expect(groups[0]!.items[0]!.onAction).toHaveBeenCalledOnce();
   });
+  it('writes the kind on the item and draws extra actions after the main one', async () => {
+    const add = vi.fn();
+    render(
+      <Agenda
+        groups={[
+          {
+            heading: 'Later',
+            items: [
+              {
+                id: 'k',
+                title: 'Safeguarding due',
+                kind: 'assignmentDue',
+                actionLabel: 'Start training',
+                onAction: vi.fn(),
+                extraActions: [
+                  {
+                    label: 'Add to phone calendar',
+                    ariaLabel: 'Add to phone calendar: Safeguarding due',
+                    onClick: add,
+                  },
+                ],
+              },
+            ],
+          },
+        ]}
+        emptyText="Nothing coming up"
+      />,
+    );
+    const li = screen.getByRole('listitem');
+    expect(li.getAttribute('data-kind')).toBe('assignmentDue');
+    expect(li.querySelector('[data-title]')?.textContent).toBe('Safeguarding due');
+    const buttons = screen.getAllByRole('button').map((b) => b.textContent);
+    expect(buttons).toEqual(['Start training', 'Add to phone calendar']);
+    await userEvent.click(screen.getByRole('button', { name: /^Add to phone calendar/ }));
+    expect(add).toHaveBeenCalledOnce();
+  });
   it('shows the empty text when there are no items', () => {
     render(<Agenda groups={[]} emptyText="Nothing coming up" />);
     expect(screen.getByText('Nothing coming up')).toBeInTheDocument();

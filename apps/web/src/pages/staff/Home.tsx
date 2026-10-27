@@ -242,6 +242,12 @@ export function Home() {
             ))}
           </ul>
         )}
+        <a
+          href="#/staff/calendar"
+          className={`mt-2 inline-flex min-h-[var(--target-min)] items-center underline ${focusLink}`}
+        >
+          {t('calendar.seeCalendar')}
+        </a>
       </Section>
       {rewards.data ? (
         <>

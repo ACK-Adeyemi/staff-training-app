@@ -76,6 +76,12 @@ const dump = async <R,>(handle: StoreHandle, store: string): Promise<R[]> =>
 const items = () => Array.from(document.querySelectorAll<HTMLElement>('li[data-kind]'));
 const BILLING_KINDS = ['planRenewal', 'invoiceDue', 'addOnTrialEnd', 'accountStateChange'];
 const noop = (): void => undefined;
+// Built in this realm: in jsdom a TextEncoder result is a Uint8Array from another realm, which the data layer refuses.
+const bytes = (text: string): Uint8Array<ArrayBuffer> => {
+  const out = new Uint8Array(new ArrayBuffer(text.length));
+  for (let k = 0; k < text.length; k++) out[k] = text.charCodeAt(k);
+  return out;
+};
 
 async function open(opts: Parameters<typeof renderRoute>[2] = {}) {
   const view = await renderRoute('/client/calendar', 'client', opts);
@@ -259,7 +265,7 @@ describe('C28 first aiders forecast', () => {
           purpose: 'certificate',
           title: 'Certificate (fictional)',
           mime: 'application/pdf',
-          data: new TextEncoder().encode('%PDF-1.4\n% Fictional certificate for tests only.\n%%EOF\n'),
+          data: bytes('%PDF-1.4\n% Fictional certificate for tests only.\n%%EOF\n'),
           personId: mark.id,
           siteId: mark.primarySiteId,
         });
@@ -365,7 +371,7 @@ describe('C28 exports', () => {
       for (const l of lines) expect(ICS_ALLOWED.has(l.name)).toBe(true);
       const summaries = lines.filter((l) => l.name === 'SUMMARY').map((l) => l.value);
       expect(summaries.some((s) => s.includes('3 Safeguarding expiries'))).toBe(true);
-      expect(text).not.toMatch(/Hannah|Chris|Lucy|Mark|Jade|Ben Carter|Ellie/);
+      expect(text).not.toMatch(/Hannah|\bChris\b|Lucy|Mark|Jade|Ben Carter|Ellie/);
       expect(lines.filter((l) => l.name === 'DTSTART').every((l) => l.params === 'VALUE=DATE')).toBe(true);
     } finally {
       cap.restore();

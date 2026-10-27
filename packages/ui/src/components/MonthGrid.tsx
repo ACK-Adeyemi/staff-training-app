@@ -116,10 +116,9 @@ export function MonthGrid(props: MonthGridProps) {
                       {counts[iso(d)] ? (
                         <span
                           aria-hidden="true"
-                          className="ms-1 rounded-full border border-current px-1 text-xs font-bold"
-                        >
-                          {counts[iso(d)]}
-                        </span>
+                          data-count={counts[iso(d)]}
+                          className="ms-1 rounded-full border border-current px-1 text-xs font-bold before:content-[attr(data-count)]"
+                        />
                       ) : null}
                     </td>
                   ),

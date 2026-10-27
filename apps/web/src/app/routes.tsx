@@ -80,6 +80,10 @@ export const routes: RouteObject[] = [
               Component: (await import('../pages/staff/UploadCertificate')).UploadCertificate,
             }),
           },
+          {
+            path: 'calendar',
+            lazy: async () => ({ Component: (await import('../pages/staff/Calendar')).Calendar }),
+          },
           { path: 'compete', element: <Compete /> },
           { path: 'me', element: <Me /> },
           { path: 'me/display', element: <Display /> },
@@ -143,6 +147,10 @@ export const routes: RouteObject[] = [
           {
             path: 'rules',
             lazy: async () => ({ Component: (await import('../pages/client/Rules')).Rules }),
+          },
+          {
+            path: 'calendar',
+            lazy: async () => ({ Component: (await import('../pages/client/Calendar')).Calendar }),
           },
           {
             path: 'reminders',
