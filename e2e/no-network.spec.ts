@@ -71,3 +71,19 @@ test('the viewport meta tag does not disable zoom', async ({ request }) => {
   expect(tag).not.toMatch(/user-scalable\s*=\s*(no|0)/i);
   expect(tag).not.toMatch(/maximum-scale\s*=\s*1(\.0)?\b/i);
 });
+
+test('F-5: Export all data (ZIP) and the person export make no request outside the origin', async ({ page }) => {
+  const urls: string[] = [];
+  page.on('request', (r) => urls.push(r.url()));
+  await page.goto('./#/client/data');
+  await page.getByRole('button', { name: 'Export all data (ZIP)' }).click();
+  const dialog = page.getByRole('dialog', { name: "Confirm it's you" });
+  await dialog.getByRole('textbox', { name: 'Confirmation code' }).fill('123456');
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    dialog.getByRole('button', { name: 'Download' }).click(),
+  ]);
+  expect(download.suggestedFilename()).toMatch(/\.zip$/);
+  const outside = urls.filter((u) => !u.startsWith(origin) && !u.startsWith('data:') && !u.startsWith('blob:'));
+  expect(outside).toEqual([]);
+});

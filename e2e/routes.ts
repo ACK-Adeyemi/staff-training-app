@@ -136,3 +136,6 @@ export const m3HelpRoutes: NavEntry[] = [
   { hash: '#/client/help', label: 'Help' },
   { hash: '#/client/help/ticket/new', label: 'Raise a ticket' },
 ];
+
+/** M3 chunk 20b routes (data and retention). */
+export const m3DataRoutes: NavEntry[] = [{ hash: '#/client/data', label: 'Data and retention' }];
