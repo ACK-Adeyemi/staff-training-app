@@ -527,6 +527,8 @@ export function createAuthoringOperations(backend: RawBackend, options: StoreOpt
     clientId: string,
     module: Module,
     links: LinkInput[],
+    /** Documents the target's stored overlay already points at (the seeded policy is a Markdown document). */
+    keep: ReadonlySet<string> = new Set(),
   ): Promise<LearnMoreLink[]> {
     if (!Array.isArray(links) || links.length === 0 || links.length > MAX_LINKS_PER_TARGET) {
       throw new ValidationError([`links: give 1 to ${String(MAX_LINKS_PER_TARGET)} links`]);
@@ -550,7 +552,10 @@ export function createAuthoringOperations(backend: RawBackend, options: StoreOpt
       if (raw.url !== undefined && (typeof raw.url !== 'string' || !isSafeHttpsUrl(raw.url))) {
         throw new RuleError('notHttps');
       }
-      if (raw.attachmentId !== undefined && (typeof raw.attachmentId !== 'string' || !docs.has(raw.attachmentId))) {
+      if (
+        raw.attachmentId !== undefined &&
+        (typeof raw.attachmentId !== 'string' || !(docs.has(raw.attachmentId) || keep.has(raw.attachmentId)))
+      ) {
         issues.push('links.attachmentId: not a PDF document of yours');
       }
       const base = {
@@ -595,7 +600,6 @@ export function createAuthoringOperations(backend: RawBackend, options: StoreOpt
         throw new ValidationError(['lessonId: not in this module']);
       }
       checkAccountState(call, true);
-      const links = await cleanLinks(call, clientId, module, input.links);
       const existing = (await call.all<ClientLinkOverlay>('clientLinkOverlays')).find(
         (o) =>
           o.clientId === clientId &&
@@ -604,6 +608,8 @@ export function createAuthoringOperations(backend: RawBackend, options: StoreOpt
           o.questionId === input.questionId &&
           o.lessonId === input.lessonId,
       );
+      const keep = new Set((existing?.links ?? []).flatMap((l) => (l.attachmentId ? [l.attachmentId] : [])));
+      const links = await cleanLinks(call, clientId, module, input.links, keep);
       const overlay = validate('clientLinkOverlays', {
         id: existing?.id ?? call.newId(),
         clientId,

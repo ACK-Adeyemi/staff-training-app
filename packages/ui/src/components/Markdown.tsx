@@ -51,15 +51,17 @@ export function parseMarkdown(source: string): Block[] {
 export interface MarkdownProps {
   source: string;
   className?: string;
+  /** Headings one level lower (## as h3, ### as h4), for text shown under a heading of its own. */
+  demote?: boolean;
 }
 
-export function Markdown({ source, className }: MarkdownProps) {
+export function Markdown({ source, className, demote = false }: MarkdownProps) {
   return (
     <div className={['flex flex-col gap-3 leading-relaxed', className].filter(Boolean).join(' ')}>
       {parseMarkdown(source).map((b, i) => {
         const key = `b${i}`;
         if (b.kind === 'h') {
-          const Tag = b.level === 2 ? 'h2' : 'h3';
+          const Tag = demote ? (b.level === 2 ? 'h3' : 'h4') : b.level === 2 ? 'h2' : 'h3';
           return (
             <Tag key={key} className={b.level === 2 ? 'text-xl font-bold' : 'text-lg font-semibold'}>
               {inline(b.text, key)}

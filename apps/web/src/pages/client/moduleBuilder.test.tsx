@@ -109,10 +109,6 @@ const MARKDOWN = [
   '# Raise the alarm',
   'Shout fire and press the nearest call point.',
   '',
-  '## Key points',
-  '- Stay calm',
-  '- Do not use the lifts',
-  '',
   '# Leave the building',
   'Lead the children to the assembly point.',
   '> Take the register with you.',
@@ -297,10 +293,15 @@ describe('C7 Module Builder: Markdown to lessons (BP-2)', () => {
   it('lists dropped images, html and non-https links as warnings and keeps them out of the lessons', async () => {
     await renderRoute('/client/modules/new', 'client');
     await paste(
-      '# Intro\nSee ![plan](https://example.invalid/plan.png) and <script>alert(1)</script> and [site](http://example.invalid/a).',
+      [
+        '# Intro',
+        'See ![plan](https://example.invalid/plan.png) for the layout.',
+        '<script>alert(1)</script>',
+        'Read [the site](http://example.invalid/a) too.',
+      ].join('\n'),
     );
     await lessons();
-    expect(screen.getAllByTestId('markdown-warning').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByTestId('markdown-warning')).toHaveLength(3);
     expect(document.body.textContent).not.toContain('<script>');
     expect(document.body.textContent).not.toContain('http://example.invalid/a');
   });
@@ -309,8 +310,9 @@ describe('C7 Module Builder: Markdown to lessons (BP-2)', () => {
     const c = await renderRoute('/client/modules/new', 'client');
     const user = userEvent.setup();
     fireEvent.change(await field('Title'), { target: { value: 'Fire drill basics' } });
-    await paste(MARKDOWN);
-    expect(await lessons()).toHaveLength(3);
+    // A list only becomes key points inside a lesson called Key points (domain rule, assumption 12).
+    await paste(`${MARKDOWN}\n\n## Key points\n- Stay calm\n- Do not use the lifts`);
+    expect(await lessons()).toHaveLength(4);
     await user.click(screen.getByRole('button', { name: 'Save draft' }));
     await status('Draft saved.');
     const saved = need((await ownModules(c)).find((m) => m.title === 'Fire drill basics'));
@@ -318,6 +320,7 @@ describe('C7 Module Builder: Markdown to lessons (BP-2)', () => {
       'Raise the alarm',
       'Leave the building',
       'Check everyone is out',
+      'Key points',
     ]);
     const kinds = saved.lessons.flatMap((l) => l.blocks.map((b) => b.kind));
     expect(kinds).toContain('keyPoints');
@@ -852,8 +855,12 @@ describe('C7 Module Builder: provider module overlay panel only (BP-1, BP-3)', (
       target: { value: 'Our policy PDF' },
     });
     await user.upload(within(panel).getByLabelText('Choose a PDF'), pdfBytes());
+    // The seed already holds two overlays on this module (the client's safeguarding policy on two questions), so
+    // the new links are looked up by title; a link added to a target that has an overlay joins it.
+    const titles = async () =>
+      (await overlays(c)).filter((o) => o.moduleId === PROVIDER).flatMap((o) => o.links.map((l) => l.title));
     await waitFor(async () => {
-      expect((await overlays(c)).filter((o) => o.moduleId === PROVIDER)).toHaveLength(2);
+      expect(await titles()).toEqual(expect.arrayContaining(['Our safeguarding lead', 'Our policy PDF']));
     });
     const stored = (await overlays(c)).filter((o) => o.moduleId === PROVIDER);
     const onLesson = stored.find((o) => o.lessonId === lessonKey);
@@ -863,7 +870,7 @@ describe('C7 Module Builder: provider module overlay panel only (BP-1, BP-3)', (
       url: 'https://example.invalid/our-lead',
       kind: 'organisation',
     });
-    expect(onQuestion?.links[0]?.attachmentId).toBeTruthy();
+    expect(onQuestion?.links.find((l) => l.title === 'Our policy PDF')?.attachmentId).toBeTruthy();
     expect(JSON.stringify(await provider(c))).toBe(before);
     expect(within(await targetOf('lesson', lessonKey)).getAllByTestId('link-item')).toHaveLength(1);
   });
@@ -873,13 +880,15 @@ describe('C7 Module Builder: provider module overlay panel only (BP-1, BP-3)', (
     async (url) => {
       const c = await open();
       const user = userEvent.setup();
+      const count = async () => (await overlays(c)).filter((o) => o.moduleId === PROVIDER).length;
+      const seeded = await count(); // the seed already has two overlays on this module
       const key = need((await provider(c)).lessons[0]).id;
       const panel = await targetOf('lesson', key);
       fireEvent.change(within(panel).getByRole('textbox', { name: 'Link title' }), { target: { value: 'Bad' } });
       fireEvent.change(within(panel).getByRole('textbox', { name: 'Web address' }), { target: { value: url } });
       await user.click(within(panel).getByRole('button', { name: 'Add link' }));
       expect((await within(await targetOf('lesson', key)).findByRole('alert')).textContent).toBe(NOT_HTTPS);
-      expect((await overlays(c)).filter((o) => o.moduleId === PROVIDER)).toHaveLength(0);
+      expect(await count()).toBe(seeded);
     },
   );
 

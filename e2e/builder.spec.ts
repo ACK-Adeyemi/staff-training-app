@@ -66,7 +66,7 @@ test('Track A step 6: paste three headings, see three lessons, add three questio
   page,
 }) => {
   await newModule(page);
-  await page.getByRole('textbox', { name: 'Title' }).fill('Fire drill for new starters');
+  await page.getByRole('textbox', { name: 'Title', exact: true }).fill('Fire drill for new starters');
   await page.getByRole('textbox', { name: 'Paste your lessons' }).fill(MARKDOWN);
   await page.getByRole('button', { name: 'Turn into lessons' }).click();
   await expect(page.getByTestId('builder-lesson')).toHaveCount(3);
@@ -105,7 +105,7 @@ test('Track A step 6: paste three headings, see three lessons, add three questio
 
 test('Save draft keeps the work across a reload (BP-2)', async ({ page }) => {
   await newModule(page);
-  await page.getByRole('textbox', { name: 'Title' }).fill('Reload test module');
+  await page.getByRole('textbox', { name: 'Title', exact: true }).fill('Reload test module');
   await page.getByRole('textbox', { name: 'Paste your lessons' }).fill(MARKDOWN);
   await page.getByRole('button', { name: 'Turn into lessons' }).click();
   await addMcq(page, 0, 'Reload question?');
@@ -113,7 +113,7 @@ test('Save draft keeps the work across a reload (BP-2)', async ({ page }) => {
   await expect(page.getByRole('status').filter({ hasText: 'Draft saved.' })).toBeVisible();
   await expect(page).toHaveURL(/#\/client\/modules\/[^/]+\/edit$/);
   await page.reload();
-  await expect(page.getByRole('textbox', { name: 'Title' })).toHaveValue('Reload test module');
+  await expect(page.getByRole('textbox', { name: 'Title', exact: true })).toHaveValue('Reload test module');
   await expect(page.getByTestId('builder-lesson')).toHaveCount(3);
   await expect(page.getByTestId('builder-question')).toHaveCount(1);
   await expect(page.getByTestId('builder-question').getByRole('textbox', { name: 'Question' })).toHaveValue(
@@ -161,11 +161,11 @@ test('editing a published own module and publishing makes the next version, and 
   await fire.getByRole('link', { name: 'Edit' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Module builder' })).toBeVisible();
   await expect(page.getByTestId('version-row')).toHaveCount(2);
-  await page.getByRole('textbox', { name: 'Title' }).fill('Fire evacuation (revised)');
+  await page.getByRole('textbox', { name: 'Title', exact: true }).fill('Fire evacuation (revised)');
   await page.getByRole('checkbox', { name: 'This module is optional' }).check();
   await page.getByRole('button', { name: 'Save draft' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Draft saved.' })).toBeVisible();
-  const published = (await readStore(page, 'modules')).filter((m) => m['title'] === 'Fire evacuation');
+  const published = (await readStore(page, 'modules')).filter((m) => m['title'] === 'Fire evacuation at Little Acorns');
   expect(published).toHaveLength(1);
   expect(published[0]?.['version']).toBe(2);
   const assignments = (await readStore(page, 'assignments')).length;
@@ -187,7 +187,7 @@ test('own module Learn more panel accepts https links and a PDF and refuses http
   page,
 }) => {
   await newModule(page);
-  await page.getByRole('textbox', { name: 'Title' }).fill('Links module');
+  await page.getByRole('textbox', { name: 'Title', exact: true }).fill('Links module');
   await page.getByRole('textbox', { name: 'Paste your lessons' }).fill('# One\nSome text.');
   await page.getByRole('button', { name: 'Turn into lessons' }).click();
   const lesson = page.locator('[data-testid="link-target"][data-target-kind="lesson"]').first();
@@ -229,7 +229,9 @@ test('a provider module shows only the Add our own links panel and saves overlay
   await expect(
     page.getByText('This training belongs to the provider, so you cannot change it. You can make your own copy.'),
   ).toBeVisible();
-  for (const name of ['Title', 'Paste your lessons']) await expect(page.getByRole('textbox', { name })).toHaveCount(0);
+  for (const name of ['Title', 'Paste your lessons']) {
+    await expect(page.getByRole('textbox', { name, exact: true })).toHaveCount(0);
+  }
   for (const name of ['Save draft', 'Publish']) await expect(page.getByRole('button', { name })).toHaveCount(0);
 
   const before = (await readStore(page, 'modules')).find((m) => m['id'] === PROVIDER_MODULE);
@@ -242,16 +244,19 @@ test('a provider module shows only the Add our own links panel and saves overlay
   await lesson.getByRole('button', { name: 'Add link' }).click();
   await expect(lesson.getByTestId('link-item')).toHaveCount(1);
   const question = page.locator('[data-testid="link-target"][data-target-kind="question"]').first();
+  // The seed already holds the client's policy link on some questions, so count what was there.
+  const seededLinks = await question.getByTestId('link-item').count();
   await question.getByRole('textbox', { name: 'Link title' }).fill('Our policy');
   await question.getByLabel('Choose a PDF').setInputFiles(PDF);
-  await expect(question.getByTestId('link-item')).toHaveCount(1);
+  await expect(question.getByTestId('link-item')).toHaveCount(seededLinks + 1);
   await expectTouchTargets(
     lesson.getByRole('button', { name: 'Add link' }),
     lesson.getByRole('button', { name: 'Remove link' }),
   );
 
-  const overlays = await readStore(page, 'clientLinkOverlays');
-  expect(overlays.filter((o) => o['moduleId'] === PROVIDER_MODULE)).toHaveLength(2);
+  const overlays = (await readStore(page, 'clientLinkOverlays')).filter((o) => o['moduleId'] === PROVIDER_MODULE);
+  const titles = overlays.flatMap((o) => ((o['links'] as { title: string }[] | undefined) ?? []).map((l) => l.title));
+  expect(titles).toEqual(expect.arrayContaining(['Our safeguarding lead', 'Our policy']));
   expect((await readStore(page, 'modules')).find((m) => m['id'] === PROVIDER_MODULE)).toEqual(before);
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')).toEqual([]);

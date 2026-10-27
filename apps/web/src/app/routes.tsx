@@ -89,7 +89,14 @@ export const routes: RouteObject[] = [
             path: 'modules',
             lazy: async () => ({ Component: (await import('../pages/client/ModuleLibrary')).ModuleLibrary }),
           },
-          page('modules/:moduleId/edit', 'client.library.title', 'client.library.builderSoon'),
+          {
+            path: 'modules/new',
+            lazy: async () => ({ Component: (await import('../pages/client/ModuleBuilder')).ModuleBuilder }),
+          },
+          {
+            path: 'modules/:moduleId/edit',
+            lazy: async () => ({ Component: (await import('../pages/client/ModuleBuilder')).ModuleBuilder }),
+          },
           {
             path: 'modules/:moduleId/preview',
             lazy: async () => ({ Component: (await import('../pages/client/ModulePreview')).ModulePreview }),

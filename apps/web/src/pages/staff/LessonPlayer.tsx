@@ -15,15 +15,18 @@ export function Block({
   block,
   acknowledged,
   onAcknowledge,
+  demoteHeadings = false,
 }: {
   block: ContentBlock;
   acknowledged: boolean;
   onAcknowledge: (value: boolean) => void;
+  /** For a lesson shown under an h2 of its own (the builder preview). */
+  demoteHeadings?: boolean;
 }) {
   const t = useT();
   switch (block.kind) {
     case 'text':
-      return <Markdown source={block.markdown} />;
+      return <Markdown source={block.markdown} demote={demoteHeadings} />;
     case 'keyPoints':
       return (
         <ul className="list-disc ps-6">

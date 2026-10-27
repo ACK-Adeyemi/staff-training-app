@@ -129,3 +129,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - e2e/two-factor.spec.ts: rare (~1 in 10 isolated runs) timeout in persona/enrol flows under load; added settle waits in 3a-fix commit, full check.sh green. Watch it.
 - 2026-10-27: M3 chunk 14 billing UI and Demo AI landed (tests f1de9c8, impl b25fa65), check.sh green. Stopping at a clean point; chunk 15 next.
 - 2026-10-27: M3 chunk 15a module library, preview and group assign landed (ccc3e09); billing.spec.ts:120 flaked twice under load (first banner wait now 20s). Chunk 15b next.
+- 2026-10-27: M3 chunk 15b module builder landed; check.sh green except the known billing.spec.ts:120 load flake (passes alone). Chunk 16 next.

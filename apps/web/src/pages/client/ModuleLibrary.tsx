@@ -2,7 +2,7 @@
 // sorting and the per-module actions. Provider modules never show edit controls (BP-3).
 import { useState, type ReactNode } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Badge, Button, Card, Dialog, PageHeader } from '@sta/ui';
+import { Badge, Button, Card, Dialog, LinkButton, PageHeader } from '@sta/ui';
 import { holdsAnywhere, type Module } from '@sta/domain';
 import type { MessageKey } from '@sta/content';
 import { useActor, useClock, useStore, useT } from '../../app/hooks';
@@ -232,7 +232,9 @@ function LibraryBody() {
 
   return (
     <>
-      <PageHeader title={t('client.library.title')} />
+      <PageHeader title={t('client.library.title')}>
+        {canManage ? <LinkButton href="#/client/modules/new">{t('client.library.newModule')}</LinkButton> : null}
+      </PageHeader>
       <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <label className="flex flex-col gap-1 font-semibold">
           {t('client.library.search')}
