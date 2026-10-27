@@ -119,3 +119,9 @@ export const m3RulesRoutes: NavEntry[] = [
   { hash: '#/client/reminders', label: 'Reminders' },
   { hash: '#/staff/notifications', label: 'Notifications' },
 ];
+
+/** M3 chunk 18b routes (calendars). */
+export const m3CalendarRoutes: NavEntry[] = [
+  { hash: '#/staff/calendar', label: 'Calendar' },
+  { hash: '#/client/calendar', label: 'Calendar' },
+];

@@ -154,3 +154,23 @@ test('S17 Upload certificate does not clip or overlap at 200% text, before and a
   await expect(page.getByRole('button', { name: 'Send for checking' })).toBeVisible();
   await expectNoClipOrOverlap(page);
 });
+
+// M3 chunk 18b (F-5): S18 and C28 at 200% text on the 390 px phone, list and month views.
+test('S18 and C28 Calendar do not clip or overlap at 200% text', async ({ page }) => {
+  for (const [hash, month] of [
+    ['#/staff/calendar', false],
+    ['#/staff/calendar', true],
+    ['#/client/calendar', false],
+    ['#/client/calendar', true],
+  ] as const) {
+    await page.goto(`./${hash}`);
+    await expect(page.getByRole('heading', { level: 1, name: 'Calendar' })).toBeVisible();
+    await scale(page);
+    if (month) {
+      await page.getByRole('radio', { name: 'Month' }).check();
+      await expect(page.getByRole('grid')).toBeVisible();
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    await expectNoClipOrOverlap(page);
+  }
+});
