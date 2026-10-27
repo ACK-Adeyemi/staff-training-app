@@ -423,7 +423,7 @@ export interface CompetitionsService {
 }
 
 /** A Sites board row. `small` marks a site with too few people for a fair percentage. */
-export type SitesBoardRow = SiteBoardRow & { small: boolean };
+export type SitesBoardRow = SiteBoardRow & { small: boolean; eligible: number; siteName: string };
 export type SitesBoardView = {
   rows: SitesBoardRow[];
   own: SitesBoardRow | null;

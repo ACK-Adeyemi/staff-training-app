@@ -71,3 +71,14 @@ export function londonDayEnd(date: string): string | null {
   const p = parts(date);
   return p ? fromLondonWall({ ...p, h: 23, mi: 59, s: 59, ms: 0 }).toISOString() : null;
 }
+
+export const SITE_MEASURES = ['compliance', 'onTime', 'participation', 'knowledge'] as const;
+
+export const measureLabel = (t: TFunction, measure: string): string =>
+  t(`sitesBoard.measures.${measure}` as MessageKey);
+
+export const scopeLabel = (t: TFunction, scope: string): string => t(`leaderboard.scopes.${scope}` as MessageKey);
+
+/** A Sites board value: a percentage, or the Knowledge measure to one decimal place. */
+export const siteValueText = (measure: string, value: number): string =>
+  measure === 'knowledge' ? value.toFixed(1) : `${String(value)}%`;

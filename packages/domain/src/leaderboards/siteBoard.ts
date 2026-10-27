@@ -13,7 +13,12 @@ export type SiteMeasure = 'compliance' | 'onTime' | 'participation' | 'knowledge
 export type SiteBoardPeriod = 'thisMonth' | 'thisQuarter';
 export type SiteBoardInput = BoardInput & { sites: Site[]; submissions: EvidenceSubmission[]; amberWindowDays: number };
 export type SiteBoardEntry = { siteId: string; value: number; eligible: number; small: boolean; rank: number };
-export type SiteBoardOptions = { excludeSmall?: boolean; excludedSiteIds?: string[] };
+export type SiteBoardOptions = {
+  excludeSmall?: boolean;
+  excludedSiteIds?: string[];
+  /** A site with fewer eligible people than this is small. Defaults to the platform minimum. */
+  smallSiteMin?: number;
+};
 
 export function siteLeaderboard(
   measure: SiteMeasure,
@@ -35,7 +40,7 @@ export function siteLeaderboard(
       const people = eligible.filter((p) => p.primarySiteId === site.id);
       return { siteId: site.id, name: site.name, people, value: measureValue(measure, site, people, window, input) };
     })
-    .map((r) => ({ ...r, small: r.people.length < adminConfig.smallSiteMinimum }))
+    .map((r) => ({ ...r, small: r.people.length < (options.smallSiteMin ?? adminConfig.smallSiteMinimum) }))
     .filter((r) => !(options.excludeSmall === true && r.small))
     .sort((a, b) => b.value - a.value || a.name.localeCompare(b.name, 'en-GB'));
 

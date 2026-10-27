@@ -1256,8 +1256,8 @@
     "staffScopes": "Staff can see",
     "scopes": {
       "site": "My site",
-      "region": "Region",
-      "country": "Country",
+      "region": "My region",
+      "country": "My country",
       "all": "All sites"
     },
     "scopeLater": "Appears when your organisation has more than one site, region or country",
@@ -1266,7 +1266,28 @@
     "readOnly": "You can see these settings but not change them.",
     "saveError": "That could not be saved. Please try again.",
     "loadError": "We could not load the settings. Please try again.",
-    "selected": "Selected"
+    "selected": "Selected",
+    "boardScopes": "Staff scopes: {board}",
+    "boardScopesLocked": "My site is always on",
+    "siteBoardSaved": "Saved.",
+    "siteBoardNeedMeasure": "Choose at least one measure.",
+    "siteBoardSave": "Save Sites board settings",
+    "siteBoardMeasures": "Measures",
+    "siteBoardThreshold": "Small site threshold",
+    "siteBoardLeaveOut": "Leave out these sites",
+    "fullRanking": "Full ranking",
+    "fullRankingIntro": "Every site, best first. Sites with few people are marked, and the ranking never rewards speed.",
+    "rankingPeriod": "Period",
+    "rankingScope": "Scope",
+    "rankingEmpty": "No sites to rank.",
+    "drillDown": "Drill down: {name}",
+    "smallSite": "Small site",
+    "eligiblePeople": "{count} eligible people",
+    "eligibleOne": "1 eligible person",
+    "rankLine": "Rank {ordinal}",
+    "valueLine": "Score {value}",
+    "close": "Close",
+    "siteBoardNeedThreshold": "Enter a whole number of 1 or more for the small site threshold."
   },
   "organise": {
     "title": "Organise modules",
@@ -2834,7 +2855,20 @@
     "groupedBy": "People grouped by site",
     "scope": "Show",
     "scopeSite": "This site",
-    "scopeGroup": "The whole group"
+    "scopeGroup": "The whole group",
+    "comparisonTitle": "Site comparison",
+    "complianceFigure": "Compliance {percent}%",
+    "overdueFigure": "{count} overdue",
+    "expiringFigure": "{count} expiring soon",
+    "completionFigure": "Completion {percent}%",
+    "staffFigure": "{count} staff",
+    "open": "Open {name}",
+    "view": "View",
+    "viewBySite": "By site",
+    "viewOneList": "One list",
+    "peopleCount": "{count} people",
+    "peopleOne": "1 person",
+    "alsoWorksHere": "Also works here"
   },
   "sitesBoard": {
     "title": "Sites board",
@@ -2844,7 +2878,21 @@
     "engagement": "Learning activity",
     "fairNote": "Sites are compared by the share of people, not by the number, and never by speed.",
     "rank": "Position {rank}",
-    "empty": "The board needs at least two sites."
+    "empty": "The board needs at least two sites.",
+    "measures": {
+      "compliance": "Compliance",
+      "onTime": "On-time completion",
+      "participation": "Participation",
+      "knowledge": "Knowledge"
+    },
+    "boardType": "Board type",
+    "tabPeople": "People",
+    "tabSites": "Sites",
+    "period": "Period",
+    "scope": "Scope",
+    "loadError": "We could not load the Sites board. Please try again.",
+    "toNext": "{count} more people with learning this month would move {name} up one place",
+    "toNextOne": "1 more person with learning this month would move {name} up one place"
   },
   "ai": {
     "explain": "Explain",

@@ -554,11 +554,17 @@ export function createCompetitionOperations(backend: RawBackend, options: StoreO
           amberWindowDays: client.settings.amberWindowDays,
           now: call.actor.now,
         },
-        { excludedSiteIds: settings.siteBoard.excludedSiteIds },
+        { excludedSiteIds: settings.siteBoard.excludedSiteIds, smallSiteMin: settings.siteBoard.smallSiteMinActive },
       );
       const view = siteBoardView(entries, { viewerSiteId, audience, measure: input.measure });
       const small = new Map(entries.map((e) => [e.siteId, e.small]));
-      const withSmall = <T extends { siteId: string }>(row: T) => ({ ...row, small: small.get(row.siteId) ?? false });
+      const eligible = new Map(entries.map((e) => [e.siteId, e.eligible]));
+      const withSmall = <T extends { siteId: string }>(row: T) => ({
+        ...row,
+        small: small.get(row.siteId) ?? false,
+        eligible: eligible.get(row.siteId) ?? 0,
+        siteName: sites.find((x) => x.id === row.siteId)?.name ?? '',
+      });
       return structuredClone({
         rows: view.rows.map(withSmall),
         own: view.own ? withSmall(view.own) : null,

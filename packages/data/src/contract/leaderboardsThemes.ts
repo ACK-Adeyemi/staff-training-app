@@ -47,7 +47,15 @@ import { addLearningFixture, refusal, ruleOf } from './learning';
 import { buildWorld, freshId, TODAY } from './world';
 
 type Scope = 'site' | 'region' | 'country' | 'all';
-type SiteRow = { rank: number; siteId: string; value: number; isViewer: boolean; small: boolean };
+type SiteRow = {
+  rank: number;
+  siteId: string;
+  value: number;
+  isViewer: boolean;
+  small: boolean;
+  eligible: number;
+  siteName: string;
+};
 type SitesBoardView = {
   rows: SiteRow[];
   own: SiteRow | null;
@@ -314,6 +322,30 @@ export function runLeaderboardsThemesContract(
         const ranks = view.rows.map((r) => r.rank);
         expect(ranks).toEqual([...ranks].sort((x, y) => x - y));
         expect(view.rows.every((r) => typeof r.small === 'boolean')).toBe(true);
+      });
+
+      it('carries each site eligible head count and applies the small site threshold from the settings', async () => {
+        const s: S = await setup();
+        await s.configure(['site'], ['site']);
+        const input = { measure: 'participation', period: 'thisMonth', scope: 'all' } as const;
+        const before = await s.store.leaderboards.sitesBoard(s.actors.gina, input);
+        expect(before.rows.every((r) => Number.isInteger(r.eligible) && r.eligible >= 0)).toBe(true);
+        const names = (await dump<Site>(s.admin, 'sites')).map((x) => x.name);
+        expect(before.rows.every((r) => names.includes(r.siteName))).toBe(true);
+        const biggest = Math.max(...before.rows.map((r) => r.eligible));
+        const current = await s.store.leaderboards.settings(s.actors.gina);
+        await s.store.leaderboards.saveSettings(s.actors.gina, {
+          ...current,
+          siteBoard: { ...current.siteBoard, smallSiteMinActive: biggest + 1 },
+        });
+        const after = await s.store.leaderboards.sitesBoard(s.actors.gina, input);
+        expect(after.rows.every((r) => r.small)).toBe(true);
+        await s.store.leaderboards.saveSettings(s.actors.gina, {
+          ...current,
+          siteBoard: { ...current.siteBoard, smallSiteMinActive: 1 },
+        });
+        const none = await s.store.leaderboards.sitesBoard(s.actors.gina, input);
+        expect(none.rows.some((r) => r.small)).toBe(false);
       });
 
       it('gives a group admin every Oak Tree site and a site manager the same plus their site detail', async () => {

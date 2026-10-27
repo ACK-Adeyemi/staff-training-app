@@ -5,6 +5,7 @@ import type { MessageKey } from '@sta/content';
 import { Button, Card, PageHeader } from '@sta/ui';
 import { can, dueAtFromLondonDate, londonDateString, planAssignment } from '@sta/domain';
 import { useActor, useClock, useStore, useT } from '../../app/hooks';
+import { useSiteScope } from '../../app/siteScope';
 import { fullName, useClientData, usePermissions } from './queries';
 
 type Result = { created: number; skipped: string[] };
@@ -46,6 +47,7 @@ export function Assign() {
   const queryClient = useQueryClient();
   const q = useClientData();
   const perms = usePermissions();
+  const site = useSiteScope();
   const [moduleId, setModuleId] = useState('');
   const [groupId, setGroupId] = useState('');
   const groupsQ = useQuery({
@@ -69,6 +71,7 @@ export function Assign() {
   const published = modules.filter((m) => m.status === 'published');
   const choosable = view.people
     .filter((p) => p.status !== 'archived')
+    .filter((p) => site === 'all' || p.primarySiteId === site)
     .filter((p) =>
       can(held, 'assign.manage', { clientId: p.clientId, siteIds: [p.primarySiteId, ...p.additionalSiteIds] }, 'write'),
     )

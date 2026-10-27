@@ -16,6 +16,7 @@ import {
   type PersonRow,
 } from '@sta/domain';
 import { useActor, useStore, useT } from '../../app/hooks';
+import { useSiteScope } from '../../app/siteScope';
 import { formatLondonDate, formatLondonShort } from '../../demo/format';
 import { focusLink } from '../staff/styles';
 import { FeedbackRegion } from './FeedbackRegion';
@@ -41,6 +42,7 @@ function StatsBody({ moduleId }: { moduleId: string | undefined }) {
   const actor = useActor();
   const data = useClientData();
   const perms = usePermissions();
+  const site = useSiteScope();
   const extra = useQuery({
     queryKey: ['moduleStatsData', actor.userId],
     queryFn: async () => {
@@ -50,7 +52,12 @@ function StatsBody({ moduleId }: { moduleId: string | undefined }) {
   });
   if (data.isError || extra.isError) return <p role="alert">{t('client.loadError')}</p>;
   if (!data.data || !extra.data || !perms.data) return <p>{t('shell.loading')}</p>;
-  const { view, assignments, modules } = data.data;
+  const { view: whole, assignments: allAssignments, modules } = data.data;
+  const ids = new Set(whole.people.filter((p) => site === 'all' || p.primarySiteId === site).map((p) => p.id));
+  const inSite = <T extends { personId: string }>(rows: T[]): T[] =>
+    site === 'all' ? rows : rows.filter((r) => ids.has(r.personId));
+  const view = { ...whole, people: whole.people.filter((p) => ids.has(p.id)), evidence: inSite(whole.evidence) };
+  const assignments = inSite(allAssignments);
   const module = modules.find((m) => m.id === moduleId);
   if (!module) return <p role="alert">{t('client.moduleStats.notFound')}</p>;
 
@@ -58,8 +65,8 @@ function StatsBody({ moduleId }: { moduleId: string | undefined }) {
   const input: ModuleStatsInput = {
     module,
     assignments,
-    attempts: extra.data.attempts,
-    events: extra.data.events,
+    attempts: inSite(extra.data.attempts),
+    events: inSite(extra.data.events),
     evidence: view.evidence,
     now: view.now,
   };

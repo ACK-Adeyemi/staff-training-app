@@ -3,6 +3,7 @@ import { Button, DataTable, Icon, PageHeader, StatusBadge, type DataTableRow } f
 import { can, matrixCsv, trainingMatrix, type MatrixCell, type RequirementStatusName } from '@sta/domain';
 import type { MessageKey } from '@sta/content';
 import { useActor, useClock, useStore, useT } from '../../app/hooks';
+import { useSiteScope } from '../../app/siteScope';
 import { formatLondonDate, formatLondonDateTime } from '../../demo/format';
 import { focusLink } from '../staff/styles';
 import { PermissionGate } from './PermissionGate';
@@ -40,11 +41,12 @@ function MatrixBody() {
   const teams = useTeams();
   const clientName = useClientName();
   const perms = usePermissions();
+  const site = useSiteScope();
   if (data.isError || teams.isError || clientName.isError) return <p role="alert">{t('client.loadError')}</p>;
   if (!data.data || !teams.data || clientName.data === undefined) return <p>{t('shell.loading')}</p>;
   const { view } = data.data;
   const matrix = trainingMatrix({
-    people: view.people,
+    people: site === 'all' ? view.people : view.people.filter((p) => p.primarySiteId === site),
     requirements: view.requirements,
     evidence: view.evidence,
     submissions: view.submissions,
@@ -156,7 +158,7 @@ function MatrixBody() {
 /** C15: the training matrix, for the screen, for print and for CSV. */
 export function Matrix() {
   return (
-    <PermissionGate permission="reports.view" message="client.reports.noPermission">
+    <PermissionGate permission="reports.view" anyScope message="client.reports.noPermission">
       <MatrixBody />
     </PermissionGate>
   );

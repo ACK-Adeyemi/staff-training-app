@@ -4,7 +4,7 @@ import type { NavItem } from '@sta/ui';
 import type { TwoFactorStatus } from '@sta/domain';
 import { holdsAnywhere } from '@sta/domain';
 import { useT } from '../app/hooks';
-import { SiteScopeContext } from '../app/siteScope';
+import { SetSiteScopeContext, SiteScopeContext } from '../app/siteScope';
 import { useTwoFactorStatus } from '../pages/client/foundationsQueries';
 import { useClientData, usePermissions } from '../pages/client/queries';
 import { AccountBannerView, SiteSwitch, TwoFactorBanner } from './clientChrome';
@@ -64,58 +64,60 @@ function ClientFrame({ twoFactor }: { twoFactor: TwoFactorStatus }) {
   if (data.isPending) return <p className="p-4">{t('shell.loading')}</p>;
   return (
     <SiteScopeContext value={site}>
-      <Shell
-        config={{
-          side: 'client',
-          bar: [
-            item('/client', t('nav.client.dashboard'), 'home'),
-            item('/client/people', t('nav.client.people'), 'user'),
-            item('/client/modules', t('nav.client.training'), 'book'),
-            item('/client/competitions', t('nav.client.engage'), 'trophy'),
-          ],
-          more: [
-            ...(perms.data && holdsAnywhere(perms.data, 'assign.view')
-              ? [item('/client/calendar', t('calendar.title'), 'clock')]
-              : []),
-            item('/client/organise', t('organise.title'), 'book'),
-            item('/client/reports', t('nav.client.reports'), 'chart'),
-            ...(perms.data && holdsAnywhere(perms.data, 'reports.view')
-              ? [item('/client/stats', t('stats.title'), 'chart')]
-              : []),
-            ...(perms.data && holdsAnywhere(perms.data, 'moduleFeedback.view')
-              ? [item('/client/module-feedback', t('feedback.inbox.title'), 'help')]
-              : []),
-            ...(perms.data && holdsAnywhere(perms.data, 'evidence.view')
-              ? [item('/client/evidence', t('evidenceFlow.queueTitle'), 'check')]
-              : []),
-            ...(perms.data && holdsAnywhere(perms.data, 'assign.manage')
-              ? [item('/client/rules', t('rules.title'), 'check')]
-              : []),
-            ...(perms.data && holdsAnywhere(perms.data, 'reminders.view')
-              ? [item('/client/reminders', t('reminders.title'), 'bell')]
-              : []),
-            item('/client/team', t('team.title'), 'user'),
-            item('/client/settings', t('nav.client.settings'), 'more'),
-            ...(perms.data && holdsAnywhere(perms.data, 'billing.view')
-              ? [
-                  item('/client/billing', t('nav.client.billing'), 'chart'),
-                  item('/client/billing/add-ons', t('addOns.title'), 'more'),
-                ]
-              : []),
-            item('/client/account-status', t('account.statusTitle'), 'clock'),
-            item('/client/onboarding', t('onboarding.title'), 'check'),
-            item('/client/help', t('nav.client.help'), 'help'),
-          ],
-          headerLinks: [],
-          headerExtra: <SiteSwitch value={site} onChange={setSite} />,
-          top: (
-            <>
-              {twoFactor.kind === 'grace' ? <TwoFactorBanner daysLeft={twoFactor.daysLeft} /> : null}
-              <AccountBannerView />
-            </>
-          ),
-        }}
-      />
+      <SetSiteScopeContext value={setSite}>
+        <Shell
+          config={{
+            side: 'client',
+            bar: [
+              item('/client', t('nav.client.dashboard'), 'home'),
+              item('/client/people', t('nav.client.people'), 'user'),
+              item('/client/modules', t('nav.client.training'), 'book'),
+              item('/client/competitions', t('nav.client.engage'), 'trophy'),
+            ],
+            more: [
+              ...(perms.data && holdsAnywhere(perms.data, 'assign.view')
+                ? [item('/client/calendar', t('calendar.title'), 'clock')]
+                : []),
+              item('/client/organise', t('organise.title'), 'book'),
+              item('/client/reports', t('nav.client.reports'), 'chart'),
+              ...(perms.data && holdsAnywhere(perms.data, 'reports.view')
+                ? [item('/client/stats', t('stats.title'), 'chart')]
+                : []),
+              ...(perms.data && holdsAnywhere(perms.data, 'moduleFeedback.view')
+                ? [item('/client/module-feedback', t('feedback.inbox.title'), 'help')]
+                : []),
+              ...(perms.data && holdsAnywhere(perms.data, 'evidence.view')
+                ? [item('/client/evidence', t('evidenceFlow.queueTitle'), 'check')]
+                : []),
+              ...(perms.data && holdsAnywhere(perms.data, 'assign.manage')
+                ? [item('/client/rules', t('rules.title'), 'check')]
+                : []),
+              ...(perms.data && holdsAnywhere(perms.data, 'reminders.view')
+                ? [item('/client/reminders', t('reminders.title'), 'bell')]
+                : []),
+              item('/client/team', t('team.title'), 'user'),
+              item('/client/settings', t('nav.client.settings'), 'more'),
+              ...(perms.data && holdsAnywhere(perms.data, 'billing.view')
+                ? [
+                    item('/client/billing', t('nav.client.billing'), 'chart'),
+                    item('/client/billing/add-ons', t('addOns.title'), 'more'),
+                  ]
+                : []),
+              item('/client/account-status', t('account.statusTitle'), 'clock'),
+              item('/client/onboarding', t('onboarding.title'), 'check'),
+              item('/client/help', t('nav.client.help'), 'help'),
+            ],
+            headerLinks: [],
+            headerExtra: <SiteSwitch value={site} onChange={setSite} />,
+            top: (
+              <>
+                {twoFactor.kind === 'grace' ? <TwoFactorBanner daysLeft={twoFactor.daysLeft} /> : null}
+                <AccountBannerView />
+              </>
+            ),
+          }}
+        />
+      </SetSiteScopeContext>
     </SiteScopeContext>
   );
 }
