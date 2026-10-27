@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M3
 Milestone base commit: bb460c4
-Next step: M3 chunk 14 (Billing UI and Demo AI: C19, C20, invoice print, mock pay page at /client/billing/pay, request flow, Explain in simpler words, billing.spec.ts) per docs/plans/m3.md. Open from chunk 13: nothing filters by site switcher yet (useSiteScope ready, chunk 19); onboarding hide not persisted; two-tab seed race (decisions M3 chunk 11).
+Next step: M3 chunk 15 (Module Library and Builder UI: C6 full preview extends the minimal preview route from chunk 14, C7) per docs/plans/m3.md. Open: nothing filters by site switcher yet (chunk 19); onboarding hide not persisted; two-tab seed race.
 
 ## Milestones
 - [x] M0 Foundations
@@ -31,7 +31,7 @@ M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 11 Seed version 4 (tests 21b1194, impl 96a9f2e)
 - [x] 12 UI components
 - [x] 13 Client foundations UI (tests b623e08, impl 3f00424)
-- [ ] 14 Billing UI and Demo AI
+- [x] 14 Billing UI and Demo AI (tests f1de9c8, impl b25fa65)
 - [ ] 15 Module Library and Builder UI
 - [ ] 16 Stats and feedback UI
 - [ ] 17 Evidence UI
@@ -65,6 +65,7 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - F1 (M0, ?reset=1): fixed; awaiting user re-check. Cause: editing only the hash (`#/staff?reset=1`) never reloads the page and the hash form was not read. Both forms now work (resetParam.ts, hashchange reload), with e2e for both against the base-path build. Fix commit: see git log "fix: ?reset=1 works before the hash".
 
 ## Known issues
+- Chunk 14: C19 usage omits Battle Rooms limit (data layer has no count); C6 preview is minimal until chunk 15.
 - e2e 'C1 updates in one tab when Jade passes the refresher in another tab' (client-dashboard.spec.ts) failed once, passed on rerun: possible flake, watch it.
 - Action versions in deploy.yml unconfirmed (VERIFY, in review checklist). Commit b6146c5 touched protected files (docs/questions-for-user.md).
 
@@ -126,3 +127,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-26: M3 chunk 12 UI components landed (tests 280b023, impl 1447299), check.sh green. Added qrcode-generator 2.0.4 and jest-dom 7.0.1 (see docs/decisions.md 'M3 chunk 12'). Stopping at a clean point; chunk 13 next.
 - 2026-10-26: M3 chunk 13 client foundations UI landed (tests b623e08, impl 3f00424), check.sh green. Stopping at a clean point; chunk 14 next.
 - e2e/two-factor.spec.ts: rare (~1 in 10 isolated runs) timeout in persona/enrol flows under load; added settle waits in 3a-fix commit, full check.sh green. Watch it.
+- 2026-10-27: M3 chunk 14 billing UI and Demo AI landed (tests f1de9c8, impl b25fa65), check.sh green. Stopping at a clean point; chunk 15 next.
