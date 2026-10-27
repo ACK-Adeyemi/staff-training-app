@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M3
 Milestone base commit: bb460c4
-Next step: M3 chunk 17 (Evidence UI: S8 actions, S17 upload with image processing, C27 queue and review, first aiders print, C3 upload on behalf and Send reminder, evidence.spec.ts) per docs/plans/m3.md. Open: nothing filters by site switcher yet (chunk 19); onboarding hide not persisted; two-tab seed race.
+Next step: M3 chunk 18 (Rules, reminders, notifications and calendars UI: C5, C16, S13, C3 job role edit, C2 Add staff member, S18 with .ics, C28 with week assign and forecast; reminders.spec.ts, calendar.spec.ts; large, may split 18a/18b) per docs/plans/m3.md. Open: nothing filters by site switcher yet (chunk 19); onboarding hide not persisted; two-tab seed race.
 
 ## Milestones
 - [x] M0 Foundations
@@ -34,7 +34,7 @@ M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 14 Billing UI and Demo AI (tests f1de9c8, impl b25fa65)
 - [x] 15 Module Library and Builder UI (15a tests/impl ccc3e09; 15b tests 818c1c0, impl f01ee4d)
 - [x] 16 Stats and feedback UI (tests 0411da5, impl 79f0751)
-- [ ] 17 Evidence UI
+- [x] 17 Evidence UI (tests 52bb2d1, impl fe3d7c0)
 - [ ] 18 Rules, reminders, notifications and calendars UI
 - [ ] 19 Multi-site, leaderboards and themes UI
 - [ ] 20 Help, tickets and data UI
@@ -132,3 +132,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-27: M3 chunk 15b module builder landed; check.sh green except the known billing.spec.ts:120 load flake (passes alone). Chunk 16 next.
 - 2026-10-27: M3 chunk 15b module builder landed (f01ee4d). Full e2e green on rerun (465 passed); billing.spec.ts:120 flake appeared only in runs overlapping other load. Chunk 16 next.
 - 2026-10-27: M3 chunk 16 stats and feedback UI landed (C8 full, C9, C29, S5 to S7, minimal P5 and P10); see docs/decisions.md 'M3 chunk 16'. Chunk 17 next.
+- 2026-10-27: M3 chunk 17 evidence UI landed (fe3d7c0), check.sh green. Chunk 18 next.
