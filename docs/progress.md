@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M3
 Milestone base commit: bb460c4
-Next step: M3 chunk 19 (Multi-site, leaderboards and themes UI: C1 comparison, C2 grouped, site filter across every client page, S10 scopes and Sites board, C14 settings and full ranking, C12 eligibility pickers, C17 and theme application; multisite.spec.ts, themes.spec.ts; large, split 19a/19b) per docs/plans/m3.md. Open: no module exists for the New starter induction requirement so the default induction rule assigns nothing (decisions M3 chunk 18a).
+Next step: M3 chunk 19b (themes: C17 presets, builder with contrast checks, schedule, apply to staff or admin, phone preview, saved count; app/theme.ts DisplayPrefsProvider applying themeCssVariables before accessibility overrides; C12 competition eligibility pickers deferred from M2; themes.spec.ts) per docs/plans/m3.md. Open: no module exists for the New starter induction requirement so the default induction rule assigns nothing (decisions M3 chunk 18a).
 
 ## Milestones
 - [x] M0 Foundations
@@ -36,7 +36,7 @@ M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 16 Stats and feedback UI (tests 0411da5, impl 79f0751)
 - [x] 17 Evidence UI (tests 52bb2d1, impl fe3d7c0)
 - [x] 18 Rules, reminders, notifications and calendars UI (18a tests 91a1552, impl 0e8eb76; 18b tests ebdc820, impl f7d4d08)
-- [ ] 19 Multi-site, leaderboards and themes UI
+- [ ] 19 Multi-site, leaderboards and themes UI: 19a multi-site and leaderboards done (tests 8f0a7f2, impl 37184f2); 19b themes C17, theme application, C12 eligibility pickers next
 - [ ] 20 Help, tickets and data UI
 - [ ] 21 Track A and docs
 M2: all 17 chunks done.
@@ -135,3 +135,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-27: M3 chunk 17 evidence UI landed (fe3d7c0), check.sh green. Chunk 18 next.
 - 2026-10-27: M3 chunk 18a rules, reminders, notifications landed (0e8eb76). two-factor.spec.ts:67 desktop flaked once under load (known). Chunk 18b next.
 - 2026-10-27: M3 chunk 18b calendars landed (f7d4d08), check.sh green. Chunk 19 next.
+- 2026-10-27: M3 chunk 19a multi-site and leaderboards landed (37184f2), check.sh green. Chunk 19b next.
