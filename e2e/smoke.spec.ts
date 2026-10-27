@@ -8,6 +8,7 @@ import {
   m3BillingRoutes,
   m3CalendarRoutes,
   m3ThemeRoutes,
+  m3HelpRoutes,
   m3EvidenceRoutes,
   m3Routes,
   m3StatsRoutes,
@@ -74,6 +75,7 @@ const routes: Route[] = [
     ...m3EvidenceRoutes,
     ...m3CalendarRoutes,
     ...m3ThemeRoutes,
+    ...m3HelpRoutes,
   ].map((r) => ({
     hash: r.hash,
     name: `M3 ${r.hash} ${r.label}`,
@@ -101,7 +103,7 @@ for (const colorScheme of ['light', 'dark'] as const) {
 for (const colorScheme of ['light', 'dark'] as const) {
   test.describe(`high contrast, ${colorScheme}`, () => {
     test.use({ colorScheme });
-    for (const route of [...m2Routes, ...m3CalendarRoutes, ...m3ThemeRoutes]) {
+    for (const route of [...m2Routes, ...m3CalendarRoutes, ...m3ThemeRoutes, ...m3HelpRoutes]) {
       test(`${route.hash} passes axe with high contrast (${colorScheme})`, async ({ page }) => {
         await page.goto(`./${route.hash}`);
         await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();

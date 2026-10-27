@@ -128,3 +128,11 @@ export const m3CalendarRoutes: NavEntry[] = [
 
 /** M3 chunk 19b routes (themes). */
 export const m3ThemeRoutes: NavEntry[] = [{ hash: '#/client/themes', label: 'Themes' }];
+
+/** M3 chunk 20a routes (help and tickets). Ticket thread routes (with an id) are covered in tickets.spec.ts. */
+export const m3HelpRoutes: NavEntry[] = [
+  { hash: '#/staff/help', label: 'Help' },
+  { hash: '#/staff/help/ticket/new', label: 'Raise a ticket' },
+  { hash: '#/client/help', label: 'Help' },
+  { hash: '#/client/help/ticket/new', label: 'Raise a ticket' },
+];
