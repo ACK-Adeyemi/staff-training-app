@@ -460,6 +460,8 @@ export type TeamMember = {
   status: UserAccount['status'];
   roleIds: Id[];
   scope?: Scope;
+  /** Why this person's access cannot be changed or revoked by the actor: their own, or the only Account Owner. */
+  accessLocked?: 'self' | 'lastOwner';
 };
 
 /** An activity entry: ids, action names and counts only. Never note text, feedback text or file contents. */

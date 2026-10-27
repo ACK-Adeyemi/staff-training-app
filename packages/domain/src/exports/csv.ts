@@ -11,7 +11,8 @@ export const csvField = (s: string): string => quote(csvGuard(s));
 export type CsvColumn = { key: string; header: string };
 export type CsvCell = string | number | boolean | null | undefined;
 
-export function toCsv(columns: CsvColumn[], rows: Record<string, CsvCell>[]): string {
+/** `footer` is an optional last line of text, such as the "formerly" note. */
+export function toCsv(columns: CsvColumn[], rows: Record<string, CsvCell>[], footer?: string): string {
   const cell = (v: CsvCell): string => {
     if (v === null || v === undefined) return '';
     if (typeof v === 'string') return csvField(v);
@@ -19,6 +20,7 @@ export function toCsv(columns: CsvColumn[], rows: Record<string, CsvCell>[]): st
   };
   const lines = [columns.map((c) => csvField(c.header)).join(',')];
   for (const row of rows) lines.push(columns.map((c) => cell(row[c.key])).join(','));
+  if (footer) lines.push(csvField(footer));
   return lines.join('\r\n') + '\r\n';
 }
 

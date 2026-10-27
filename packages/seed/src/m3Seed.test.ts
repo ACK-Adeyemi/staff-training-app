@@ -677,3 +677,62 @@ describe('seed version 4: onboarding checklist (assumption 10)', () => {
     expect(new Date(row.startedAt).getTime()).toBeLessThan(NOW.getTime());
   });
 });
+
+describe('seeded rules through the data layer (M3 review fix)', () => {
+  it('writes nothing when the jobs run on a fresh seed, today or tomorrow (so the app can run them at boot)', async () => {
+    const s = await world();
+    const before = hashStores((await s.admin.dumpAll()) as Dump);
+    await s.admin.runJobs(TODAY);
+    await s.admin.runJobs(new Date(Date.parse(TODAY) + DAY).toISOString());
+    expect(hashStores((await s.admin.dumpAll()) as Dump)).toEqual(before);
+  });
+
+  const actorOf = (s: Awaited<ReturnType<typeof world>>) =>
+    ({ userId: s.user('priya'), side: 'client', clientId: s.la, now: TODAY }) as const;
+
+  it('saves every seeded rule unchanged without an error', async () => {
+    const s = await world();
+    const actor = actorOf(s);
+    const rules = await s.handle.store.autoAssign.list(actor);
+    expect(rules.length).toBe(3);
+    for (const r of rules) {
+      const { id, clientId: _clientId, ...rest } = r;
+      await expect(s.handle.store.autoAssign.save(actor, { ...rest, id }), r.name).resolves.toBeDefined();
+    }
+  });
+
+  it('points the induction rule at a published module that exists', async () => {
+    const s = await world();
+    const mod = (s.dump['modules'] as Module[]).find((m) => m.id === moduleIds.newStarterInduction);
+    expect(mod?.status).toBe('published');
+    expect(mod?.draftContent).toBe(true);
+  });
+
+  it('preview counts the same people that running the rule assigns', async () => {
+    const s = await world();
+    const actor = actorOf(s);
+    const refresher = (await s.handle.store.autoAssign.list(actor)).find(
+      (r) => 'moduleId' in r.action && r.action.moduleId === moduleIds.safeguardingAndWhistleblowing,
+    )!;
+    await s.handle.store.autoAssign.setEnabled(actor, refresher.id, true);
+    const before = await s.handle.store.autoAssign.preview(actor, refresher.id);
+    expect(before.count).toBeGreaterThan(0);
+    await s.admin.runJobs(TODAY);
+    const made = await s.handle.store.autoAssign.history(actor, refresher.id);
+    expect(new Set(made.map((a) => a.personId))).toEqual(new Set(before.personIds));
+  });
+
+  it('previews nothing, and assigns nothing, when the rule points at a module that is not published', async () => {
+    const s = await world();
+    const actor = actorOf(s);
+    const refresher = (await s.handle.store.autoAssign.list(actor)).find(
+      (r) => 'moduleId' in r.action && r.action.moduleId === moduleIds.safeguardingAndWhistleblowing,
+    )!;
+    await s.handle.store.autoAssign.setEnabled(actor, refresher.id, true);
+    const sg = (s.dump['modules'] as Module[]).find((m) => m.id === moduleIds.safeguardingAndWhistleblowing)!;
+    await s.admin.bulkPut('modules', [{ ...sg, status: 'draft' }]);
+    expect((await s.handle.store.autoAssign.preview(actor, refresher.id)).count).toBe(0);
+    await s.admin.runJobs(TODAY);
+    expect(await s.handle.store.autoAssign.history(actor, refresher.id)).toHaveLength(0);
+  });
+});

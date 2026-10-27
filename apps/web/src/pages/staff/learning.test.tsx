@@ -565,6 +565,35 @@ describe('certificate', () => {
     expect(print).toHaveBeenCalledTimes(1);
   });
 
+  it('shows the name the organisation had when the certificate was issued, not the new one (BP-8)', async () => {
+    await renderRoute(`${base}/certificate`, 'staff', {
+      prepare: async (ctx) => {
+        await ready(ctx);
+        await finishViaStore(ctx.handle, actorFor('staff', ctx.keys), 0);
+        const d = await dump(ctx.handle);
+        const client = d.clients!.find((c) => c['id'] === ctx.keys.clients['littleAcorns'])!;
+        await ctx.handle.admin.bulkPut('clients', [
+          {
+            ...client,
+            displayName: 'Little Acorns Group',
+            nameHistory: [
+              {
+                old: 'Little Acorns',
+                new: 'Little Acorns Group',
+                changedBy: ctx.keys.users['priya'],
+                changedAt: '2026-10-20T09:00:00.000Z',
+                reviewStatus: 'pendingReview',
+              },
+            ],
+          },
+        ]);
+      },
+    });
+    expect(await screen.findByText('Certificate of completion')).toBeTruthy();
+    expect(screen.getByText(/Little Acorns(?! Group)/)).toBeTruthy();
+    expect(screen.queryByText(/Little Acorns Group/)).toBeNull();
+  });
+
   it('does not show a certificate for a module that does not exist', async () => {
     await renderRoute('/staff/module/01M0DDDDDDDDDDDDDDDDDDDDDD/certificate', 'staff');
     await screen.findByRole('heading', { level: 1 });

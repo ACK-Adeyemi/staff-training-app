@@ -161,8 +161,6 @@ export function Team() {
     if (s.kind === 'limited') return t('twoFactor.limited');
     return t('twoFactor.enrolled');
   };
-  const isOwner = (m: TeamMember) =>
-    m.roleIds.some((id) => roles.find((r) => r.id === id)?.systemKey === 'accountOwner');
 
   const invite = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -254,9 +252,8 @@ export function Team() {
       <Section id="c18-members" title={t('team.members')}>
         <ul className="m-0 flex list-none flex-col gap-3 p-0">
           {visible.map((m) => {
-            const owner = isOwner(m);
             const self = m.userId === actor.userId;
-            const locked = owner || self;
+            const locked = m.accessLocked !== undefined;
             const twoFactorLine = twoFactorText(m);
             const chosen = edits[m.userId] ?? m.roleIds[0] ?? '';
             return (

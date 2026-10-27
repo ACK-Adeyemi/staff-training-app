@@ -71,7 +71,7 @@ export function BuilderEditor({ data, onCreated }: { data: BuilderData; onCreate
           id: freshLinkKey(f),
           title: link.title,
           ...('url' in link ? { url: link.url } : { attachmentId: link.attachmentId }),
-          publisher: data.clientName,
+          publisher: data.clientName ?? t('builder.ourOrganisation'),
           kind: 'organisation',
           language: base?.language ?? 'en-GB',
           showFor: f.quiz.learnMoreFor,

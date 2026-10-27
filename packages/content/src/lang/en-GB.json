@@ -107,24 +107,6 @@
     }
   },
   "placeholder": {
-    "staff": {
-      "home": "Your home screen will be here soon.",
-      "learn": "Your training will be here soon.",
-      "progress": "Your progress will be here soon.",
-      "compete": "Competitions will be here soon.",
-      "me": "Your settings will be here soon.",
-      "notifications": "Your notifications will be here soon.",
-      "help": "Help will be here soon."
-    },
-    "client": {
-      "dashboard": "The dashboard will be here soon.",
-      "people": "Your team list will be here soon.",
-      "training": "Training will be here soon.",
-      "engage": "Competitions and rewards will be here soon.",
-      "reports": "Reports will be here soon.",
-      "settings": "Settings will be here soon.",
-      "help": "Help will be here soon."
-    },
     "provider": {
       "overview": "The overview will be here soon.",
       "clients": "The client list will be here soon.",
@@ -1499,6 +1481,7 @@
       "only": "(only {details})"
     },
     "anyJobRole": "Any job role",
+    "severalJobRoles": "Several job roles: {names}",
     "someone": "Someone",
     "requirement": "Requirement",
     "group": "Group: {name}",
@@ -1972,7 +1955,10 @@
       "removeItem": "Remove: {label}",
       "note": "You can take any of these off before you send.",
       "roleStaff": "Staff member",
-      "roleClient": "Client admin"
+      "roleClient": "Client admin",
+      "devicePhone": "Phone",
+      "deviceTablet": "Tablet",
+      "deviceComputer": "Computer"
     },
     "screenshots": {
       "add": "Add a screenshot",
@@ -2982,7 +2968,8 @@
       "correct": "Each question needs one correct answer",
       "explanation": "Each question needs an explanation",
       "pass": "Set a pass mark"
-    }
+    },
+    "ourOrganisation": "Our organisation"
   },
   "library": {
     "title": "Modules",
@@ -3118,12 +3105,6 @@
     "done": "All done",
     "markDone": "Mark as done",
     "steps": {
-      "people": "Add your people",
-      "assign": "Give out your first training",
-      "rules": "Set up a rule",
-      "theme": "Choose a theme",
-      "twoStep": "Set up two-step sign-in",
-      "export": "Try an export",
       "inviteStaff": "Invite your team",
       "reminderSettings": "Check your reminder settings",
       "assignTraining": "Give out some training",

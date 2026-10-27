@@ -20,7 +20,7 @@ export type BuilderData = {
   categories: Category[];
   categoryId: string;
   overlays: ClientLinkOverlay[];
-  clientName: string;
+  clientName: string | undefined;
 };
 
 export async function loadBuilder(
@@ -54,6 +54,6 @@ export async function loadBuilder(
     categories,
     categoryId: placements.find((p) => module !== null && p.moduleId === module.id)?.categoryId ?? '',
     overlays: overlays.filter((o) => module !== null && o.moduleId === module.id && o.siteId === undefined),
-    clientName: client?.displayName ?? 'Our organisation',
+    clientName: client?.displayName,
   };
 }

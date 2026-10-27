@@ -271,6 +271,8 @@ const errorKey = (e: unknown): MessageKey =>
       ? 'rules.limit'
       : 'rules.errorSave';
 
+const KEEP_ROLES = 'keep';
+
 function RuleForm({
   existing,
   lookups,
@@ -293,7 +295,10 @@ function RuleForm({
     : '';
   const [name, setName] = useState(existing?.name ?? '');
   const [trigger, setTrigger] = useState<AutoAssignRule['trigger']['type']>(existing?.trigger.type ?? 'personAdded');
-  const [role, setRole] = useState(existing?.filters.jobRoleIds?.[0] ?? '');
+  // A rule saved with several job roles keeps them unless the user picks something else.
+  const keptRoles = existing?.filters.jobRoleIds ?? [];
+  const severalRoles = keptRoles.length > 1;
+  const [role, setRole] = useState(severalRoles ? KEEP_ROLES : (keptRoles[0] ?? ''));
   const [requirementId, setRequirementId] = useState(
     existing?.trigger.type === 'requirementExpiring'
       ? existing.trigger.requirementId
@@ -334,7 +339,10 @@ function RuleForm({
         name: name.trim(),
         enabled: existing?.enabled ?? true,
         trigger: trigger === 'requirementExpiring' ? { type: trigger, days, requirementId } : { type: trigger },
-        filters: { ...otherFilters, ...(role ? { jobRoleIds: [role] } : {}) },
+        filters: {
+          ...otherFilters,
+          ...(role === KEEP_ROLES ? { jobRoleIds: keptRoles } : role ? { jobRoleIds: [role] } : {}),
+        },
         action: training.startsWith('g:') ? { groupId: training.slice(2) } : { moduleId: training.slice(2) },
         dueInDays: dueIn,
       });
@@ -419,6 +427,11 @@ function RuleForm({
           className={field}
         >
           <option value="">{t('rules.anyJobRole')}</option>
+          {severalRoles ? (
+            <option value={KEEP_ROLES}>
+              {t('rules.severalJobRoles', { names: keptRoles.map((id) => names.jobRoles[id] ?? id).join(', ') })}
+            </option>
+          ) : null}
           {lookups.jobRoles.map((r) => (
             <option key={r.id} value={r.id}>
               {r.name}

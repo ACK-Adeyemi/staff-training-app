@@ -118,6 +118,7 @@ const byCreated = (a: Assignment, b: Assignment): number =>
 /** What the rules need for one client, read through `all`. `people` may be replaced to include a change not yet stored. */
 async function ruleInput(all: Loader, client: Client, now: Date, people?: Person[]): Promise<DomainRuleInput> {
   const own = <T extends { clientId?: string }>(rows: T[]): T[] => rows.filter((r) => r.clientId === client.id);
+  const modules = await all<Module>('modules');
   return {
     rules: own(await all<AutoAssignRule>('autoAssignRules')),
     people: people ?? own(await all<Person>('people')),
@@ -129,7 +130,10 @@ async function ruleInput(all: Loader, client: Client, now: Date, people?: Person
     groups: own(await all<ModuleGroup>('moduleGroups')),
     now,
     amberWindowDays: client.settings.amberWindowDays,
-    modules: await all<Module>('modules'),
+    modules: modules,
+    usableModuleIds: modules
+      .filter((m) => m.status === 'published' && (m.owner === 'provider' || m.owner.clientId === client.id))
+      .map((m) => m.id),
   };
 }
 
@@ -182,6 +186,9 @@ async function planOps(
   }
   return { created, ops };
 }
+
+/** An offset day that passed unsent (quiet hours, a missed run) still fires on a run up to this many days later. */
+const REMINDER_CATCH_UP_DAYS = 1;
 
 function reminderInput(
   now: Date,
@@ -758,7 +765,7 @@ export function createRulesOperations(backend: RawBackend, options: StoreOptions
       }
 
       const data = await clientData(all, client, created);
-      const plan = planReminders(reminderInput(now, client, state, data));
+      const plan = planReminders({ ...reminderInput(now, client, state, data), catchUpDays: REMINDER_CATCH_UP_DAYS });
       for (const r of plan.send) {
         const person = data.people.find((p) => p.id === r.personId);
         const user = users.find((u) => u.side === 'staff' && u.personId === r.personId && u.status === 'active');

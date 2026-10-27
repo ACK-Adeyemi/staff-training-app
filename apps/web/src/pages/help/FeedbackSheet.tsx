@@ -37,7 +37,7 @@ export function FeedbackSheet({ open, onClose, onSent }: { open: boolean; onClos
       await store.appFeedback.submit(actor, {
         kind,
         text: text.trim(),
-        context: { screen: location.pathname, device: deviceSummary() },
+        context: { screen: location.pathname, device: deviceSummary(t) },
       });
       setText('');
       setKind('idea');

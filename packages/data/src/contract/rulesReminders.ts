@@ -816,6 +816,21 @@ export function runRulesRemindersContract(
         expect(await s.reminderNotes(s.jadeUser)).toHaveLength(1);
       });
 
+      it('sends a reminder deferred by quiet hours on a later day, once (BP-6, assumption 28)', async () => {
+        const s = await setup();
+        await s.admin.bulkPut('assignments', [s.dueAssignment(1, s.jade, SEVEN)]);
+        await s.admin.runJobs('2026-10-19T20:30:00.000Z'); // 21:30 London on the offset day: quiet
+        expect(await s.logFor(s.jade)).toEqual([]);
+        await s.admin.runJobs('2026-10-20T20:30:00.000Z'); // the next night: still quiet, still waiting
+        expect(await s.logFor(s.jade)).toEqual([]);
+        await s.admin.runJobs('2026-10-20T11:00:00.000Z'); // the next day at midday London
+        expect(await s.logFor(s.jade)).toHaveLength(1);
+        expect(await s.reminderNotes(s.jadeUser)).toHaveLength(1);
+        await s.admin.runJobs('2026-10-20T13:00:00.000Z');
+        expect(await s.logFor(s.jade)).toHaveLength(1);
+        expect(await s.reminderNotes(s.jadeUser)).toHaveLength(1);
+      });
+
       it('sends nothing late in the evening in London (21:00 onwards)', async () => {
         const s = await setup();
         await s.admin.bulkPut('assignments', [s.dueAssignment(1, s.jade, SEVEN)]);

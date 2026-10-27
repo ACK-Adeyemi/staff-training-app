@@ -79,7 +79,7 @@ const londonDate = new Intl.DateTimeFormat('en-CA', {
   day: '2-digit',
 });
 
-export function matrixCsv(matrix: Matrix, t: (key: string) => string): string {
+export function matrixCsv(matrix: Matrix, t: (key: string) => string, footer?: string): string {
   const lines: string[] = [];
   lines.push([t('matrix.csv.name'), t('matrix.csv.team'), ...matrix.columns.map((c) => c.name)].map(field).join(','));
   for (const group of matrix.groups) {
@@ -93,5 +93,6 @@ export function matrixCsv(matrix: Matrix, t: (key: string) => string): string {
       );
     }
   }
+  if (footer) lines.push(field(footer));
   return lines.join('\r\n') + '\r\n';
 }

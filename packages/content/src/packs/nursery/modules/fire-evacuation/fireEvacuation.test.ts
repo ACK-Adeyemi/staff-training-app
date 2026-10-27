@@ -60,7 +60,7 @@ describe('Fire evacuation sample module', () => {
 
   it('is not exported in nurseryModules (it is seeded as the client own module)', () => {
     expect(nurseryModules.some((m) => /fire/i.test(m.title))).toBe(false);
-    expect(nurseryModules).toHaveLength(5);
+    expect(nurseryModules).toHaveLength(6);
   });
 
   it('makes no EYFS claim beyond paragraph 3.58', () => {

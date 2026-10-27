@@ -83,5 +83,6 @@ Things only the user can check, by milestone.
 - [ ] Fire evacuation at Little Acorns (new, `packages/content/src/packs/nursery/modules/fire-evacuation/`): three lessons, questions, fictional site details, no EYFS reference.
 - [ ] Staff and client FAQs and the three release notes in `packages/content/src/lang/en-GB.json`.
 - [ ] Nursery pack additions in `packs/nursery.ts`: accepted providers and approver checklists (Paediatric first aid, Safeguarding, Food hygiene), default auto-assign rule due dates, theme preset colours.
+- [ ] New starter induction (new, `packages/content/src/packs/nursery/modules/new-starter-induction/`): two lessons and six questions, written for the demo with no source citations. Draft content label stays on. Replace with real induction content.
 - [ ] No other module text was changed in M3.
 

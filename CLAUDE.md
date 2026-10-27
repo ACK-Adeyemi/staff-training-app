@@ -71,7 +71,7 @@ This repo is built unattended by an agent team on an isolated VM. Environment an
 - Use the subagents in .claude/agents for each milestone: planner (milestone plan from the build pack), test-writer, implementer, then security-reviewer and code-reviewer before a milestone is marked done. Details in scripts/BUILD_PROMPT.md.
 
 ## Status
-- Current milestone: M3 (M0, M1, M2 done).
+- Current milestone: M4 (M0, M1, M2, M3 done).
 - Decisions: docs/brief.md section 3 and docs/decisions.md. Still open: docs/brief.md section 11.
 
 ## Working efficiently (added by the user)

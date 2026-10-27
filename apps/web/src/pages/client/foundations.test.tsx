@@ -314,6 +314,43 @@ describe('C18 Team and roles', () => {
     expect(stored.some((r) => r.name === 'Rota helper')).toBe(true);
   });
 
+  it('lets a second Account Owner be demoted, because another owner remains (lastOwnerGuard)', async () => {
+    await renderRoute('/client/team', 'client', {
+      prepare: async ({ handle, keys }) => {
+        const roles = await dump<{ id: string; systemKey?: string; owner: unknown }>(handle, 'roles');
+        const owner = need(
+          roles.find(
+            (r) =>
+              r.systemKey === 'accountOwner' && JSON.stringify(r.owner).includes(need(keys.clients['littleAcorns'])),
+          ),
+        );
+        await handle.admin.bulkPut('roleAssignments', [
+          {
+            id: '01M0EEEEEEEEEEEEEEEEEEEEEE',
+            userId: need(keys.users['daniel']),
+            roleIds: [owner.id],
+            scope: { type: 'clients', ids: [need(keys.clients['littleAcorns'])] },
+            grants: [],
+            denies: [],
+            status: 'active',
+          },
+        ]);
+      },
+    });
+    const danielRow = await memberRow('Daniel Hughes');
+    const select = within(danielRow).getByRole<HTMLSelectElement>('combobox', {
+      name: t('team.memberRole', { name: 'Daniel Hughes' }),
+    });
+    expect(select.disabled).toBe(false);
+    const priyaRow = await memberRow('Priya Shah');
+    // Your own access is never editable here.
+    expect(
+      within(priyaRow).getByRole<HTMLSelectElement>('combobox', {
+        name: t('team.memberRole', { name: 'Priya Shah' }),
+      }).disabled,
+    ).toBe(true);
+  });
+
   it('keeps the Account Owner: no enabled remove button and a note', async () => {
     await renderRoute('/client/team', 'client');
     const row = await memberRow('Priya Shah');

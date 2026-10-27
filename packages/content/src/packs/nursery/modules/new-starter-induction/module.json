@@ -1,0 +1,190 @@
+{
+  "title": "New starter induction",
+  "description": "A short welcome for someone new: who to ask, who to tell if you are worried about a child, and the first things to find out.",
+  "estimatedMinutes": 5,
+  "language": "en-GB",
+  "status": "published",
+  "version": 1,
+  "roleTags": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "Welcome and who to ask",
+      "minutes": 3
+    },
+    {
+      "id": "lesson-2",
+      "title": "Keeping everyone safe",
+      "minutes": 2
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-ind-worried",
+      "type": "mcq",
+      "prompt": "You are worried about a child. Who do you tell?",
+      "options": [
+        {
+          "id": "q-ind-worried-o1",
+          "text": "The designated safeguarding lead, straight away",
+          "correct": true
+        },
+        {
+          "id": "q-ind-worried-o2",
+          "text": "Nobody, until you are sure",
+          "correct": false
+        },
+        {
+          "id": "q-ind-worried-o3",
+          "text": "Another parent",
+          "correct": false
+        },
+        {
+          "id": "q-ind-worried-o4",
+          "text": "Wait for the next staff meeting",
+          "correct": false
+        }
+      ],
+      "explanation": "Tell the designated safeguarding lead straight away. Do not wait and do not deal with it alone.",
+      "learnMore": [],
+      "tags": ["induction"]
+    },
+    {
+      "id": "q-ind-stranger",
+      "type": "mcq",
+      "prompt": "Someone you do not know asks to collect a child. What do you do?",
+      "options": [
+        {
+          "id": "q-ind-stranger-o1",
+          "text": "Hand the child over if they seem friendly",
+          "correct": false
+        },
+        {
+          "id": "q-ind-stranger-o2",
+          "text": "Do not hand the child over and ask your manager",
+          "correct": true
+        },
+        {
+          "id": "q-ind-stranger-o3",
+          "text": "Ask the child if they know them",
+          "correct": false
+        },
+        {
+          "id": "q-ind-stranger-o4",
+          "text": "Let them wait in the room with the child",
+          "correct": false
+        }
+      ],
+      "explanation": "Never hand a child to someone you do not know. Ask your manager.",
+      "learnMore": [],
+      "tags": ["induction"]
+    },
+    {
+      "id": "q-ind-ask",
+      "type": "trueFalse",
+      "prompt": "If you are not sure what to do in your first week, it is better to ask. True or false?",
+      "options": [
+        {
+          "id": "q-ind-ask-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-ind-ask-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. Nobody expects you to know everything at once. Ask your manager or a colleague.",
+      "learnMore": [],
+      "tags": ["induction"]
+    },
+    {
+      "id": "q-ind-policies",
+      "type": "trueFalse",
+      "prompt": "You do not need to read the setting's policies in your first days. True or false?",
+      "options": [
+        {
+          "id": "q-ind-policies-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-ind-policies-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. The policies tell you what to do and what not to do, so ask to see them early.",
+      "learnMore": [],
+      "tags": ["induction"]
+    },
+    {
+      "id": "q-ind-fire",
+      "type": "mcq",
+      "prompt": "What should you find out on your first day?",
+      "options": [
+        {
+          "id": "q-ind-fire-o1",
+          "text": "Where the fire exits and the assembly point are",
+          "correct": true
+        },
+        {
+          "id": "q-ind-fire-o2",
+          "text": "Which snacks are the most popular",
+          "correct": false
+        },
+        {
+          "id": "q-ind-fire-o3",
+          "text": "Who has the longest service",
+          "correct": false
+        },
+        {
+          "id": "q-ind-fire-o4",
+          "text": "Nothing until the first drill",
+          "correct": false
+        }
+      ],
+      "explanation": "Find out where the fire exits and the assembly point are, and what to do when the alarm sounds.",
+      "learnMore": [],
+      "tags": ["induction"]
+    },
+    {
+      "id": "q-ind-kit",
+      "type": "trueFalse",
+      "prompt": "You should know where the first aid kit is. True or false?",
+      "options": [
+        {
+          "id": "q-ind-kit-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-ind-kit-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. Look for the first aid kit and the names of the trained first aiders.",
+      "learnMore": [],
+      "tags": ["induction"]
+    }
+  ],
+  "quiz": {
+    "mode": "mcq",
+    "drawCount": 6,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "passMark": 80,
+    "maxRetakes": null,
+    "feedback": true,
+    "showSourceRef": true,
+    "notesInQuiz": "choice",
+    "learnMoreFor": "all"
+  },
+  "sourceAttribution": "Written for this demo as plain-English induction guidance. Check it against your own setting's procedures.",
+  "draftContent": true,
+  "verify": [
+    "Draft content: generic induction wording written for the demo with no source citations. The user should review it and replace it with real induction content."
+  ]
+}

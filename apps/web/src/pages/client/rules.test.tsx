@@ -294,6 +294,34 @@ describe('C5 Auto-assign rules', () => {
     });
   });
 
+  it('keeps every job role of a rule that has several when it is edited and saved again', async () => {
+    let c!: Ctx;
+    let two: string[] = [];
+    await renderRoute('/client/rules', 'client', {
+      prepare: async (x) => {
+        c = x;
+        const roles = await x.handle.store.jobRoles.list(priya(x.keys));
+        two = roles.slice(0, 2).map((r) => r.id);
+        const rule = need((await rulesOf(x)).find((r) => r.name.includes('What changed in September 2026')));
+        await x.handle.admin.bulkPut('autoAssignRules', [{ ...rule, filters: { ...rule.filters, jobRoleIds: two } }]);
+      },
+    });
+    await screen.findByRole('heading', { level: 1 });
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Edit rule: What changed in September 2026 for everyone' }),
+    );
+    const dialog = await screen.findByRole('dialog', { name: 'Edit rule' });
+    const due = within(dialog).getByRole('spinbutton', { name: 'Due in (days)' });
+    await userEvent.clear(due);
+    await userEvent.type(due, '12');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Save rule' }));
+    await waitFor(async () => {
+      const saved = await ruleNamed(c, 'What changed in September 2026');
+      expect(saved.dueInDays).toBe(12);
+      expect([...(saved.filters.jobRoleIds ?? [])].sort()).toEqual([...two].sort());
+    });
+  });
+
   it('shows the no-access message without assign.manage', async () => {
     await renderRoute('/client/rules', 'client', { actor: asTestUser, prepare: (x) => addUser(x, ['people.view']) });
     expect((await screen.findByRole('heading', { level: 1 })).textContent).toBe('Auto-assign rules');

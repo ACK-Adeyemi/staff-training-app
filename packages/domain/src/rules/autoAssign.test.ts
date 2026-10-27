@@ -416,3 +416,16 @@ describe('ruleSentence', () => {
     expect(s.params.training).toBe('Induction pack');
   });
 });
+
+describe('usableModuleIds (preview and assignment agree)', () => {
+  const p = staffAt(riverside, 'Una', 'U', { jobRoleIds: [PRACTITIONER] });
+  it('plans and previews nothing for a module that is not usable, and both agree when it is', () => {
+    const r = rule();
+    const gone = input({ rules: [r], people: [p], usableModuleIds: [fire] });
+    expect(evaluateAutoAssign(added(p), gone)).toEqual([]);
+    expect(previewRule(r, gone).count).toBe(0);
+    const ok = input({ rules: [r], people: [p], usableModuleIds: [induction] });
+    expect(evaluateAutoAssign(added(p), ok)).toHaveLength(1);
+    expect(previewRule(r, ok).count).toBe(1);
+  });
+});

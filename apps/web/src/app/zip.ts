@@ -31,6 +31,8 @@ export type ZipInput = {
   bundle: ExportBundle;
   files: ExportFile[];
   clientName: string;
+  /** The organisation name in force at a date (domain displayNameAt); defaults to clientName. */
+  nameAt?: (iso: string) => string;
   amberWindowDays: number;
   now: Date;
   t: TFunction;
@@ -113,7 +115,9 @@ export function buildExportZip(input: ZipInput): Uint8Array {
         requirement,
         date: day(e.completedAt),
       }),
-      t('dataPage.moduleCertificate.issuedBy', { client: input.clientName }),
+      t('dataPage.moduleCertificate.issuedBy', {
+        client: input.nameAt ? input.nameAt(e.completedAt) : input.clientName,
+      }),
     ];
     const heading = escapeHtml(t('dataPage.moduleCertificate.heading'));
     const html =
@@ -126,7 +130,10 @@ export function buildExportZip(input: ZipInput): Uint8Array {
   const text = (name: string, content: string): void => {
     zippable[name] = [strToU8(content), { level: 6 }];
   };
-  const csv = (columns: CsvColumn[], rows: Record<string, CsvCell>[]): string => toCsv(columns, rows);
+  const formerly = bundle.formerlyNote
+    ? t('dataPage.readme.formerly', { old: bundle.formerlyNote.old, date: day(bundle.formerlyNote.changedAt) })
+    : undefined;
+  const csv = (columns: CsvColumn[], rows: Record<string, CsvCell>[]): string => toCsv(columns, rows, formerly);
 
   text(
     names.people,
@@ -231,6 +238,7 @@ export function buildExportZip(input: ZipInput): Uint8Array {
         amberWindowDays: input.amberWindowDays,
       }),
       (key) => t(key as MessageKey),
+      formerly,
     ),
   );
 

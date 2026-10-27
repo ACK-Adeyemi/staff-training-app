@@ -169,8 +169,16 @@ test.describe('Presenter panel (D2)', () => {
     await panel(page).getByRole('button', { name: 'Reset demo' }).click();
     await page.getByRole('button', { name: 'Yes, reset' }).click();
     await expect(page.getByTestId('demo-badge')).toBeVisible();
-    await page.keyboard.press('Shift+Alt+KeyP');
-    await expect.poll(async () => dayNumber(await dateText(page))).toBe(today);
+    // The reset runs the scheduled jobs before it clears the offset, so it takes a few seconds: wait for it with the panel open.
+    await expect
+      .poll(
+        async () => {
+          if (!(await panel(page).isVisible())) await page.keyboard.press('Shift+Alt+KeyP');
+          return dayNumber(await dateText(page));
+        },
+        { timeout: 30_000 },
+      )
+      .toBe(today);
   });
 
   test('the later-build items are shown disabled', async ({ page }) => {

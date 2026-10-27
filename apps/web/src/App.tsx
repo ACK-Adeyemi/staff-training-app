@@ -6,6 +6,7 @@ import { reset } from '@sta/seed';
 import { resolveActor } from './app/actor';
 import { AppProviders } from './app/providers';
 import type { DemoApi } from './app/context';
+import { fastForwardRunTimes } from './app/jobs';
 import { routes } from './app/routes';
 import type { Booted } from './demo/bootstrap';
 
@@ -56,6 +57,7 @@ function Inner({ booted }: { booted: Booted }) {
       state,
       reset: async () => {
         await reset(handle.admin);
+        await handle.admin.runJobs(systemClock.now().toISOString());
         setPersonas(await handle.admin.listPersonas());
         const next: DemoState = { ...state, clockOffsetMs: 0, persona: { side: 'staff', userId: keys.users['jade'] } };
         delete next.clientPersona;
@@ -63,11 +65,14 @@ function Inner({ booted }: { booted: Booted }) {
       },
       fastForward: async (days) => {
         // The scheduled jobs (rule triggers, reminders) run once for each day passed, as they would overnight.
-        const from = clock.now().getTime();
-        for (let day = 1; day <= days; day++) await handle.admin.runJobs(new Date(from + day * DAY_MS).toISOString());
+        // Midday runs for the days in between, then the new "now", so quiet hours cannot swallow a whole fast-forward.
+        for (const at of fastForwardRunTimes(clock.now(), days)) await handle.admin.runJobs(at);
         await save({ ...state, clockOffsetMs: state.clockOffsetMs + days * DAY_MS });
       },
-      backToToday: () => save({ ...state, clockOffsetMs: 0 }),
+      backToToday: async () => {
+        await handle.admin.runJobs(systemClock.now().toISOString());
+        await save({ ...state, clockOffsetMs: 0 });
+      },
       listOutbox: () => handle.admin.listOutbox(),
       listStaffUsers: (clientId) => handle.admin.listStaffUsers(clientId),
       listPersonas: () => handle.admin.listPersonas(),

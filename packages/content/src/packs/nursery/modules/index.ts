@@ -22,6 +22,9 @@ import sleepLesson2 from './safer-sleep/lesson-2.md?raw';
 import changedJson from './what-changed-2026/module.json';
 import changedLesson1 from './what-changed-2026/lesson-1.md?raw';
 import changedLesson2 from './what-changed-2026/lesson-2.md?raw';
+import inductionJson from './new-starter-induction/module.json';
+import inductionLesson1 from './new-starter-induction/lesson-1.md?raw';
+import inductionLesson2 from './new-starter-induction/lesson-2.md?raw';
 
 const lessonFiles = [safeguardingLesson1, safeguardingLesson2, safeguardingLesson3, safeguardingLesson4];
 
@@ -49,4 +52,6 @@ export const nurseryModules: Module[] = [
   // Safer sleep is optional (no requirement link). What changed in September 2026 is contentId(604).
   build(sleepJson, [sleepLesson1, sleepLesson2], moduleIds.saferSleep, []),
   build(changedJson, [changedLesson1, changedLesson2], moduleIds.whatChangedSeptember2026, [contentId(604)]),
+  // New starter induction is contentId(605) and the target of the default induction rule.
+  build(inductionJson, [inductionLesson1, inductionLesson2], moduleIds.newStarterInduction, [contentId(605)]),
 ];

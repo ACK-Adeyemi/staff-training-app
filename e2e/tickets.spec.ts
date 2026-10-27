@@ -128,8 +128,34 @@ test('Jade raises a ticket with two screenshots, one blurred with a drawn box, i
     expect(containsText(bytes, 'http://ns.adobe.com/xap')).toBe(false);
     expect(containsText(bytes, 'XMP')).toBe(false);
   }
-  // The blurred copy is not the same encode as the untouched copy of the same file.
-  expect(blurred).not.toEqual(plain);
+  // Decode both stored images and compare pixels: the drawn box (x 10 to 90 per cent, y 10 to 40 per cent) is solid
+  // black in the blurred copy and clearly lighter in the untouched copy; away from the box the two roughly match.
+  const mean = (inside: boolean) => async (bytes: number[]) =>
+    page.evaluate(
+      async ({ data, inBox }) => {
+        const bitmap = await createImageBitmap(new Blob([new Uint8Array(data)], { type: 'image/jpeg' }));
+        const canvas = document.createElement('canvas');
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('no canvas');
+        ctx.drawImage(bitmap, 0, 0);
+        const [x0, x1, y0, y1] = inBox ? [0.3, 0.7, 0.3, 0.38] : [0.3, 0.7, 0.6, 0.9];
+        const w = Math.floor((x1 - x0) * bitmap.width);
+        const h = Math.floor((y1 - y0) * bitmap.height);
+        const px = ctx.getImageData(Math.floor(x0 * bitmap.width), Math.floor(y0 * bitmap.height), w, h).data;
+        let sum = 0;
+        for (let i = 0; i < px.length; i += 4) sum += ((px[i] ?? 0) + (px[i + 1] ?? 0) + (px[i + 2] ?? 0)) / 3;
+        return sum / (px.length / 4);
+      },
+      { data: bytes, inBox: inside },
+    );
+  const boxMean = mean(true);
+  const outsideMean = mean(false);
+  expect(await boxMean(blurred)).toBeLessThan(25);
+  expect(await boxMean(plain)).toBeGreaterThan(150);
+  expect(Math.abs((await outsideMean(blurred)) - (await outsideMean(plain)))).toBeLessThan(20);
+  expect(await outsideMean(plain)).toBeGreaterThan(150);
 });
 
 test('a ticket shows in My tickets with its number, opens as a thread and takes a reply', async ({ page }) => {

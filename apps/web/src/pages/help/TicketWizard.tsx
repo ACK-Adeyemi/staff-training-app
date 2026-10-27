@@ -97,7 +97,7 @@ export function TicketWizard() {
     k === 'screen'
       ? location.pathname
       : k === 'device'
-        ? deviceSummary()
+        ? deviceSummary(t)
         : k === 'role'
           ? t(side === 'client' ? 'tickets.context.roleClient' : 'tickets.context.roleStaff')
           : appVersion();

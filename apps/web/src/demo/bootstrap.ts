@@ -46,6 +46,8 @@ export async function bootstrap(search: string, hash = ''): Promise<Booted> {
     await admin.setDemoState(state);
   }
   offsetMs = state.clockOffsetMs;
+  // The cron stand-in runs after boot (plan assumption 27). On a fresh seed it writes nothing (seed tests pin that).
+  await admin.runJobs(storeClock.now().toISOString());
   return {
     handle,
     keys,

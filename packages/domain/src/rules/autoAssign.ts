@@ -20,6 +20,8 @@ export type RuleInput = {
   amberWindowDays: number;
   /** Modules may name the requirements they satisfy (`requirementIds`) as well as the requirement naming them. */
   modules?: { id: string; requirementIds: string[] }[];
+  /** When given, only these modules (published, usable by the client) can be assigned; preview and assignment then agree. */
+  usableModuleIds?: string[];
 };
 
 export type Trigger =
@@ -61,7 +63,9 @@ function planPerson(rule: AutoAssignRule, p: Person, input: RuleInput, taken: Se
     dueAt = addDays(input.now, rule.dueInDays).toISOString();
   }
   const out: Planned[] = [];
+  const usable = input.usableModuleIds ? new Set(input.usableModuleIds) : undefined;
   for (const moduleId of moduleIdsOf(rule, input.groups)) {
+    if (usable && !usable.has(moduleId)) continue;
     const key = `${p.id}|${moduleId}`;
     if (taken.has(key)) continue;
     const named = input.modules?.find((m) => m.id === moduleId)?.requirementIds ?? [];

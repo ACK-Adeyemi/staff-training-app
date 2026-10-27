@@ -58,6 +58,7 @@ export type TeamMember = {
   status: 'invited' | 'active' | 'suspended';
   roleIds: string[];
   scope?: Scope;
+  accessLocked?: 'self' | 'lastOwner';
 };
 
 export type AuditLine = {
@@ -727,6 +728,29 @@ export function runIdentityOrgContract(name: string, makeStore: (options: StoreO
         expect(demoted.roleIds).toEqual([s.fx.ids.roles.supervisor]);
         // Now Olive is the only owner and cannot be removed.
         expect(await reasonOf(s.store.team.revoke(s.mega_, s.olive.id))).toBe('lastOwner');
+      });
+
+      it('flags who cannot be changed in team.members: yourself always, an Account Owner only when they are the last', async () => {
+        const s = await setup();
+        const flagOf = async (viewer: typeof s.daniel, userId: string) =>
+          (await s.store.team.members(viewer)).find((m) => m.userId === userId)?.accessLocked;
+        // Two owners: either can be demoted by someone else.
+        expect(await flagOf(s.daniel, s.fx.ids.users.priya)).toBeUndefined();
+        expect(await flagOf(s.daniel, s.olive.id)).toBeUndefined();
+        expect(await flagOf(s.priya, s.fx.ids.users.priya)).toBe('self');
+        await s.admin.bulkPut('roleAssignments', [
+          {
+            id: freshId(2020),
+            userId: s.olive.id,
+            roleIds: [s.fx.ids.roles.aOwner],
+            scope: { type: 'clients', ids: [s.a] },
+            grants: [],
+            denies: [],
+            status: 'suspended',
+          },
+        ]);
+        // One owner left: the last one is locked.
+        expect(await flagOf(s.daniel, s.fx.ids.users.priya)).toBe('lastOwner');
       });
 
       it('revokes a member: their access stops and the audit event is written', async () => {

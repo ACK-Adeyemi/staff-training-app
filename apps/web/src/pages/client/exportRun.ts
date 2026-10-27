@@ -2,7 +2,7 @@
 // own attachment access, so a file they may not see is simply left out.
 import type { ActorContext, DataStore, ExportBundle } from '@sta/data';
 import type { TFunction } from '@sta/content';
-import { exportFileNames } from '@sta/domain';
+import { displayNameAt, exportFileNames } from '@sta/domain';
 import { buildExportZip, type ExportFile } from '../../app/zip';
 
 async function certificateFiles(store: DataStore, actor: ActorContext, bundle: ExportBundle): Promise<ExportFile[]> {
@@ -55,6 +55,7 @@ export async function buildExport(
       bundle,
       files: await certificateFiles(store, actor, bundle),
       clientName: client.displayName,
+      nameAt: (iso) => displayNameAt(client, iso),
       amberWindowDays: client.settings.amberWindowDays,
       now,
       t,

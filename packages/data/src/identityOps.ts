@@ -284,6 +284,7 @@ export function createIdentityOperations(backend: RawBackend, options: StoreOpti
       const call = await clientCall(ctx, 'staff.view');
       const clientId = call.clientId as string;
       const assignments = await call.all<RoleAssignment>('roleAssignments');
+      const roles = await call.all<Role>('roles');
       const members: TeamMember[] = (await call.all<UserAccount>('users'))
         .filter((u) => u.side === 'client' && u.clientId === clientId)
         .map((u) => {
@@ -296,6 +297,11 @@ export function createIdentityOperations(backend: RawBackend, options: StoreOpti
             status: u.status,
             roleIds: [...new Set(mine.flatMap((a) => a.roleIds))],
             ...(scope ? { scope } : {}),
+            ...(!canEditRolesOf(call.actor.user.id, u.id)
+              ? { accessLocked: 'self' as const }
+              : !lastOwnerGuard({ type: 'deleteUser', userId: u.id }, assignments, roles, call.actor.now).ok
+                ? { accessLocked: 'lastOwner' as const }
+                : {}),
           };
         });
       return members.sort((a, b) =>

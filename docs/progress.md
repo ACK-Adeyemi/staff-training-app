@@ -2,15 +2,15 @@
 Status: IN PROGRESS
 Mode: unattended
 Branch: agent/poc-build
-Current milestone: M3
+Current milestone: M4
 Milestone base commit: bb460c4
-Next step: M3 reviews: security-reviewer then code-reviewer on git diff bb460c4...HEAD against docs/plans/m3.md; fix Critical/High security and Must-fix code findings (max two rounds); then acceptance results, review checklist, CLAUDE.md status.
+Next step: M4 Provider story: write docs/plans/m4.md with the planner (record the M4 base commit first).
 
 ## Milestones
 - [x] M0 Foundations
 - [x] M1 Client story core
 - [x] M2 Engagement
-- [ ] M3 Client admin depth
+- [x] M3 Client admin depth
 - [ ] M4 Provider story
 - [ ] M5 Polish and demo readiness
 - [ ] M6 Luxury retail pack
@@ -61,6 +61,8 @@ M1 (final commit 5b87b6d, scripts/check.sh fully green): BP-1 refresher on 390x8
 
 M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to F-11 each proven by tests listed in docs/plans/m2.md (domain, contract on both adapters, seed, component, Playwright incl. Track A steps 3, 4, 7, axe in light, dark and high contrast, text scale 200%, no-network). Pass. Phone checks deferred to user in docs/review-checklist.md. Security review: FAIL first pass (1 High cross-site standings leak, 2 Medium, several Low), fixed in 6425abe; two Lows (nickname collision, small-team percentages) accepted and logged in docs/decisions.md. Code review: APPROVE with Should fixes left open (builder multi-press UI test confirmation, Switch/Chip use fixed min-h instead of --target-min token, C8 unanswered-order test could pass vacuously, no Pause in read-aloud).
 
+M3 (scripts/check.sh fully green on the final commit, see session log): every acceptance criterion in docs/plans/m3.md 'Acceptance criteria' is proven by the domain, contract (both adapters), seed, component and Playwright tests listed in the plan (Track A steps for M3, axe, 200% text, dark mode, no-network). Pass. Phone checks and Draft content deferred to user in docs/review-checklist.md. Security review: findings fixed in 832c5f8 (see docs/decisions.md 'M3 security review'). Code review: Must fixes done (docs/decisions.md 'M3 review fixes'); leftovers under Known issues.
+
 ## User feedback
 - F1 (M0, ?reset=1): fixed; awaiting user re-check. Cause: editing only the hash (`#/staff?reset=1`) never reloads the page and the hash form was not read. Both forms now work (resetParam.ts, hashchange reload), with e2e for both against the base-path build. Fix commit: see git log "fix: ?reset=1 works before the hash".
 
@@ -70,6 +72,8 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - Action versions in deploy.yml unconfirmed (VERIFY, in review checklist). Commit b6146c5 touched protected files (docs/questions-for-user.md).
 
 - e2e flakes seen once each and passing on rerun: client-dashboard.spec.ts (C1 two tabs), track-a.spec.ts desktop. (FIXED in chunk 14: stale module progress after lesson finish; watch only) client-dashboard C1 two-tab flake had recurred in 3 full runs (chunks 11, 13): investigate its cause (cross-tab update timing) at the start of chunk 14 or in M2 review.
+
+- M3 code review leftovers (not fixed, by decision): placeholders not all in adminConfig; ModuleLibrary stats computed in the UI; duplicate London-day helpers; .ics DTSTAMP hour rounding; reminders e2e cap check is loose; affected-now preview ignores the actor's scope; reports.test privacy check is narrow; ContrastCheck formula duplicated in the UI.
 
 ## Session log
 - 2026-10-25: session started, created progress.md, M0 planning.
@@ -141,3 +145,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-27: M3 chunk 20b data and retention landed (c548430), check.sh green. Chunk 21 next.
 - 2026-10-27: M3 chunk 21 Track A steps, F-5 audit, demo script and review checklist landed. Screenshot review of C7, C8, C19, C27, S17, S18, C28 at 390x844 and desktop done: two layout fixes (C7 PDF input overflow, tab bar label wrap), see decisions. M3 chunks complete.
 - 2026-10-27: M3 chunk 21 Track A steps and docs landed; all 21 chunks done. Reviews next.
+- 2026-10-27: M3 security and code reviews done, fixes landed, full check.sh green. M3 complete. M4 next.

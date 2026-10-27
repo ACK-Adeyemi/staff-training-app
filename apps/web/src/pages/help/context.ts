@@ -1,5 +1,5 @@
 // What a ticket or feedback note sends along by default (brief 25.3). Short plain words, never the raw browser string.
-import type { MessageKey } from '@sta/content';
+import type { MessageKey, TFunction } from '@sta/content';
 
 export const CONTEXT_ITEMS = ['screen', 'device', 'role', 'version'] as const;
 export type ContextKey = (typeof CONTEXT_ITEMS)[number];
@@ -13,10 +13,16 @@ const BROWSERS: [RegExp, string][] = [
 ];
 
 /** For example "Phone, Chrome". */
-export function deviceSummary(): string {
+export function deviceSummary(t: TFunction): string {
   const agent = typeof navigator === 'undefined' ? '' : navigator.userAgent;
   const width = typeof window === 'undefined' ? 1024 : window.innerWidth;
-  const kind = width < 600 ? 'Phone' : width < 1024 ? 'Tablet' : 'Computer';
+  const kind = t(
+    width < 600
+      ? 'tickets.context.devicePhone'
+      : width < 1024
+        ? 'tickets.context.deviceTablet'
+        : 'tickets.context.deviceComputer',
+  );
   const browser = BROWSERS.find(([re]) => re.test(agent))?.[1];
   return browser ? `${kind}, ${browser}` : kind;
 }

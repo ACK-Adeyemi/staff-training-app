@@ -352,6 +352,119 @@ describe('quiet hours', () => {
   });
 });
 
+describe('assignments whose requirement is waiting or already met (BP-15, BP-6)', () => {
+  const sgMod = requirement('Safeguarding module', { renewEveryMonths: 24, satisfiedByModuleIds: [moduleId] });
+  const p = staffAt(s, 'Ext', 'Ernal');
+  const a = (days: number) => dueIn(p, days, T, { createdAt: addDays(T, -10).toISOString() });
+
+  it('sends the reminder when nothing else is going on', () => {
+    expect(plan({ requirements: [sgMod], people: [p], assignments: [a(7)] }).send).toHaveLength(1);
+  });
+
+  it('skips it, with the reason, while a certificate for that requirement awaits a check', () => {
+    const r = plan({
+      requirements: [sgMod],
+      people: [p],
+      assignments: [a(7)],
+      submissions: [submissionWaiting(p, sgMod)],
+    });
+    expect(r.send).toEqual([]);
+    expect(r.skipped).toEqual([expect.objectContaining({ personId: p.id, reason: 'awaitingCheck' })]);
+  });
+
+  it('sends no overdue reminder once approved Evidence recorded since the assignment meets the requirement', () => {
+    const ext = evidenceExpiring(p, sgMod, 700, {
+      kind: 'external',
+      completedAt: addDays(T, -2).toISOString(),
+      approvedAt: addDays(T, -1).toISOString(),
+      expiresAt: addDays(T, 700).toISOString(),
+    });
+    const r = plan({ requirements: [sgMod], people: [p], assignments: [a(-1)], evidence: [ext] });
+    expect(r.send).toEqual([]);
+    expect(r.deferred).toEqual([]);
+  });
+
+  it('still reminds when the Evidence on file is older than the assignment (a refresher before expiry)', () => {
+    const old = evidenceExpiring(p, sgMod, 60, {
+      completedAt: addDays(T, -600).toISOString(),
+      expiresAt: addDays(T, 60).toISOString(),
+    });
+    expect(
+      plan({ requirements: [sgMod], people: [p], assignments: [a(7)], evidence: [old] }).send.filter(
+        (x: { kind: string }) => x.kind === 'dueSoon',
+      ),
+    ).toHaveLength(1);
+  });
+});
+
+describe('catching up after quiet hours (BP-6, assumption 28)', () => {
+  const p = staffAt(s, 'Cat', 'Chup');
+  // Offset day 19 October, 22:00 London (21:00Z) is quiet. The next run is the next morning.
+  const night = new Date('2026-10-19T21:00:00.000Z');
+  const morning = new Date('2026-10-20T09:00:00.000Z');
+  const a = assignment(p, moduleId, 7, {
+    dueAt: addDays(night, 7).toISOString(),
+    createdAt: addDays(night, -3).toISOString(),
+  });
+
+  it('defers on the offset night and sends on a later run, once', () => {
+    const first = plan({ now: night, people: [p], assignments: [a], catchUpDays: 1 });
+    expect(first.send).toEqual([]);
+    expect(first.deferred).toHaveLength(1);
+    const later = plan({ now: morning, people: [p], assignments: [a], catchUpDays: 1 });
+    expect(later.send).toEqual([expect.objectContaining({ kind: 'dueSoon', targetId: a.id, offset: 7 })]);
+    const log = later.send.map((x: { key: string }) => ({
+      key: x.key,
+      clientId: CLIENT,
+      personId: p.id,
+      kind: 'dueSoon' as const,
+      sentAt: morning.toISOString(),
+      weekKey: londonWeekKey(morning),
+    }));
+    expect(plan({ now: morning, people: [p], assignments: [a], catchUpDays: 1, log }).send).toEqual([]);
+  });
+
+  it('does not catch up unless asked to (default is the exact offset day only)', () => {
+    expect(plan({ now: morning, people: [p], assignments: [a] }).send).toEqual([]);
+  });
+
+  it('does not catch up what the weekly cap stopped on the offset day', () => {
+    const used = Array.from({ length: 3 }, (_, i) => ({
+      key: `${p.id}:dueSoon:${nextId()}:${i}`,
+      clientId: CLIENT,
+      personId: p.id,
+      kind: 'dueSoon' as const,
+      sentAt: addDays(night, -1).toISOString(),
+      weekKey: londonWeekKey(night),
+    }));
+    expect(plan({ now: morning, people: [p], assignments: [a], catchUpDays: 1, log: used }).send).toEqual([]);
+  });
+
+  it('does not catch up an assignment made after the offset day', () => {
+    const fresh = { ...a, createdAt: morning.toISOString() };
+    expect(plan({ now: morning, people: [p], assignments: [fresh], catchUpDays: 1 }).send).toEqual([]);
+  });
+
+  it('does not catch up once the assignment is done', () => {
+    const done = { ...a, status: 'done' as const };
+    expect(plan({ now: morning, people: [p], assignments: [done], catchUpDays: 1 }).send).toEqual([]);
+  });
+
+  it('catches up an expiry reminder too, but not if the certificate was renewed since', () => {
+    const e = evidenceExpiring(p, sg, 30, {
+      completedAt: addDays(night, -700).toISOString(),
+      expiresAt: addDays(night, 30).toISOString(),
+    });
+    const r = plan({ now: morning, people: [p], evidence: [e], catchUpDays: 1 });
+    expect(r.send).toEqual([expect.objectContaining({ kind: 'expiring', offset: 30 })]);
+    const renewed = evidenceExpiring(p, sg, 700, {
+      completedAt: addDays(morning, -1).toISOString(),
+      expiresAt: addDays(morning, 700).toISOString(),
+    });
+    expect(plan({ now: morning, people: [p], evidence: [e, renewed], catchUpDays: 1 }).send).toEqual([]);
+  });
+});
+
 describe('renderReminder', () => {
   const params = { firstName: 'Jade', training: 'Fire safety', date: '5 November' };
 

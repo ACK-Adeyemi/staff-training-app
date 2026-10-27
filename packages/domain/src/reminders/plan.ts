@@ -1,6 +1,7 @@
 // Reminder planning (brief 21.1; plan M3 assumptions 28 and 29). Pure: the caller sends and logs what comes back.
-// Reminders fire only on the exact offset days. There is no catch-up if a run is missed (docs/decisions.md, M3 chunk 2).
-import { daysBetween } from '../dates';
+// Reminders fire on the offset days. With `catchUpDays` (the jobs pass 1) an offset day that passed without a send, for
+// example because it fell in quiet hours, still fires on a later run until the next offset (docs/decisions.md, M3 review fixes).
+import { addDays, daysBetween, startOfLondonDay } from '../dates';
 import { londonWeekKey } from '../engagement/weeks';
 import { personRequirementStatus } from '../requirements';
 import type { ReminderLog } from '../schemas/admin';
@@ -35,6 +36,11 @@ export type PlanInput = {
   evidence: Evidence[];
   submissions: EvidenceSubmission[];
   log: ReminderLog[];
+  /**
+   * How many London days back an offset day still counts (default 0: only today's offsets). The log key stops a second
+   * send, and a reminder is only caught up when the assignment or Evidence already existed on the offset day.
+   */
+  catchUpDays?: number;
 };
 
 type Range = { from: string; to: string };
@@ -74,26 +80,87 @@ const rangesFor = (policy: ReminderPolicy, p: Person): Range[] => [
 
 type Candidate = { kind: ReminderKind; targetId: string; offset: number; waiting: boolean };
 
-function candidates(input: PlanInput, p: Person): Candidate[] {
+/**
+ * Whether an open module assignment is still worth a reminder (BP-15). 'waiting': a certificate for a requirement the
+ * module satisfies is awaiting a check. 'met': Evidence recorded since the assignment was made now meets it.
+ */
+function assignmentState(input: PlanInput, p: Person, site: Site, a: Assignment): 'open' | 'waiting' | 'met' {
+  if (!('moduleId' in a.target)) return 'open';
+  const moduleId = a.target.moduleId;
+  const ev = input.evidence.filter((e) => e.personId === p.id);
+  const subs = input.submissions.filter((s) => s.personId === p.id);
+  let waiting = false;
+  for (const r of input.requirements.filter((x) => x.satisfiedByModuleIds.includes(moduleId))) {
+    const s = personRequirementStatus(r, p, site, ev, subs, input.now, 0);
+    if (s.status === 'awaitingCheck' || s.evidenceWaiting === true) waiting = true;
+    else if (
+      s.status === 'current' &&
+      ev.some(
+        (e) =>
+          e.requirementId === r.id &&
+          new Date(e.approvedAt ?? e.completedAt).getTime() >= new Date(a.createdAt).getTime(),
+      )
+    )
+      return 'met';
+  }
+  return waiting ? 'waiting' : 'open';
+}
+
+function candidatesAt(input: PlanInput, p: Person, back: number): Candidate[] {
   const out: Candidate[] = [];
+  const ref = back === 0 ? input.now : addDays(input.now, -back);
+  const endOfRef = startOfLondonDay(addDays(ref, 1)).getTime();
+  const site = input.sites.find((s) => s.id === p.primarySiteId);
   for (const a of input.assignments) {
     if (a.personId !== p.id || a.status !== 'open') continue;
-    const days = daysBetween(input.now, new Date(a.dueAt));
-    if (days > 0 && input.policy.dueOffsetsDays.includes(days)) {
-      out.push({ kind: 'dueSoon', targetId: a.id, offset: days, waiting: false });
-    } else if (days < 0 && (-days - 1) % 7 === 0) {
-      out.push({ kind: 'overdue', targetId: a.id, offset: -days, waiting: false });
-    }
+    if (back > 0 && new Date(a.createdAt).getTime() >= endOfRef) continue;
+    const days = daysBetween(ref, new Date(a.dueAt));
+    const dueSoon = days > 0 && input.policy.dueOffsetsDays.includes(days);
+    const overdue = days < 0 && (-days - 1) % 7 === 0;
+    if (!dueSoon && !overdue) continue;
+    const state = site ? assignmentState(input, p, site, a) : 'open';
+    if (state === 'met') continue;
+    out.push({
+      kind: dueSoon ? 'dueSoon' : 'overdue',
+      targetId: a.id,
+      offset: dueSoon ? days : -days,
+      waiting: state === 'waiting',
+    });
   }
-  const site = input.sites.find((s) => s.id === p.primarySiteId);
   if (site) {
     const ev = input.evidence.filter((e) => e.personId === p.id);
     const subs = input.submissions.filter((s) => s.personId === p.id);
+    const evThen = back === 0 ? ev : ev.filter((e) => new Date(e.approvedAt ?? e.completedAt).getTime() < endOfRef);
     for (const r of input.requirements) {
-      const s = personRequirementStatus(r, p, site, ev, subs, input.now, 36500);
+      const s = personRequirementStatus(r, p, site, evThen, subs, ref, 36500);
       if (s.expiresAt === undefined || s.daysLeft === undefined || s.daysLeft <= 0) continue;
       if (!input.policy.expiringOffsetsDays.includes(s.daysLeft)) continue;
-      out.push({ kind: 'expiring', targetId: r.id, offset: s.daysLeft, waiting: s.status === 'awaitingCheck' });
+      const now = back === 0 ? s : personRequirementStatus(r, p, site, ev, subs, input.now, 36500);
+      // Renewed since the offset day: the old reminder would be stale.
+      if (back > 0 && now.expiresAt !== s.expiresAt) continue;
+      out.push({ kind: 'expiring', targetId: r.id, offset: s.daysLeft, waiting: now.status === 'awaitingCheck' });
+    }
+  }
+  return out;
+}
+
+/** Today's candidates, plus (with catchUpDays) earlier offset days for targets with nothing due today. */
+function candidates(input: PlanInput, p: Person): Candidate[] {
+  const out = candidatesAt(input, p, 0);
+  const seen = new Set(out.map((c) => `${c.kind === 'overdue' ? 'dueSoon' : c.kind}:${c.targetId}`));
+  for (let back = 1; back <= (input.catchUpDays ?? 0); back++) {
+    // Only quiet hours (or a missed run) are caught up. If the weekly cap was already used up that day, the cap stopped it.
+    const ref = addDays(input.now, -back);
+    const endOfRef = startOfLondonDay(addDays(ref, 1)).getTime();
+    const usedThen = input.log.filter(
+      (l) => l.personId === p.id && l.weekKey === londonWeekKey(ref) && new Date(l.sentAt).getTime() < endOfRef,
+    ).length;
+    if (usedThen >= input.policy.weeklyCapPerPerson) continue;
+    for (const c of candidatesAt(input, p, back)) {
+      const id = `${c.kind === 'overdue' ? 'dueSoon' : c.kind}:${c.targetId}`;
+      if (seen.has(id)) continue;
+      seen.add(id);
+      out.push(c);
     }
   }
   return out;
