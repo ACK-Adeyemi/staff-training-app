@@ -178,9 +178,9 @@ describe('releaseNoteSchema', () => {
       moduleVersions: [{ moduleId: id(32), version: 2 }],
     };
     expect(releaseNoteSchema.safeParse(base).success).toBe(true);
-    expect(
-      releaseNoteSchema.safeParse({ ...base, moduleVersions: [{ moduleId: id(32), version: 0 }] }).success,
-    ).toBe(false);
+    expect(releaseNoteSchema.safeParse({ ...base, moduleVersions: [{ moduleId: id(32), version: 0 }] }).success).toBe(
+      false,
+    );
   });
 });
 

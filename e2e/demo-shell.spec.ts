@@ -212,12 +212,14 @@ test.describe('Presenter panel (D2)', () => {
 });
 
 test.describe('D3 outbox', () => {
-  test('shows the empty state', async ({ page }) => {
+  test('shows the seeded price notice for Brookfield Primary School', async ({ page }) => {
+    // Seed version 5 (M4) puts one message in the Outbox: the notice of the confirmed price change.
     await page.goto('./#/demo/outbox');
     await expect(page.getByRole('heading', { level: 1, name: 'Outbox' })).toBeVisible();
+    await expect(page.getByText(/Your plan price changes on/).first()).toBeVisible();
     await expect(
       page.getByText('Nothing has been sent yet. In the demo, messages are shown here instead of being sent.'),
-    ).toBeVisible();
+    ).toHaveCount(0);
   });
 });
 

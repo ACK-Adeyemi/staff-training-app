@@ -48,7 +48,7 @@ describe('seed version 5', () => {
       ['linkCheckResults', linkCheckResultSchema],
     ];
     for (const [store, schema] of checks) {
-      expect(dump[store]?.length, `${store} is seeded`).toBeGreaterThan(0);
+      expect(dump[store].length, `${store} is seeded`).toBeGreaterThan(0);
       for (const r of dump[store]!) expect(() => schema.parse(r), store).not.toThrow();
     }
   });
@@ -160,7 +160,9 @@ describe('seeded Learn more link check', () => {
 describe('seeded Other entries and saved replies', () => {
   it('has the trending issue type phrase 5 times in 30 days, linked to real tickets', async () => {
     const { dump } = await world();
-    const g = dump['otherEntryGroups']!.find((x) => x.field === 'issueType' && /certificate won.t download/i.test(x.normalised));
+    const g = dump['otherEntryGroups']!.find(
+      (x) => x.field === 'issueType' && /certificate won.t download/i.test(x.normalised),
+    );
     expect(g).toBeDefined();
     expect(g.count).toBe(5);
     expect(g.ticketIds).toHaveLength(5);
@@ -183,7 +185,8 @@ describe('seeded Other entries and saved replies', () => {
     const oneOffs = groups.filter((x) => x.count === 1);
     expect(oneOffs).toHaveLength(2);
     expect(groups).toHaveLength(4);
-    for (const g of groups) for (const tid of g.ticketIds) expect(dump['tickets']!.some((t) => t.id === tid)).toBe(true);
+    for (const g of groups)
+      for (const tid of g.ticketIds) expect(dump['tickets']!.some((t) => t.id === tid)).toBe(true);
   });
 
   it('has 5 saved replies, at least one using the firstName placeholder', async () => {

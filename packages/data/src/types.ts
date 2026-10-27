@@ -123,6 +123,18 @@ export const storeNames = [
   'tickets',
   'ticketMessages',
   'faqVotes',
+  'priceAdjustments',
+  'ownershipTransfers',
+  'announcements',
+  'releaseNotes',
+  'recoveryRequests',
+  'dataRequests',
+  'incidents',
+  'otherEntryGroups',
+  'savedReplies',
+  'profileChangeRequests',
+  'linkCheckResults',
+  'moduleNotices',
 ] as const;
 export type StoreName = (typeof storeNames)[number];
 

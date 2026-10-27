@@ -1,6 +1,18 @@
 // The small storage interface an adapter implements. Everything else (validation, tenancy, permissions, audit,
 // copies) lives in createStore, so the memory and IndexedDB adapters enforce exactly the same rules.
 import {
+  priceAdjustmentSchema,
+  ownershipTransferSchema,
+  announcementSchema,
+  releaseNoteSchema,
+  recoveryRequestSchema,
+  dataRequestSchema,
+  incidentSchema,
+  otherEntryGroupSchema,
+  savedReplySchema,
+  profileChangeRequestSchema,
+  linkCheckResultSchema,
+  moduleNoticeSchema,
   addOnRequestSchema,
   addOnSchema,
   appFeedbackSchema,
@@ -132,6 +144,18 @@ const parsers: Record<StoreName, Parser> = {
   tickets: ticketSchema,
   ticketMessages: ticketMessageSchema,
   faqVotes: faqVoteSchema,
+  priceAdjustments: priceAdjustmentSchema,
+  ownershipTransfers: ownershipTransferSchema,
+  announcements: announcementSchema,
+  releaseNotes: releaseNoteSchema,
+  recoveryRequests: recoveryRequestSchema,
+  dataRequests: dataRequestSchema,
+  incidents: incidentSchema,
+  otherEntryGroups: otherEntryGroupSchema,
+  savedReplies: savedReplySchema,
+  profileChangeRequests: profileChangeRequestSchema,
+  linkCheckResults: linkCheckResultSchema,
+  moduleNotices: moduleNoticeSchema,
 };
 
 /** Parses with the domain schema; throws ValidationError listing every issue. Returns the cleaned record. */

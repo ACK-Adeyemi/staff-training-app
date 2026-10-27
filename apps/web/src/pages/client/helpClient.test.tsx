@@ -144,7 +144,7 @@ describe('C23 Help: My tickets and Organisation tickets', () => {
       },
     });
     const org = (await screen.findByRole('heading', { level: 2, name: 'Organisation tickets' })).closest('section');
-    expect((await within(need(org)).findByRole('link', { name: /T-1004.*Quiz will not start/ })).textContent).toContain(
+    expect((await within(need(org)).findByRole('link', { name: /T-1015.*Quiz will not start/ })).textContent).toContain(
       'Jade',
     );
   });
@@ -180,9 +180,9 @@ describe('C23 Raise a ticket and thread', () => {
     );
     expect(screen.queryByRole('checkbox', { name: 'Share with my manager' })).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Send ticket' }));
-    expect((await screen.findByRole('status')).textContent).toContain('Your ticket T-1004 has been sent.');
+    expect((await screen.findByRole('status')).textContent).toContain('Your ticket T-1015 has been sent.');
     expect(screen.getByRole('link', { name: 'See my tickets' }).getAttribute('href')).toBe('#/client/help');
-    const t = await ticketNumbered(c.handle, 'T-1004');
+    const t = await ticketNumbered(c.handle, 'T-1015');
     expect(t).toMatchObject({ raiserSide: 'client', featureId: 'reports', sharedWithManager: false });
   });
 

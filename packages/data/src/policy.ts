@@ -168,7 +168,7 @@ export const forbid = (reason: ForbiddenReason): never => {
   throw new ForbiddenError(reason);
 };
 
-/** The M3 stores no operation is wired to yet: every actor is refused until a later chunk adds its operations. */
+/** The M3 and M4 stores no operation is wired to yet: every actor is refused until a later chunk adds its operations. */
 const UNWIRED_STORES: ReadonlySet<StoreName> = new Set<StoreName>([
   'moduleDrafts',
   'moduleVersions',
@@ -186,6 +186,18 @@ const UNWIRED_STORES: ReadonlySet<StoreName> = new Set<StoreName>([
   'tickets',
   'ticketMessages',
   'faqVotes',
+  'priceAdjustments',
+  'ownershipTransfers',
+  'announcements',
+  'releaseNotes',
+  'recoveryRequests',
+  'dataRequests',
+  'incidents',
+  'otherEntryGroups',
+  'savedReplies',
+  'profileChangeRequests',
+  'linkCheckResults',
+  'moduleNotices',
 ]);
 
 /**

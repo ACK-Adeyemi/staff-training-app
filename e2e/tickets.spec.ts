@@ -1,7 +1,7 @@
 // M3 chunk 20a (BP-16, F-3): Help, tickets and app feedback end to end. Written before the implementation.
 // Contract: see apps/web/src/pages/staff/helpStaff.test.tsx (S14 to S16) and apps/web/src/pages/client/helpClient.test.tsx
 // (C23). Seed: Jade (staff) has T-1002 (resolved); Priya has T-1001 (in progress); Daniel raised T-1003. A new ticket
-// is T-1004. Screenshots go through the real app/images prepareImage (canvas), so stored files are re-encoded JPEGs.
+// is T-1015. Screenshots go through the real app/images prepareImage (canvas), so stored files are re-encoded JPEGs.
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import { containsText, exifJpeg, GPS_MARKER } from './helpers/files';
@@ -97,14 +97,14 @@ test('Jade raises a ticket with two screenshots, one blurred with a drawn box, i
   await noSeriousAxe(page);
   await expectTouchTarget(page.getByRole('button', { name: 'Send ticket' }));
   await page.getByRole('button', { name: 'Send ticket' }).click();
-  await expect(page.getByRole('status').filter({ hasText: 'Your ticket T-1004 has been sent.' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'Your ticket T-1015 has been sent.' })).toBeVisible();
   await page.getByRole('link', { name: 'See my tickets' }).click();
-  await expect(page.getByRole('link', { name: /T-1004.*My notes will not save/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /T-1015.*My notes will not save/ })).toBeVisible();
   expect(Date.now() - started).toBeLessThan(60_000);
 
   // Stored: the removed context item is gone, and both images are clean re-encoded JPEGs.
   const tickets = await readStore(page, 'tickets');
-  const ticket = tickets.find((t) => t['number'] === 'T-1004');
+  const ticket = tickets.find((t) => t['number'] === 'T-1015');
   expect(ticket).toBeTruthy();
   const context = ticket?.['context'] as Record<string, string>;
   expect(Object.keys(context)).not.toContain('device');
@@ -167,10 +167,10 @@ test('a ticket shows in My tickets with its number, opens as a thread and takes 
   await next(page).click();
   await expect(stepHeading(page, 'Check and send')).toBeVisible();
   await page.getByRole('button', { name: 'Send ticket' }).click();
-  await expect(page.getByRole('status').filter({ hasText: 'Your ticket T-1004 has been sent.' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'Your ticket T-1015 has been sent.' })).toBeVisible();
   await page.getByRole('link', { name: 'See my tickets' }).click();
-  await page.getByRole('link', { name: /T-1004.*Quiz will not start/ }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Ticket T-1004' })).toBeVisible();
+  await page.getByRole('link', { name: /T-1015.*Quiz will not start/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Ticket T-1015' })).toBeVisible();
   await noSeriousAxe(page);
   await page.getByRole('textbox', { name: 'Reply' }).fill('It also happens on the second quiz.');
   await page.getByRole('button', { name: 'Send reply' }).click();

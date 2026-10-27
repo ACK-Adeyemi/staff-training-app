@@ -44,7 +44,7 @@
 //     App version, each with a button "Remove: <label>" (NEW key tickets.context.removeItem). A removed item shows
 //     "Removed" and its key is NOT in the stored context. Context keys: screen, device, role, version.
 //     Staff only: checkbox "Share with my manager" (NEW), default off. Button "Send ticket" calls tickets.raise with
-//     the answers, the remaining context and the uploaded screenshot ids, then shows role=status "Your ticket T-1004
+//     the answers, the remaining context and the uploaded screenshot ids, then shows role=status "Your ticket T-1015
 //     has been sent." and a link "See my tickets" to #/staff/help.
 //     When staff tickets are switched off: role=alert "Support requests from staff are switched off. Ask your manager."
 //     and no steps.
@@ -415,9 +415,9 @@ describe('S15 Raise a ticket', () => {
     await answerUpToReview(user, { ...answers, feature: 'Quizzes', impact: "I can't use the app" });
     expect(screen.getByRole<HTMLInputElement>('checkbox', { name: 'Share with my manager' }).checked).toBe(false);
     await user.click(screen.getByRole('button', { name: 'Send ticket' }));
-    expect((await screen.findByRole('status')).textContent).toContain('Your ticket T-1004 has been sent.');
+    expect((await screen.findByRole('status')).textContent).toContain('Your ticket T-1015 has been sent.');
     expect(screen.getByRole('link', { name: 'See my tickets' }).getAttribute('href')).toBe('#/staff/help');
-    const t = await ticketNumbered(c.handle, 'T-1004');
+    const t = await ticketNumbered(c.handle, 'T-1015');
     expect(t).toMatchObject({
       raisedBy: c.keys.users['jade'],
       raiserSide: 'staff',
@@ -442,7 +442,7 @@ describe('S15 Raise a ticket', () => {
     await user.click(screen.getByRole('checkbox', { name: 'Share with my manager' }));
     await user.click(screen.getByRole('button', { name: 'Send ticket' }));
     await screen.findByRole('status');
-    expect((await ticketNumbered(c.handle, 'T-1004')).sharedWithManager).toBe(true);
+    expect((await ticketNumbered(c.handle, 'T-1015')).sharedWithManager).toBe(true);
   });
 
   it('sends the screen, device, role and app version by default, and not what Jade removed', async () => {
@@ -457,7 +457,7 @@ describe('S15 Raise a ticket', () => {
     expect(group.getByText('Removed')).toBeTruthy();
     await user.click(screen.getByRole('button', { name: 'Send ticket' }));
     await screen.findByRole('status');
-    const t = await ticketNumbered(c.handle, 'T-1004');
+    const t = await ticketNumbered(c.handle, 'T-1015');
     expect(Object.keys(t.context).sort()).toEqual(['role', 'screen', 'version']);
     expect(JSON.stringify(t.context)).not.toMatch(/jsdom|Mozilla|Chrome/i);
   });
@@ -479,7 +479,7 @@ describe('S15 Raise a ticket', () => {
     await user.click(screen.getByRole('button', { name: 'Send ticket' }));
     await screen.findByRole('status');
     expect(hoisted.calls.map((x) => x.boxes.length)).toEqual([1, 0]);
-    const t = await ticketNumbered(c.handle, 'T-1004');
+    const t = await ticketNumbered(c.handle, 'T-1015');
     const shots = (
       await dump<{
         id: string;
@@ -516,7 +516,7 @@ describe('S15 Raise a ticket', () => {
     });
     await user.click(screen.getByRole('button', { name: 'Send ticket' }));
     await screen.findByRole('status');
-    const t = await ticketNumbered(c.handle, 'T-1004');
+    const t = await ticketNumbered(c.handle, 'T-1015');
     const first = need((await dump<TicketMessage>(c.handle, 'ticketMessages')).find((m) => m.ticketId === t.id));
     expect(first.attachmentIds).toHaveLength(1);
     const shots = (await dump<{ purpose?: string }>(c.handle, 'attachments')).filter(

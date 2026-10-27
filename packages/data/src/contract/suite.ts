@@ -79,6 +79,18 @@ const ALL_STORES: StoreName[] = [
   'tickets',
   'ticketMessages',
   'faqVotes',
+  'priceAdjustments',
+  'ownershipTransfers',
+  'announcements',
+  'releaseNotes',
+  'recoveryRequests',
+  'dataRequests',
+  'incidents',
+  'otherEntryGroups',
+  'savedReplies',
+  'profileChangeRequests',
+  'linkCheckResults',
+  'moduleNotices',
 ];
 
 type Setup = { store: DataStore; admin: StoreHandle['admin']; fx: Fixture; options: StoreOptions };

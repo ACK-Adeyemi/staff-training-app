@@ -46,10 +46,10 @@ async function world() {
 }
 
 describe('seed version 4 (assumption 53)', () => {
-  it('is 4, and load stores it in the seed metadata', async () => {
-    expect(SEED_VERSION).toBe(4);
+  it('is 5 (M4), and load stores it in the seed metadata', async () => {
+    expect(SEED_VERSION).toBe(5);
     const { admin } = await seeded();
-    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 4 });
+    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 5 });
   });
 
   it('reseeds a stored version 3 world with the same seed value and today', async () => {
@@ -59,10 +59,11 @@ describe('seed version 4 (assumption 53)', () => {
     await admin.setSeedMeta({ ...SEED, seedVersion: 3 });
     const keys = await ensureCurrentSeed(admin);
     expect(keys).not.toBeNull();
-    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 4 });
+    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 5 });
     const dump = (await admin.dumpAll()) as Dump;
     expect(dump['moduleFeedback']!.length).toBeGreaterThan(20);
-    expect(dump['tickets']).toHaveLength(3);
+    // Seed version 5 (M4) adds tickets from other clients; Little Acorns still has its three.
+    expect(dump['tickets']!.filter((t) => t.clientId === keys!.clients['littleAcorns'])).toHaveLength(3);
     expect(dump['clients']).toHaveLength(13);
   });
 
@@ -145,10 +146,11 @@ describe('seed version 4: earlier streams and compliance untouched', () => {
     expect(hashStores({ evidence: dump['evidence']! })['evidence']).toBe(EARLIER['evidence']);
   });
 
-  it('keeps the audit log and the outbox empty', async () => {
+  it('keeps the audit log empty and the outbox with only the M4 price notice', async () => {
     const { dump } = await world();
     expect(dump['audit']).toHaveLength(0);
-    expect(dump['outbox']).toHaveLength(0);
+    // Seed version 5 (M4) adds the Brookfield price change notice; nothing else is in the Outbox.
+    expect(dump['outbox']).toHaveLength(1);
   });
 });
 
@@ -356,9 +358,9 @@ describe('seed version 4: app feedback and tickets (assumption 54)', () => {
 
   it('has 3 tickets at Little Acorns: Priya in progress, Jade resolved, Daniel received', async () => {
     const { dump, la, user } = await world();
-    const tickets = (dump['tickets'] as unknown[]).map((t) => ticketSchema.parse(t));
+    // Seed version 5 (M4) adds tickets from other clients, so look at Little Acorns' own.
+    const tickets = (dump['tickets'] as unknown[]).map((t) => ticketSchema.parse(t)).filter((t) => t.clientId === la);
     expect(tickets).toHaveLength(3);
-    for (const t of tickets) expect(t.clientId).toBe(la);
     expect(new Set(tickets.map((t) => t.number)).size).toBe(3);
     const by = (k: string) => tickets.find((t) => t.raisedBy === user(k))!;
     expect(by('priya')).toMatchObject({ status: 'inProgress', raiserSide: 'client' });

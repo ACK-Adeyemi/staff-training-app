@@ -30,7 +30,12 @@ async function world() {
   const fx = await buildWorld(admin);
   const actors: Record<string, ActorContext> = {
     'client owner': { userId: fx.ids.users.priya, side: 'client', clientId: fx.ids.clients.a, now: TODAY },
-    'client admin without billing': { userId: fx.ids.users.daniel, side: 'client', clientId: fx.ids.clients.a, now: TODAY },
+    'client admin without billing': {
+      userId: fx.ids.users.daniel,
+      side: 'client',
+      clientId: fx.ids.clients.a,
+      now: TODAY,
+    },
     'staff member': { userId: fx.ids.users.jade, side: 'staff', clientId: fx.ids.clients.a, now: TODAY },
     'provider owner': { userId: fx.ids.users.provOwner, side: 'provider', now: TODAY },
   };

@@ -492,11 +492,12 @@ describe('seed: validity and fictional data', () => {
     }
   });
 
-  it('writes the seed metadata and leaves the audit log and outbox empty', async () => {
+  it('writes the seed metadata and leaves the audit log empty and the outbox with only the M4 price notice', async () => {
     const { admin, dump } = await seeded();
-    expect(await admin.getSeedMeta()).toEqual({ seedValue: 20261019, today: TODAY, seedVersion: 4 });
+    expect(await admin.getSeedMeta()).toEqual({ seedValue: 20261019, today: TODAY, seedVersion: 5 });
     expect(dump['audit']).toHaveLength(0);
-    expect(dump['outbox']).toHaveLength(0);
+    // Seed version 5 (M4) adds the Brookfield price change notice; nothing else is in the Outbox.
+    expect(dump['outbox']).toHaveLength(1);
   });
 
   it('includes the nursery pack requirements and job roles and the packages and add-ons', async () => {

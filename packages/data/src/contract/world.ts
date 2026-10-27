@@ -89,6 +89,19 @@ const SEED_LEARNING_STORES = new Set([
   'invoices',
   'billingProfiles',
   'onboarding',
+  // M4 seed version 5 (the suite builds its own).
+  'billingChangeRequests',
+  'outbox',
+  'priceAdjustments',
+  'announcements',
+  'releaseNotes',
+  'recoveryRequests',
+  'dataRequests',
+  'incidents',
+  'otherEntryGroups',
+  'savedReplies',
+  'profileChangeRequests',
+  'linkCheckResults',
 ]);
 
 /** The M2 shape of the seeded records that version 4 changes: no sign-in states, name history, theme or extra submissions. */

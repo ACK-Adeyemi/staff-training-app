@@ -860,3 +860,29 @@ Copied from docs/plans/m3.md (chunk 1). Numbers match the plan, so other docs ca
 - **Team locks.** `TeamMember.accessLocked` is `'self'` or `'lastOwner'`, set by the data layer from `canEditRolesOf` and `lastOwnerGuard`. The UI disables the role select and Remove only when it is set, so a second Account Owner can be demoted and the last cannot.
 - **Rule form roles.** A rule saved with several job roles shows "Several job roles: ..." and keeps them unless another role is chosen.
 - **Housekeeping.** Removed unused `placeholder.staff.*`, `placeholder.client.*` and the six old `onboarding.steps.*` keys. "Our organisation" and the Phone, Tablet and Computer words moved into the language file.
+
+## M4 assumptions
+
+Recorded when M4 chunk 1 was built (plan docs/plans/m4.md, Assumptions and conflicts).
+
+1. D3 was not read when the plan was written. Confirm its scope in build pack 5.4 before the Track B chunk.
+2. Routes follow the pack. P2, P7, P11, P14 and P18 replace existing placeholders; the rest are new routes.
+3. The step-up code for price confirmation reuses the simulated 2FA code in `packages/domain/src/twoFactor.ts`.
+4. Ownership transfer cooling-off defaults to 7 days (placeholder), skipped by Fast-forward through the Clock.
+5. Recovery cooling-off defaults to 24 hours (placeholder). Two approvers must be different provider users, and the person being recovered cannot approve (enforced by the schema).
+6. Price change notice defaults to 30 days (the schema fills it in). A change with no end date runs until cancelled.
+7. Update billing name to match applies to invoices issued after the update. Issued invoices are never edited.
+8. The link check is simulated and deterministic: only the seeded broken link fails. No network requests.
+9. Provider module feedback shows names removed (brief 19.1). Learner notes are never exposed.
+10. Provider permissions use can() and entitled(). No role-name checks in the UI.
+11. Both adapters must pass every new contract test. New stores are deny-all in `policy.ts` until a later chunk wires their operations.
+12. No conflict between the brief and the pack found so far.
+
+Chunk 1 choices:
+
+13. There is no separate open-count event schema. Learn more open counts are computed from the seeded `learnMoreOpened` learning events, which carry a `linkId`.
+14. Telemetry schemas (UsageDaily, ApiDaily, ErrorGroup, LogEntry) are left to a later chunk.
+15. Store and schema names are chunk 1 choices: `priceAdjustments`, `ownershipTransfers`, `announcements`, `releaseNotes`, `recoveryRequests`, `dataRequests`, `incidents`, `otherEntryGroups`, `savedReplies`, `profileChangeRequests`, `linkCheckResults`, `moduleNotices` (IndexedDB version 5). `ownershipTransfers`, `recoveryRequests`, `profileChangeRequests` and `moduleNotices` carry a clientId index.
+16. `PriceAdjustment` status values are draft, submitted, scheduled, active, ended, cancelled (the pack's names). "Awaiting confirmation" in the plan is `submitted`. The schema only requires an effective date and a confirmer to appear together on a scheduled or active change; the lifecycle in the domain and data ops (later chunks) refuse to schedule without both.
+17. `OwnershipTransfer` gains optional `acceptedAt` and `twoFactorConfirmedAt` so acceptance and the simulated 2FA step can be recorded. `ModuleNotice` is one record per targeted client.
+18. Seed version 5 adds a Harbour Cafe Group account owner (fictional) with an Account Owner role, so its billing address request has a real requester, and billing profiles for Brookfield and Harbour. Provider-side tickets for the Other entries review come from Oak Tree and Willow Lane users, so Little Acorns keeps its three tickets. The Outbox holds exactly one seeded message (the Brookfield price notice).

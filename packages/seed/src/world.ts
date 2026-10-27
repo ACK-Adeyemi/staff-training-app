@@ -16,6 +16,18 @@ import {
   startOfLondonDay,
   ulid,
   type AccountState,
+  type Announcement,
+  type BillingChangeRequest,
+  type DataRequest,
+  type Incident,
+  type LinkCheckResult,
+  type OtherEntryGroup,
+  type OutboxMessage,
+  type PriceAdjustment,
+  type ProfileChangeRequest,
+  type RecoveryRequest,
+  type ReleaseNote,
+  type SavedReply,
   type AddOnSubscription,
   type AppFeedback,
   type AutoAssignRule,
@@ -62,6 +74,7 @@ import {
 } from '@sta/domain';
 import { buildHistory } from './history';
 import { buildBilling, buildFeedback, buildM3History, buildSupport } from './m3';
+import { buildM4 } from './m4';
 
 /** Well-known keys are declared properties, so reading one gives a string; any other key is looked up by index. */
 type KeyMap<K extends string> = Record<K, string> & Record<string, string>;
@@ -168,6 +181,19 @@ export type SeedData = {
   invoices: Invoice[];
   billingProfiles: BillingProfile[];
   onboarding: OnboardingChecklist[];
+  // Added in M4 (seed version 5).
+  billingChangeRequests: BillingChangeRequest[];
+  outbox: OutboxMessage[];
+  priceAdjustments: PriceAdjustment[];
+  announcements: Announcement[];
+  releaseNotes: ReleaseNote[];
+  recoveryRequests: RecoveryRequest[];
+  dataRequests: DataRequest[];
+  incidents: Incident[];
+  otherEntryGroups: OtherEntryGroup[];
+  savedReplies: SavedReply[];
+  profileChangeRequests: ProfileChangeRequest[];
+  linkCheckResults: LinkCheckResult[];
 };
 
 const POLICY_BODY = `## Little Acorns Safeguarding policy
@@ -645,6 +671,8 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     m3history: root.fork('m3history'),
     feedback: root.fork('feedback'),
     support: root.fork('support'),
+    // Added in M4, drawn last.
+    m4: root.fork('m4'),
   };
   const newId = (rng: Rng) => (): string => ulid(clock, rng);
   const ago = (days: number): Date => addDays(today, -days);
@@ -701,6 +729,18 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     invoices: [],
     billingProfiles: [],
     onboarding: [],
+    billingChangeRequests: [],
+    outbox: [],
+    priceAdjustments: [],
+    announcements: [],
+    releaseNotes: [],
+    recoveryRequests: [],
+    dataRequests: [],
+    incidents: [],
+    otherEntryGroups: [],
+    savedReplies: [],
+    profileChangeRequests: [],
+    linkCheckResults: [],
   };
 
   keys.requirements = {
@@ -1177,6 +1217,9 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
   buildM3History({ data, keys, today, clock, rng: streams.m3history });
   buildFeedback({ data, keys, today, clock, rng: streams.feedback });
   buildSupport({ data, keys, today, clock, rng: streams.support });
+
+  // M4: provider story (price changes, profile changes, link check, Other entries, comms).
+  buildM4({ data, keys, today, clock, rng: streams.m4 });
 
   return { data, keys };
 }

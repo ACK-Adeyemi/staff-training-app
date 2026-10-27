@@ -89,10 +89,10 @@ function jadePosition(w: W, events: LearningEvent[] = w.events, attempts: Attemp
 }
 
 describe('seed version (assumption 33; 4 after M3)', () => {
-  it('is 4 and load stores it', async () => {
-    expect(SEED_VERSION).toBe(4);
+  it('is 5 and load stores it', async () => {
+    expect(SEED_VERSION).toBe(5);
     const { admin } = await seeded();
-    expect((await admin.getSeedMeta())?.seedVersion).toBe(4);
+    expect((await admin.getSeedMeta())?.seedVersion).toBe(5);
   });
 
   it('is deterministic: two loads with the same seed give identical stores, including the new ones', async () => {
