@@ -125,3 +125,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-26: M3 chunk 11 seed version 4 landed (tests 21b1194, impl 96a9f2e), check.sh green. 10b carry-overs (anonymise files, Closed deletion date) done. Stopping at a clean point; chunk 12 next.
 - 2026-10-26: M3 chunk 12 UI components landed (tests 280b023, impl 1447299), check.sh green. Added qrcode-generator 2.0.4 and jest-dom 7.0.1 (see docs/decisions.md 'M3 chunk 12'). Stopping at a clean point; chunk 13 next.
 - 2026-10-26: M3 chunk 13 client foundations UI landed (tests b623e08, impl 3f00424), check.sh green. Stopping at a clean point; chunk 14 next.
+- e2e/two-factor.spec.ts: rare (~1 in 10 isolated runs) timeout in persona/enrol flows under load; added settle waits in 3a-fix commit, full check.sh green. Watch it.
