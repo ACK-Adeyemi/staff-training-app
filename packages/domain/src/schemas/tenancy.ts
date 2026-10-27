@@ -29,6 +29,8 @@ export const reminderTemplateSchema = z.object({
   text: z.string().min(1).max(300).optional(),
 });
 
+export const reminderTemplatesSchema = z.record(z.string(), reminderTemplateSchema);
+
 const battleSettingsSchema = z.object({
   allowStaffHost: z.boolean().default(true),
   allowCrossSite: z.boolean().default(true),

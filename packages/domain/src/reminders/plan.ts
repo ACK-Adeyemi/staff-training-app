@@ -158,6 +158,45 @@ export function renderReminder(
   });
 }
 
+export type ReminderTone = 'friendly' | 'neutral' | 'brief';
+export const MAX_REMINDER_TEXT = 300;
+
+const TONE_TEXT: Record<ReminderTone, Record<ReminderKind, string>> = {
+  friendly: {
+    dueSoon: 'Hi {firstName}, {training} is due on {date}.',
+    overdue: 'Hi {firstName}, {training} was due on {date}. Please finish it when you can.',
+    expiring: 'Hi {firstName}, your {training} certificate runs out on {date}.',
+  },
+  neutral: {
+    dueSoon: '{firstName}, {training} is due on {date}.',
+    overdue: '{firstName}, {training} was due on {date} and is now overdue.',
+    expiring: '{firstName}, your {training} certificate expires on {date}.',
+  },
+  brief: {
+    dueSoon: '{training}: due {date}.',
+    overdue: '{training}: overdue since {date}.',
+    expiring: '{training}: expires {date}.',
+  },
+};
+
+/** The message used when a client has not written their own. Unknown kinds fall back to the due-soon wording. */
+export function defaultReminderText(kind: string, tone: ReminderTone = 'friendly'): string {
+  const set = TONE_TEXT[tone];
+  return kind === 'overdue' ? set.overdue : kind === 'expiring' ? set.expiring : set.dueSoon;
+}
+
+/** Whether a client-written message can be saved: 1 to 300 characters, only {firstName}, {training} and {date}. */
+export function checkReminderTemplate(text: string): 'ok' | 'empty' | 'tooLong' | 'unknownPlaceholder' {
+  if (text.length === 0) return 'empty';
+  if (text.length > MAX_REMINDER_TEXT) return 'tooLong';
+  try {
+    renderReminder(text, { firstName: '', training: '', date: '' });
+  } catch {
+    return 'unknownPlaceholder';
+  }
+  return 'ok';
+}
+
 export type ChaseSkipReason = SkipReason | 'accountState';
 
 /** Everyone with something overdue right now, whatever the offsets, and who would be skipped and why. */
@@ -209,6 +248,8 @@ type DigestInput = Omit<PlanInput, 'log' | 'accountState'>;
 type Chase = {
   overdue: Assignment[];
   expiring: { requirementId: string; daysLeft: number; waiting: boolean }[];
+  /** Requirements that have already run out (or were never met), as "Chase all overdue" counts them. */
+  lapsed: { requirementId: string; daysOver: number; waiting: boolean }[];
 };
 
 /** Open assignments past their due date, and Evidence that runs out within the policy's widest expiry offset. */
@@ -218,17 +259,22 @@ function chaseItems(input: DigestInput, p: Person): Chase {
   );
   const widest = Math.max(0, ...input.policy.expiringOffsetsDays);
   const expiring: Chase['expiring'] = [];
+  const lapsed: Chase['lapsed'] = [];
   const site = input.sites.find((s) => s.id === p.primarySiteId);
   if (site) {
     const ev = input.evidence.filter((e) => e.personId === p.id);
     const subs = input.submissions.filter((s) => s.personId === p.id);
     for (const r of input.requirements) {
       const s = personRequirementStatus(r, p, site, ev, subs, input.now, 36500);
+      if (s.status === 'overdue') {
+        const over = s.daysLeft === undefined ? 1 : Math.max(1, -s.daysLeft);
+        lapsed.push({ requirementId: r.id, daysOver: over, waiting: s.evidenceWaiting === true });
+      }
       if (s.expiresAt === undefined || s.daysLeft === undefined || s.daysLeft <= 0 || s.daysLeft > widest) continue;
       expiring.push({ requirementId: r.id, daysLeft: s.daysLeft, waiting: s.status === 'awaitingCheck' });
     }
   }
-  return { overdue, expiring };
+  return { overdue, expiring, lapsed };
 }
 
 /** Who has something overdue and who has Evidence about to expire, each person once per list. Sends nothing. */
@@ -251,7 +297,7 @@ export type ManualSkipReason = SkipReason | 'nothingToChase';
 export type ManualReminder = {
   personId: string;
   kind: 'overdue' | 'expiring';
-  /** The assignment id (overdue) or requirement id (expiring) the reminder names. */
+  /** The assignment id (overdue), or the requirement id (overdue with no assignment, or expiring), the reminder names. */
   targetId: string;
   /** Days overdue or days left. */
   offset: number;
@@ -281,12 +327,13 @@ export function planManualSend(
       a.dueAt === b.dueAt ? (a.id < b.id ? -1 : 1) : a.dueAt < b.dueAt ? -1 : 1,
     )[0];
     const ready = items.expiring.filter((e) => !e.waiting);
+    const lapsedReady = items.lapsed.filter((e) => !e.waiting);
     const reason: ManualSkipReason | undefined =
-      !first && items.expiring.length === 0
+      !first && items.expiring.length === 0 && items.lapsed.length === 0
         ? 'nothingToChase'
         : state
           ? state
-          : !first && ready.length === 0
+          : !first && ready.length === 0 && lapsedReady.length === 0
             ? 'awaitingCheck'
             : inQuietHours(input.now, rangesFor(input.policy, p))
               ? 'quietHours'
@@ -301,6 +348,13 @@ export function planManualSend(
         kind: 'overdue',
         targetId: first.id,
         offset: Math.max(1, -daysBetween(input.now, new Date(first.dueAt))),
+      });
+    } else if (lapsedReady[0]) {
+      send.push({
+        personId: id,
+        kind: 'overdue',
+        targetId: lapsedReady[0].requirementId,
+        offset: lapsedReady[0].daysOver,
       });
     } else {
       const e = ready[0] as (typeof ready)[number];

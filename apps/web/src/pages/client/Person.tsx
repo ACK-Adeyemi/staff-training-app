@@ -1,12 +1,13 @@
 import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import { Button, Card, Dialog, PageHeader, StatusBadge } from '@sta/ui';
-import { can, personRequirementRows } from '@sta/domain';
+import { can, personRequirementRows, type Person } from '@sta/domain';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { formatLondonDate } from '../../demo/format';
 import { UploadForm } from '../evidence/UploadForm';
 import { focusLink } from '../staff/styles';
-import { fullName, useClientData, usePermissions } from './queries';
+import { fullName, orEmpty, useClientData, usePermissions } from './queries';
 
 /** C3: one person's requirements and their status. Learner notes are never shown here. */
 export function PersonRecord() {
@@ -40,6 +41,7 @@ export function PersonRecord() {
   const site = view.sites.find((s) => s.id === person.primarySiteId);
   const target = { clientId: person.clientId, siteIds: [person.primarySiteId, ...person.additionalSiteIds] };
   const mayUpload = !!perms.data && can(perms.data, 'evidence.uploadForOthers', target);
+  const mayManage = !!perms.data && can(perms.data, 'staff.manage', target);
   const mayRemind = !!perms.data && can(perms.data, 'reminders.manage', target);
   const uploadRow = rows.find((r) => r.requirement.id === uploading);
   const remind = async () => {
@@ -69,6 +71,7 @@ export function PersonRecord() {
           {reminder ? <p role={reminder.role}>{reminder.text}</p> : null}
         </div>
       ) : null}
+      {mayManage ? <JobRoles key={person.id} person={person} /> : null}
       <section aria-labelledby="c3-reqs">
         <h2 id="c3-reqs" className="mb-3 text-lg font-bold">
           {t('client.person.requirements')}
@@ -145,5 +148,50 @@ export function PersonRecord() {
         ) : null}
       </Dialog>
     </>
+  );
+}
+
+/** C3: which job roles this person has. Changing them fires the "job role changes" auto-assign rules in the same save. */
+function JobRoles({ person }: { person: Person }) {
+  const t = useT();
+  const store = useStore();
+  const actor = useActor();
+  const queryClient = useQueryClient();
+  const roles = useQuery({ queryKey: ['jobRoles', actor.userId], queryFn: () => orEmpty(store.jobRoles.list(actor)) });
+  const [chosen, setChosen] = useState<string[]>(person.jobRoleIds);
+  const [notice, setNotice] = useState<{ role: 'status' | 'alert'; text: string } | null>(null);
+  if (!roles.data) return null;
+  const save = async () => {
+    try {
+      await store.people.update(actor, person.id, { jobRoleIds: chosen });
+      setNotice({ role: 'status', text: t('client.person.jobRolesSaved') });
+      await queryClient.invalidateQueries();
+    } catch {
+      setNotice({ role: 'alert', text: t('client.person.jobRolesError') });
+    }
+  };
+  return (
+    <fieldset className="m-0 mb-4 flex flex-col gap-1 border-0 p-0">
+      <legend className="mb-2 text-lg font-bold">{t('client.person.jobRoles')}</legend>
+      {roles.data.map((r) => (
+        <label key={r.id} className="inline-flex min-h-[var(--target-min)] items-center gap-2">
+          <input
+            type="checkbox"
+            checked={chosen.includes(r.id)}
+            onChange={(e) => {
+              setChosen(e.target.checked ? [...chosen, r.id] : chosen.filter((x) => x !== r.id));
+            }}
+            className="h-5 w-5 accent-[var(--color-accent)]"
+          />
+          {r.name}
+        </label>
+      ))}
+      <div className="mt-2">
+        <Button variant="secondary" onClick={() => void save()}>
+          {t('client.person.saveJobRoles')}
+        </Button>
+      </div>
+      {notice ? <p role={notice.role}>{notice.text}</p> : null}
+    </fieldset>
   );
 }

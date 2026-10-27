@@ -81,14 +81,18 @@ export type RulesStore = {
   };
   reminders: {
     policy(ctx: ActorContext): Promise<ReminderPolicy>;
-    savePolicy(ctx: ActorContext, policy: ReminderPolicy): Promise<ReminderPolicy>;
+    savePolicy(
+      ctx: ActorContext,
+      policy: ReminderPolicy,
+      templates?: Record<string, { tone: 'friendly' | 'neutral' | 'brief'; text?: string }>,
+    ): Promise<ReminderPolicy>;
     chaseOverdue(ctx: ActorContext, options: { preview: true }): Promise<ChaseResult>;
   };
   notifications: {
     list(ctx: ActorContext): Promise<Notification[]>;
     snooze(ctx: ActorContext, id: string): Promise<Notification>;
   };
-  me: { updatePrefs(ctx: ActorContext, patch: { quietHours?: { from: string; to: string } }): Promise<unknown> };
+  me: { updatePrefs(ctx: ActorContext, patch: { quietHours?: { from: string; to: string } | null }): Promise<unknown> };
 };
 export type JobsAdmin = DemoAdmin & { runJobs(now: string): Promise<unknown> };
 
@@ -771,6 +775,22 @@ export function runRulesRemindersContract(
         expect(await s.logFor(s.jade)).toHaveLength(4);
       });
 
+      it('saves reminder messages with the policy and refuses unknown placeholders, empty or long text', async () => {
+        const s = await setup();
+        const policy = await s.store.reminders.policy(s.actors.priya);
+        const text = 'Hi {firstName}, {training} was due on {date}.';
+        await s.store.reminders.savePolicy(s.actors.priya, policy, { overdue: { tone: 'brief', text } });
+        const stored = async () =>
+          (await dump<Client>(s.admin, 'clients')).find((c) => c.id === s.a)?.settings.reminderTemplates;
+        expect(await stored()).toEqual({ overdue: { tone: 'brief', text } });
+        for (const bad of ['Hi {surname}', '', 'x'.repeat(301)]) {
+          await expect(
+            s.store.reminders.savePolicy(s.actors.priya, policy, { overdue: { tone: 'brief', text: bad } }),
+          ).rejects.toBeInstanceOf(DataError);
+        }
+        expect(await stored()).toEqual({ overdue: { tone: 'brief', text } });
+      });
+
       it('honours the cap set in the client policy', async () => {
         const s = await setup();
         const policy = await s.store.reminders.policy(s.actors.priya);
@@ -810,6 +830,17 @@ export function runRulesRemindersContract(
         await s.admin.runJobs(TODAY); // 10:00 London
         expect(await s.logFor(s.jade)).toEqual([]);
         await s.admin.runJobs('2026-10-19T12:00:00.000Z'); // 13:00 London
+        expect(await s.logFor(s.jade)).toHaveLength(1);
+      });
+
+      it('clears the person quiet hours when updatePrefs is given null, so reminders go out again', async () => {
+        const s = await setup();
+        await s.store.me.updatePrefs(s.actors.jade, { quietHours: { from: '09:00', to: '12:00' } });
+        await s.store.me.updatePrefs(s.actors.jade, { quietHours: null });
+        const person = (await dump<Person>(s.admin, 'people')).find((p) => p.id === s.jade);
+        expect(person?.prefs.quietHours).toBeUndefined();
+        await s.admin.bulkPut('assignments', [s.dueAssignment(1, s.jade, SEVEN)]);
+        await s.admin.runJobs(TODAY);
         expect(await s.logFor(s.jade)).toHaveLength(1);
       });
 

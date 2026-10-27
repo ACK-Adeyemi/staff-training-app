@@ -339,7 +339,11 @@ export interface AccessService {
 
 export interface MeService {
   get(ctx: ActorContext): Promise<MeRecord>;
-  updatePrefs(ctx: ActorContext, patch: Partial<LearnerPrefs>): Promise<MeRecord>;
+  /** `quietHours: null` clears the person's quiet hours. */
+  updatePrefs(
+    ctx: ActorContext,
+    patch: Partial<Omit<LearnerPrefs, 'quietHours'>> & { quietHours?: LearnerPrefs['quietHours'] | null },
+  ): Promise<MeRecord>;
   updateProfile(
     ctx: ActorContext,
     patch: { nickname?: string | null; hideFromLeaderboards?: boolean },
@@ -713,8 +717,15 @@ export interface RemindersService {
   ): Promise<{ sent: Id[]; skipped: { personId: Id; reason: ManualSkipReason | 'noAccount' }[] }>;
   /** reminders.view */
   policy(ctx: ActorContext): Promise<ReminderPolicy>;
-  /** reminders.manage */
-  savePolicy(ctx: ActorContext, policy: ReminderPolicy): Promise<ReminderPolicy>;
+  /**
+   * reminders.manage. `templates` (optional) replaces the client's `settings.reminderTemplates`: a message must be 1 to
+   * 300 characters and use only {firstName}, {training} and {date}, else ValidationError and nothing is stored.
+   */
+  savePolicy(
+    ctx: ActorContext,
+    policy: ReminderPolicy,
+    templates?: Client['settings']['reminderTemplates'],
+  ): Promise<ReminderPolicy>;
   /** reminders.manage. Writes nothing. */
   chaseOverdue(ctx: ActorContext, options: { preview: true }): Promise<ChaseResult>;
 }

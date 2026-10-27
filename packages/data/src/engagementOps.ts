@@ -254,8 +254,10 @@ export function createEngagementOperations(backend: RawBackend, options: StoreOp
           display[key] = (patch as Record<string, unknown>)[key];
       const check = validateDisplayPrefs(display);
       if (!check.ok) throw new ValidationError(check.fields.map((f) => `${f}: not allowed`));
-      const defined = Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined));
-      const prefs = parsed<LearnerPrefs>(learnerPrefsSchema, { ...person.prefs, ...defined });
+      const defined = Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined && v !== null));
+      const merged: Record<string, unknown> = { ...person.prefs, ...defined };
+      if (patch.quietHours === null) delete merged['quietHours'];
+      const prefs = parsed<LearnerPrefs>(learnerPrefsSchema, merged);
       const next: Person = { ...person, prefs };
       await apply([put('people', next)]);
       return meRecord(next);

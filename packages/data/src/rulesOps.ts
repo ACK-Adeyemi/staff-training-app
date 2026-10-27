@@ -6,6 +6,8 @@ import {
   autoAssignRuleSchema,
   checkLimit,
   chasePreview,
+  checkReminderTemplate,
+  defaultReminderText,
   evaluateAutoAssign,
   defaultDisplayPrefs,
   featureAvailability,
@@ -18,6 +20,7 @@ import {
   reminderDigest,
   previewRule,
   reminderPolicySchema,
+  reminderTemplatesSchema,
   renderReminder,
   ulid,
   type AddOnSubscription,
@@ -229,7 +232,11 @@ function reminderDetails(
     };
   }
   const a = data.assignments.find((x) => x.id === targetId);
-  if (!a) return { training: '', date: '' };
+  if (!a) {
+    // An overdue requirement with no assignment: name the requirement and date it from how long it has been overdue.
+    const req = data.requirements.find((q) => q.id === targetId);
+    return { training: req?.name ?? '', date: req ? londonDateString(addDays(now, -offset)) : '' };
+  }
   const training =
     'moduleId' in a.target
       ? (modules.find((m) => m.id === (a.target as { moduleId: string }).moduleId)?.title ?? '')
@@ -237,21 +244,13 @@ function reminderDetails(
   return { training, date: londonDateString(new Date(a.dueAt)) };
 }
 
-const DEFAULT_TEXT = {
-  dueSoon: 'Hi {firstName}, {training} is due on {date}.',
-  overdue: 'Hi {firstName}, {training} was due on {date}. Please finish it when you can.',
-  expiring: 'Hi {firstName}, your {training} certificate runs out on {date}.',
-};
-
-const defaultText = (kind: string): string =>
-  kind === 'overdue' ? DEFAULT_TEXT.overdue : kind === 'expiring' ? DEFAULT_TEXT.expiring : DEFAULT_TEXT.dueSoon;
-
 function reminderText(client: Client, kind: string, params: { firstName: string; training: string; date: string }) {
-  const custom = client.settings.reminderTemplates[kind]?.text;
+  const template = client.settings.reminderTemplates[kind];
+  const custom = template?.text;
   try {
-    return renderReminder(custom ?? defaultText(kind), params);
+    return renderReminder(custom ?? defaultReminderText(kind, template?.tone), params);
   } catch {
-    return renderReminder(defaultText(kind), params);
+    return renderReminder(defaultReminderText(kind), params);
   }
 }
 
@@ -534,7 +533,7 @@ export function createRulesOperations(backend: RawBackend, options: StoreOptions
       return structuredClone(clientOf(call).settings.reminderPolicy);
     },
 
-    async savePolicy(ctx, policy) {
+    async savePolicy(ctx, policy, templates) {
       const call = await clientCall(ctx, 'reminders.manage');
       const parsed = reminderPolicySchema.safeParse(policy);
       if (!parsed.success) {
@@ -545,10 +544,30 @@ export function createRulesOperations(backend: RawBackend, options: StoreOptions
       if (offsets.some((d) => d < 1 || d > MAX_OFFSET_DAYS)) {
         throw new ValidationError([`offsets: each must be between 1 and ${String(MAX_OFFSET_DAYS)} days`]);
       }
+      let nextTemplates: Client['settings']['reminderTemplates'] | undefined;
+      if (templates !== undefined) {
+        const parsedTemplates = reminderTemplatesSchema.safeParse(templates);
+        if (!parsedTemplates.success) {
+          throw new ValidationError(parsedTemplates.error.issues.map((i) => `templates: ${i.message}`));
+        }
+        nextTemplates = parsedTemplates.data;
+        for (const [kind, template] of Object.entries(nextTemplates)) {
+          if (template.text === undefined) continue;
+          const problem = checkReminderTemplate(template.text);
+          if (problem !== 'ok') throw new ValidationError([`templates.${kind}.text: ${problem}`]);
+        }
+      }
       checkAccountState(call, false);
       const client = clientOf(call);
       await apply([
-        put('clients', { ...client, settings: { ...client.settings, reminderPolicy: next } }),
+        put('clients', {
+          ...client,
+          settings: {
+            ...client.settings,
+            reminderPolicy: next,
+            ...(nextTemplates ? { reminderTemplates: nextTemplates } : {}),
+          },
+        }),
         audit(call, client.id, 'reminders.policySaved', `client:${client.id}`, client.settings.reminderPolicy, next),
       ]);
       return structuredClone(next);

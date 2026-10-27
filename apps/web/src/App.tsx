@@ -61,7 +61,12 @@ function Inner({ booted }: { booted: Booted }) {
         delete next.clientPersona;
         await save(next);
       },
-      fastForward: (days) => save({ ...state, clockOffsetMs: state.clockOffsetMs + days * DAY_MS }),
+      fastForward: async (days) => {
+        // The scheduled jobs (rule triggers, reminders) run once for each day passed, as they would overnight.
+        const from = clock.now().getTime();
+        for (let day = 1; day <= days; day++) await handle.admin.runJobs(new Date(from + day * DAY_MS).toISOString());
+        await save({ ...state, clockOffsetMs: state.clockOffsetMs + days * DAY_MS });
+      },
       backToToday: () => save({ ...state, clockOffsetMs: 0 }),
       listOutbox: () => handle.admin.listOutbox(),
       listStaffUsers: (clientId) => handle.admin.listStaffUsers(clientId),

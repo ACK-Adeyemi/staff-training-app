@@ -44,10 +44,38 @@ export function PresenterPanel({ open, onClose }: { open: boolean; onClose: () =
       close();
     })();
   };
-  const close = () => {
+  // Fast-forward runs a day's scheduled jobs at a time. Closing waits for it, so "the panel is gone" means "it is done".
+  const [running, setRunning] = useState(0);
+  const [closeRequested, setCloseRequested] = useState(false);
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    setCloseRequested(false);
+  }
+  const finish = () => {
     setConfirming(false);
     onClose();
   };
+  const close = () => {
+    if (running > 0) setCloseRequested(true);
+    else finish();
+  };
+  const forward = (days: number) => {
+    setCloseRequested(false);
+    setConfirming(false);
+    setRunning((n) => n + 1);
+    void (async () => {
+      try {
+        await demo.fastForward(days);
+        await queryClient.invalidateQueries();
+      } finally {
+        setRunning((n) => n - 1);
+      }
+    })();
+  };
+  useEffect(() => {
+    if (closeRequested && running === 0) onClose();
+  }, [closeRequested, running, onClose]);
   return (
     <Dialog open={open} title={t('demo.presenterPanel')} onClose={close}>
       {open ? (
@@ -57,7 +85,7 @@ export function PresenterPanel({ open, onClose }: { open: boolean; onClose: () =
             <Button
               variant="secondary"
               onClick={() => {
-                void demo.fastForward(1);
+                forward(1);
               }}
             >
               {t('demo.fastForwardOne')}
@@ -67,7 +95,7 @@ export function PresenterPanel({ open, onClose }: { open: boolean; onClose: () =
                 key={days}
                 variant="secondary"
                 onClick={() => {
-                  void demo.fastForward(days);
+                  forward(days);
                 }}
               >
                 {t('demo.fastForward', { days })}

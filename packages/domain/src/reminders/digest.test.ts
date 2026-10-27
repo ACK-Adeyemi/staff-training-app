@@ -88,6 +88,20 @@ describe('planManualSend', () => {
     expect(r.send).toEqual([{ personId: ann.id, kind: 'expiring', targetId: sg.id, offset: 30 }]);
   });
 
+  it('reminds about a requirement that has already run out, as Chase all overdue lists it', () => {
+    const ann = staffAt(s, 'Ann', 'Adams');
+    const r = planManualSend(
+      input([ann], {
+        assignments: [],
+        evidence: [evidenceExpiring(ann, sg, -10, { expiresAt: addDays(T, -10).toISOString() })],
+      }),
+      [ann.id],
+    );
+    expect(r.skipped).toEqual([]);
+    expect(r.send).toHaveLength(1);
+    expect(r.send[0]).toMatchObject({ personId: ann.id, kind: 'overdue', targetId: sg.id });
+  });
+
   it('skips with the reason: leave, pause, nothing to chase, unknown person and the weekly cap', () => {
     const leave = staffAt(s, 'Lea', 'Leave', { status: 'onLeave' });
     const paused = staffAt(s, 'Pat', 'Paused', { pausedUntil: addDays(T, 5).toISOString() });

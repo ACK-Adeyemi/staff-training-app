@@ -85,6 +85,12 @@ function ClientFrame({ twoFactor }: { twoFactor: TwoFactorStatus }) {
             ...(perms.data && holdsAnywhere(perms.data, 'evidence.view')
               ? [item('/client/evidence', t('evidenceFlow.queueTitle'), 'check')]
               : []),
+            ...(perms.data && holdsAnywhere(perms.data, 'assign.manage')
+              ? [item('/client/rules', t('rules.title'), 'check')]
+              : []),
+            ...(perms.data && holdsAnywhere(perms.data, 'reminders.view')
+              ? [item('/client/reminders', t('reminders.title'), 'bell')]
+              : []),
             item('/client/team', t('team.title'), 'user'),
             item('/client/settings', t('nav.client.settings'), 'more'),
             ...(perms.data && holdsAnywhere(perms.data, 'billing.view')
