@@ -102,7 +102,9 @@ describe('C23 Help: FAQs, What is new, feedback', () => {
     await user.type(dialog.getByRole('textbox', { name: 'Tell us more' }), 'The matrix is slow to open.');
     await user.click(dialog.getByRole('button', { name: 'Send feedback' }));
     expect((await screen.findByRole('status')).textContent).toContain('Thank you. The product team will read this.');
-    const rows = (await dump<AppFeedback>(c.handle, 'appFeedback')).filter((r) => r.userId === c.keys.users['priya']);
+    const rows = (await dump<AppFeedback>(c.handle, 'appFeedback')).filter(
+      (r) => r.userId === c.keys.users['priya'] && r.text === 'The matrix is slow to open.',
+    );
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({ side: 'client', kind: 'problem', text: 'The matrix is slow to open.' });
   });

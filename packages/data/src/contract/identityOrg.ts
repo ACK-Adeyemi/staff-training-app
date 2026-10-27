@@ -126,6 +126,7 @@ export type IdentityStore = {
   organisation: {
     /** Display name and short name only; any actor of the client, staff included. */
     profile(ctx: ActorContext): Promise<{ displayName: string; shortName?: string }>;
+    supportSettings(ctx: ActorContext): Promise<{ allowStaffTickets: boolean }>;
     updateProfile(ctx: ActorContext, patch: { displayName?: string; shortName?: string }): Promise<unknown>;
     updateSettings(ctx: ActorContext, patch: SettingsPatch): Promise<unknown>;
     sites: { update(ctx: ActorContext, siteId: string, patch: { name?: string; region?: string }): Promise<Site> };
@@ -934,6 +935,15 @@ export function runIdentityOrgContract(name: string, makeStore: (options: StoreO
           expect(Object.keys(profile).every((k) => k === 'displayName' || k === 'shortName')).toBe(true);
         }
         expect((await s.store.organisation.profile(s.otOwner)).displayName).not.toBe(client.displayName);
+      });
+
+      it('tells any actor of the client, staff included, whether staff may raise tickets', async () => {
+        const s = await setup();
+        for (const ctx of [s.priya, s.jade]) {
+          expect(await s.store.organisation.supportSettings(ctx)).toEqual({ allowStaffTickets: true });
+        }
+        await s.store.organisation.updateSettings(s.priya, { allowStaffTickets: false });
+        expect(await s.store.organisation.supportSettings(s.jade)).toEqual({ allowStaffTickets: false });
       });
 
       it('renames the organisation: trims, appends a pending-review name history entry and one audit event with both names', async () => {

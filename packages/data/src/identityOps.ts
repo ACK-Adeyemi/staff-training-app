@@ -530,6 +530,12 @@ export function createIdentityOperations(backend: RawBackend, options: StoreOpti
       return profileOf(call.actor.client);
     },
 
+    async supportSettings(ctx) {
+      const call = await beginCall(backend, options, ctx);
+      if (call.side === 'provider' || !call.actor.client) return forbid('permission');
+      return { allowStaffTickets: call.actor.client.settings.allowStaffTickets };
+    },
+
     async updateProfile(ctx, patch) {
       const call = await clientCall(ctx, 'org.editName');
       const client = call.actor.client as Client;

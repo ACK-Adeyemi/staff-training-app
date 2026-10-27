@@ -33,12 +33,22 @@ import { Notifications } from '../pages/staff/Notifications';
 import { TrainingRecord } from '../pages/staff/Record';
 import { Progress } from '../pages/staff/Progress';
 import { SignIn } from '../pages/staff/SignIn';
+import { Help } from '../pages/help/Help';
+import { TicketThread } from '../pages/help/TicketThread';
+import { TicketWizard } from '../pages/help/TicketWizard';
 import { RouteError } from './RouteError';
 
 const page = (path: string, title: MessageKey, body: MessageKey): RouteObject => ({
   path,
   element: <Placeholder titleKey={title} bodyKey={body} />,
 });
+
+// S14 to S16 for staff and C23 for admins: the same components, told apart by the signed-in side.
+const helpRoutes: RouteObject[] = [
+  { path: 'help', element: <Help /> },
+  { path: 'help/ticket/new', element: <TicketWizard /> },
+  { path: 'help/ticket/:ticketId', element: <TicketThread /> },
+];
 
 export const routes: RouteObject[] = [
   {
@@ -88,7 +98,7 @@ export const routes: RouteObject[] = [
           { path: 'me', element: <Me /> },
           { path: 'me/display', element: <Display /> },
           { path: 'notifications', element: <Notifications /> },
-          page('help', 'shell.help', 'placeholder.staff.help'),
+          ...helpRoutes,
         ],
       },
       {
@@ -200,7 +210,7 @@ export const routes: RouteObject[] = [
           { path: 'team', element: <Team /> },
           { path: 'account-status', element: <AccountStatus /> },
           { path: 'onboarding', element: <Onboarding /> },
-          page('help', 'nav.client.help', 'placeholder.client.help'),
+          ...helpRoutes,
         ],
       },
       {

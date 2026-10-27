@@ -522,6 +522,8 @@ export interface TeamService {
 export interface OrganisationService {
   /** Display name and short name only; any actor of the client, staff included. */
   profile(ctx: ActorContext): Promise<{ displayName: string; shortName?: string }>;
+  /** Whether staff may raise support tickets (M3 chunk 20a). Any actor of the client, staff included. */
+  supportSettings(ctx: ActorContext): Promise<{ allowStaffTickets: boolean }>;
   updateProfile(
     ctx: ActorContext,
     patch: { displayName?: string; shortName?: string },

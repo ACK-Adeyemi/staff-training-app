@@ -1882,7 +1882,10 @@
       "context": "We also send the screen you are on and your device type. Nothing else about you.",
       "submit": "Send feedback",
       "thanks": "Thank you. The product team will read this.",
-      "stuck": "Need a reply? Raise a ticket instead."
+      "stuck": "Need a reply? Raise a ticket instead.",
+      "empty": "Please tell us a little more.",
+      "sendError": "Your feedback could not be sent. Please try again.",
+      "cancel": "Cancel"
     },
     "staff": {
       "intro": "Your feedback helps make training better.",
@@ -1964,7 +1967,11 @@
       "screen": "Screen",
       "device": "Device and browser",
       "role": "Your role",
-      "version": "App version"
+      "version": "App version",
+      "removeItem": "Remove: {label}",
+      "note": "You can take any of these off before you send.",
+      "roleStaff": "Staff member",
+      "roleClient": "Client admin"
     },
     "screenshots": {
       "add": "Add a screenshot",
@@ -1974,7 +1981,12 @@
       "remove": "Remove image",
       "altText": "Describe the image (optional)",
       "reminder": "Do not include information about children.",
-      "metadata": "Location and camera details are removed from images."
+      "metadata": "Location and camera details are removed from images.",
+      "badType": "Please choose a photo.",
+      "title": "Screenshot {n}",
+      "previewAlt": "Preview of screenshot {n}",
+      "take": "Take a photo",
+      "attached": "{count} screenshots attached"
     },
     "submit": "Send ticket",
     "sent": "Your ticket {number} has been sent.",
@@ -1991,7 +2003,8 @@
     "filters": {
       "open": "Open",
       "resolved": "Resolved",
-      "all": "All"
+      "all": "All",
+      "label": "Show tickets"
     },
     "thread": {
       "reply": "Reply",
@@ -2002,7 +2015,16 @@
       "up": "Yes",
       "down": "No",
       "comment": "Anything to add? (optional)",
-      "autoClose": "This will close in {days} days if there is no reply."
+      "autoClose": "This will close in {days} days if there is no reply.",
+      "messages": "Messages",
+      "timeline": "Status timeline",
+      "you": "You",
+      "support": "Support",
+      "ratedUp": "You said this helped.",
+      "ratedDown": "You said this did not help.",
+      "timelineReceived": "Received",
+      "timelineResolved": "Resolved",
+      "readOnly": "You can read this ticket. Only the person who raised it can reply."
     },
     "features": {
       "myTraining": "My training",
@@ -2047,7 +2069,22 @@
       "intro": "Tell us what went wrong and we will help.",
       "off": "Support requests from staff are switched off. Ask your manager.",
       "privateNote": "Only you and the support team can see your tickets."
-    }
+    },
+    "share": "Share with my manager",
+    "shareNote": "Only you and the support team can see your ticket unless you tick this.",
+    "errors": {
+      "choose": "Choose one to carry on.",
+      "otherText": "Write 3 to 80 characters.",
+      "title": "Give your ticket a title of 3 to 100 characters.",
+      "description": "Tell us what happened, in up to 2000 characters.",
+      "send": "Your ticket could not be sent. Please try again.",
+      "reply": "Please write a reply.",
+      "replySend": "Your reply could not be sent. Please try again.",
+      "action": "That did not work. Please try again."
+    },
+    "raisedBy": "Raised by {name}",
+    "stepOf": "Step {n} of {total}",
+    "sentAgain": "Raise another ticket"
   },
   "help": {
     "title": "Help",
@@ -2071,7 +2108,10 @@
     "staff": {
       "intro": "Answers to common questions, and a way to ask us.",
       "stillStuck": "Still stuck? Send feedback or ask your manager."
-    }
+    },
+    "loadError": "Help could not be loaded. Please try again.",
+    "loading": "Loading.",
+    "whatsNewEmpty": "There is nothing new yet."
   },
   "faq": {
     "categories": {

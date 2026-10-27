@@ -207,7 +207,9 @@ describe("S14 Help: What's new and app feedback", () => {
     await user.click(dialog.getByRole('button', { name: 'Send feedback' }));
     expect((await screen.findByRole('status')).textContent).toContain('Thank you. The product team will read this.');
     const rows = await dump<AppFeedback>(c.handle, 'appFeedback');
-    const mine = rows.filter((r) => r.userId === c.keys.users['jade']);
+    const mine = rows.filter(
+      (r) => r.userId === c.keys.users['jade'] && r.text === 'A dark theme for the quiz screen.',
+    );
     expect(mine).toHaveLength(1);
     expect(mine[0]).toMatchObject({ kind: 'idea', side: 'staff', text: 'A dark theme for the quiz screen.' });
     expect(Object.keys(mine[0]?.context ?? {})).toContain('screen');
@@ -494,7 +496,8 @@ describe('S15 Raise a ticket', () => {
       expect(Array.from(need(s.data))).toEqual(Array.from(hoisted.prepared));
       expect(s.ownerUserId).toBe(c.keys.users['jade']);
     }
-    expect(shots.map((s) => s.alt).sort()).toEqual([undefined, 'The quiz start button']);
+    expect(shots.map((s) => s.alt ?? '').sort()).toEqual(['', 'The quiz start button']);
+    expect(shots.filter((s) => s.alt === undefined)).toHaveLength(1);
     const first = need((await dump<TicketMessage>(c.handle, 'ticketMessages')).find((m) => m.ticketId === t.id));
     expect([...first.attachmentIds].sort()).toEqual(shots.map((s) => s.id).sort());
   });
@@ -536,6 +539,11 @@ describe('S15 Raise a ticket', () => {
     addScreenshot('s6.png');
     expect((await screen.findByRole('alert')).textContent).toContain('You can add up to 5 images.');
     expect(screen.queryByRole('group', { name: 'Screenshot 6' })).toBeNull();
+    // Images are prepared when the ticket is sent (the blur boxes are only final then): the sixth never is.
+    await next(user);
+    await step('Check and send');
+    await user.click(screen.getByRole('button', { name: 'Send ticket' }));
+    await screen.findByRole('status');
     expect(hoisted.calls).toHaveLength(5);
   });
 
