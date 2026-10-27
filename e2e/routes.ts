@@ -112,3 +112,10 @@ export const m3EvidenceRoutes: NavEntry[] = [
   { hash: '#/client/evidence', label: 'Evidence to check' },
   { hash: '#/print/first-aiders', label: 'First aiders' },
 ];
+
+/** M3 chunk 18a routes (rules and reminders). #/staff/notifications is already a shell route. */
+export const m3RulesRoutes: NavEntry[] = [
+  { hash: '#/client/rules', label: 'Auto-assign rules' },
+  { hash: '#/client/reminders', label: 'Reminders' },
+  { hash: '#/staff/notifications', label: 'Notifications' },
+];
