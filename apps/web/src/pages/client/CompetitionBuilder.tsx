@@ -26,6 +26,7 @@ import { formatLondonDate } from '../../demo/format';
 import { competitionErrorKey } from '../compete/errors';
 import { useCompetition, useEntitlements } from '../compete/queries';
 import { londonDayEnd, londonDayStart, templateText } from '../compete/shared';
+import { CompetitionEligibility, buildEligibility } from './CompetitionEligibility';
 import { field } from './organiseShared';
 import { usePermissions } from './queries';
 
@@ -60,6 +61,10 @@ type Form = {
   teamTarget: number;
   teamUnit: 'team' | 'site';
   moduleIds: string[];
+  jobRoleIds: string[];
+  teamIds: string[];
+  siteIds: string[];
+  excludePersonIds: string[];
 };
 
 function RadioGroup<T extends string>({
@@ -128,6 +133,10 @@ function initialForm(existing: Competition | undefined, today: Date): Form {
       teamTarget: existing.teamTarget ?? 90,
       teamUnit: existing.teamUnit ?? 'team',
       moduleIds: existing.moduleIds ?? [],
+      jobRoleIds: existing.eligibility.jobRoleIds ?? [],
+      teamIds: existing.eligibility.teamIds ?? [],
+      siteIds: existing.eligibility.siteIds ?? [],
+      excludePersonIds: existing.eligibility.excludePersonIds,
     };
   }
   return {
@@ -145,6 +154,10 @@ function initialForm(existing: Competition | undefined, today: Date): Form {
     teamTarget: 90,
     teamUnit: 'team',
     moduleIds: [],
+    jobRoleIds: [],
+    teamIds: [],
+    siteIds: [],
+    excludePersonIds: [],
   };
 }
 
@@ -221,7 +234,7 @@ function Builder({ existing }: { existing?: Competition }) {
       startAt,
       endAt,
       prizeText: form.prize.trim(),
-      eligibility: existing?.eligibility ?? { excludePersonIds: [] },
+      eligibility: buildEligibility(form),
       status: existing?.status ?? 'draft',
     };
     if (form.description.trim() !== '') base.description = form.description.trim();
@@ -497,7 +510,7 @@ function Builder({ existing }: { existing?: Competition }) {
             ) : null}
           </>
         ) : null}
-        <p className="m-0">{t('competition.builder.everyone')}</p>
+        <CompetitionEligibility value={form} onChange={set} />
         <section aria-labelledby="banner-preview">
           <h2 id="banner-preview" className="mb-2 mt-0 text-lg font-bold">
             {t('competition.builder.preview')}

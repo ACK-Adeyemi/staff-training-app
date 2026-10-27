@@ -41,7 +41,8 @@ async function expectTouchTarget(...targets: ReturnType<Page['locator']>[]) {
 }
 const cssVar = (page: Page, name: string) =>
   page.evaluate((n) => document.documentElement.style.getPropertyValue(n).trim().toLowerCase(), name);
-const hexBox = (page: Page, group: string) => page.getByRole('group', { name: group }).getByRole('textbox');
+// Playwright also lists the colour picker as a textbox, so pick the hex code box by its type.
+const hexBox = (page: Page, group: string) => page.getByRole('group', { name: group }).locator('input[type="text"]');
 async function setHex(page: Page, group: string, value: string) {
   await hexBox(page, group).fill(value);
 }

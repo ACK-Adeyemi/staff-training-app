@@ -95,6 +95,9 @@ function ClientFrame({ twoFactor }: { twoFactor: TwoFactorStatus }) {
               ...(perms.data && holdsAnywhere(perms.data, 'reminders.view')
                 ? [item('/client/reminders', t('reminders.title'), 'bell')]
                 : []),
+              ...(perms.data && holdsAnywhere(perms.data, 'themes.view')
+                ? [item('/client/themes', t('themes.title'), 'more')]
+                : []),
               item('/client/team', t('team.title'), 'user'),
               item('/client/settings', t('nav.client.settings'), 'more'),
               ...(perms.data && holdsAnywhere(perms.data, 'billing.view')

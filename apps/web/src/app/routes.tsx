@@ -153,6 +153,10 @@ export const routes: RouteObject[] = [
             lazy: async () => ({ Component: (await import('../pages/client/Calendar')).Calendar }),
           },
           {
+            path: 'themes',
+            lazy: async () => ({ Component: (await import('../pages/client/Themes')).Themes }),
+          },
+          {
             path: 'reminders',
             lazy: async () => ({ Component: (await import('../pages/client/Reminders')).Reminders }),
           },

@@ -150,11 +150,14 @@ describe('C12 eligibility pickers (single site)', () => {
     const text = (n: number) => (n === 1 ? '1 person can take part' : `${n} people can take part`);
     const summary = async () => (await screen.findByTestId('eligibility-summary')).textContent;
     await who();
-    expect(await summary()).toBe(text(people.length));
+    // Grace is on leave, so isEligible leaves her out even with nothing ticked.
+    const everyone = count((p) => isEligible({ eligibility: { excludePersonIds: [] } }, p));
+    expect(everyone).toBeLessThan(people.length);
+    expect(await summary()).toBe(text(everyone));
     await userEvent.click(screen.getByRole('checkbox', { name: role.name }));
     const base: Competition['eligibility'] = { jobRoleIds: [role.id], excludePersonIds: [] };
     const expected = count((p) => isEligible({ eligibility: base }, p));
-    expect(expected).toBeLessThan(people.length);
+    expect(expected).toBeLessThan(everyone);
     await waitFor(async () => {
       expect(await summary()).toBe(text(expected));
     });
