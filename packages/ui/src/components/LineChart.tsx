@@ -32,7 +32,7 @@ export function LineChart(props: LineChartProps) {
             {p.d.value}
           </text>
           <text x={p.x} y={CHART_H - 8} textAnchor="middle" fontSize={12} fill="currentColor">
-            {p.d.label}
+            {p.d.axisLabel ?? p.d.label}
           </text>
         </g>
       ))}

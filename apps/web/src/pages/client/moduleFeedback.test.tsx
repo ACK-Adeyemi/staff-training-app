@@ -32,6 +32,8 @@ type Ctx = { handle: StoreHandle; keys: SeedKeys };
 const priya = (keys: SeedKeys): ActorContext => actorFor('client', keys);
 const items = async () => screen.findAllByTestId('feedback-item');
 const idOf = (el: HTMLElement) => el.getAttribute('data-feedback-id');
+/** The page's filter selects. Every item card also has a "Status" select, so the page filter is looked up in its group. */
+const filter = (name: string) => within(screen.getByRole('group', { name: 'Filters' })).getByRole('combobox', { name });
 
 describe('C29 list (BP-14)', () => {
   it('lists every module feedback item of the client, question reports first', async () => {
@@ -74,20 +76,20 @@ describe('C29 list (BP-14)', () => {
     await items();
     const stored = await ctx.handle.store.moduleFeedback.list(priya(ctx.keys));
 
-    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Status' }), 'Actioned');
+    await userEvent.selectOptions(filter('Status'), 'Actioned');
     await waitFor(() => {
       expect(screen.getAllByTestId('feedback-item')).toHaveLength(stored.filter((f) => f.status === 'actioned').length);
     });
-    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Status' }), 'All statuses');
+    await userEvent.selectOptions(filter('Status'), 'All statuses');
 
     const fireId = need(ctx.keys.modules['fireEvacuation']);
-    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Module' }), fireId);
+    await userEvent.selectOptions(filter('Module'), fireId);
     await waitFor(() => {
       expect(screen.getAllByTestId('feedback-item')).toHaveLength(stored.filter((f) => f.moduleId === fireId).length);
     });
-    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Module' }), 'All modules');
+    await userEvent.selectOptions(filter('Module'), 'All modules');
 
-    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Tag' }), 'Unclear');
+    await userEvent.selectOptions(filter('Tag'), 'Unclear');
     await waitFor(() => {
       const shown = screen.getAllByTestId('feedback-item');
       expect(shown).toHaveLength(stored.filter((f) => f.tags.includes('unclear')).length);
@@ -98,9 +100,9 @@ describe('C29 list (BP-14)', () => {
   it('says No feedback yet. when a filter matches nothing', async () => {
     await renderRoute('/client/module-feedback', 'client');
     await items();
-    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Module' }), 'All modules');
-    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Tag' }), 'Hard to use on my phone');
-    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Status' }), 'No action needed');
+    await userEvent.selectOptions(filter('Module'), 'All modules');
+    await userEvent.selectOptions(filter('Tag'), 'Hard to use on my phone');
+    await userEvent.selectOptions(filter('Status'), 'No action needed');
     expect(await screen.findByText('No feedback yet.')).toBeTruthy();
     expect(screen.queryAllByTestId('feedback-item')).toHaveLength(0);
   });

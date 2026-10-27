@@ -5,6 +5,7 @@ import { Button, Markdown, PageHeader, Stepper } from '@sta/ui';
 import type { ContentBlock, Lesson, Module } from '@sta/domain';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { ExplainThis } from '../ExplainThis';
+import { LessonThumbs } from './FeedbackWidgets';
 import { LearnMoreGroups } from './LearnMoreList';
 import { ReadAloud } from './ReadAloud';
 import { LearningFrame } from './LearningFrame';
@@ -149,6 +150,7 @@ function Player({ module, lesson, organisationName }: { module: Module; lesson: 
         ) : null}
       </div>
       <ExplainThis moduleId={moduleId} lessonId={lesson.id} admin={false} />
+      {last ? <LessonThumbs moduleId={moduleId} lessonId={lesson.id} /> : null}
       {failed ? <p role="alert">{t('staff.lesson.saveError')}</p> : null}
       <div className="flex gap-3">
         <Button

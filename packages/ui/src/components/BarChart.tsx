@@ -33,7 +33,7 @@ export function BarChart(props: BarChartProps) {
               {d.value}
             </text>
             <text x={cx} y={CHART_H - 8} textAnchor="middle" fontSize={12} fill="currentColor">
-              {d.label}
+              {d.axisLabel ?? d.label}
             </text>
           </g>
         );

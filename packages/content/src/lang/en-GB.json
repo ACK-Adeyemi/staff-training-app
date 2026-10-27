@@ -92,7 +92,9 @@
       "reports": "Reports",
       "settings": "Settings",
       "help": "Help",
-      "billing": "Billing"
+      "billing": "Billing",
+      "stats": "Stats",
+      "moduleFeedback": "Module feedback"
     },
     "provider": {
       "overview": "Overview",
@@ -514,7 +516,7 @@
       }
     },
     "moduleStats": {
-      "noPermission": "You do not have permission to see training results. Ask your manager.",
+      "noPermission": "You don't have access to this. Ask your manager. They can give you permission to see training results.",
       "notFound": "We could not find that training.",
       "headline": "Headline numbers",
       "assigned": "Assigned",
@@ -535,7 +537,54 @@
       "noAnswers": "No answers yet",
       "noSource": "None given",
       "viewResults": "Results for {title}",
-      "back": "Back to the dashboard"
+      "back": "Back to the dashboard",
+      "firstAttemptPassRate": "First-attempt pass rate",
+      "minutes": "{count} min",
+      "download": "Download CSV",
+      "print": "Print summary",
+      "csvName": "module-results.csv",
+      "regionHardest": "Hardest questions",
+      "statusSentence": "People by status: {completed} completed, {inProgress} in progress, {notStarted} not started, {overdue} overdue.",
+      "statusCaption": "Number of people at each stage",
+      "statusLabel": "Stage",
+      "statusValue": "People",
+      "funnelSentence": "People who reached each lesson: {list}.",
+      "funnelCaption": "Number of people reaching each lesson",
+      "funnelLabel": "Lesson",
+      "funnelValue": "People",
+      "scoresSentence": "Quiz scores in ten bands, with the number of people in each: {list}.",
+      "scoresCaption": "Number of people in each score band",
+      "scoresLabel": "Score",
+      "scoresValue": "People",
+      "retakesCount": "Retakes: {count}",
+      "weeksSentence": "Completions in each of the last {count} weeks, oldest first: {list}.",
+      "weeksCaption": "Number of completions each week",
+      "weeksLabel": "Week starting",
+      "weeksValue": "Completed",
+      "peopleCaption": "People given this training",
+      "person": "Name",
+      "stage": "Status",
+      "score": "Score",
+      "completedOn": "Completed on",
+      "timeTaken": "Time taken",
+      "notYet": "Not yet",
+      "noPeople": "Nobody has been given this training yet."
+    },
+    "stats": {
+      "sentence": "{title}: {list}.",
+      "caption": "{title}: percent up to date",
+      "name": "Name",
+      "percent": "Percent up to date",
+      "daysOverdue": "Days overdue: {count}",
+      "daysLeft": "Days left: {count}",
+      "showingFirst": "Showing the first {count}.",
+      "moduleItem": "{title}: {percent}%",
+      "range": "Time range",
+      "trendSentence": "Percent up to date over the last {days} days, oldest first: {list}.",
+      "trendCaption": "Percent up to date on each date",
+      "date": "Date",
+      "percentShort": "Percent",
+      "loadError": "We could not load the stats. Please try again."
     }
   },
   "staff": {
@@ -705,7 +754,8 @@
       "trainingAssigned": "You have been asked to do {moduleTitle} by {dueDate}.",
       "other": "You have a new message.",
       "loadError": "We could not load your notifications. Please try again.",
-      "bellWithCount": "Notifications, {count} unread"
+      "bellWithCount": "Notifications, {count} unread",
+      "feedbackReply": "Your manager replied to your feedback on {moduleTitle}."
     },
     "module": {
       "notFoundTitle": "Training not found",
@@ -1466,19 +1516,32 @@
       "anonymous": "Send without my name",
       "anonymousNote": "In a small team, people may still guess who sent it.",
       "submit": "Send feedback",
-      "thanks": "Thank you for your feedback."
+      "thanks": "Thank you for your feedback.",
+      "ratings": {
+        "1": "Poor",
+        "2": "Fair",
+        "3": "Good",
+        "4": "Very good",
+        "5": "Excellent"
+      },
+      "sendError": "We could not send your feedback. Please try again."
     },
     "lesson": {
       "question": "Was this lesson helpful?",
       "up": "Yes, it was helpful",
       "down": "No, it was not helpful",
-      "thanks": "Thanks for letting us know."
+      "thanks": "Thanks for letting us know.",
+      "sendError": "We could not save that. Please try again."
     },
     "report": {
       "title": "Report a problem with this question",
       "what": "What is wrong?",
       "submit": "Send report",
-      "thanks": "Thank you. This will be looked at."
+      "thanks": "Thank you. This will be looked at.",
+      "open": "Report a problem with this question",
+      "cancel": "Cancel",
+      "sendError": "We could not send your report. Please try again.",
+      "kind": "What kind of problem is it?"
     },
     "tags": {
       "reallyUseful": "Really useful",
@@ -1523,7 +1586,45 @@
     "staff": {
       "intro": "Your feedback helps make training better.",
       "privacy": "Your manager can see your name unless you choose to send it without."
-    }
+    },
+    "inbox": {
+      "title": "Module feedback",
+      "filters": "Filters",
+      "module": "Module",
+      "allModules": "All modules",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "tag": "Tag",
+      "allTags": "All tags",
+      "count": "{count} items",
+      "countOne": "1 item",
+      "noPermission": "You don't have access to this. Ask your manager.",
+      "loadError": "We could not load the feedback. Please try again."
+    },
+    "kind": {
+      "moduleCard": "Module card",
+      "lessonThumb": "Lesson thumb",
+      "questionReport": "Question report"
+    },
+    "who": {
+      "anonymous": "Anonymous",
+      "unknown": "A member of staff"
+    },
+    "statusLabel": "Status",
+    "averageRating": "Average rating: {rating}",
+    "noRatings": "No ratings yet",
+    "tagCount": "{tag}: {count}",
+    "sendReply": "Send reply",
+    "sendNote": "Send note",
+    "cancel": "Cancel",
+    "theirReply": "Reply sent: {text}",
+    "thumbUp": "Thumbs up",
+    "thumbDown": "Thumbs down",
+    "ratingOf": "Rating: {rating} of 5",
+    "lessonName": "Lesson: {title}",
+    "questionName": "Question: {prompt}",
+    "actionError": "That did not work. Please try again.",
+    "regionSummary": "Summary"
   },
   "tickets": {
     "title": "Support tickets",
@@ -2539,5 +2640,35 @@
     "correct": "Correct.",
     "notQuite": "Not quite.",
     "stepLabel": "Step {number}"
+  },
+  "provider": {
+    "feedback": {
+      "moduleRegion": "Module feedback",
+      "ownRegion": "Our clients' own modules",
+      "noPermission": "You don't have access to this. Ask your manager.",
+      "loadError": "We could not load the feedback. Please try again.",
+      "none": "No feedback yet.",
+      "itemCount": "{count} items",
+      "itemCountOne": "1 item",
+      "moduleCount": "{count} modules",
+      "moduleCountOne": "1 module",
+      "ownCounts": "{modules}, {items}",
+      "ownNote": "Only counts are shown. The text of a client's own feedback stays with the client.",
+      "lessonKey": "Lesson: {key}",
+      "questionKey": "Question: {key}",
+      "appLink": "App feedback",
+      "appTitle": "App feedback",
+      "appIntro": "What staff and managers have told the product team. Read only.",
+      "screen": "Screen: {screen}",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "appStatus": {
+        "new": "New",
+        "triaged": "Triaged",
+        "planned": "Planned",
+        "done": "Done",
+        "wontDo": "Won't do"
+      }
+    }
   }
 }

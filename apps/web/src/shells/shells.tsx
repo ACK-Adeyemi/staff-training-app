@@ -76,6 +76,12 @@ function ClientFrame({ twoFactor }: { twoFactor: TwoFactorStatus }) {
           more: [
             item('/client/organise', t('organise.title'), 'book'),
             item('/client/reports', t('nav.client.reports'), 'chart'),
+            ...(perms.data && holdsAnywhere(perms.data, 'reports.view')
+              ? [item('/client/stats', t('stats.title'), 'chart')]
+              : []),
+            ...(perms.data && holdsAnywhere(perms.data, 'moduleFeedback.view')
+              ? [item('/client/module-feedback', t('feedback.inbox.title'), 'help')]
+              : []),
             item('/client/team', t('team.title'), 'user'),
             item('/client/settings', t('nav.client.settings'), 'more'),
             ...(perms.data && holdsAnywhere(perms.data, 'billing.view')

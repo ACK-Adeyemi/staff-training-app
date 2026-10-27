@@ -7,6 +7,7 @@ import type { MessageKey } from '@sta/content';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { useDisplayPrefs } from '../../app/display/context';
 import { celebrate } from '../../app/feedback';
+import { ModuleFeedbackCard } from './FeedbackWidgets';
 import { RewardsPanel } from './RewardsPanel';
 import { LearnMoreGroups } from './LearnMoreList';
 import { LearningFrame } from './LearningFrame';
@@ -123,6 +124,7 @@ export function Results() {
               {back}
             </div>
             {error ? <p role="alert">{t(error)}</p> : null}
+            <ModuleFeedbackCard moduleId={module.id} />
             {!passed ? <p>{t('staff.results.failedHelp')}</p> : null}
             {missed.length > 0 ? (
               <section aria-labelledby="review-heading">

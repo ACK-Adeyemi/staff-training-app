@@ -113,3 +113,11 @@ export function providerProjection(
 
 /** Anonymous feedback cannot be replied to: there is nobody to reply to. */
 export const canReplyToFeedback = (item: Pick<ModuleFeedback, 'anonymous'>): boolean => !item.anonymous;
+
+/** The order managers read feedback in: question reports first, then newest first. */
+export function orderFeedback<T extends Pick<ModuleFeedback, 'kind' | 'createdAt' | 'id'>>(items: readonly T[]): T[] {
+  const rank = (f: T): number => (f.kind === 'questionReport' ? 0 : 1);
+  return [...items].sort(
+    (a, b) => rank(a) - rank(b) || b.createdAt.localeCompare(a.createdAt) || a.id.localeCompare(b.id),
+  );
+}

@@ -305,7 +305,9 @@ describe('C8 staff feedback (BP-14, Track A step 6)', () => {
     const items = await fireItems(ctx);
     const summary = feedbackSummary(items);
     expect(within(r).getByTestId('feedback-average').textContent).toContain(String(summary.averageRating));
-    const unclear = within(r).getByTestId('tag-count').parentElement?.querySelector('[data-tag="unclear"]');
+    const unclear = within(r)
+      .getAllByTestId('tag-count')
+      .find((el) => el.getAttribute('data-tag') === 'unclear');
     expect(unclear?.textContent).toContain('Unclear');
     expect(unclear?.textContent).toContain(String(summary.tagCounts['unclear']));
     const shown = within(r).getAllByTestId('feedback-item');

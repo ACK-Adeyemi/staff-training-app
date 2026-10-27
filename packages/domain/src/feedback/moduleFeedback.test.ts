@@ -14,7 +14,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ModuleFeedback } from '../schemas/support';
 import { moduleFor } from '../progress/testFixtures';
-import { canReplyToFeedback, feedbackSummary, providerProjection } from './moduleFeedback';
+import { canReplyToFeedback, feedbackSummary, orderFeedback, providerProjection } from './moduleFeedback';
 
 const ID = (n: number): string => `01HZX${String(n).padStart(21, '0')}`;
 const CLIENT_A = ID(1);
@@ -204,5 +204,16 @@ describe('canReplyToFeedback', () => {
     const anon = fb({ anonymous: true });
     delete (anon as { personId?: string }).personId;
     expect(canReplyToFeedback(anon)).toBe(false);
+  });
+});
+
+describe('orderFeedback', () => {
+  it('puts question reports first and then the newest first, without changing the input', () => {
+    const a = fb({ id: ID(31), kind: 'moduleCard', createdAt: '2026-10-01T09:00:00.000Z' });
+    const b = fb({ id: ID(32), kind: 'moduleCard', createdAt: '2026-10-05T09:00:00.000Z' });
+    const r = fb({ id: ID(33), kind: 'questionReport', questionId: 'q-1', createdAt: '2026-09-01T09:00:00.000Z' });
+    const input = [a, b, r];
+    expect(orderFeedback(input).map((f) => f.id)).toEqual([r.id, b.id, a.id]);
+    expect(input.map((f) => f.id)).toEqual([a.id, b.id, r.id]);
   });
 });

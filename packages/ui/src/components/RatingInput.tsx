@@ -25,6 +25,7 @@ export function RatingInput({ legend, labels, value, onChange }: RatingInputProp
                 type="radio"
                 name={name}
                 value={n}
+                aria-label={`${String(n)} ${label}`}
                 checked={value === n}
                 onChange={() => {
                   onChange(n);

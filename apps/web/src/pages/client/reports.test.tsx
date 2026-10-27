@@ -268,7 +268,8 @@ describe('C8 Module stats (basic)', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getByRole('heading', { level: 1 }).textContent).toContain(sgModule.title);
     expect(value('Assigned')).toBe('1');
-    expect(value('Started')).toBe('0');
+    // Started is the number of people with an attempt (moduleStats): Daniel's seeded practice attempts count.
+    expect(value('Started')).toBe('1');
     expect(value('Completed')).toBe('0');
     expect(value('Completion rate')).toBe('0%');
     expect(value('Overdue')).toBe('0');
@@ -287,10 +288,11 @@ describe('C8 Module stats (basic)', () => {
     });
     const value = await headline();
     expect(value('Assigned')).toBe('1');
-    expect(value('Started')).toBe('1');
+    expect(value('Started')).toBe('2'); // Daniel (seeded practice) and Jade
     expect(value('Completion rate')).toBe('100%');
     expect(value('Average score')).toBe('80%'); // (70 + 70 + 100) / 3 with the seeded practice attempts
-    expect(value('Pass rate')).toBe('50%'); // one of the two people with finished attempts (Daniel, Jade) has passed
+    expect(value('Pass rate')).toBe('33%'); // one of the three finished attempts passed
+    expect(value('First-attempt pass rate')).toBe('50%'); // one of the two people with finished attempts (Daniel, Jade)
   });
 
   it('counts an assignment past its due date as overdue', async () => {
@@ -390,8 +392,9 @@ describe('C8 Module stats (basic)', () => {
       questionId: sgModule.questions[0]?.id ?? '',
       linkId: sgModule.questions[0]?.learnMore[0]?.id ?? '',
     });
-    await screen.findByRole('region', { name: 'Question results' });
-    expect(document.body.textContent).not.toContain('Jade Mills');
+    const region = await screen.findByRole('region', { name: 'Question results' });
+    // The People section of the full page names people; the question results never say who opened a link.
+    expect(region.textContent).not.toContain('Jade Mills');
   });
 
   it('shows a permission message without reports.view', async () => {

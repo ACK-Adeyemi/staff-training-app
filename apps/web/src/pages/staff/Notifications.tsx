@@ -25,6 +25,9 @@ export function Notifications() {
         dueDate: due ? formatLondonDate(`${due}T12:00:00.000Z`) : '',
       });
     }
+    if (n.kind === 'feedbackReply') {
+      return t('staff.notifications.feedbackReply', { moduleTitle: String(n.params['moduleTitle'] ?? '') });
+    }
     return t('staff.notifications.other');
   };
 

@@ -11,6 +11,10 @@ const dateFormat = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZon
 /** "2 November 2026", in London time. */
 export const formatLondonDate = (iso: string): string => dateFormat.format(new Date(iso));
 
+const shortFormat = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: zone });
+/** "2 Nov", in London time. */
+export const formatLondonShort = (iso: string): string => shortFormat.format(new Date(iso));
+
 const poundsFormat = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
 /** "£12.34" from pence. */
 export const formatPounds = (pence: number): string => poundsFormat.format(pence / 100);

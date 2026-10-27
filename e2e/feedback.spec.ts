@@ -178,7 +178,8 @@ test('Fire evacuation stats show the funnel, hardest questions and the Unclear c
     'People',
     'Feedback',
   ]) {
-    await expect(page.getByRole('region', { name })).toBeVisible();
+    // Exact, because Playwright matches names as substrings and "People" is inside "Where people are".
+    await expect(page.getByRole('region', { name, exact: true })).toBeVisible();
   }
   await noSeriousAxe(page);
 
@@ -197,7 +198,14 @@ test('Fire evacuation stats show the funnel, hardest questions and the Unclear c
   const feedback = page.getByRole('region', { name: 'Feedback' });
   const unclear = feedback.locator('[data-testid="feedback-item"][data-lesson-id="lesson-2"][data-tags~="unclear"]');
   expect(await unclear.count()).toBeGreaterThanOrEqual(4);
-  const named = unclear.filter({ hasNotText: 'Anonymous' }).first();
+  // Newest first, so the first named item is Lucy's, which already has a reply. Pick the first one that can be replied
+  // to and then follow it by id, because after the reply it no longer matches that filter.
+  const replyable = unclear
+    .filter({ hasNotText: 'Anonymous' })
+    .filter({ has: page.getByRole('button', { name: 'Reply', exact: true }) })
+    .first();
+  const targetId = await replyable.getAttribute('data-feedback-id');
+  const named = feedback.locator(`[data-feedback-id="${String(targetId)}"]`);
   await named.getByRole('button', { name: 'Reply' }).click();
   await named.getByRole('textbox', { name: 'Reply' }).fill('Thank you, we are adding pictures to lesson 2.');
   await named.getByRole('button', { name: 'Send reply' }).click();

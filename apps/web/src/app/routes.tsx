@@ -131,6 +131,14 @@ export const routes: RouteObject[] = [
             lazy: async () => ({ Component: (await import('../pages/client/Organise')).Organise }),
           },
           { path: 'reports', element: <Reports /> },
+          {
+            path: 'stats',
+            lazy: async () => ({ Component: (await import('../pages/client/StatsOverview')).StatsOverview }),
+          },
+          {
+            path: 'module-feedback',
+            lazy: async () => ({ Component: (await import('../pages/client/ModuleFeedback')).ModuleFeedback }),
+          },
           { path: 'reports/matrix', element: <Matrix /> },
           { path: 'modules/:moduleId/stats', element: <ModuleStats /> },
           {
@@ -166,7 +174,14 @@ export const routes: RouteObject[] = [
             element: <Placeholder titleKey="nav.provider.overview" bodyKey="placeholder.provider.overview" />,
           },
           page('clients', 'nav.provider.clients', 'placeholder.provider.clients'),
-          page('content', 'nav.provider.content', 'placeholder.provider.content'),
+          {
+            path: 'content',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProviderContent')).ProviderContent }),
+          },
+          {
+            path: 'feedback',
+            lazy: async () => ({ Component: (await import('../pages/provider/AppFeedback')).AppFeedback }),
+          },
           page('packages', 'nav.provider.commercial', 'placeholder.provider.commercial'),
           page('tickets', 'nav.provider.support', 'placeholder.provider.support'),
           page('comms', 'nav.provider.comms', 'placeholder.provider.comms'),

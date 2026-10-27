@@ -131,3 +131,4 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 - 2026-10-27: M3 chunk 15a module library, preview and group assign landed (ccc3e09); billing.spec.ts:120 flaked twice under load (first banner wait now 20s). Chunk 15b next.
 - 2026-10-27: M3 chunk 15b module builder landed; check.sh green except the known billing.spec.ts:120 load flake (passes alone). Chunk 16 next.
 - 2026-10-27: M3 chunk 15b module builder landed (f01ee4d). Full e2e green on rerun (465 passed); billing.spec.ts:120 flake appeared only in runs overlapping other load. Chunk 16 next.
+- 2026-10-27: M3 chunk 16 stats and feedback UI landed (C8 full, C9, C29, S5 to S7, minimal P5 and P10); see docs/decisions.md 'M3 chunk 16'. Chunk 17 next.
