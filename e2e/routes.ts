@@ -91,3 +91,10 @@ export const m3Routes: NavEntry[] = [
   { hash: '#/client/onboarding', label: 'Getting started' },
   { hash: '#/client/signin', label: 'Two-step sign-in' },
 ];
+
+/** M3 chunk 14 routes (billing, add-ons and the mock pay page). Routes with an id in them are covered in billing.spec.ts. */
+export const m3BillingRoutes: NavEntry[] = [
+  { hash: '#/client/billing', label: 'Plan and billing' },
+  { hash: '#/client/billing/add-ons', label: 'Add-ons' },
+  { hash: '#/client/billing/pay', label: 'Pay now' },
+];
