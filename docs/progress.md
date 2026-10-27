@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M3
 Milestone base commit: bb460c4
-Next step: M3 chunk 16 (Stats and feedback UI: C8 full, C9, C29, S5 thumbs, S6 report, S7 card, minimal P5 and P10, feedback.spec.ts) per docs/plans/m3.md per docs/plans/m3.md. Open: nothing filters by site switcher yet (chunk 19); onboarding hide not persisted; two-tab seed race.
+Next step: M3 chunk 17 (Evidence UI: S8 actions, S17 upload with image processing, C27 queue and review, first aiders print, C3 upload on behalf and Send reminder, evidence.spec.ts) per docs/plans/m3.md. Open: nothing filters by site switcher yet (chunk 19); onboarding hide not persisted; two-tab seed race.
 
 ## Milestones
 - [x] M0 Foundations
@@ -33,7 +33,7 @@ M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 13 Client foundations UI (tests b623e08, impl 3f00424)
 - [x] 14 Billing UI and Demo AI (tests f1de9c8, impl b25fa65)
 - [x] 15 Module Library and Builder UI (15a tests/impl ccc3e09; 15b tests 818c1c0, impl f01ee4d)
-- [ ] 16 Stats and feedback UI
+- [x] 16 Stats and feedback UI (tests 0411da5, impl 79f0751)
 - [ ] 17 Evidence UI
 - [ ] 18 Rules, reminders, notifications and calendars UI
 - [ ] 19 Multi-site, leaderboards and themes UI
