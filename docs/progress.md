@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M4
 Milestone base commit: c7160e2
-Next step: M4 Provider story: write docs/plans/m4.md with the planner (record the M4 base commit first).
+Next step: M4 chunk 1 (decisions, schemas, seed additions) per docs/plans/m4.md: test-writer then implementer.
 
 ## Milestones
 - [x] M0 Foundations
@@ -17,6 +17,7 @@ Next step: M4 Provider story: write docs/plans/m4.md with the planner (record th
 - [ ] M7 Battle Room
 
 ## Current milestone chunks
+M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list): none done yet.
 M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 1 Decisions, schemas, stores and personas
 - [x] 2 Domain: sites, leaderboards, calendar, rules, reminders
