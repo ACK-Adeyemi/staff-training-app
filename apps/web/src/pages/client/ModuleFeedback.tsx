@@ -42,7 +42,7 @@ function Inbox() {
         onChange={(e) => {
           set(e.target.value);
         }}
-        className={fieldClass}
+        className={`${fieldClass} max-w-full`}
       >
         {options.map(([v, text]) => (
           <option key={v} value={v}>

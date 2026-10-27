@@ -10,7 +10,7 @@ export function DescriptionList({ items }: DescriptionListProps) {
       {items.map((it, i) => (
         <div key={i} className="contents">
           <dt className="font-semibold text-[var(--color-text-muted)]">{it.term}</dt>
-          <dd className="m-0 mb-2 sm:mb-0">{it.description}</dd>
+          <dd className="m-0 mb-2 min-w-0 [overflow-wrap:anywhere] sm:mb-0">{it.description}</dd>
         </div>
       ))}
     </dl>

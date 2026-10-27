@@ -109,7 +109,7 @@ export function FeedbackItemCard({ item, module, personName, perms, showModule }
             <select
               id={statusId}
               value={item.status}
-              className={fieldClass}
+              className={`${fieldClass} max-w-full`}
               onChange={(e) => {
                 const status = e.target.value as ModuleFeedback['status'];
                 void run(() => store.moduleFeedback.setStatus(actor, item.id, status));
