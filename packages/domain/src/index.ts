@@ -65,3 +65,4 @@ export * from './demoAi';
 export * from './pricing/index';
 export * from './ownership';
 export * from './recovery';
+export * from './comms';
