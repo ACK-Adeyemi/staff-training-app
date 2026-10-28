@@ -79,7 +79,7 @@ export function runProviderTeamContract(
       expect(inv).toMatchObject({ side: 'provider', status: 'invited', invitedBy: s.u.provOwner });
       expect(inv.clientId).toBeUndefined();
       const roleId = (await s.dump<Role>('roles')).find(
-        (r) => r.owner === 'provider' && r.systemKey === 'readOnly',
+        (r) => r.owner === 'provider' && r.systemKey === 'providerReadOnly',
       )?.id;
       expect(inv.roleIds).toEqual([roleId]);
       expect(
