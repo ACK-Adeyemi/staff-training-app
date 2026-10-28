@@ -22,7 +22,7 @@ import {
 } from './ownership';
 import { ownershipTransferSchema, type OwnershipTransfer } from './schemas/m4';
 
-const uid = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+const uid = (n: number) => String(n).padStart(26, '0'); // ids are 26-character ULIDs
 const DAY = 24 * 60 * 60 * 1000;
 const start = fixedClock('2026-03-02T09:00:00.000Z');
 const input = {
