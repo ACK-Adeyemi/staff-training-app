@@ -892,3 +892,8 @@ Chunk 1 choices:
 - The packaging option (A or B) is demo-wide `DemoState.packagingOption`. It reads as A when absent, so A is the default.
 - Under B, any Option A package maps to the Option B package (Core), add-ons are kept, and the floor package stays the cheapest. Switching goes only from A to B in the demo; B back to A is just setting the option again.
 - Reset demo drops the option, so it returns to A. `setPackagingOption` needs a stored demo state.
+
+### M4 chunk 5
+- Ownership transfer and provider team are services (`store.ownership`, `store.providerTeam`) built like pricing: provider or client side checked first, one batch with its audit event, time from `ctx.now`. Domain refusals surface as `RuleError`. A wrong step-up code writes `ownership.confirmFailed` before throwing.
+- The provider Admin role template gains `team.manage` and `recovery.start` (needed so an Admin can manage the team under `canGrant`'s rule that you can only grant what you hold). Owner and Co-Owner roles still need `owner.manageOwnerRoles`. Placeholder, for the user to review with the P20 matrix.
+- Custom provider roles are stored with their permissions closed over `requires` (`closePermissions` in domain).
