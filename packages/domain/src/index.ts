@@ -64,3 +64,4 @@ export * from './exports/csv';
 export * from './demoAi';
 export * from './pricing/index';
 export * from './ownership';
+export * from './recovery';
