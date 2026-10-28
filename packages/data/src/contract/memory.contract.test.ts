@@ -9,6 +9,7 @@ import { runEvidenceFlowContract } from './evidenceFlow';
 import { runFeedbackTicketsContract } from './feedbackTickets';
 import { runIdentityOrgContract } from './identityOrg';
 import { runPricingContract } from './pricing';
+import { runOwnershipTransferContract } from './ownershipTransfer';
 import { runPackagingOptionContract } from './packagingOption';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
@@ -49,4 +50,5 @@ runExportsRetentionContract('memory adapter', (options) => Promise.resolve(creat
 runRemindersLeftoversContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
 runPricingContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runOwnershipTransferContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 runPackagingOptionContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
