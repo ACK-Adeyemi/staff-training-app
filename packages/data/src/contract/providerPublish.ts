@@ -213,7 +213,7 @@ export function runProviderPublishContract(
         type: 'moduleCompleted',
         moduleId: s.m.id,
         moduleVersion: 1,
-      } as LearningEvent;
+      };
       await s.handle.admin.bulkPut('learningEvents', [event]);
       await s.store.publishToClients(s.owner, s.m.id, { summary: SUMMARY, clientIds: [s.a] });
       expect((await s.store.getVersion(s.owner, s.m.id, 1)).title).toBe('Fire drills');
