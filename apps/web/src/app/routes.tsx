@@ -37,6 +37,9 @@ import { SignIn } from '../pages/staff/SignIn';
 import { Help } from '../pages/help/Help';
 import { TicketThread } from '../pages/help/TicketThread';
 import { TicketWizard } from '../pages/help/TicketWizard';
+import { Overview } from '../pages/provider/Overview';
+import { Clients } from '../pages/provider/Clients';
+import { ClientDetail } from '../pages/provider/ClientDetail';
 import { RouteError } from './RouteError';
 
 const page = (path: string, title: MessageKey, body: MessageKey): RouteObject => ({
@@ -219,11 +222,9 @@ export const routes: RouteObject[] = [
         path: '/provider',
         lazy: async () => ({ Component: (await import('../shells/shells')).ProviderShell }),
         children: [
-          {
-            index: true,
-            element: <Placeholder titleKey="nav.provider.overview" bodyKey="placeholder.provider.overview" />,
-          },
-          page('clients', 'nav.provider.clients', 'placeholder.provider.clients'),
+          { index: true, element: <Overview /> },
+          { path: 'clients', element: <Clients /> },
+          { path: 'clients/:id', element: <ClientDetail /> },
           {
             path: 'content',
             lazy: async () => ({ Component: (await import('../pages/provider/ProviderContent')).ProviderContent }),

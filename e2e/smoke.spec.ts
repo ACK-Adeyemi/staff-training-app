@@ -72,6 +72,11 @@ const routes: Route[] = [
   { hash: `#/client/modules/${moduleId}/preview/${String(lessonId)}`, name: 'C6 lesson preview' },
   {
     hash: '',
+    name: 'P3 client detail',
+    resolve: async (page) => `#/provider/clients/${await firstId(page, 'clients')}`,
+  },
+  {
+    hash: '',
     name: 'C27 evidence review',
     resolve: async (page) =>
       `#/client/evidence/${await firstId(page, 'evidenceSubmissions', (s) => s['status'] === 'awaitingCheck')}`,

@@ -8,6 +8,7 @@ import { SetSiteScopeContext, SiteScopeContext } from '../app/siteScope';
 import { useTwoFactorStatus } from '../pages/client/foundationsQueries';
 import { useClientData, usePermissions } from '../pages/client/queries';
 import { AccountBannerView, SiteSwitch, TwoFactorBanner } from './clientChrome';
+import { ProviderStatus } from './providerChrome';
 import { Shell } from './Shell';
 
 const item = (path: string, label: string, icon: NavItem['icon']): NavItem => ({
@@ -145,7 +146,8 @@ export function ProviderShell() {
           item('/provider/comms', t('nav.provider.comms'), 'bell'),
           item('/provider/team', t('nav.provider.teamSecurity'), 'user'),
         ],
-        headerLinks: [],
+        headerLinks: [item('/provider/comms', t('provider.shell.notifications'), 'bell')],
+        headerExtra: <ProviderStatus />,
       }}
     />
   );

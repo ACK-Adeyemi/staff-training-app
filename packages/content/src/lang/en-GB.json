@@ -3144,6 +3144,82 @@
     "stepLabel": "Step {number}"
   },
   "provider": {
+    "shell": {
+      "status": "System status",
+      "statusOk": "All systems working",
+      "statusNote": "Simulated",
+      "notifications": "Notifications"
+    },
+    "loadError": "We could not load this page. Please try again.",
+    "noPermission": "You don't have access to this. Ask your manager.",
+    "accountState": {
+      "trial": "Trial",
+      "active": "Active",
+      "pastDue": "Payment overdue",
+      "limited": "Limited",
+      "readOnly": "Read only",
+      "closed": "Closed",
+      "deleted": "Deleted",
+      "paused": "Paused"
+    },
+    "overview": {
+      "title": "Overview",
+      "clientsTotal": "Clients",
+      "sitesTotal": "Sites",
+      "peopleTotal": "People",
+      "byState": "Clients by account state",
+      "attention": "Needs attention",
+      "attentionNone": "No clients need attention.",
+      "viewClient": "Open {name}",
+      "simulatedNote": "Health scores are simulated for this demo."
+    },
+    "clients": {
+      "title": "Clients",
+      "stateFilter": "Account state",
+      "allStates": "All states",
+      "none": "No clients match.",
+      "name": "Client",
+      "sites": "Sites: {count}",
+      "people": "People: {count}",
+      "health": "Health score: {score} (simulated)",
+      "noHealth": "No health score yet"
+    },
+    "client": {
+      "notFound": "We could not find that client.",
+      "back": "Back to clients",
+      "tabsLabel": "Client sections",
+      "tabs": {
+        "overview": "Overview",
+        "sites": "Sites",
+        "staff": "Staff",
+        "usage": "Usage",
+        "api": "API",
+        "errors": "Errors and logs",
+        "tickets": "Support tickets",
+        "billing": "Billing",
+        "modules": "Modules",
+        "competitions": "Competitions",
+        "audit": "Audit",
+        "device": "This device"
+      },
+      "laterStep": "This section is not part of the demo yet.",
+      "usageNone": "No usage recorded yet.",
+      "usageLine": "{feature}: {count} uses, {users} active people",
+      "errorsNone": "No errors recorded for this client.",
+      "errorLine": "{message}: seen {count} times, {users} people affected",
+      "errorStatus": "Status: {status}"
+    },
+    "errorStatus": {
+      "open": "Open",
+      "acknowledged": "Acknowledged",
+      "resolved": "Resolved"
+    },
+    "thisDevice": {
+      "intro": "Errors and events this browser has recorded. They stay on this device and are never sent anywhere.",
+      "empty": "Nothing has been recorded on this device.",
+      "error": "Error",
+      "event": "Event"
+    },
     "feedback": {
       "moduleRegion": "Module feedback",
       "ownRegion": "Our clients' own modules",
