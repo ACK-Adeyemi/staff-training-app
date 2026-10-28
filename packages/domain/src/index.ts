@@ -62,3 +62,4 @@ export * from './billing';
 export * from './retention';
 export * from './exports/csv';
 export * from './demoAi';
+export * from './pricing/index';

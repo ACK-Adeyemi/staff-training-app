@@ -93,7 +93,9 @@ describe('replacedBy', () => {
       adj({ id: 'draft', status: 'draft' }),
     ];
     expect(replacedBy(others, incoming)).toEqual([]);
-    expect(replacedBy([adj({ id: 'same', status: 'active', scope: { kind: 'addOn', addOnId: 'x' } })], addOnIncoming)).toHaveLength(1);
+    expect(
+      replacedBy([adj({ id: 'same', status: 'active', scope: { kind: 'addOn', addOnId: 'x' } })], addOnIncoming),
+    ).toHaveLength(1);
   });
 });
 
@@ -130,7 +132,9 @@ describe('previewAdjustment', () => {
   it('warns when a new price falls below the floor', () => {
     const a = adj({ type: 'override', value: 4000 });
     expect(previewAdjustment({ clients, adjustment: a, at: AT, floorPence: 5000 }).warnings).toContain('belowFloor');
-    expect(previewAdjustment({ clients, adjustment: a, at: AT, floorPence: 4000 }).warnings).not.toContain('belowFloor');
+    expect(previewAdjustment({ clients, adjustment: a, at: AT, floorPence: 4000 }).warnings).not.toContain(
+      'belowFloor',
+    );
   });
 });
 

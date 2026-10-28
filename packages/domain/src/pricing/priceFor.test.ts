@@ -103,14 +103,20 @@ describe('priceFor', () => {
 
   it('only applies an add-on change to that add-on', () => {
     const a = adj({ type: 'percent', value: -50, scope: { kind: 'addOn', addOnId: 'addon-1' } });
-    expect(priceFor({ listPrice: 2000, scope: { kind: 'addOn', addOnId: 'addon-1' }, adjustments: [a], at: AT })).toBe(1000);
-    expect(priceFor({ listPrice: 2000, scope: { kind: 'addOn', addOnId: 'addon-2' }, adjustments: [a], at: AT })).toBe(2000);
+    expect(priceFor({ listPrice: 2000, scope: { kind: 'addOn', addOnId: 'addon-1' }, adjustments: [a], at: AT })).toBe(
+      1000,
+    );
+    expect(priceFor({ listPrice: 2000, scope: { kind: 'addOn', addOnId: 'addon-2' }, adjustments: [a], at: AT })).toBe(
+      2000,
+    );
     expect(priceFor({ listPrice: 2000, scope: PLAN, adjustments: [a], at: AT })).toBe(2000);
   });
 
   it('does not apply a plan change to an add-on', () => {
     const a = adj({ type: 'override', value: 100 });
-    expect(priceFor({ listPrice: 2000, scope: { kind: 'addOn', addOnId: 'addon-1' }, adjustments: [a], at: AT })).toBe(2000);
+    expect(priceFor({ listPrice: 2000, scope: { kind: 'addOn', addOnId: 'addon-1' }, adjustments: [a], at: AT })).toBe(
+      2000,
+    );
   });
 });
 
