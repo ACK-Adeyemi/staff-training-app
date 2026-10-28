@@ -176,6 +176,21 @@ test('S18 and C28 Calendar do not clip or overlap at 200% text', async ({ page }
   }
 });
 
+// F2: GitHub's runners have wider system fonts than the dev container. Force a wide one so the calendar is checked
+// against it here too (falls back to the default font where DejaVu Sans is not installed).
+test('S18 and C28 Calendar month view fits at 200% text with a wide font', async ({ page }) => {
+  for (const hash of ['#/staff/calendar', '#/client/calendar']) {
+    await page.goto(`./${hash}`);
+    await expect(page.getByRole('heading', { level: 1, name: 'Calendar' })).toBeVisible();
+    await scale(page);
+    await page.addStyleTag({ content: '*, *::before, *::after { font-family: "DejaVu Sans" !important }' });
+    await page.getByRole('radio', { name: 'Month' }).check();
+    await expect(page.getByRole('grid')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    await expectNoClipOrOverlap(page);
+  }
+});
+
 // M3 chunk 21 (F-5): C7, C8 and C19 at 200% text on the 390 px phone.
 test('C7 Module builder does not clip or overlap at 200% text, with lessons and a question added', async ({ page }) => {
   await page.goto('./#/client/modules/new');

@@ -75,6 +75,9 @@ test('each recovery code works once', async ({ page }) => {
 
   await signInWithRecoveryCode(page, first);
   await expect(page).toHaveURL(/#\/client$/);
+  // The address changes before the router has rendered the dashboard. Wait for the screen itself, or the next
+  // goto can land while the sign-in screen is still mounted and keep its old state.
+  await expect(page.getByRole('heading', { level: 1, name: 'Two-step sign-in' })).toBeHidden();
 
   await signInWithRecoveryCode(page, first);
   await expect(page.getByRole('alert')).toContainText("That code isn't right");

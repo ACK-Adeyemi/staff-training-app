@@ -63,7 +63,8 @@ if [ -f package.json ]; then
     elif [ -f package-lock.json ]; then step "npm ci" npm ci
     else step "npm install" npm install; fi
   fi
-  if [ "$install" = 1 ]; then step "playwright install chromium" pnpm exec playwright install chromium; fi
+  # CI installs (and caches) Chromium itself and sets SKIP_PLAYWRIGHT_INSTALL=1 so it is not installed twice.
+  if [ "$install" = 1 ] && [ -z "${SKIP_PLAYWRIGHT_INSTALL:-}" ]; then step "playwright install chromium" pnpm exec playwright install chromium; fi
   # Order matters: e2e usually runs against the production build.
   for s in lint typecheck test build e2e; do
     if has_npm_script "$s"; then step "$PM run $s" "$PM" run "$s"; fi

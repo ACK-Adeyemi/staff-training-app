@@ -71,6 +71,9 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 
 ## User feedback
 - F1 (M0, ?reset=1): fixed; awaiting user re-check. Cause: editing only the hash (`#/staff?reset=1`) never reloads the page and the hash form was not read. Both forms now work (resetParam.ts, hashchange reload), with e2e for both against the base-path build. Fix commit: see git log "fix: ?reset=1 works before the hash".
+- F2 (M3, calendar at 200% text with wider fonts): the MonthGrid fix (earlier this session) holds with DejaVu Sans forced on every screen in text-scale.spec.ts (24 of 24 pass); added a permanent wide-font calendar test. Awaiting user re-check on GitHub.
+- F3 (M3, two-factor.spec.ts:67): reproduced (14 of 40 runs under load). Cause was the test: the address changes before the router renders the dashboard, so the next goto hit a still-mounted sign-in screen. The test now waits for the screen. 150 of 150 pass under load. Awaiting user re-check.
+- F4 (CI): ci.yml caches ~/.cache/ms-playwright keyed on the Playwright version, installs Chromium once (check.sh skips its own install when SKIP_PLAYWRIGHT_INSTALL=1), adds install-deps on a cache hit. actions/cache@v5 is unverified (VERIFY). Playwright workers left at the default: more workers raised flakes locally. Awaiting user re-check.
 
 ## Known issues
 - Chunk 14: C19 usage omits Battle Rooms limit (data layer has no count); C6 preview is minimal until chunk 15.
@@ -159,3 +162,4 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - 2026-10-28: M4 chunk 2 price engine landed (ceba2fd), check.sh green (e2e step alone ~855s; run it in the background). invoiceLinesFor label text is built in the domain, move to language files in the billing UI chunk. Chunk 3 next.
 - 2026-10-28: M4 chunk 3 landed (ee8d588), check.sh green. Small one-file briefs to test-writer/implementer worked (first big brief hit an API error). Chunk 4 next.
 - 2026-10-28: M4 chunk 4 landed (4a pricing ops 142412c, 4b packaging option aebb303), check.sh green. Known: a confirmed price change replaces a whole earlier multi-client adjustment, even for clients that do not overlap (follows domain replacedBy). Test-writer briefs of ~150 lines work; the 400-line brief hit an API error. Chunk 5 next.
+- 2026-10-28 (session 2): merged origin/main; fixed user feedback F2, F3, F4 (see User feedback). M4 chunk 5 next.
