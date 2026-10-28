@@ -11,6 +11,7 @@ import { runIdentityOrgContract } from './identityOrg';
 import { runPricingContract } from './pricing';
 import { runOwnershipTransferContract } from './ownershipTransfer';
 import { runProviderTeamContract } from './providerTeam';
+import { runCreateClientContract } from './createClient';
 import { runPackagingOptionContract } from './packagingOption';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
@@ -54,3 +55,4 @@ runPricingContract('memory adapter', (options) => Promise.resolve(createMemorySt
 runOwnershipTransferContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 runProviderTeamContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 runPackagingOptionContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runCreateClientContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
