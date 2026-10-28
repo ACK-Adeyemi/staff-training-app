@@ -907,3 +907,13 @@ Chunk 1 choices:
 - **First admin.** Besides the invitation and the one Outbox email, the batch writes an `invited` user and an active role assignment (Account Owner, scope = the new client), mirroring `team.invite`, so accepting the invitation has an account to activate. The invitation expires after 14 days.
 - **Audit.** One `client.create` event (target and clientId = the new client) holding pack, package, site count and trial days only; no personal data.
 - **`authoring.publishToClients`.** Reuses `publishVersion`, so the old version is snapshotted in `moduleVersions` and the draft is removed. A placement is added only for chosen clients that have none (an existing category is kept). One `ModuleNotice` per client; `fromVersion` is the previous version.
+
+### M4 chunk 8b
+
+- **Services.** `store.recovery`, `store.profileChanges` and `store.billingChanges` (providerRecoveryOps.ts), provider side only, built like providerCommsOps: permission checked first (Forbidden before validation), one batch with its audit event, domain refusals as `RuleError('notApplicable')` (no new rule names). The stores stay in the direct-access deny list in policy.ts, so the generic repos remain deny-all and only these services reach them.
+- **Time.** Reviewed-at, cooling off and billing profile `updatedAt` come from the injected Clock (`options.clock`), not `ctx.now`.
+- **Permissions.** Recovery: list, request and reject need `recovery.start`; approve and complete need `recovery.approve`. Name changes: `clients.reviewNameChanges` (revert needs `clients.revertDisplayName`). Billing changes: `clients.editBilling`.
+- **Recovery request checks.** The subject must be a client-side user of the named client; the reason is required. `complete` with outcome `reset2fa` removes the subject's `twoFactor` in the same batch; `transferOwner` (or no outcome) only marks the request done, the transfer itself goes through `store.ownership`.
+- **Audit content.** Ids, statuses, approval counts, field names only. Never the recovery reason, names or addresses.
+- **Name changes.** A review of a request that is not `pendingReview` is a rule error. Keep and ask work even when the client has no billing profile (the request is decided; nothing else changes); update-to-match without a profile is refused. Revert puts the client's `displayName` back to `oldName` and leaves billing alone. Issued invoices are never written.
+- **Billing changes.** Approve and edit-then-approve write the profile (`updatedBy` = reviewer); a decline needs a non-blank reason (ValidationError) and leaves the profile alone. A request with no billing profile to apply to is refused.

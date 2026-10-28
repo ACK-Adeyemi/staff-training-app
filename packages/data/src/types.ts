@@ -2,6 +2,8 @@
 import type {
   AccountState,
   Announcement,
+  ProfileChangeRequest,
+  RecoveryRequest,
   LinkCheckResult,
   MaintenanceApp,
   OtherEntryGroup,
@@ -976,7 +978,43 @@ export interface LearnMoreService {
   counts(ctx: ActorContext): Promise<{ linkId: string; opens: number }[]>;
 }
 
+/** Account recovery (M4 chunk 8b). Provider side only: list, request and reject need recovery.start; approve and complete need recovery.approve. */
+export interface RecoveryService {
+  list(ctx: ActorContext): Promise<RecoveryRequest[]>;
+  request(
+    ctx: ActorContext,
+    input: { clientId: string; subjectUserId: string; reason: string; outcome?: 'reset2fa' | 'transferOwner' },
+  ): Promise<RecoveryRequest>;
+  approve(ctx: ActorContext, id: string): Promise<RecoveryRequest>;
+  complete(ctx: ActorContext, id: string): Promise<RecoveryRequest>;
+  reject(ctx: ActorContext, id: string): Promise<RecoveryRequest>;
+}
+
+/** Organisation name changes waiting for review. Needs clients.reviewNameChanges (revert needs clients.revertDisplayName). */
+export interface ProfileChangesService {
+  list(ctx: ActorContext): Promise<(ProfileChangeRequest & { billingName: string })[]>;
+  keepBillingName(ctx: ActorContext, id: string): Promise<ProfileChangeRequest>;
+  updateBillingName(ctx: ActorContext, id: string): Promise<ProfileChangeRequest>;
+  askClient(ctx: ActorContext, id: string): Promise<ProfileChangeRequest>;
+  revertDisplayName(ctx: ActorContext, id: string): Promise<ProfileChangeRequest>;
+}
+
+/** Client billing detail change requests, decided by the provider. Needs clients.editBilling. */
+export interface BillingChangesService {
+  list(ctx: ActorContext): Promise<BillingChangeRequest[]>;
+  approve(ctx: ActorContext, id: string): Promise<BillingChangeRequest>;
+  editThenApprove(
+    ctx: ActorContext,
+    id: string,
+    proposed: BillingChangeRequest['proposed'],
+  ): Promise<BillingChangeRequest>;
+  decline(ctx: ActorContext, id: string, reason: string): Promise<BillingChangeRequest>;
+}
+
 export interface DataStore {
+  recovery: RecoveryService;
+  profileChanges: ProfileChangesService;
+  billingChanges: BillingChangesService;
   providerComms: ProviderCommsService;
   maintenance: MaintenanceService;
   linkCheck: LinkCheckService;

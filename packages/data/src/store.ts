@@ -23,6 +23,7 @@ import { createOwnershipOperations } from './ownershipOps';
 import { createProviderTeamOperations } from './providerTeamOps';
 import { createProviderTicketOperations } from './providerTicketOps';
 import { createProviderCommsOperations } from './providerCommsOps';
+import { createProviderRecoveryOperations } from './providerRecoveryOps';
 import { createPricingOperations } from './pricingOps';
 import { createProviderOperations } from './providerOps';
 import { createBillingOperations, simulateFailedPayment } from './billingOps';
@@ -303,6 +304,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const providerTeam = createProviderTeamOperations(backend, options);
   const providerTicketOps = createProviderTicketOperations(backend, options);
   const commsOps = createProviderCommsOperations(backend, options);
+  const recoveryOps = createProviderRecoveryOperations(backend, options);
   const authoringOps = createAuthoringOperations(backend, options);
   const evidenceFlow = createEvidenceOperations(backend, options);
   const support = createSupportOperations(backend, options);
@@ -348,6 +350,9 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     maintenance: commsOps.maintenance,
     linkCheck: commsOps.linkCheck,
     learnMore: commsOps.learnMore,
+    recovery: recoveryOps.recovery,
+    profileChanges: recoveryOps.profileChanges,
+    billingChanges: recoveryOps.billingChanges,
     addOnRequests: billingOps.addOnRequests,
     account: billingOps.account,
     ai: billingOps.ai,
