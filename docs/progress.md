@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M4
 Milestone base commit: c7160e2
-Next step: M4 chunk 9 (provider shell and P1-P3 with This device) per docs/plans/m4.md. Give the test-writer small briefs (one test file each); big briefs hit API errors.
+Next step: M4 chunk 10 (P4 New client wizard) per docs/plans/m4.md. Chunk 9 left P3 tabs Sites, Staff, API, Support tickets, Billing, Modules, Competitions, Audit as 'not part of the demo yet' stubs: fill them in the chunks that own those screens (P3 Billing in chunk 12/P25, tickets in 7/P11, etc.) and before M4 is marked done per docs/plans/m4.md. Give the test-writer small briefs (one test file each); big briefs hit API errors.
 
 ## Milestones
 - [x] M0 Foundations
@@ -26,7 +26,8 @@ M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list):
 - [x] 6 Data ops C (tests dca84ed, f9e6d35, impl ec3b521)
 - [x] 7 Data ops D (tests cb51eea, impl e4e99a3)
 - [x] 8 Data ops E: 8a comms, maintenance, link check, Learn more counts done (tests 8ae4af0, impl c8ee98f); 8b recovery + profile/billing change ops done (tests 91be646, impl 0a6341c); 8c telemetry + overview reads done (tests ea67a8a, impl 10447fa; seed v6, IndexedDB v6)
-- [ ] 9-18 see the plan
+- [x] 9 Provider shell and P1-P3 (tests 5bf1716, impl cac7c7f, check.sh green)
+- [ ] 10-18 see the plan
 M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 1 Decisions, schemas, stores and personas
 - [x] 2 Domain: sites, leaderboards, calendar, rules, reminders
@@ -176,3 +177,4 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - 2026-10-28: e2e flake feedback.spec.ts:46 (phone) fixed. Cause: the forced radio click scrolled the control under the fixed bottom tab bar and hit the Progress tab. app.css now sets html scroll-padding-bottom. 16 of 16 pass repeated.
 
 - 2026-10-28 (session 3): M4 chunk 8c done. Full check.sh: all green except 3 e2e ENOENT artifact failures caused by an overlapping earlier run; the 2 files rerun alone 9/9 green.
+- 2026-10-28 (session 3, cont.): M4 chunk 9 done, check.sh green.
