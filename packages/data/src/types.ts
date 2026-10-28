@@ -844,7 +844,23 @@ export interface OwnershipService {
   list(ctx: ActorContext): Promise<OwnershipTransfer[]>;
 }
 
+export type ProviderTeamMember = { userId: string; name: string; email: string; status: string; roleNames: string[] };
+export type ProviderRoleInput = { name: string; description: string; permissionIds: string[] };
+
+/** Provider team and roles (M4 chunk 5b). Provider side only; Owner and Co-Owner roles need owner.manageOwnerRoles. */
+export interface ProviderTeamService {
+  list(ctx: ActorContext): Promise<ProviderTeamMember[]>;
+  invite(ctx: ActorContext, input: { email: string; displayName: string; roleKey: string }): Promise<UserAccount>;
+  setRole(ctx: ActorContext, userId: string, roleKey: string): Promise<void>;
+  suspend(ctx: ActorContext, userId: string): Promise<void>;
+  reactivate(ctx: ActorContext, userId: string): Promise<void>;
+  createRole(ctx: ActorContext, input: ProviderRoleInput): Promise<Role>;
+  updateRole(ctx: ActorContext, roleId: string, input: Partial<ProviderRoleInput>): Promise<Role>;
+  deleteRole(ctx: ActorContext, roleId: string): Promise<void>;
+}
+
 export interface DataStore {
+  providerTeam: ProviderTeamService;
   pricing: PricingService;
   ownership: OwnershipService;
   clients: WriteRepo<Client>;
