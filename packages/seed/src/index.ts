@@ -88,7 +88,11 @@ export async function reset(admin: DemoAdmin): Promise<SeedKeys> {
   const meta = (await admin.getSeedMeta()) ?? { seedValue: DEFAULT_SEED_VALUE, today: DEFAULT_TODAY };
   const state = await admin.getDemoState();
   const keys = await load(admin, meta);
-  if (state) await admin.setDemoState({ ...state, clockOffsetMs: 0 });
+  if (state) {
+    const next = { ...state, clockOffsetMs: 0 };
+    delete next.packagingOption;
+    await admin.setDemoState(next);
+  }
   return keys;
 }
 

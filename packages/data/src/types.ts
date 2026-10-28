@@ -1021,6 +1021,9 @@ export interface DemoAdmin {
   dumpAll(): Promise<Record<StoreName, unknown[]>>;
   getDemoState(): Promise<DemoState | undefined>;
   setDemoState(state: DemoState): Promise<void>;
+  /** The demo-wide packaging option; 'A' when none is stored. */
+  getPackagingOption(): Promise<'A' | 'B'>;
+  setPackagingOption(option: 'A' | 'B'): Promise<void>;
   getSeedMeta(): Promise<SeedMeta | undefined>;
   setSeedMeta(meta: SeedMeta): Promise<void>;
   listOutbox(): Promise<OutboxMessage[]>;

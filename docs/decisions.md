@@ -886,3 +886,9 @@ Chunk 1 choices:
 16. `PriceAdjustment` status values are draft, submitted, scheduled, active, ended, cancelled (the pack's names). "Awaiting confirmation" in the plan is `submitted`. The schema only requires an effective date and a confirmer to appear together on a scheduled or active change; the lifecycle in the domain and data ops (later chunks) refuse to schedule without both.
 17. `OwnershipTransfer` gains optional `acceptedAt` and `twoFactorConfirmedAt` so acceptance and the simulated 2FA step can be recorded. `ModuleNotice` is one record per targeted client.
 18. Seed version 5 adds a Harbour Cafe Group account owner (fictional) with an Account Owner role, so its billing address request has a real requester, and billing profiles for Brookfield and Harbour. Provider-side tickets for the Other entries review come from Oak Tree and Willow Lane users, so Little Acorns keeps its three tickets. The Outbox holds exactly one seeded message (the Brookfield price notice).
+
+## M4 chunk 4b
+
+- The packaging option (A or B) is demo-wide `DemoState.packagingOption`. It reads as A when absent, so A is the default.
+- Under B, any Option A package maps to the Option B package (Core), add-ons are kept, and the floor package stays the cheapest. Switching goes only from A to B in the demo; B back to A is just setting the option again.
+- Reset demo drops the option, so it returns to A. `setPackagingOption` needs a stored demo state.

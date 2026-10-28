@@ -192,6 +192,14 @@ function demoAdmin(backend: RawBackend, options: StoreOptions, runJobs: DemoAdmi
       }
       await setSetting('demoState', parsed.data);
     },
+    async getPackagingOption() {
+      return ((await setting('demoState')) as DemoState | undefined)?.packagingOption ?? 'A';
+    },
+    async setPackagingOption(option) {
+      const state = (await setting('demoState')) as DemoState | undefined;
+      if (!state) throw new ValidationError(['demoState: set the demo state before the packaging option']);
+      await this.setDemoState({ ...state, packagingOption: option });
+    },
     async getSeedMeta() {
       return (await setting('seedMeta')) as SeedMeta | undefined;
     },

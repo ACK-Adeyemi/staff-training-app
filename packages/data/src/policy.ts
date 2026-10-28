@@ -10,6 +10,7 @@ import {
   checkLimit,
   effectivePermissions,
   entitlements,
+  packageForOption,
   featureAvailability,
   lastOwnerGuard,
   twoFactorStatus,
@@ -21,6 +22,7 @@ import {
   type Assignment,
   type AuditEvent,
   type Client,
+  type DemoState,
   type EffectivePermission,
   type Package,
   type Person,
@@ -701,9 +703,11 @@ export async function clientEntitlements(call: Call, clientId: string): Promise<
   const subscription = client
     ? (await call.all<Subscription>('subscriptions')).find((x) => x.clientId === clientId)
     : undefined;
-  const pkg = client ? await call.find<Package>('packages', subscription?.packageId ?? client.packageId) : undefined;
-  if (!client || !pkg) return undefined;
+  const ownPkg = client ? await call.find<Package>('packages', subscription?.packageId ?? client.packageId) : undefined;
+  if (!client || !ownPkg) return undefined;
   const packages = await call.all<Package>('packages');
+  const demoState = ((await call.backend.get('settings', 'demoState')) as { value?: DemoState } | undefined)?.value;
+  const pkg = packageForOption(ownPkg, packages, demoState?.packagingOption ?? 'A');
   // The floor package is the cheapest one: what an account keeps when it is not on a full plan.
   const price = (p: Package): number => p.bands[0]?.pricePerSite ?? 0;
   const floor = packages.reduce((lowest, p) => (price(p) < price(lowest) ? p : lowest), pkg);

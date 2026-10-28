@@ -24,6 +24,15 @@ const larger = (a: Limit, b: Limit): Limit => {
   return Math.max(a, b);
 };
 
+/**
+ * The package an account is evaluated on under a packaging option. Option A changes nothing. Option B maps any
+ * Option A package to the Option B package (add-ons are kept by the caller). Falls back to `pkg` if there is none.
+ */
+export function packageForOption(pkg: Package, packages: readonly Package[], option: 'A' | 'B'): Package {
+  if (option === 'A' || pkg.option === 'B') return pkg;
+  return packages.find((p) => p.option === 'B') ?? pkg;
+}
+
 export function entitlements(
   pkg: Package,
   activeAddOns: AddOn[],
