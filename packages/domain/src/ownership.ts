@@ -52,8 +52,8 @@ export const completeTransfer = (t: OwnershipTransfer, clock: Clock): OwnershipR
   return { ok: true, transfer: { ...t, status: 'done' } };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- clock kept for a uniform lifecycle signature
 export const cancelTransfer = (t: OwnershipTransfer, byUserId: string, clock: Clock): OwnershipResult => {
-  void clock; // kept for a uniform lifecycle signature
   if (t.status !== 'pending') return fail('This transfer is no longer open.');
   if (byUserId !== t.fromUserId && byUserId !== t.toUserId) return fail('Only the people involved can cancel.');
   return { ok: true, transfer: { ...t, status: 'cancelled' } };
@@ -62,9 +62,9 @@ export const cancelTransfer = (t: OwnershipTransfer, byUserId: string, clock: Cl
 export const canChangeOwnerRole = (
   owners: string[],
   userId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- demote and remove are guarded the same way
   change: 'demote' | 'remove',
 ): { allowed: boolean; reason?: string } => {
-  void change; // demote and remove are guarded the same way
   if (owners.includes(userId) && owners.every((o) => o === userId))
     return { allowed: false, reason: 'There must always be at least one Account Owner.' };
   return { allowed: true };
