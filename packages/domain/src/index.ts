@@ -69,3 +69,4 @@ export * from './comms';
 // normaliseOtherText stays exported from './support' (a looser version for ticket validation).
 export { groupOtherEntries, retagEntries, trendingPhrase } from './otherEntries';
 export type { OtherField, OtherGroupView } from './otherEntries';
+export * from './billingNames';
