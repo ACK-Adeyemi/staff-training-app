@@ -77,7 +77,7 @@ export function MonthGrid(props: MonthGridProps) {
           <thead>
             <tr>
               {props.dayNames.map((n, i) => (
-                <th key={i} scope="col" className="px-1 py-2 text-center text-sm font-semibold">
+                <th key={i} scope="col" className="px-0 py-2 text-center text-sm font-semibold">
                   {n}
                 </th>
               ))}
@@ -117,7 +117,7 @@ export function MonthGrid(props: MonthGridProps) {
                         <span
                           aria-hidden="true"
                           data-count={counts[iso(d)]}
-                          className="ms-1 rounded-full border border-current px-1 text-xs font-bold before:content-[attr(data-count)]"
+                          className="mx-auto block w-fit rounded-full border border-current px-1 text-xs font-bold before:content-[attr(data-count)]"
                         />
                       ) : null}
                     </td>

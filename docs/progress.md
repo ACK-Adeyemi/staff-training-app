@@ -153,3 +153,4 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - 2026-10-27: M4 started, base c7160e2, planning.
 - 2026-10-27: M4 plan committed (ab5d4cc); chunk 1 done (125c3aa). Planner agents hit API errors on long runs, so plan was written in three small parts.
 - 2026-10-28: session start; no origin/main changes, F1 already handled. M4 chunk 2 test-writer failed twice with API server errors (nothing written, tree clean). Stopping at a clean point; retry chunk 2 next session, with a very small brief.
+- 2026-10-28: fixed S18/C28 text-scale e2e failure (MonthGrid count badge overflowed the last column at 200% text; badge now stacks under the day number). One full run lost the preview server mid-e2e (ERR_CONNECTION_REFUSED, not a code fault); rerun fully green.
