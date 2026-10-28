@@ -115,14 +115,19 @@ describe('dependencies', () => {
 describe('sensitiveIn', () => {
   it('lists only the sensitive permissions in a set', () => {
     const ids = ['staff.view', 'staff.delete', 'billing.view', 'reports.view', 'reports.export'];
-    expect(new Set(sensitiveIn(ids, clientCatalogue))).toEqual(new Set(['staff.delete', 'billing.view', 'reports.export']));
+    expect(new Set(sensitiveIn(ids, clientCatalogue))).toEqual(
+      new Set(['staff.delete', 'billing.view', 'reports.export']),
+    );
     expect(sensitiveIn(['staff.view', 'reports.view'], clientCatalogue)).toEqual([]);
   });
 });
 
 describe('compareRoles', () => {
   it('shows what the second role adds and removes compared with the first', () => {
-    const diff = compareRoles(['staff.view', 'reports.view', 'assign.view'], ['staff.view', 'assign.view', 'assign.manage']);
+    const diff = compareRoles(
+      ['staff.view', 'reports.view', 'assign.view'],
+      ['staff.view', 'assign.view', 'assign.manage'],
+    );
     expect(diff.added).toEqual(['assign.manage']);
     expect(diff.removed).toEqual(['reports.view']);
   });
@@ -140,8 +145,15 @@ describe('effectiveWithSources', () => {
 
     const byId = new Map(result.map((r) => [r.permissionId, r]));
     expect(new Set(byId.keys())).toEqual(new Set(['staff.view', 'reports.view', 'assign.view', 'assign.manage']));
-    expect(byId.get('staff.view')?.sources.map((s) => s.roleName).sort()).toEqual(['Trainer', 'Viewer']);
-    expect(byId.get('reports.view')?.sources).toEqual([expect.objectContaining({ roleId: viewer.id, roleName: 'Viewer' })]);
+    expect(
+      byId
+        .get('staff.view')
+        ?.sources.map((s) => s.roleName)
+        .sort(),
+    ).toEqual(['Trainer', 'Viewer']);
+    expect(byId.get('reports.view')?.sources).toEqual([
+      expect.objectContaining({ roleId: viewer.id, roleName: 'Viewer' }),
+    ]);
     expect(byId.get('assign.manage')?.sources.map((s) => s.roleName)).toEqual(['Trainer']);
   });
 
