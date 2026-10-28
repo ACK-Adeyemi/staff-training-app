@@ -11,6 +11,7 @@ import { runFeedbackTicketsContract } from './feedbackTickets';
 import { runIdentityOrgContract } from './identityOrg';
 import { runPricingContract } from './pricing';
 import { runOwnershipTransferContract } from './ownershipTransfer';
+import { runProviderTeamContract } from './providerTeam';
 import { runPackagingOptionContract } from './packagingOption';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
@@ -74,6 +75,9 @@ runRemindersLeftoversContract('indexeddb adapter', (options) =>
 
 runPricingContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
 runOwnershipTransferContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runProviderTeamContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );
 runPackagingOptionContract('indexeddb adapter', (options) =>
