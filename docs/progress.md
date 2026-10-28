@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M4
 Milestone base commit: c7160e2
-Next step: M4 chunk 4 (data ops A: pricing) per docs/plans/m4.md. Give the test-writer small briefs (one test file each); big briefs hit API errors.
+Next step: M4 chunk 5 (data ops B: ownership and team) per docs/plans/m4.md. Give the test-writer small briefs (one test file each); big briefs hit API errors.
 
 ## Milestones
 - [x] M0 Foundations
@@ -21,8 +21,8 @@ M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list):
 - [x] 1 Decisions, schemas and seed additions (tests 8bd8188, impl 125c3aa)
 - [x] 2 Domain: price engine (tests 1ee83ad, 002b093, impl ceba2fd)
 - [x] 3 Domain: transfer, recovery, comms, other entries, billing names, permission matrix (ownership d1e3557, recovery 371052b, comms, otherEntries 4477ef5, billingNames b34b0c8, matrix ee8d588)
-- [ ] 4 Data ops A: pricing (next)
-- [ ] 4-18 see the plan
+- [x] 4 Data ops A: pricing (4a tests 1bc6c1a, 70e3332, impl 142412c; 4b packaging option tests b87e2ef, impl aebb303)
+- [ ] 5-18 see the plan (5 next)
 M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 1 Decisions, schemas, stores and personas
 - [x] 2 Domain: sites, leaderboards, calendar, rules, reminders
@@ -158,3 +158,4 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - 2026-10-28: fixed S18/C28 text-scale e2e failure (MonthGrid count badge overflowed the last column at 200% text; badge now stacks under the day number). One full run lost the preview server mid-e2e (ERR_CONNECTION_REFUSED, not a code fault); rerun fully green.
 - 2026-10-28: M4 chunk 2 price engine landed (ceba2fd), check.sh green (e2e step alone ~855s; run it in the background). invoiceLinesFor label text is built in the domain, move to language files in the billing UI chunk. Chunk 3 next.
 - 2026-10-28: M4 chunk 3 landed (ee8d588), check.sh green. Small one-file briefs to test-writer/implementer worked (first big brief hit an API error). Chunk 4 next.
+- 2026-10-28: M4 chunk 4 landed (4a pricing ops 142412c, 4b packaging option aebb303), check.sh green. Known: a confirmed price change replaces a whole earlier multi-client adjustment, even for clients that do not overlap (follows domain replacedBy). Test-writer briefs of ~150 lines work; the 400-line brief hit an API error. Chunk 5 next.
