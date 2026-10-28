@@ -152,3 +152,4 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - 2026-10-27: M3 security and code reviews done, fixes landed, full check.sh green. M3 complete. M4 next.
 - 2026-10-27: M4 started, base c7160e2, planning.
 - 2026-10-27: M4 plan committed (ab5d4cc); chunk 1 done (125c3aa). Planner agents hit API errors on long runs, so plan was written in three small parts.
+- 2026-10-28: session start; no origin/main changes, F1 already handled. M4 chunk 2 test-writer failed twice with API server errors (nothing written, tree clean). Stopping at a clean point; retry chunk 2 next session, with a very small brief.
