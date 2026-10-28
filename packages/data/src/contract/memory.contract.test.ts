@@ -8,6 +8,7 @@ import { runEngagementContract } from './engagement';
 import { runEvidenceFlowContract } from './evidenceFlow';
 import { runFeedbackTicketsContract } from './feedbackTickets';
 import { runIdentityOrgContract } from './identityOrg';
+import { runPricingContract } from './pricing';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
 import { runExportsRetentionContract } from './exportsRetention';
@@ -45,3 +46,5 @@ runLeaderboardsThemesContract('memory adapter', (options) => Promise.resolve(cre
 runExportsRetentionContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
 runRemindersLeftoversContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runPricingContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
