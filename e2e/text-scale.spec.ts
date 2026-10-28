@@ -1,6 +1,7 @@
 // F-10: at 390px with the root font size doubled, D1 and the staff shell do not scroll sideways and every tab label is reachable.
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import { readStore } from './helpers/idb';
 import { expectNoClipOrOverlap } from './helpers/layout';
 import { answerQuestion, finishLessons, type QuizQuestion } from './helpers/quiz';
 import { need, staffTabs } from './routes';
@@ -125,4 +126,105 @@ test('the 200% text setting is still applied after a reload', async ({ page }) =
   await chooseLargestText(page, '#/client/display');
   await page.reload();
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).fontSize)).toBe('32px');
+});
+
+// M3 chunk 17 (F-5): C27 and S17 at 200% text on the 390 px phone.
+test('C27 Evidence to check does not clip or overlap at 200% text', async ({ page }) => {
+  await page.goto('./#/client/evidence');
+  await expect(page.getByRole('heading', { level: 1, name: 'Evidence to check' })).toBeVisible();
+  await scale(page);
+  await expectNoClipOrOverlap(page);
+  await page.getByRole('link', { name: 'Ben Carter' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Check a certificate' })).toBeVisible();
+  await expectNoClipOrOverlap(page);
+});
+
+test('S17 Upload certificate does not clip or overlap at 200% text, before and after choosing a file', async ({
+  page,
+}) => {
+  await page.goto('./#/staff/progress');
+  await page.getByRole('link', { name: 'Upload certificate: Paediatric first aid' }).first().click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Upload certificate' })).toBeVisible();
+  await scale(page);
+  await expectNoClipOrOverlap(page);
+  await page.locator('input[type="file"]:not([capture])').setInputFiles({
+    name: 'certificate.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from('%PDF-1.4\n% Fictional.\n%%EOF\n'),
+  });
+  await expect(page.getByRole('button', { name: 'Send for checking' })).toBeVisible();
+  await expectNoClipOrOverlap(page);
+});
+
+// M3 chunk 18b (F-5): S18 and C28 at 200% text on the 390 px phone, list and month views.
+test('S18 and C28 Calendar do not clip or overlap at 200% text', async ({ page }) => {
+  for (const [hash, month] of [
+    ['#/staff/calendar', false],
+    ['#/staff/calendar', true],
+    ['#/client/calendar', false],
+    ['#/client/calendar', true],
+  ] as const) {
+    await page.goto(`./${hash}`);
+    await expect(page.getByRole('heading', { level: 1, name: 'Calendar' })).toBeVisible();
+    await scale(page);
+    if (month) {
+      await page.getByRole('radio', { name: 'Month' }).check();
+      await expect(page.getByRole('grid')).toBeVisible();
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    await expectNoClipOrOverlap(page);
+  }
+});
+
+// F2: GitHub's runners have wider system fonts than the dev container. Force a wide one so the calendar is checked
+// against it here too (falls back to the default font where DejaVu Sans is not installed).
+test('S18 and C28 Calendar month view fits at 200% text with a wide font', async ({ page }) => {
+  for (const hash of ['#/staff/calendar', '#/client/calendar']) {
+    await page.goto(`./${hash}`);
+    await expect(page.getByRole('heading', { level: 1, name: 'Calendar' })).toBeVisible();
+    await scale(page);
+    await page.addStyleTag({ content: '*, *::before, *::after { font-family: "DejaVu Sans" !important }' });
+    await page.getByRole('radio', { name: 'Month' }).check();
+    await expect(page.getByRole('grid')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    await expectNoClipOrOverlap(page);
+  }
+});
+
+// M3 chunk 21 (F-5): C7, C8 and C19 at 200% text on the 390 px phone.
+test('C7 Module builder does not clip or overlap at 200% text, with lessons and a question added', async ({ page }) => {
+  await page.goto('./#/client/modules/new');
+  await expect(page.getByRole('heading', { level: 1, name: 'Module builder' })).toBeVisible();
+  await scale(page);
+  await expectNoClipOrOverlap(page);
+  await page.getByRole('textbox', { name: 'Title', exact: true }).fill('Fire drill for new starters');
+  await page
+    .getByRole('textbox', { name: 'Paste your lessons' })
+    .fill('# Raise the alarm\nShout fire.\n\n# Leave\nWalk out.');
+  await page.getByRole('button', { name: 'Turn into lessons' }).click();
+  await page.getByRole('button', { name: 'Add multiple choice question' }).click();
+  await expect(page.getByTestId('builder-question')).toHaveCount(1);
+  await expectNoClipOrOverlap(page);
+});
+
+test('C8 Module stats does not clip or overlap at 200% text', async ({ page }) => {
+  await page.goto('./#/client');
+  await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+  const fire = (await readStore(page, 'modules')).find((m) => m['title'] === 'Fire evacuation at Little Acorns');
+  await page.goto(`./#/client/modules/${String(fire?.['id'])}/stats`);
+  await expect(page.getByRole('heading', { level: 1, name: /^Results for Fire evacuation/ })).toBeVisible();
+  await scale(page);
+  await expectNoClipOrOverlap(page);
+});
+
+test('C19 Plan and billing and C20 Add-ons do not clip or overlap at 200% text', async ({ page }) => {
+  for (const [hash, heading] of [
+    ['#/client/billing', 'Plan and billing'],
+    ['#/client/billing/add-ons', 'Add-ons'],
+  ] as const) {
+    await page.goto(`./${hash}`);
+    await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
+    await scale(page);
+    await expectNoClipOrOverlap(page);
+  }
 });

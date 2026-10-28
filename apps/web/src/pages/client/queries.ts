@@ -1,5 +1,6 @@
 // Data loading for the client screens. All reads go through the data layer; rules live in the domain package.
 import { useQuery } from '@tanstack/react-query';
+import { ForbiddenError } from '@sta/data';
 import {
   londonDateString,
   type Assignment,
@@ -17,6 +18,13 @@ export type ClientData = {
   accountState: string;
 };
 
+/** A read the role may not have: the screen shows nothing for it rather than failing. Other errors still fail. */
+export const orEmpty = <T>(read: Promise<T[]>): Promise<T[]> =>
+  read.catch((e: unknown) => {
+    if (e instanceof ForbiddenError) return [];
+    throw e;
+  });
+
 /** Everything the dashboard, people list and person record need, in the actor's read scope. */
 export function useClientData() {
   const store = useStore();
@@ -32,9 +40,9 @@ export function useClientData() {
         store.people.list(actor),
         store.sites.list(actor),
         store.requirements.list(actor),
-        store.evidence.list(actor),
-        store.evidenceSubmissions.list(actor),
-        store.assignments.list(actor),
+        orEmpty(store.evidence.list(actor)),
+        orEmpty(store.evidenceSubmissions.list(actor)),
+        orEmpty(store.assignments.list(actor)),
         store.modules.list(actor),
       ]);
       return {

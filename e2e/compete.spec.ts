@@ -20,8 +20,11 @@ async function signInAs(page: Page, name: RegExp) {
 async function open(context: BrowserContext, who: RegExp | 'priya') {
   const page = await context.newPage();
   await page.clock.install({ time: PINNED });
-  if (who === 'priya') await page.goto('./#/client');
-  else await signInAs(page, who);
+  if (who === 'priya') {
+    await page.goto('./#/client');
+    // Let the first page finish seeding before a second page opens (two cold pages would both seed the same store).
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  } else await signInAs(page, who);
   return page;
 }
 const boardOf = (page: Page) => page.getByRole('region', { name: BOARD });

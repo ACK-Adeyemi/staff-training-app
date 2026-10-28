@@ -15,6 +15,7 @@ import {
 import type { MessageKey } from '@sta/content';
 import { useActor, useClock, useStore, useT } from '../../app/hooks';
 import { ConfirmDialog } from './ConfirmDialog';
+import { ReportQuestion } from './FeedbackWidgets';
 import { NotesPanel } from './Notes';
 import { ReadAloud } from './ReadAloud';
 import { LearnMoreGroups } from './LearnMoreList';
@@ -280,6 +281,7 @@ function QuestionView({
           </Button>
         )}
       </div>
+      <ReportQuestion moduleId={module.id} questionId={question.id} />
     </>
   );
 }

@@ -12,15 +12,24 @@ export const reminderPolicySchema = z.object({
   escalateAfterDays: countSchema.optional(),
 });
 
+// Bounds are placeholders (M3 assumption 50).
 export const retentionPolicySchema = z.object({
-  leaverRecordsMonths: countSchema,
-  notesAfterLeaveDays: countSchema,
-  eventDetailMonths: countSchema,
-  feedbackMonths: countSchema,
+  leaverRecordsMonths: z.number().int().min(12).max(120),
+  notesAfterLeaveDays: z.number().int().min(30).max(365),
+  eventDetailMonths: z.number().int().min(13).max(60),
+  feedbackMonths: z.number().int().min(12).max(60),
   ticketMonthsAfterClose: countSchema,
   attachmentDaysAfterClose: countSchema,
   trialDeleteDays: countSchema,
 });
+
+export const reminderToneSchema = z.enum(['friendly', 'neutral', 'brief']);
+export const reminderTemplateSchema = z.object({
+  tone: reminderToneSchema,
+  text: z.string().min(1).max(300).optional(),
+});
+
+export const reminderTemplatesSchema = z.record(z.string(), reminderTemplateSchema);
 
 const battleSettingsSchema = z.object({
   allowStaffHost: z.boolean().default(true),
@@ -39,6 +48,11 @@ export const clientSettingsSchema = z.object({
   allowSelfApproval: z.boolean().default(false),
   /** Lessons per London week for the weekly goal (M2 assumption 7). */
   weeklyGoalLessons: z.number().int().min(1).max(7).default(1),
+  /** The base theme (M3 assumption 52). */
+  themeId: idSchema.optional(),
+  /** Warn when first aiders for a site drop below this many (M3 assumption 23, placeholder). */
+  firstAiderThreshold: z.number().int().min(0).max(20).default(2),
+  reminderTemplates: z.record(z.string(), reminderTemplateSchema).default({}),
   battles: battleSettingsSchema.prefault({}),
   reminderPolicy: reminderPolicySchema.default({
     dueOffsetsDays: [7, 1],
@@ -158,7 +172,18 @@ export const userAccountSchema = z
     displayName: z.string().min(1),
     status: z.enum(['invited', 'active', 'suspended']),
     login: z.object({ method: z.enum(['pin', 'emailPassword']), pinSet: z.boolean() }),
-    twoFactor: z.object({ enrolledAt: isoDateSchema, recoveryCodesLeft: countSchema }).optional(),
+    /** Set for every client admin; staff never have it (M3 assumption 3). */
+    twoFactorRequiredSince: isoDateSchema.optional(),
+    twoFactor: z
+      .object({
+        enrolledAt: isoDateSchema,
+        recoveryCodesLeft: countSchema,
+        /** SHA-256 hex of each unused recovery code (M3 assumption 4). */
+        recoveryCodeHashes: z.array(z.string()).optional(),
+        lockedUntil: isoDateSchema.optional(),
+        failedCodes: countSchema.optional(),
+      })
+      .optional(),
     lastActiveAt: isoDateSchema.optional(),
   })
   .superRefine((user, ctx) => {

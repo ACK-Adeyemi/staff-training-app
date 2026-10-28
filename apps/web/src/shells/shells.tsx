@@ -1,6 +1,13 @@
+import { useState } from 'react';
+import { Navigate } from 'react-router';
 import type { NavItem } from '@sta/ui';
+import type { TwoFactorStatus } from '@sta/domain';
+import { holdsAnywhere } from '@sta/domain';
 import { useT } from '../app/hooks';
-import { useClientData } from '../pages/client/queries';
+import { SetSiteScopeContext, SiteScopeContext } from '../app/siteScope';
+import { useTwoFactorStatus } from '../pages/client/foundationsQueries';
+import { useClientData, usePermissions } from '../pages/client/queries';
+import { AccountBannerView, SiteSwitch, TwoFactorBanner } from './clientChrome';
 import { Shell } from './Shell';
 
 const item = (path: string, label: string, icon: NavItem['icon']): NavItem => ({
@@ -33,30 +40,91 @@ export function StaffShell() {
   );
 }
 
+/** Gate: an admin who has not set up two-step sign-in in time can only reach the sign-in screen (brief 22.6). */
 export function ClientShell() {
   const t = useT();
+  const twoFactor = useTwoFactorStatus();
+  if (twoFactor.isError)
+    return (
+      <p role="alert" className="p-4">
+        {t('twoFactor.loadError')}
+      </p>
+    );
+  if (!twoFactor.data) return <p className="p-4">{t('shell.loading')}</p>;
+  if (twoFactor.data.kind === 'limited') return <Navigate to="/client/signin?setup=1" replace />;
+  return <ClientFrame twoFactor={twoFactor.data} />;
+}
+
+function ClientFrame({ twoFactor }: { twoFactor: TwoFactorStatus }) {
+  const t = useT();
+  const [site, setSite] = useState('all');
   // Load the organisation data once, up front, so every client screen opens with its content rather than a spinner.
   const data = useClientData();
+  const perms = usePermissions();
   if (data.isPending) return <p className="p-4">{t('shell.loading')}</p>;
   return (
-    <Shell
-      config={{
-        side: 'client',
-        bar: [
-          item('/client', t('nav.client.dashboard'), 'home'),
-          item('/client/people', t('nav.client.people'), 'user'),
-          item('/client/modules', t('nav.client.training'), 'book'),
-          item('/client/competitions', t('nav.client.engage'), 'trophy'),
-        ],
-        more: [
-          item('/client/organise', t('organise.title'), 'book'),
-          item('/client/reports', t('nav.client.reports'), 'chart'),
-          item('/client/settings', t('nav.client.settings'), 'more'),
-          item('/client/help', t('nav.client.help'), 'help'),
-        ],
-        headerLinks: [],
-      }}
-    />
+    <SiteScopeContext value={site}>
+      <SetSiteScopeContext value={setSite}>
+        <Shell
+          config={{
+            side: 'client',
+            bar: [
+              item('/client', t('nav.client.dashboard'), 'home'),
+              item('/client/people', t('nav.client.people'), 'user'),
+              item('/client/modules', t('nav.client.training'), 'book'),
+              item('/client/competitions', t('nav.client.engage'), 'trophy'),
+            ],
+            more: [
+              ...(perms.data && holdsAnywhere(perms.data, 'assign.view')
+                ? [item('/client/calendar', t('calendar.title'), 'clock')]
+                : []),
+              item('/client/organise', t('organise.title'), 'book'),
+              item('/client/reports', t('nav.client.reports'), 'chart'),
+              ...(perms.data && holdsAnywhere(perms.data, 'reports.view')
+                ? [item('/client/stats', t('stats.title'), 'chart')]
+                : []),
+              ...(perms.data && holdsAnywhere(perms.data, 'moduleFeedback.view')
+                ? [item('/client/module-feedback', t('feedback.inbox.title'), 'help')]
+                : []),
+              ...(perms.data && holdsAnywhere(perms.data, 'evidence.view')
+                ? [item('/client/evidence', t('evidenceFlow.queueTitle'), 'check')]
+                : []),
+              ...(perms.data && holdsAnywhere(perms.data, 'assign.manage')
+                ? [item('/client/rules', t('rules.title'), 'check')]
+                : []),
+              ...(perms.data && holdsAnywhere(perms.data, 'reminders.view')
+                ? [item('/client/reminders', t('reminders.title'), 'bell')]
+                : []),
+              ...(perms.data && holdsAnywhere(perms.data, 'themes.view')
+                ? [item('/client/themes', t('themes.title'), 'more')]
+                : []),
+              item('/client/team', t('team.title'), 'user'),
+              item('/client/settings', t('nav.client.settings'), 'more'),
+              ...(perms.data && holdsAnywhere(perms.data, 'settings.view')
+                ? [item('/client/data', t('dataPage.title'), 'more')]
+                : []),
+              ...(perms.data && holdsAnywhere(perms.data, 'billing.view')
+                ? [
+                    item('/client/billing', t('nav.client.billing'), 'chart'),
+                    item('/client/billing/add-ons', t('addOns.title'), 'more'),
+                  ]
+                : []),
+              item('/client/account-status', t('account.statusTitle'), 'clock'),
+              item('/client/onboarding', t('onboarding.title'), 'check'),
+              item('/client/help', t('nav.client.help'), 'help'),
+            ],
+            headerLinks: [],
+            headerExtra: <SiteSwitch value={site} onChange={setSite} />,
+            top: (
+              <>
+                {twoFactor.kind === 'grace' ? <TwoFactorBanner daysLeft={twoFactor.daysLeft} /> : null}
+                <AccountBannerView />
+              </>
+            ),
+          }}
+        />
+      </SetSiteScopeContext>
+    </SiteScopeContext>
   );
 }
 

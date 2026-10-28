@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@sta/ui';
+import { displayNameAt } from '@sta/domain';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { formatLondonDate } from '../../demo/format';
 import { LearningFrame } from './LearningFrame';
@@ -40,7 +41,7 @@ export function Certificate() {
               version={latest.moduleVersion ?? module.version}
               name={`${person.firstName} ${person.lastName}`}
               completedAt={latest.completedAt}
-              clientName={client.displayName}
+              clientName={displayNameAt(client, latest.completedAt)}
               siteId={latest.siteIdAtTime}
               back={back}
             />

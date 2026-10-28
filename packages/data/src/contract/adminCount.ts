@@ -18,6 +18,7 @@ import {
   type UserAccount,
 } from '@sta/domain';
 import { ForbiddenError, type ActorContext, type DemoAdmin, type StoreHandle, type StoreOptions } from '../types';
+import { flowOf } from './evidenceFlow';
 import { buildWorld, id, TODAY } from './world';
 
 type Second = 'none' | 'active' | 'suspendedUser' | 'expiredAssignment' | 'suspendedAssignment';
@@ -185,7 +186,7 @@ export function runAdminCountContract(name: string, makeStore: (options: StoreOp
 
   const approveOwn = async (s: Awaited<ReturnType<typeof setup>>) => {
     const sub = await s.store.evidenceSubmissions.get(s.ctx, ids.submission);
-    return s.store.evidenceSubmissions.put(s.ctx, { ...sub, status: 'approved' });
+    return flowOf(s.store).review(s.ctx, sub.id, { kind: 'approve' });
   };
   const reasonOf = async (p: Promise<unknown>): Promise<string> => {
     try {

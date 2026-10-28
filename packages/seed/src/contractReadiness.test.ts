@@ -111,7 +111,7 @@ describe('seed as the contract suite world', () => {
     const sub = await w.store.evidenceSubmissions.get(ctx, w.keys.submissions['ben']);
     expect(sub.status).toBe('awaitingCheck');
     expect(sub.uploadedBy).not.toBe(w.keys.users['daniel']);
-    const done = await w.store.evidenceSubmissions.put(ctx, { ...sub, status: 'approved' });
+    const done = await w.store.evidenceFlow.review(ctx, sub.id, { kind: 'approve' });
     expect(done.status).toBe('approved');
     const evidence = (await w.store.evidence.list(ctx)).filter(
       (e) => e.personId === w.keys.personas['ben'] && e.requirementId === w.keys.requirements['safeguarding'],

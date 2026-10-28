@@ -7,8 +7,9 @@ import { buildWorld, type SeedData, type SeedKeys } from './world';
 export type { SeedKeys } from './world';
 
 /** Version of the seeded world. 1 was M0; 2 adds modules, learning data and Little Acorns' policy (M1); 3 adds history, notes, organising data and
- * competitions (M2). */
-export const SEED_VERSION = 3;
+ * competitions (M2); 4 adds own modules, feedback, tickets, rules, themes, invoices and sign-in states (M3);
+ * 5 adds price changes, profile changes, the link check, Other entries, comms and a recovery request (M4). */
+export const SEED_VERSION = 5;
 export const DEFAULT_SEED_VALUE = 20261019;
 /** Used only when nothing is stored and the caller gave no date. The web app passes the real first-load date. */
 export const DEFAULT_TODAY = '2026-10-19T09:00:00.000Z';
@@ -48,6 +49,29 @@ const storeOrder: (keyof SeedData)[] = [
   'modulePlacements',
   'competitions',
   'standingBoardSettings',
+  'moduleVersions',
+  'moduleFeedback',
+  'appFeedback',
+  'tickets',
+  'ticketMessages',
+  'autoAssignRules',
+  'reminderLog',
+  'themes',
+  'invoices',
+  'billingProfiles',
+  'onboarding',
+  'billingChangeRequests',
+  'outbox',
+  'priceAdjustments',
+  'announcements',
+  'releaseNotes',
+  'recoveryRequests',
+  'dataRequests',
+  'incidents',
+  'otherEntryGroups',
+  'savedReplies',
+  'profileChangeRequests',
+  'linkCheckResults',
 ];
 
 /** Replaces everything in the store with the seeded world, and stores the seed value and today. */
@@ -64,7 +88,11 @@ export async function reset(admin: DemoAdmin): Promise<SeedKeys> {
   const meta = (await admin.getSeedMeta()) ?? { seedValue: DEFAULT_SEED_VALUE, today: DEFAULT_TODAY };
   const state = await admin.getDemoState();
   const keys = await load(admin, meta);
-  if (state) await admin.setDemoState({ ...state, clockOffsetMs: 0 });
+  if (state) {
+    const next = { ...state, clockOffsetMs: 0 };
+    delete next.packagingOption;
+    await admin.setDemoState(next);
+  }
   return keys;
 }
 

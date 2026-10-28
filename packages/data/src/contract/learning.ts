@@ -402,7 +402,8 @@ export function runLearningContract(name: string, makeStore: (options: StoreOpti
           'notifications',
         ] as const) {
           expect(Object.keys(store[key]).sort(), key).not.toContain('put');
-          expect(Object.keys(store[key]).sort(), key).not.toContain('remove');
+          // attachments.remove is the owner-or-approver removal of an unsubmitted file (M3 chunk 8), not a generic remove.
+          if (key !== 'attachments') expect(Object.keys(store[key]).sort(), key).not.toContain('remove');
         }
       });
 
@@ -1208,7 +1209,7 @@ export function runLearningContract(name: string, makeStore: (options: StoreOpti
         const lucy = s.fx.keys.personas['lucy'];
         await s.store.assignments.assign(priya(s), { moduleId: s.lf.moduleId, personIds: [lucy], dueAt: due });
         expect(calls).toHaveLength(1);
-        expect(new Set(calls[0])).toEqual(new Set(['assignments', 'notifications', 'audit']));
+        expect(new Set(calls[0])).toEqual(new Set(['assignments', 'notifications', 'audit', 'onboarding']));
         await refusal(
           s.store.assignments.assign(priya(s), {
             moduleId: s.lf.moduleId,

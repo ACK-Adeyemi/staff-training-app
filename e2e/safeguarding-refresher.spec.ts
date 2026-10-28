@@ -188,7 +188,7 @@ test('the organisation policy opens on its own page', async ({ page }, testInfo)
   test.skip(testInfo.project.name !== 'phone', 'phone project only');
   await page.goto('./#/staff');
   await expect(page.getByText('1 to do')).toBeVisible();
-  const id = (await readStore(page, 'attachments'))[0]?.['id'];
+  const id = (await readStore(page, 'attachments')).find((a) => a['kind'] === 'document')?.['id'];
   await page.goto(`./#/doc/${String(id)}`);
   await expect(page.getByRole('heading', { level: 1, name: 'Little Acorns Safeguarding policy' })).toBeVisible();
   await axeClean(page, 'org document');

@@ -4,13 +4,15 @@ import {
   DISPLAY_KEYS,
   defaultDisplayPrefs,
   displayAttributes,
+  londonDateString,
   mergeDisplayPrefs,
+  themeCssVariables,
   type AppliedDisplayPrefs,
   type DisplayPatch,
   type LearnerPrefs,
 } from '@sta/domain';
 import { DemoContext } from '../context';
-import { useActor, useStore } from '../hooks';
+import { useActor, useClock, useStore } from '../hooks';
 import { addPending, applyToHtml, clearPending, readPending, rememberApplied } from './applied';
 import { DisplayPrefsContext, type DisplayPrefsApi } from './context';
 
@@ -19,6 +21,12 @@ const pickDisplay = (source: Partial<Record<string, unknown>> | undefined): Appl
   for (const key of DISPLAY_KEYS) if (source?.[key] !== undefined) picked[key] = source[key];
   return mergeDisplayPrefs(undefined, picked);
 };
+
+const THEME_VARIABLES = ['--theme-primary', '--theme-accent', '--theme-tint', '--theme-radius'] as const;
+const THEME_VALUE = /^(#[0-9a-f]{6}|\d{1,2}px)$/i;
+
+const prefersDark = (): boolean =>
+  typeof window.matchMedia === 'function' && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
 const definedOnly = (patch: DisplayPatch): Partial<LearnerPrefs> =>
   Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined));
@@ -32,11 +40,19 @@ export function DisplayPrefsProvider({ children }: { children: ReactNode }) {
   const store = useStore();
   const actor = useActor();
   const demo = useContext(DemoContext);
+  const clock = useClock();
   const personal = actor.side !== 'provider';
   const me = useQuery({
     queryKey: ['me', actor.userId],
     queryFn: () => store.me.get(actor),
     enabled: personal,
+  });
+  // Staff see the theme for the staff app and client admins the one for the admin app; the provider side has none.
+  const themeSide = actor.side === 'staff' ? 'staff' : actor.side === 'client' ? 'admin' : undefined;
+  const activeTheme = useQuery({
+    queryKey: ['activeTheme', actor.userId, themeSide, londonDateString(clock.now())],
+    queryFn: () => store.themes.active(actor, themeSide ?? 'staff'),
+    enabled: themeSide !== undefined,
   });
   const base = personal ? me.data?.prefs : demo?.state.displayPrefs;
   const loaded = personal ? me.isSuccess || me.isError : true;
@@ -67,6 +83,23 @@ export function DisplayPrefsProvider({ children }: { children: ReactNode }) {
     applyToHtml(applied);
     rememberApplied(applied);
   }, [prefs, ready]);
+
+  // The theme goes on after the display settings, which always win: dark mode and high contrast drop its colours.
+  const theme = themeSide === undefined ? null : (activeTheme.data ?? null);
+  useLayoutEffect(() => {
+    if (!ready) return;
+    const root = document.documentElement;
+    for (const name of THEME_VARIABLES) root.style.removeProperty(name);
+    const colourMode = prefs.colourMode === 'auto' ? (prefersDark() ? 'dark' : 'light') : prefs.colourMode;
+    const vars = theme ? themeCssVariables(theme, { contrast: prefs.contrast, colourMode }) : {};
+    for (const [name, value] of Object.entries(vars)) {
+      if ((THEME_VARIABLES as readonly string[]).includes(name) && THEME_VALUE.test(value)) {
+        root.style.setProperty(name, value);
+      }
+    }
+    if (vars['--theme-primary'] !== undefined) root.setAttribute('data-theme-colours', 'true');
+    else root.removeAttribute('data-theme-colours');
+  }, [theme, prefs.contrast, prefs.colourMode, ready]);
 
   // The font file is requested only when the dyslexia-friendly font is chosen.
   useEffect(() => {

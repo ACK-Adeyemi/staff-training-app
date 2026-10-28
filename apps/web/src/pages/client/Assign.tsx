@@ -1,10 +1,11 @@
 import { useState, type SyntheticEvent } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AccountStateError, ForbiddenError, NotFoundError, RuleError, ValidationError } from '@sta/data';
 import type { MessageKey } from '@sta/content';
 import { Button, Card, PageHeader } from '@sta/ui';
 import { can, dueAtFromLondonDate, londonDateString, planAssignment } from '@sta/domain';
 import { useActor, useClock, useStore, useT } from '../../app/hooks';
+import { useSiteScope } from '../../app/siteScope';
 import { fullName, useClientData, usePermissions } from './queries';
 
 type Result = { created: number; skipped: string[] };
@@ -46,7 +47,13 @@ export function Assign() {
   const queryClient = useQueryClient();
   const q = useClientData();
   const perms = usePermissions();
+  const site = useSiteScope();
   const [moduleId, setModuleId] = useState('');
+  const [groupId, setGroupId] = useState('');
+  const groupsQ = useQuery({
+    queryKey: ['moduleGroups', actor.userId],
+    queryFn: () => store.moduleGroups.list(actor),
+  });
   const [picked, setPicked] = useState<ReadonlySet<string>>(new Set());
   const [due, setDue] = useState('');
   const [busy, setBusy] = useState(false);
@@ -54,7 +61,7 @@ export function Assign() {
   const [errorMsg, setErrorMsg] = useState<MessageKey | null>(null);
 
   if (q.isError) return <p role="alert">{t('client.loadError')}</p>;
-  if (!q.data || !perms.data) return <p>{t('shell.loading')}</p>;
+  if (!q.data || !perms.data || (!groupsQ.data && !groupsQ.isError)) return <p>{t('shell.loading')}</p>;
   const { view, assignments, modules, accountState } = q.data;
   const held = perms.data;
   const allowed = held.some((p) => p.permissionId === 'assign.manage');
@@ -64,6 +71,7 @@ export function Assign() {
   const published = modules.filter((m) => m.status === 'published');
   const choosable = view.people
     .filter((p) => p.status !== 'archived')
+    .filter((p) => site === 'all' || p.primarySiteId === site)
     .filter((p) =>
       can(held, 'assign.manage', { clientId: p.clientId, siteIds: [p.primarySiteId, ...p.additionalSiteIds] }, 'write'),
     )
@@ -79,7 +87,21 @@ export function Assign() {
         now: clock.now(),
       })
     : null;
-  const count = plan?.toCreate.length ?? 0;
+  const group = groupsQ.data?.find((g) => g.id === groupId);
+  const groupPlans = group
+    ? group.moduleIds.map((id) =>
+        planAssignment({
+          moduleId: id,
+          personIds: [...picked],
+          people: view.people,
+          existing: assignments,
+          dueAt: due ? safeDue(due) : '',
+          now: clock.now(),
+        }),
+      )
+    : null;
+  const count = groupPlans ? groupPlans.reduce((n, p) => n + p.toCreate.length, 0) : (plan?.toCreate.length ?? 0);
+  const skippedCount = groupPlans ? groupPlans.reduce((n, p) => n + p.skipped.length, 0) : (plan?.skipped.length ?? 0);
 
   const toggle = (id: string) => {
     const next = new Set(picked);
@@ -91,7 +113,7 @@ export function Assign() {
   const submit = async (e: SyntheticEvent) => {
     e.preventDefault();
     setResult(null);
-    if (!moduleId || picked.size === 0 || !due) {
+    if ((!moduleId && !groupId) || picked.size === 0 || !due) {
       setErrorMsg('client.assign.errors.validation');
       return;
     }
@@ -105,7 +127,9 @@ export function Assign() {
     setErrorMsg(null);
     setBusy(true);
     try {
-      const out = await store.assignments.assign(actor, { moduleId, personIds: [...picked], dueAt });
+      const out = groupId
+        ? await store.assignments.assignGroup(actor, { groupId, personIds: [...picked], dueAt })
+        : await store.assignments.assign(actor, { moduleId, personIds: [...picked], dueAt });
       const names = new Map(view.people.map((p) => [p.id, fullName(p)]));
       setResult({ created: out.created.length, skipped: out.skipped.map((s) => names.get(s.personId) ?? '') });
       setPicked(new Set());
@@ -136,6 +160,7 @@ export function Assign() {
             value={moduleId}
             onChange={(e) => {
               setModuleId(e.target.value);
+              if (e.target.value) setGroupId('');
             }}
             className={field}
           >
@@ -143,6 +168,28 @@ export function Assign() {
             {published.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label htmlFor="assign-group" className="font-semibold">
+            {t('client.assign.group')}
+          </label>
+          <select
+            id="assign-group"
+            value={groupId}
+            onChange={(e) => {
+              setGroupId(e.target.value);
+              if (e.target.value) setModuleId('');
+            }}
+            className={field}
+          >
+            <option value="">{t('client.assign.chooseGroup')}</option>
+            {(groupsQ.data ?? []).map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
               </option>
             ))}
           </select>
@@ -191,9 +238,7 @@ export function Assign() {
               ? t('client.assign.previewOne')
               : t('client.assign.preview', { count })}
         </p>
-        {plan && plan.skipped.length > 0 ? (
-          <p className="m-0">{t('client.assign.previewSkipped', { count: plan.skipped.length })}</p>
-        ) : null}
+        {skippedCount > 0 ? <p className="m-0">{t('client.assign.previewSkipped', { count: skippedCount })}</p> : null}
 
         {blocked ? <p className="m-0 font-semibold">{t(blocked)}</p> : null}
         <div>

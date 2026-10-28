@@ -1,18 +1,26 @@
 // createStore: builds a DataStore and DemoAdmin on top of any RawBackend. Both adapters use it, so the
 // policy (validation, tenancy, permissions, audit, account state, entitlements) is identical.
 import {
-  defaultDisplayPrefs,
   demoStateSchema,
   seedMetaSchema,
   type DemoState,
-  type LearnerPrefs,
   type OutboxMessage,
   type SeedMeta,
+  type Client,
   type UserAccount,
 } from '@sta/domain';
 import { createOperations } from './ops';
 import { createEngagementOperations } from './engagementOps';
 import { createCompetitionOperations } from './competitionOps';
+import { createIdentityOperations } from './identityOps';
+import { createAuthoringOperations } from './authoringOps';
+import { createEvidenceOperations } from './evidenceOps';
+import { createSupportOperations } from './supportOps';
+import { createThemesOperations } from './themesOps';
+import { createDataRightsOperations } from './dataRightsOps';
+import { createRulesOperations, newPersonPrefs } from './rulesOps';
+import { createPricingOperations } from './pricingOps';
+import { createBillingOperations, simulateFailedPayment } from './billingOps';
 import { keyOf, validate, type RawBackend, type SettingsRecord, type WriteOp } from './backend';
 import {
   authorizePut,
@@ -57,28 +65,29 @@ const matches = (record: Rec, filter: Filter | undefined): boolean =>
 
 /** Another person's personal settings are theirs alone: everyone else reads a person without `prefs`. */
 function shape(call: Call, store: StoreName, record: Rec): Rec {
+  // Another account's recovery-code hashes and lock counters are internal to the two-step flow.
+  if (store === 'users' && record['id'] !== call.actor.user.id && record['twoFactor']) {
+    const safe = { ...(record['twoFactor'] as Rec) };
+    for (const key of ['recoveryCodeHashes', 'failedCodes', 'lockedUntil']) Reflect.deleteProperty(safe, key);
+    return { ...record, twoFactor: safe };
+  }
   if (store !== 'people' || call.actor.user.personId === record['id']) return record;
   const rest = { ...record };
   delete rest['prefs'];
   return rest;
 }
 
-const newPersonPrefs = (): LearnerPrefs => ({
-  hideFromLeaderboards: false,
-  ...defaultDisplayPrefs,
-  language: 'en-GB',
-  battleExtraTimePercent: 0,
-});
-
 function repo(backend: RawBackend, options: StoreOptions, store: StoreName) {
-  const begin = (ctx: ActorContext): Promise<Call> => beginCall(backend, options, ctx);
+  const begin = (ctx: ActorContext, opts?: { allowLimited?: boolean }): Promise<Call> =>
+    beginCall(backend, options, ctx, opts);
 
   const visible = async (call: Call, record: Rec): Promise<boolean> =>
     (await canReadStore(call, store)) && (await canReadRecord(call, store, record));
 
   return {
     get: async (ctx: ActorContext, id: string) => {
-      const call = await begin(ctx);
+      // A limited admin may still read their own user record (M3 assumption 3).
+      const call = await begin(ctx, { allowLimited: store === 'users' && id === ctx.userId });
       const record = (await backend.get(store, id)) as Rec | undefined;
       if (!record || !(await visible(call, record))) throw new NotFoundError();
       return shape(call, store, record);
@@ -150,7 +159,7 @@ function appendOnly(backend: RawBackend, options: StoreOptions, store: 'audit' |
   };
 }
 
-function demoAdmin(backend: RawBackend): DemoAdmin {
+function demoAdmin(backend: RawBackend, options: StoreOptions, runJobs: DemoAdmin['runJobs']): DemoAdmin {
   const setting = async (key: string): Promise<unknown> => {
     const row = (await backend.get('settings', key)) as SettingsRecord | undefined;
     return row?.value;
@@ -160,6 +169,7 @@ function demoAdmin(backend: RawBackend): DemoAdmin {
 
   return {
     clearAll: () => backend.clear(),
+    runJobs,
     async bulkPut(store, records) {
       const ops = records.map((record, i): WriteOp => {
         const clean = validate(store, record, `[${i}] `);
@@ -182,6 +192,14 @@ function demoAdmin(backend: RawBackend): DemoAdmin {
       }
       await setSetting('demoState', parsed.data);
     },
+    async getPackagingOption() {
+      return ((await setting('demoState')) as DemoState | undefined)?.packagingOption ?? 'A';
+    },
+    async setPackagingOption(option) {
+      const state = (await setting('demoState')) as DemoState | undefined;
+      if (!state) throw new ValidationError(['demoState: set the demo state before the packaging option']);
+      await this.setDemoState({ ...state, packagingOption: option });
+    },
     async getSeedMeta() {
       return (await setting('seedMeta')) as SeedMeta | undefined;
     },
@@ -195,6 +213,32 @@ function demoAdmin(backend: RawBackend): DemoAdmin {
     async listOutbox() {
       return ((await backend.getAll('outbox')) as OutboxMessage[]).sort(byKey('outbox'));
     },
+    async listPersonas() {
+      const clients = (await backend.getAll('clients')) as Client[];
+      const nameOf = new Map(clients.map((c) => [c.id, c.displayName]));
+      return ((await backend.getAll('users')) as UserAccount[])
+        .filter(
+          (u): u is UserAccount & { side: 'client' | 'staff'; clientId: string } =>
+            (u.side === 'client' || u.side === 'staff') &&
+            u.status === 'active' &&
+            u.clientId !== undefined &&
+            nameOf.has(u.clientId),
+        )
+        .map((u) => ({
+          userId: u.id,
+          displayName: u.displayName,
+          side: u.side,
+          clientId: u.clientId,
+          clientName: nameOf.get(u.clientId) as string,
+        }))
+        .sort(
+          (a, b) =>
+            (a.side === b.side ? 0 : a.side === 'client' ? -1 : 1) ||
+            (a.clientName < b.clientName ? -1 : a.clientName > b.clientName ? 1 : 0) ||
+            (a.displayName < b.displayName ? -1 : a.displayName > b.displayName ? 1 : 0),
+        );
+    },
+    simulateFailedPayment: (clientId, now) => simulateFailedPayment(backend, options, clientId, now),
     async listStaffUsers(clientId) {
       return ((await backend.getAll('users')) as UserAccount[])
         .filter(
@@ -246,6 +290,15 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const ops = createOperations(backend, options);
   const engagement = createEngagementOperations(backend, options);
   const competitionOps = createCompetitionOperations(backend, options);
+  const identity = createIdentityOperations(backend, options);
+  const billingOps = createBillingOperations(backend, options);
+  const pricing = createPricingOperations(backend, options);
+  const authoringOps = createAuthoringOperations(backend, options);
+  const evidenceFlow = createEvidenceOperations(backend, options);
+  const support = createSupportOperations(backend, options);
+  const rules = createRulesOperations(backend, options);
+  const themeOps = createThemesOperations(backend, options);
+  const dataRights = createDataRightsOperations(backend, options);
   const readOnly = (name: StoreName) => {
     const full = repo(backend, options, name);
     return { get: full.get, list: full.list };
@@ -256,11 +309,14 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     return { get: full.get, list: full.list, put: full.put };
   };
   const audit = r('audit');
+  const notificationsRepo = readOnly('notifications');
   const store = {
     clients: withoutRemove('clients'),
     sites: r('sites'),
     teams: r('teams'),
-    people: r('people'),
+    people: { ...r('people'), ...rules.people, erase: dataRights.erase },
+    autoAssign: rules.autoAssign,
+    reminders: rules.reminders,
     users: r('users'),
     jobRoles: r('jobRoles'),
     requirements: r('requirements'),
@@ -269,22 +325,49 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     roles: r('roles'),
     roleAssignments: r('roleAssignments'),
     packages: withoutRemove('packages'),
-    addOns: withoutRemove('addOns'),
+    addOns: { ...withoutRemove('addOns'), ...billingOps.addOnOps },
+    billing: billingOps.billing,
+    pricing,
+    addOnRequests: billingOps.addOnRequests,
+    account: billingOps.account,
+    ai: billingOps.ai,
     subscriptions: withoutRemove('subscriptions'),
     addOnSubscriptions: withoutRemove('addOnSubscriptions'),
     paymentAttempts: withoutRemove('paymentAttempts'),
     audit: { get: audit.get, list: audit.list, append: appendOnly(backend, options, 'audit') },
     outbox: { append: appendOnly(backend, options, 'outbox') },
     modules: readOnly('modules'),
-    attachments: readOnly('attachments'),
+    attachments: authoringOps.attachments,
+    authoring: authoringOps.authoring,
+    linkOverlays: authoringOps.linkOverlays,
     clientLinkOverlays: readOnly('clientLinkOverlays'),
-    assignments: { ...readOnly('assignments'), assign: ops.assign },
+    assignments: { ...readOnly('assignments'), assign: ops.assign, assignGroup: authoringOps.assignGroup },
     learningEvents: readOnly('learningEvents'),
     attempts: readOnly('attempts'),
-    notifications: { ...readOnly('notifications'), markRead: ops.markRead },
+    notifications: {
+      ...readOnly('notifications'),
+      list: async (ctx: ActorContext, filter?: Filter) => {
+        const visible = (await notificationsRepo.list(ctx, filter)) as { snoozedUntil?: string }[];
+        const now = new Date(ctx.now).getTime();
+        return visible.filter((n) => n.snoozedUntil === undefined || new Date(n.snoozedUntil).getTime() <= now);
+      },
+      markRead: ops.markRead,
+      snooze: rules.snooze,
+    },
     learning: ops.learning,
     ...engagement,
+    access: { ...engagement.access, features: (ctx: ActorContext) => billingOps.features(ctx) },
     ...competitionOps,
+    themes: themeOps.themes,
+    exports: dataRights.exports,
+    retention: dataRights.retention,
+    ...identity,
+    evidenceFlow,
+    ...support,
   };
-  return { store: store as unknown as DataStore, admin: demoAdmin(backend), subscribe };
+  return {
+    store: store as unknown as DataStore,
+    admin: demoAdmin(backend, options, (now) => rules.runJobs(now)),
+    subscribe,
+  };
 }

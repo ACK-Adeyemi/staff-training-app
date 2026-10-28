@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { MessageKey } from '@sta/content';
 import { Badge, DataTable, PageHeader, StatusBadge } from '@sta/ui';
 import { useT } from '../../app/hooks';
 import { formatLondonDate } from '../../demo/format';
@@ -27,6 +28,12 @@ export function Progress() {
   return (
     <>
       <PageHeader title={t('staff.progress.title')} />
+      <a
+        href="#/staff/calendar"
+        className={`mb-4 inline-flex min-h-[var(--target-min)] items-center underline ${focusLink}`}
+      >
+        {t('calendar.title')}
+      </a>
       <div role="tablist" aria-label={t('staff.progress.tabs')} className="mb-4 flex flex-wrap gap-2">
         {tabs.map((x) => (
           <button
@@ -70,28 +77,84 @@ export function Progress() {
                 { key: 'cadence', header: t('staff.progress.cadence') },
                 { key: 'action', header: t('staff.progress.action') },
               ]}
-              rows={data.summary.rows.map((r) => ({
-                id: r.requirement.id,
-                cells: {
-                  name: r.requirement.name,
-                  status: <StatusBadge status={r.status} label={t(`staff.progress.statusWord.${r.status}`)} />,
-                  last: r.lastDoneAt ? formatLondonDate(r.lastDoneAt) : t('staff.progress.never'),
-                  next: r.nextRenewalAt ? formatLondonDate(r.nextRenewalAt) : t('staff.progress.none'),
-                  cadence:
-                    r.cadenceMonths !== undefined
-                      ? t('staff.progress.everyMonths', { count: r.cadenceMonths })
-                      : t('staff.progress.none'),
-                  action: r.moduleId ? (
-                    <a
-                      href={`#/staff/module/${r.moduleId}`}
-                      aria-label={`${t('staff.progress.startTraining')}: ${r.requirement.name}`}
-                      className={`inline-flex min-h-[var(--target-min)] items-center underline ${focusLink}`}
-                    >
-                      {t('staff.progress.startTraining')}
-                    </a>
-                  ) : null,
-                },
-              }))}
+              rows={data.summary.rows.map((r) => {
+                const open = data.submissions.find(
+                  (s) =>
+                    s.requirementId === r.requirement.id &&
+                    (s.status === 'awaitingCheck' || s.status === 'needsBetterCopy' || s.status === 'rejected'),
+                );
+                const uploadHref = `#/staff/progress/upload/${r.requirement.id}`;
+                const courseUrl = r.requirement.acceptedProviders.find((p) => p.courseUrl)?.courseUrl;
+                const linkClass = `inline-flex min-h-[var(--target-min)] items-center underline ${focusLink}`;
+                return {
+                  id: r.requirement.id,
+                  cells: {
+                    name: r.requirement.name,
+                    status: (
+                      <div className="flex flex-col items-start gap-1">
+                        <StatusBadge status={r.status} label={t(`staff.progress.statusWord.${r.status}`)} />
+                        {open?.status === 'awaitingCheck' && r.status !== 'awaitingCheck' ? (
+                          <StatusBadge status="awaitingCheck" label={t('staff.progress.statusWord.awaitingCheck')} />
+                        ) : null}
+                        {open && open.status !== 'awaitingCheck' ? (
+                          <>
+                            <Badge>
+                              {open.status === 'rejected'
+                                ? t('evidenceFlow.rejected')
+                                : t('evidenceFlow.needsBetterCopy')}
+                            </Badge>
+                            {open.status === 'rejected' && open.rejectionReason ? (
+                              <span>{t(`evidenceFlow.reasons.${open.rejectionReason}` as MessageKey)}</span>
+                            ) : null}
+                            {open.decisionNote ? <span>{open.decisionNote}</span> : null}
+                          </>
+                        ) : null}
+                      </div>
+                    ),
+                    last: r.lastDoneAt ? formatLondonDate(r.lastDoneAt) : t('staff.progress.never'),
+                    next: r.nextRenewalAt ? formatLondonDate(r.nextRenewalAt) : t('staff.progress.none'),
+                    cadence:
+                      r.cadenceMonths !== undefined
+                        ? t('staff.progress.everyMonths', { count: r.cadenceMonths })
+                        : t('staff.progress.none'),
+                    action: (
+                      <div className="flex flex-col items-start">
+                        {r.moduleId ? (
+                          <a
+                            href={`#/staff/module/${r.moduleId}`}
+                            aria-label={`${t('staff.progress.startTraining')}: ${r.requirement.name}`}
+                            className={linkClass}
+                          >
+                            {t('staff.progress.startTraining')}
+                          </a>
+                        ) : null}
+                        {r.requirement.acceptsExternal && open?.status !== 'awaitingCheck' ? (
+                          <a
+                            href={uploadHref}
+                            aria-label={t(open ? 'evidenceFlow.resubmitLink' : 'evidenceFlow.uploadLink', {
+                              requirement: r.requirement.name,
+                            })}
+                            className={linkClass}
+                          >
+                            {t(open ? 'evidenceFlow.resubmit' : 'evidenceFlow.uploadTitle')}
+                          </a>
+                        ) : null}
+                        {courseUrl ? (
+                          <a
+                            href={courseUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={t('evidenceFlow.goToCourse', { requirement: r.requirement.name })}
+                            className={linkClass}
+                          >
+                            {t('evidenceFlow.goToCourseShort')}
+                          </a>
+                        ) : null}
+                      </div>
+                    ),
+                  },
+                };
+              })}
             />
           )
         ) : null}

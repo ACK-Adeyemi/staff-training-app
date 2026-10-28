@@ -77,7 +77,52 @@ const SEED_LEARNING_STORES = new Set([
   'modulePlacements',
   'competitions',
   'standingBoardSettings',
+  // M3 seed version 4 (the suite builds its own).
+  'moduleVersions',
+  'moduleFeedback',
+  'appFeedback',
+  'tickets',
+  'ticketMessages',
+  'autoAssignRules',
+  'reminderLog',
+  'themes',
+  'invoices',
+  'billingProfiles',
+  'onboarding',
+  // M4 seed version 5 (the suite builds its own).
+  'billingChangeRequests',
+  'outbox',
+  'priceAdjustments',
+  'announcements',
+  'releaseNotes',
+  'recoveryRequests',
+  'dataRequests',
+  'incidents',
+  'otherEntryGroups',
+  'savedReplies',
+  'profileChangeRequests',
+  'linkCheckResults',
 ]);
+
+/** The M2 shape of the seeded records that version 4 changes: no sign-in states, name history, theme or extra submissions. */
+function m2Shape(store: string, records: unknown[], keys: { submissions: Record<string, string> }): unknown[] {
+  if (store === 'evidenceSubmissions') {
+    return (records as { id: string }[]).filter((r) => r.id === keys.submissions['ben']);
+  }
+  if (store === 'users') {
+    return (records as UserAccount[]).map((u) => {
+      const copy: Partial<UserAccount> = { ...u };
+      delete copy.twoFactorRequiredSince;
+      if (u.side === 'client') delete copy.twoFactor;
+      return copy;
+    });
+  }
+  return (records as { settings: { themeId?: string } }[]).map((c) => {
+    const settings: { themeId?: string } = { ...c.settings };
+    delete settings.themeId;
+    return { ...c, nameHistory: [], settings };
+  });
+}
 
 export async function buildWorld(admin: DemoAdmin) {
   const keys = await load(admin, { seedValue: SEED_VALUE, today: TODAY });
@@ -87,7 +132,12 @@ export async function buildWorld(admin: DemoAdmin) {
   await admin.clearAll();
   for (const [store, records] of Object.entries(full)) {
     if (SEED_LEARNING_STORES.has(store)) continue;
-    await admin.bulkPut(store as StoreName, records);
+    await admin.bulkPut(
+      store as StoreName,
+      store === 'clients' || store === 'users' || store === 'evidenceSubmissions'
+        ? m2Shape(store, records, keys)
+        : records,
+    );
   }
   await admin.setSeedMeta({ seedValue: SEED_VALUE, today: TODAY });
   const seeded = (await admin.dumpAll()) as unknown as WorldData;

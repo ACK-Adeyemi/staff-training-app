@@ -28,7 +28,7 @@ export function BottomTabBar({ label, items, currentId, more }: BottomTabBarProp
             <a
               href={item.href}
               aria-current={item.id === currentId ? 'page' : undefined}
-              className={`flex min-h-[var(--target-min)] min-w-[var(--target-min)] flex-col items-center justify-center gap-1 px-0.5 py-1 text-center text-xs [overflow-wrap:anywhere] aria-[current=page]:font-bold aria-[current=page]:text-[var(--color-accent)] aria-[current=page]:underline ${focusClasses}`}
+              className={`flex min-h-[var(--target-min)] min-w-[var(--target-min)] flex-col items-center justify-center gap-1 px-0 py-1 text-center text-[0.6875rem] [overflow-wrap:anywhere] aria-[current=page]:font-bold aria-[current=page]:text-[var(--color-accent)] aria-[current=page]:underline ${focusClasses}`}
             >
               <Icon name={item.icon} />
               <span>{item.label}</span>
@@ -40,7 +40,7 @@ export function BottomTabBar({ label, items, currentId, more }: BottomTabBarProp
             <button
               type="button"
               onClick={more.onClick}
-              className={`flex min-h-[var(--target-min)] min-w-[var(--target-min)] w-full cursor-pointer flex-col items-center justify-center gap-1 px-0.5 py-1 text-center text-xs [overflow-wrap:anywhere] ${focusClasses}`}
+              className={`flex min-h-[var(--target-min)] min-w-[var(--target-min)] w-full cursor-pointer flex-col items-center justify-center gap-1 px-0 py-1 text-center text-[0.6875rem] [overflow-wrap:anywhere] ${focusClasses}`}
             >
               <Icon name="more" />
               <span>{more.label}</span>

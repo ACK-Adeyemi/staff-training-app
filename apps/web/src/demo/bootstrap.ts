@@ -1,5 +1,5 @@
 import { createIndexedDbStore } from '@sta/data';
-import type { StoreHandle } from '@sta/data';
+import type { PersonaListing, StoreHandle } from '@sta/data';
 import { wantsReset, withoutReset } from './resetParam';
 import { createRng, offsetClock, startOfLondonDay, systemClock, type Clock, type DemoState } from '@sta/domain';
 import { DEFAULT_SEED_VALUE, ensureCurrentSeed, load, reset, seedKeys, type SeedKeys } from '@sta/seed';
@@ -8,6 +8,7 @@ export type Booted = {
   handle: StoreHandle;
   keys: SeedKeys;
   state: DemoState;
+  personas: PersonaListing[];
   /** The store's own clock; follows setOffset. */
   setOffset: (ms: number) => void;
 };
@@ -45,10 +46,13 @@ export async function bootstrap(search: string, hash = ''): Promise<Booted> {
     await admin.setDemoState(state);
   }
   offsetMs = state.clockOffsetMs;
+  // The cron stand-in runs after boot (plan assumption 27). On a fresh seed it writes nothing (seed tests pin that).
+  await admin.runJobs(storeClock.now().toISOString());
   return {
     handle,
     keys,
     state,
+    personas: await admin.listPersonas(),
     setOffset: (ms) => {
       offsetMs = ms;
     },

@@ -1,5 +1,6 @@
 // Client role templates and the category-to-permission compiler. Brief 22.5, 27.5. Placeholders (decisions.md).
 import type { clientRoleKeys } from '../schemas/access';
+import { clientCatalogue } from './catalogue';
 export type Level = 'none' | 'view' | 'manage';
 export type ClientCategory =
   | 'staff'
@@ -43,6 +44,8 @@ const allowNeeds: Record<string, { category: ClientCategory; level: Level }> = {
   'reports.export': { category: 'reports', level: 'view' },
   'billing.view': { category: 'settingsBilling', level: 'view' },
   'billing.manage': { category: 'settingsBilling', level: 'manage' },
+  // Needed level is 'view' so the Group Admin template (billing at view) can hold it (docs/decisions.md, M3 assumptions).
+  'billing.manageAddOns': { category: 'settingsBilling', level: 'view' },
   'org.editName': { category: 'settingsBilling', level: 'manage' },
   'battles.host': { category: 'competitions', level: 'view' },
   'support.viewOrgTickets': { category: 'feedbackHelp', level: 'view' },
@@ -61,7 +64,11 @@ export function compileClientRole(levels: ClientLevels, allows: string[]): strin
   }
   for (const allow of allows) {
     const need = allowNeeds[allow];
-    if (need && rank[levels[need.category]] >= rank[need.level]) out.add(allow);
+    if (need && rank[levels[need.category]] >= rank[need.level]) {
+      out.add(allow);
+      // An Allow brings the permission it requires (billing.manageAddOns needs billing.view).
+      for (const r of clientCatalogue.find((p) => p.id === allow)?.requires ?? []) out.add(r);
+    }
   }
   return [...out];
 }

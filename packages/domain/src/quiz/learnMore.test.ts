@@ -1,8 +1,8 @@
 // BP-2: which Learn more links show when (brief 31.1, plan Assumptions 8 and 9).
 import { describe, expect, it } from 'vitest';
 import type { ClientLinkOverlay, LearnMoreLink, Question } from '../schemas/learning';
-import { displayDomain, isSafeHttpsUrl, visibleLearnMore } from './learnMore';
-import { mcq, settings } from './testFixtures';
+import { displayDomain, isSafeHttpsUrl, orphanOverlays, visibleLearnMore } from './learnMore';
+import { bank, mcq, moduleWith, settings } from './testFixtures';
 
 const link = (id: string, over: Partial<LearnMoreLink> = {}): LearnMoreLink => ({
   id,
@@ -161,5 +161,56 @@ describe('isSafeHttpsUrl', () => {
     ['ftp://example.com/', false],
   ])('%s -> %s', (url, expected) => {
     expect(isSafeHttpsUrl(url)).toBe(expected);
+  });
+});
+
+describe('overlays and the current version (BP-1)', () => {
+  const q = questionWith([link('official1')]);
+  const wrong = { ...base, correct: false, settings: settings() };
+
+  it('shows organisation links after the official ones, never mixed in', () => {
+    const r = visibleLearnMore({
+      ...wrong,
+      question: q,
+      overlays: [overlay([link('org1', { kind: 'organisation' })])],
+    });
+    expect(ids(r.official)).toEqual(['official1']);
+    expect(ids(r.organisation)).toEqual(['org1']);
+  });
+
+  it('ignores an overlay whose question is not in the module any more', () => {
+    const r = visibleLearnMore({
+      ...wrong,
+      question: q,
+      overlays: [overlay([link('org1')], { questionId: 'dropped' })],
+    });
+    expect(r.organisation).toEqual([]);
+  });
+
+  it('does not show a lesson overlay on a question', () => {
+    const lessonOverlay = overlay([link('org1')], { questionId: undefined, lessonId: 'lesson-1' });
+    const r = visibleLearnMore({ ...wrong, question: q, overlays: [lessonOverlay] });
+    expect(r.organisation).toEqual([]);
+  });
+});
+
+describe('orphanOverlays', () => {
+  const m = moduleWith(bank().slice(0, 3)); // questions m1, m2, m3; lesson-1
+  const o = (over: Partial<ClientLinkOverlay>): ClientLinkOverlay => overlay([link('x')], { moduleId: m.id, ...over });
+
+  it('lists overlays whose question is no longer in the module', () => {
+    const gone = o({ id: '01HZX0000000000000000000C2', questionId: 'dropped' });
+    expect(orphanOverlays(m, [o({ questionId: 'm1' }), gone])).toEqual([gone]);
+  });
+
+  it('lists overlays whose lesson is no longer in the module', () => {
+    const gone = o({ id: '01HZX0000000000000000000C3', questionId: undefined, lessonId: 'old-lesson' });
+    const kept = o({ id: '01HZX0000000000000000000C4', questionId: undefined, lessonId: 'lesson-1' });
+    expect(orphanOverlays(m, [kept, gone])).toEqual([gone]);
+  });
+
+  it('ignores overlays for other modules and returns nothing when all targets remain', () => {
+    const elsewhere = o({ moduleId: '01HZX0000000000000000000A9', questionId: 'dropped' });
+    expect(orphanOverlays(m, [elsewhere, o({ questionId: 'm2' })])).toEqual([]);
   });
 });

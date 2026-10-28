@@ -1,7 +1,13 @@
 // Data loading for the competition screens (S10, C11 to C14, S2 banners). Everything goes through the data layer.
 import { useQuery } from '@tanstack/react-query';
 import type { BoardPeriodId } from '@sta/data';
-import { londonDateString, type BoardId } from '@sta/domain';
+import {
+  londonDateString,
+  type BoardId,
+  type LeaderboardScope,
+  type SiteBoardPeriod,
+  type SiteMeasure,
+} from '@sta/domain';
 import { useActor, useClock, useStore } from '../../app/hooks';
 
 const useDay = (): string => londonDateString(useClock().now());
@@ -63,5 +69,30 @@ export function useEntitlements() {
   return useQuery({
     queryKey: ['competitionEntitlements', actor.userId],
     queryFn: () => store.competitions.entitlements(actor),
+  });
+}
+
+export function useScopes() {
+  const store = useStore();
+  const actor = useActor();
+  return useQuery({
+    queryKey: ['leaderboardScopes', actor.userId],
+    queryFn: () => store.leaderboards.scopes(actor),
+  });
+}
+
+export function useSitesBoard(input: {
+  measure: SiteMeasure;
+  period: SiteBoardPeriod;
+  scope: LeaderboardScope;
+  region?: string;
+}) {
+  const store = useStore();
+  const actor = useActor();
+  const day = useDay();
+  return useQuery({
+    queryKey: ['sitesBoard', actor.userId, day, input.measure, input.period, input.scope, input.region ?? ''],
+    queryFn: () => store.leaderboards.sitesBoard(actor, input),
+    placeholderData: (previous) => previous,
   });
 }

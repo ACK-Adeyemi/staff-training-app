@@ -13,6 +13,12 @@ import { Reports } from '../pages/client/Reports';
 import { People } from '../pages/client/People';
 import { PersonRecord } from '../pages/client/Person';
 import { Competitions } from '../pages/client/Competitions';
+import { AccountStatus } from '../pages/client/AccountStatus';
+import { Onboarding } from '../pages/client/Onboarding';
+import { DataRetention } from '../pages/client/DataRetention';
+import { Settings } from '../pages/client/Settings';
+import { SignIn as ClientSignIn } from '../pages/client/SignIn';
+import { Team } from '../pages/client/Team';
 import { Display } from '../pages/me/Display';
 import { Me } from '../pages/me/Me';
 import { Compete } from '../pages/staff/Compete';
@@ -28,12 +34,22 @@ import { Notifications } from '../pages/staff/Notifications';
 import { TrainingRecord } from '../pages/staff/Record';
 import { Progress } from '../pages/staff/Progress';
 import { SignIn } from '../pages/staff/SignIn';
+import { Help } from '../pages/help/Help';
+import { TicketThread } from '../pages/help/TicketThread';
+import { TicketWizard } from '../pages/help/TicketWizard';
 import { RouteError } from './RouteError';
 
 const page = (path: string, title: MessageKey, body: MessageKey): RouteObject => ({
   path,
   element: <Placeholder titleKey={title} bodyKey={body} />,
 });
+
+// S14 to S16 for staff and C23 for admins: the same components, told apart by the signed-in side.
+const helpRoutes: RouteObject[] = [
+  { path: 'help', element: <Help /> },
+  { path: 'help/ticket/new', element: <TicketWizard /> },
+  { path: 'help/ticket/:ticketId', element: <TicketThread /> },
+];
 
 export const routes: RouteObject[] = [
   {
@@ -43,10 +59,20 @@ export const routes: RouteObject[] = [
       { path: '/', element: <Landing /> },
       { path: '/demo/outbox', element: <Outbox /> },
       { path: '/staff/signin', element: <SignIn /> },
+      // Outside the client shell, so an admin who must set up two-step sign-in can still reach it.
+      { path: '/client/signin', element: <ClientSignIn /> },
       // Outside the staff chrome: a certificate prints cleanly and an organisation document opens in its own tab.
       { path: '/staff/module/:moduleId/certificate', element: <Certificate /> },
       { path: '/staff/progress/record', element: <TrainingRecord /> },
+      {
+        path: '/client/billing/invoices/:invoiceId/print',
+        lazy: async () => ({ Component: (await import('../pages/client/InvoicePrint')).InvoicePrint }),
+      },
       { path: '/doc/:attachmentId', element: <OrgDoc /> },
+      {
+        path: '/print/first-aiders',
+        lazy: async () => ({ Component: (await import('../pages/client/FirstAiders')).FirstAiders }),
+      },
       {
         path: '/staff',
         lazy: async () => ({ Component: (await import('../shells/shells')).StaffShell }),
@@ -59,11 +85,21 @@ export const routes: RouteObject[] = [
           { path: 'module/:moduleId/done', element: <Results /> },
           { path: 'notes', element: <MyNotes /> },
           { path: 'progress', element: <Progress /> },
+          {
+            path: 'progress/upload/:requirementId',
+            lazy: async () => ({
+              Component: (await import('../pages/staff/UploadCertificate')).UploadCertificate,
+            }),
+          },
+          {
+            path: 'calendar',
+            lazy: async () => ({ Component: (await import('../pages/staff/Calendar')).Calendar }),
+          },
           { path: 'compete', element: <Compete /> },
           { path: 'me', element: <Me /> },
           { path: 'me/display', element: <Display /> },
           { path: 'notifications', element: <Notifications /> },
-          page('help', 'shell.help', 'placeholder.staff.help'),
+          ...helpRoutes,
         ],
       },
       {
@@ -74,7 +110,22 @@ export const routes: RouteObject[] = [
           { path: 'people', element: <People /> },
           { path: 'people/:personId', element: <PersonRecord /> },
           { path: 'assign', element: <Assign /> },
-          page('modules', 'nav.client.training', 'placeholder.client.training'),
+          {
+            path: 'modules',
+            lazy: async () => ({ Component: (await import('../pages/client/ModuleLibrary')).ModuleLibrary }),
+          },
+          {
+            path: 'modules/new',
+            lazy: async () => ({ Component: (await import('../pages/client/ModuleBuilder')).ModuleBuilder }),
+          },
+          {
+            path: 'modules/:moduleId/edit',
+            lazy: async () => ({ Component: (await import('../pages/client/ModuleBuilder')).ModuleBuilder }),
+          },
+          {
+            path: 'modules/:moduleId/preview',
+            lazy: async () => ({ Component: (await import('../pages/client/ModulePreview')).ModulePreview }),
+          },
           { path: 'competitions', element: <Competitions /> },
           {
             path: 'competitions/new',
@@ -104,12 +155,64 @@ export const routes: RouteObject[] = [
             path: 'organise',
             lazy: async () => ({ Component: (await import('../pages/client/Organise')).Organise }),
           },
+          {
+            path: 'rules',
+            lazy: async () => ({ Component: (await import('../pages/client/Rules')).Rules }),
+          },
+          {
+            path: 'calendar',
+            lazy: async () => ({ Component: (await import('../pages/client/Calendar')).Calendar }),
+          },
+          {
+            path: 'themes',
+            lazy: async () => ({ Component: (await import('../pages/client/Themes')).Themes }),
+          },
+          {
+            path: 'reminders',
+            lazy: async () => ({ Component: (await import('../pages/client/Reminders')).Reminders }),
+          },
+          {
+            path: 'evidence',
+            lazy: async () => ({ Component: (await import('../pages/client/Evidence')).Evidence }),
+          },
+          {
+            path: 'evidence/:id',
+            lazy: async () => ({ Component: (await import('../pages/client/EvidenceReview')).EvidenceReview }),
+          },
           { path: 'reports', element: <Reports /> },
+          {
+            path: 'stats',
+            lazy: async () => ({ Component: (await import('../pages/client/StatsOverview')).StatsOverview }),
+          },
+          {
+            path: 'module-feedback',
+            lazy: async () => ({ Component: (await import('../pages/client/ModuleFeedback')).ModuleFeedback }),
+          },
           { path: 'reports/matrix', element: <Matrix /> },
           { path: 'modules/:moduleId/stats', element: <ModuleStats /> },
+          {
+            path: 'billing',
+            lazy: async () => ({ Component: (await import('../pages/client/Billing')).Billing }),
+          },
+          {
+            path: 'billing/add-ons',
+            lazy: async () => ({ Component: (await import('../pages/client/AddOns')).AddOns }),
+          },
+          {
+            path: 'billing/pay',
+            lazy: async () => ({ Component: (await import('../pages/client/PayNow')).PayNow }),
+          },
+          {
+            path: 'modules/:moduleId/preview/:lessonId',
+            lazy: async () => ({ Component: (await import('../pages/client/ModulePreview')).ModulePreview }),
+          },
           { path: 'display', element: <Display /> },
-          page('settings', 'nav.client.settings', 'placeholder.client.settings'),
-          page('help', 'nav.client.help', 'placeholder.client.help'),
+          { path: 'settings', element: <Settings /> },
+          { path: 'data', element: <DataRetention /> },
+          { path: 'team', element: <Team /> },
+          { path: 'account-status', element: <AccountStatus /> },
+          { path: 'onboarding', element: <Onboarding /> },
+          ...helpRoutes,
         ],
       },
       {
@@ -121,7 +224,14 @@ export const routes: RouteObject[] = [
             element: <Placeholder titleKey="nav.provider.overview" bodyKey="placeholder.provider.overview" />,
           },
           page('clients', 'nav.provider.clients', 'placeholder.provider.clients'),
-          page('content', 'nav.provider.content', 'placeholder.provider.content'),
+          {
+            path: 'content',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProviderContent')).ProviderContent }),
+          },
+          {
+            path: 'feedback',
+            lazy: async () => ({ Component: (await import('../pages/provider/AppFeedback')).AppFeedback }),
+          },
           page('packages', 'nav.provider.commercial', 'placeholder.provider.commercial'),
           page('tickets', 'nav.provider.support', 'placeholder.provider.support'),
           page('comms', 'nav.provider.comms', 'placeholder.provider.comms'),

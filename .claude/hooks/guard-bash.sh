@@ -49,6 +49,15 @@ has '(curl|wget)[^|]*\|[[:space:]]*(sudo[[:space:]]+)?(ba|z|da)?sh([[:space:]]|$
 { has "${GIT}[a-z-]+[^;&|]*--no-verify" || has "${GIT}commit[^;&|]*[[:space:]]-n([[:space:]]|$)"; } &&
   deny "Don't bypass git hooks (--no-verify). Fix what the hook reports instead."
 
+# Killing by name or pattern can match this Claude session itself (or the Stop hook's check run)
+# and end the session. Only kill a PID you started yourself.
+{ has '(^|[[:space:];&|(`])(pkill|killall)([[:space:]]|$)' \
+  || has 'xargs[^;&|]*[[:space:]](kill|pkill)([[:space:]]|$)' \
+  || { has '(^|[[:space:];&|(`])kill([[:space:]]+-[^[:space:]]+)*[[:space:]]+(\$\(|`)' \
+       && ! has '(^|[[:space:];&|(`])kill([[:space:]]+-[^[:space:]]+)*[[:space:]]+(\$\(|`)cat[[:space:]]+[^;&|()`]+(\)|`)[[:space:]]*($|[;&|])'; } \
+  || has '(^|[[:space:];&|(`])fuser[^;&|]*[[:space:]]-k'; } &&
+  deny "Don't kill processes by name or pattern (pkill, killall, ps | grep | xargs kill, kill \$(pgrep ...)): it can match this Claude session and end it. Kill only a PID you started yourself (for example from \$! or a pid file), and put \`timeout\` on commands that might hang. The build loop restarts the container between sessions, which clears anything left over."
+
 has '(dangerously-skip-permissions|bypassPermissions)' &&
   deny "Don't start agents that skip permission checks."
 

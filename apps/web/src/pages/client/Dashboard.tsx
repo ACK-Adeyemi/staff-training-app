@@ -1,19 +1,23 @@
 import type { ReactNode } from 'react';
-import { Badge, Card, LinkButton, PageHeader, ProgressRing, StatusBadge } from '@sta/ui';
+import { Badge, Button, Card, LinkButton, PageHeader, ProgressRing, StatusBadge } from '@sta/ui';
 import {
   can,
   needsAttention,
   openAssignmentsForActivePeople,
   percentOf,
+  siteComparison,
   orgCompliance,
   recentlyCompleted,
   waitingForCheck,
   type AttentionItem,
+  type SiteView,
 } from '@sta/domain';
 import { useActor, useT } from '../../app/hooks';
+import { useSetSiteScope, useSiteScope } from '../../app/siteScope';
 import { formatLondonDate } from '../../demo/format';
 import { focusLink } from '../staff/styles';
 import { fullName, moduleTitleOf, useClientData, usePermissions } from './queries';
+import { scopeClientData, useSiteEvents } from './siteViews';
 
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
@@ -38,15 +42,60 @@ function PersonLink({ id, name }: { id: string; name: string }) {
   );
 }
 
+/** One card per site, the one needing most attention first, with a button that opens the dashboard for that site. */
+function SiteComparison({ data }: { data: SiteView }) {
+  const t = useT();
+  const setSite = useSetSiteScope();
+  const names = new Map(data.sites.map((s) => [s.id, s.name]));
+  return (
+    <section aria-labelledby="c1-sites" className="mb-4">
+      <h2 id="c1-sites" className="mt-0 mb-3 text-xl font-bold">
+        {t('sites.comparisonTitle')}
+      </h2>
+      <ul className="m-0 grid list-none grid-cols-1 gap-3 p-0 md:grid-cols-2 xl:grid-cols-3">
+        {siteComparison(data).map((r) => {
+          const name = names.get(r.siteId) ?? '';
+          return (
+            <li key={r.siteId} data-testid="site-card">
+              <Card className="flex h-full flex-col gap-2">
+                <h3 className="m-0 text-lg font-bold">{name}</h3>
+                <p className="m-0 font-semibold">{t('sites.complianceFigure', { percent: r.compliancePercent })}</p>
+                <p className="m-0">{t('sites.overdueFigure', { count: r.overdue })}</p>
+                <p className="m-0">{t('sites.expiringFigure', { count: r.expiring })}</p>
+                <p className="m-0">{t('sites.completionFigure', { percent: r.completionRate })}</p>
+                <p className="m-0">{t('sites.staffFigure', { count: r.staff })}</p>
+                <div>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setSite(r.siteId);
+                    }}
+                  >
+                    {t('sites.open', { name })}
+                  </Button>
+                </div>
+              </Card>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
 /** C1. */
 export function Dashboard() {
   const t = useT();
   const actor = useActor();
   const q = useClientData();
   const perms = usePermissions();
+  const site = useSiteScope();
+  const compare = site === 'all' && (q.data?.view.sites.length ?? 0) > 1;
+  const events = useSiteEvents(compare);
   if (q.isError) return <p role="alert">{t('client.loadError')}</p>;
-  if (!q.data || !perms.data) return <p>{t('shell.loading')}</p>;
-  const { view, assignments, modules } = q.data;
+  if (!q.data || !perms.data || (compare && !events.data)) return <p>{t('shell.loading')}</p>;
+  const { modules } = q.data;
+  const { view, assignments } = scopeClientData(q.data, site);
 
   const attention = needsAttention(view);
   const waiting = waitingForCheck(view);
@@ -75,6 +124,9 @@ export function Dashboard() {
       <PageHeader title={t('nav.client.dashboard')}>
         {canAssign ? <LinkButton href="#/client/assign">{t('client.dashboard.assignAction')}</LinkButton> : null}
       </PageHeader>
+      {compare ? (
+        <SiteComparison data={{ ...q.data.view, assignments: q.data.assignments, events: events.data ?? [] }} />
+      ) : null}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="lg:col-span-2">
           <Section id="c1-needs" title={t('client.dashboard.needs')}>

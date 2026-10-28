@@ -72,6 +72,7 @@ const ACCOUNT_OWNER = [
   'org.editName',
   'billing.view',
   'billing.manage',
+  'billing.manageAddOns',
   'support.raise',
   'support.viewOrgTickets',
   'support.allowStaffTickets',

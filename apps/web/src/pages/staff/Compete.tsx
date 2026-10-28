@@ -2,13 +2,22 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button, Card, LeaderboardList, PageHeader, SegmentedControl } from '@sta/ui';
-import { competitionStatus, londonDateString, type BoardId, type Competition } from '@sta/domain';
+import {
+  competitionStatus,
+  londonDateString,
+  type BoardId,
+  type Competition,
+  type LeaderboardScope,
+  type SiteMeasure,
+} from '@sta/domain';
 import type { BoardPeriodId, BoardView } from '@sta/data';
 import { useActor, useClock, useStore, useT } from '../../app/hooks';
 import { formatLondonDate } from '../../demo/format';
+import { focusLink } from './styles';
 import { CompetitionSheet, positionLine, toListRows } from '../compete/CompetitionSheet';
-import { useCompetitions } from '../compete/queries';
-import { BOARD_ORDER, boardTitle, unitText } from '../compete/shared';
+import { SitesBoardPanel } from '../compete/SitesBoardPanel';
+import { useBoardSettings, useCompetitions, useScopes } from '../compete/queries';
+import { BOARD_ORDER, boardTitle, scopeLabel, SITE_MEASURES, unitText } from '../compete/shared';
 
 const h2 = 'mb-2 mt-6 text-xl font-bold';
 
@@ -67,17 +76,20 @@ const periodsFor = (b: BoardId): BoardPeriodId[] =>
   b === 'teamBoard' ? ['thisMonth', 'thisQuarter'] : ['allTime', 'thisMonth'];
 
 type Periods = Record<BoardId, BoardPeriodId>;
+type Scopes = Record<BoardId, LeaderboardScope>;
 
 /** All six boards load together, so the region appears once, complete. */
-function useBoards(periods: Periods) {
+function useBoards(periods: Periods, scopes: Scopes) {
   const store = useStore();
   const actor = useActor();
   const day = londonDateString(useClock().now());
   return useQuery({
-    queryKey: ['standingBoards', actor.userId, day, JSON.stringify(periods)],
+    queryKey: ['standingBoards', actor.userId, day, JSON.stringify(periods), JSON.stringify(scopes)],
     queryFn: async (): Promise<Record<BoardId, BoardView>> => {
       const views = await Promise.all(
-        BOARD_ORDER.map((board) => store.leaderboards.standing(actor, { board, period: periods[board] })),
+        BOARD_ORDER.map((board) =>
+          store.leaderboards.standing(actor, { board, period: periods[board], scope: scopes[board] }),
+        ),
       );
       return Object.fromEntries(BOARD_ORDER.map((b, i) => [b, views[i]])) as Record<BoardId, BoardView>;
     },
@@ -90,11 +102,18 @@ function BoardSection({
   view,
   period,
   onPeriod,
+  scopes,
+  scope,
+  onScope,
 }: {
   board: BoardId;
   view: BoardView;
   period: BoardPeriodId;
   onPeriod: (p: BoardPeriodId) => void;
+  /** The scopes that apply to the viewer and are switched on for this board. One or none means no choice. */
+  scopes: LeaderboardScope[];
+  scope: LeaderboardScope;
+  onScope: (s: LeaderboardScope) => void;
 }) {
   const t = useT();
   const title = boardTitle(t, board);
@@ -115,6 +134,18 @@ function BoardSection({
             onPeriod(v as BoardPeriodId);
           }}
         />
+        {scopes.length > 1 ? (
+          <div className="mt-3">
+            <SegmentedControl
+              legend={t('sitesBoard.scope')}
+              options={scopes.map((s) => ({ value: s, label: scopeLabel(t, s) }))}
+              value={scope}
+              onChange={(v) => {
+                onScope(v as LeaderboardScope);
+              }}
+            />
+          </div>
+        ) : null}
         <div className="mt-3">
           {rows.length > 0 ? (
             <LeaderboardList
@@ -137,20 +168,71 @@ function BoardSection({
   );
 }
 
+const SITE_SCOPE_ORDER: LeaderboardScope[] = ['site', 'region', 'country', 'all'];
+
+/** Tabs for People and Sites boards. Roving focus with the arrow keys. */
+function BoardTabs({ tab, onTab }: { tab: 'people' | 'sites'; onTab: (t: 'people' | 'sites') => void }) {
+  const t = useT();
+  const tabs = [
+    { id: 'people', label: t('sitesBoard.tabPeople') },
+    { id: 'sites', label: t('sitesBoard.tabSites') },
+  ] as const;
+  return (
+    <div role="tablist" aria-label={t('sitesBoard.boardType')} className="mb-3 flex gap-2">
+      {tabs.map((x) => (
+        <button
+          key={x.id}
+          type="button"
+          role="tab"
+          id={`board-tab-${x.id}`}
+          aria-selected={tab === x.id}
+          aria-controls={`board-panel-${x.id}`}
+          tabIndex={tab === x.id ? 0 : -1}
+          onClick={() => {
+            onTab(x.id);
+          }}
+          onKeyDown={(e) => {
+            if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+            e.preventDefault();
+            const next = x.id === 'people' ? 'sites' : 'people';
+            onTab(next);
+            document.getElementById(`board-tab-${next}`)?.focus();
+          }}
+          className={`min-h-[var(--target-min)] min-w-[var(--target-min)] cursor-pointer rounded-[var(--radius-md)] border-2 border-[var(--color-border)] px-4 py-2 font-semibold ${focusLink} ${tab === x.id ? 'bg-[var(--color-accent)] text-[var(--color-on-accent)] underline underline-offset-4' : 'bg-[var(--color-surface)]'}`}
+        >
+          {x.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function StandingBoards() {
   const t = useT();
   const [periods, setPeriods] = useState<Periods>(
     () => Object.fromEntries(BOARD_ORDER.map((b) => [b, defaultPeriod(b)])) as Periods,
   );
-  const boards = useBoards(periods);
+  const [scopes, setScopes] = useState<Scopes>(() => Object.fromEntries(BOARD_ORDER.map((b) => [b, 'site'])) as Scopes);
+  const [tab, setTab] = useState<'people' | 'sites'>('people');
+  const boards = useBoards(periods, scopes);
+  const settings = useBoardSettings();
+  const applies = useScopes();
   if (boards.isError) return <p role="alert">{t('compete.loadError')}</p>;
-  if (!boards.data) return <p>{t('shell.loading')}</p>;
+  if (!boards.data || !settings.data || !applies.data) return <p>{t('shell.loading')}</p>;
   const data = boards.data;
-  return (
-    <section aria-labelledby="standing-boards">
-      <h2 id="standing-boards" className={h2}>
-        {t('compete.boards')}
-      </h2>
+  const config = settings.data;
+  const available = applies.data;
+  const scopesFor = (b: BoardId): LeaderboardScope[] =>
+    SITE_SCOPE_ORDER.filter(
+      (s) => s === 'site' || (available.includes(s) && (config.boards[b]?.staffScopes ?? ['site']).includes(s)),
+    );
+  const siteScopes = SITE_SCOPE_ORDER.filter(
+    (s) => s === 'site' || (available.includes(s) && config.siteBoard.staffScopes.includes(s)),
+  );
+  const siteMeasures = config.siteBoard.measures.filter((m) => (SITE_MEASURES as readonly string[]).includes(m));
+  const showSites = config.siteBoard.enabled && available.includes('all') && siteMeasures.length > 0;
+  const people = (
+    <>
       <p className="mt-0">{t('compete.boardsIntro')}</p>
       {BOARD_ORDER.map((b) =>
         data[b].off === true || !data[b].visible ? null : (
@@ -162,8 +244,34 @@ function StandingBoards() {
             onPeriod={(p) => {
               setPeriods({ ...periods, [b]: p });
             }}
+            scopes={scopesFor(b)}
+            scope={scopes[b]}
+            onScope={(s) => {
+              setScopes({ ...scopes, [b]: s });
+            }}
           />
         ),
+      )}
+    </>
+  );
+  return (
+    <section aria-labelledby="standing-boards">
+      <h2 id="standing-boards" className={h2}>
+        {t('compete.boards')}
+      </h2>
+      {showSites ? (
+        <>
+          <BoardTabs tab={tab} onTab={setTab} />
+          <div role="tabpanel" id={`board-panel-${tab}`} aria-labelledby={`board-tab-${tab}`}>
+            {tab === 'people' ? (
+              people
+            ) : (
+              <SitesBoardPanel measures={siteMeasures as SiteMeasure[]} scopes={siteScopes} />
+            )}
+          </div>
+        </>
+      ) : (
+        people
       )}
     </section>
   );

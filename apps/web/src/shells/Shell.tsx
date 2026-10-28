@@ -1,4 +1,4 @@
-import { useState, type MouseEvent } from 'react';
+import { useState, type MouseEvent, type ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { Badge, BottomTabBar, Icon, MoreSheet, SideNav, focusClasses, type NavItem } from '@sta/ui';
 import { useCurrentUser, useT } from '../app/hooks';
@@ -14,6 +14,10 @@ export type ShellConfig = {
   more: readonly NavItem[];
   /** Links shown in the header (staff: notifications and help). */
   headerLinks: readonly NavItem[];
+  /** Banners shown above the page (account state, two-step sign-in). */
+  top?: ReactNode;
+  /** Extra controls in the header, such as the site switcher. */
+  headerExtra?: ReactNode;
 };
 
 function currentId(items: readonly NavItem[], pathname: string): string {
@@ -69,6 +73,7 @@ export function Shell({ config }: { config: ShellConfig }) {
         <header className="flex flex-wrap items-center justify-between gap-2 print:hidden border-b-2 border-[var(--color-border)] px-4 py-2">
           <span className="font-semibold">{user.data?.displayName ?? t('shell.loading')}</span>
           <div className="flex flex-wrap items-center gap-2">
+            {config.headerExtra}
             {config.side === 'provider' ? <Badge tone="simulated">{t('demo.simulatedData')}</Badge> : null}
             <DemoBadgeSlot />
             {config.headerLinks.map((item) => {
@@ -93,6 +98,7 @@ export function Shell({ config }: { config: ShellConfig }) {
           </div>
         </header>
         <main className="px-4 pb-28 print:p-0 md:pb-6">
+          {config.top ? <div className="mt-3 flex flex-col gap-2 print:hidden">{config.top}</div> : null}
           <Outlet />
         </main>
       </div>

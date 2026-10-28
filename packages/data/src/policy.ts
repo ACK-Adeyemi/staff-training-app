@@ -2,27 +2,28 @@
 // validate (in createStore) -> actor -> tenancy -> permission -> role rules (selfEdit, escalation, lastOwner)
 // -> account state -> entitlement limits. Business rules live in @sta/domain; this file only calls them.
 import {
-  canApproveEvidence,
+  accountStateAt,
+  defaultDunningPolicy,
   canEditRolesOf,
   canGrant,
   can,
   checkLimit,
   effectivePermissions,
   entitlements,
+  packageForOption,
   featureAvailability,
   lastOwnerGuard,
+  twoFactorStatus,
   ulid,
+  type AccountState,
   type AddOn,
   type EffectiveEntitlements,
   type AddOnSubscription,
   type Assignment,
   type AuditEvent,
   type Client,
-  OWNER_KEYS,
-  isAssignmentActive,
+  type DemoState,
   type EffectivePermission,
-  type Evidence,
-  type EvidenceSubmission,
   type Package,
   type Person,
   type Role,
@@ -34,7 +35,7 @@ import {
   type UserAccount,
   type OwnerChange,
 } from '@sta/domain';
-import { keyOf, type RawBackend, type WriteOp } from './backend';
+import type { RawBackend, WriteOp } from './backend';
 import {
   AccountStateError,
   ForbiddenError,
@@ -169,12 +170,54 @@ export const forbid = (reason: ForbiddenReason): never => {
   throw new ForbiddenError(reason);
 };
 
+/** The M3 and M4 stores no operation is wired to yet: every actor is refused until a later chunk adds its operations. */
+const UNWIRED_STORES: ReadonlySet<StoreName> = new Set<StoreName>([
+  'moduleDrafts',
+  'moduleVersions',
+  'autoAssignRules',
+  'reminderLog',
+  'themes',
+  'invitations',
+  'onboarding',
+  'invoices',
+  'billingProfiles',
+  'billingChangeRequests',
+  'addOnRequests',
+  'moduleFeedback',
+  'appFeedback',
+  'tickets',
+  'ticketMessages',
+  'faqVotes',
+  'priceAdjustments',
+  'ownershipTransfers',
+  'announcements',
+  'releaseNotes',
+  'recoveryRequests',
+  'dataRequests',
+  'incidents',
+  'otherEntryGroups',
+  'savedReplies',
+  'profileChangeRequests',
+  'linkCheckResults',
+  'moduleNotices',
+]);
+
+/**
+ * The account state at `now`, derived from the subscription (M3 assumption 45). A client with no subscription
+ * falls back to the stored state. Never read `client.accountState` directly for a decision.
+ */
+export function derivedAccountState(client: Client, subscription: Subscription | undefined, now: Date): AccountState {
+  return subscription ? accountStateAt(subscription, [], defaultDunningPolicy, now) : client.accountState;
+}
+
 export type Actor = {
   ctx: ActorContext;
   user: UserAccount;
   perms: EffectivePermission[];
   now: Date;
   client?: Client;
+  /** The derived account state of the actor's client (undefined for the provider). */
+  accountState?: AccountState;
 };
 
 /** Everything one DataStore call needs: the resolved actor plus lazily loaded, cached reads. */
@@ -212,7 +255,12 @@ export class Call {
 }
 
 /** Resolves the actor. Unknown, suspended or mismatched users get `unknownActor` on every call. */
-export async function beginCall(backend: RawBackend, options: StoreOptions, ctx: ActorContext): Promise<Call> {
+export async function beginCall(
+  backend: RawBackend,
+  options: StoreOptions,
+  ctx: ActorContext,
+  opts: { allowLimited?: boolean } = {},
+): Promise<Call> {
   const user = (await backend.get('users', ctx.userId)) as UserAccount | undefined;
   if (
     !user ||
@@ -234,13 +282,28 @@ export async function beginCall(backend: RawBackend, options: StoreOptions, ctx:
     client = (await backend.get('clients', ctx.clientId ?? '')) as Client | undefined;
     if (!client) return forbid('unknownActor');
   }
-  const actor: Actor = { ctx, user, perms, now, ...(client ? { client } : {}) };
+  const accountState = client
+    ? derivedAccountState(client, (await backend.get('subscriptions', client.id)) as Subscription | undefined, now)
+    : undefined;
+  const actor: Actor = {
+    ctx,
+    user,
+    perms,
+    now,
+    ...(client ? { client } : {}),
+    ...(accountState ? { accountState } : {}),
+  };
   const call = new Call(backend, options, actor);
+  // The two-step sign-in gate (M3 assumption 3): one check here covers every operation. The few calls that must work
+  // while limited (own user, own permissions, me, twoFactor) pass `allowLimited`.
+  if (ctx.side === 'client' && !opts.allowLimited && twoFactorStatus(user, now).kind === 'limited') {
+    return forbid('twoFactorRequired');
+  }
   // Reads and exports are never blocked before Deleted; Deleted is unavailable to everyone but the provider.
-  if (client) {
+  if (accountState) {
     const feature = ctx.side === 'staff' ? 'staffOwnRecord' : 'coreCompliance';
-    if (featureAvailability(client.accountState, feature) === 'no') {
-      throw new AccountStateError(client.accountState, feature);
+    if (featureAvailability(accountState, feature) === 'no') {
+      throw new AccountStateError(accountState, feature);
     }
   }
   return call;
@@ -352,7 +415,25 @@ export async function canReadRecord(call: Call, store: StoreName, r: Rec): Promi
   if (!visibleToTenant(call, store, tenant)) return false;
   const { actor } = call;
   if (store === 'notifications') return r['userId'] === actor.user.id;
-  if (store === 'modules' && call.side !== 'provider' && r['status'] !== 'published') return false;
+  if (store === 'modules' && call.side !== 'provider') {
+    const owner = r['owner'] as 'provider' | { clientId: string; siteId?: string };
+    // Drafts and archived modules are for the client admins who own them; everyone else sees published modules only.
+    if (
+      r['status'] !== 'published' &&
+      !(call.side === 'client' && owner !== 'provider' && holds(call, ['modules.view']))
+    ) {
+      return false;
+    }
+    // A site module is for that site: its people, and admins who can read modules there.
+    if (owner !== 'provider' && owner.siteId !== undefined) {
+      if (call.side === 'client') {
+        return canAny(call, ['modules.view'], { clientId: owner.clientId, siteIds: [owner.siteId] }, 'read');
+      }
+      const personId = call.actor.user.personId;
+      const person = personId ? await call.find<Person>('people', personId) : undefined;
+      return person !== undefined && [person.primarySiteId, ...person.additionalSiteIds].includes(owner.siteId);
+    }
+  }
   if (call.side === 'staff') {
     if (!STAFF_STORES.has(store)) return false;
     const personId = actor.user.personId;
@@ -413,15 +494,13 @@ function requireWrite(
 
 /** Account state for client-side writes: creating things is `authoring`; everything else needs full compliance use. */
 export function checkAccountState(call: Call, isCreate: boolean): void {
-  const client = call.actor.client;
-  if (!client) return;
+  const state = call.actor.accountState;
+  if (!state) return;
   const feature = isCreate ? 'authoring' : 'coreCompliance';
-  if (featureAvailability(client.accountState, feature) !== 'yes') {
-    throw new AccountStateError(client.accountState, feature);
+  if (featureAvailability(state, feature) !== 'yes') {
+    throw new AccountStateError(state, feature);
   }
 }
-
-const sortedKeys = (o: object): unknown => Object.fromEntries(Object.entries(o).sort(([a], [b]) => (a < b ? -1 : 1)));
 
 const sameJson = (a: unknown, b: unknown): boolean => JSON.stringify(a) === JSON.stringify(b);
 
@@ -452,12 +531,23 @@ export function audit(
 const clientIdOf = (tenant: string | undefined): string | undefined =>
   tenant === undefined || tenant === PROVIDER || tenant === UNKNOWN ? undefined : tenant;
 
+const SECURITY_FIELDS = [
+  'twoFactorRequiredSince',
+  'twoFactor',
+  'status',
+  'email',
+  'login',
+  'side',
+  'clientId',
+] as const;
+
 export async function authorizePut(
   call: Call,
   store: StoreName,
   rec: Rec,
   existing: Rec | undefined,
 ): Promise<WriteResult> {
+  if (UNWIRED_STORES.has(store)) return forbid('permission');
   const tenant = await tenantOf(call, store, rec);
   const isCreate = existing === undefined;
 
@@ -468,9 +558,8 @@ export async function authorizePut(
   if (READ_ONLY_STORES.has(store)) return forbid('permission');
   // Evidence is written only by the approval flow (and seed loading through DemoAdmin.bulkPut).
   if (store === 'evidence') return forbid('permission');
-  if (store === 'evidenceSubmissions') {
-    return putSubmission(call, rec as unknown as EvidenceSubmission, existing as EvidenceSubmission | undefined);
-  }
+  // Submissions change only through evidenceFlow (and seed loading through DemoAdmin.bulkPut): a direct put is refused.
+  if (store === 'evidenceSubmissions') return forbid('permission');
 
   if (PROVIDER_WRITE_ONLY.has(store)) {
     if (
@@ -501,10 +590,28 @@ export async function authorizePut(
       forbid('permission');
     }
   }
+  let record = rec;
+  if (store === 'users' && call.side !== 'provider') {
+    const u = rec as unknown as UserAccount;
+    const old = existing as unknown as UserAccount | undefined;
+    // Admin logins change only through the team operations, which hold the owner and role-editing guards.
+    if (u.side === 'client' || old?.side === 'client') {
+      if (!holds(call, ['team.manageRoles']) || !canEditRolesOf(call.actor.user.id, u.id)) forbid('selfEdit');
+    }
+    // Security fields are never writable through a generic put: stored values stay, new accounts start without them.
+    const kept: Rec = { ...rec };
+    const from = old as unknown as Rec | undefined;
+    for (const key of SECURITY_FIELDS) {
+      const value = from ? from[key] : undefined;
+      if (value === undefined) Reflect.deleteProperty(kept, key);
+      else kept[key] = value;
+    }
+    record = kept;
+  }
   if (call.side !== 'provider') {
     checkAccountState(call, isCreate && (store === 'people' || store === 'users'));
   }
-  return { record: rec, extra: store === 'people' ? await cancelOpenAssignments(call, rec) : [] };
+  return { record, extra: store === 'people' ? await cancelOpenAssignments(call, rec) : [] };
 }
 
 /** Archiving a person cancels their open assignments in the same batch (plan Data package). */
@@ -522,6 +629,7 @@ async function cancelOpenAssignments(call: Call, person: Rec): Promise<WriteOp[]
 }
 
 export async function authorizeRemove(call: Call, store: StoreName, existing: Rec): Promise<WriteResult> {
+  if (UNWIRED_STORES.has(store)) return forbid('permission');
   const tenant = await tenantOf(call, store, existing);
   if (READ_ONLY_STORES.has(store)) return forbid('permission');
   if (store === 'evidence') return forbid('permission');
@@ -595,20 +703,25 @@ export async function clientEntitlements(call: Call, clientId: string): Promise<
   const subscription = client
     ? (await call.all<Subscription>('subscriptions')).find((x) => x.clientId === clientId)
     : undefined;
-  const pkg = client ? await call.find<Package>('packages', subscription?.packageId ?? client.packageId) : undefined;
-  if (!client || !pkg) return undefined;
+  const ownPkg = client ? await call.find<Package>('packages', subscription?.packageId ?? client.packageId) : undefined;
+  if (!client || !ownPkg) return undefined;
   const packages = await call.all<Package>('packages');
+  const demoState = ((await call.backend.get('settings', 'demoState')) as { value?: DemoState } | undefined)?.value;
+  const pkg = packageForOption(ownPkg, packages, demoState?.packagingOption ?? 'A');
   // The floor package is the cheapest one: what an account keeps when it is not on a full plan.
   const price = (p: Package): number => p.bands[0]?.pricePerSite ?? 0;
   const floor = packages.reduce((lowest, p) => (price(p) < price(lowest) ? p : lowest), pkg);
   const addOnSubs = (await call.all<AddOnSubscription>('addOnSubscriptions')).filter(
-    (s) => s.clientId === clientId && s.status !== 'off',
+    (s) =>
+      s.clientId === clientId &&
+      s.status !== 'off' &&
+      (s.endsAt === undefined || Date.parse(s.endsAt) > call.actor.now.getTime()),
   );
   const addOns = (await call.all<AddOn>('addOns')).filter((a) => addOnSubs.some((s) => s.addOnId === a.id));
-  return entitlements(pkg, addOns, client.accountState, floor);
+  return entitlements(pkg, addOns, derivedAccountState(client, subscription, call.actor.now), floor);
 }
 
-async function checkCustomRoleLimit(call: Call, clientId: string): Promise<void> {
+export async function checkCustomRoleLimit(call: Call, clientId: string): Promise<void> {
   const ents = await clientEntitlements(call, clientId);
   if (!ents) throw new NotEntitledError('customClientRoles');
   const roles = await call.all<Role>('roles');
@@ -721,149 +834,3 @@ async function removeAssignment(call: Call, a: RoleAssignment): Promise<WriteRes
 }
 
 // ---------------------------------------------------------------- evidence submissions
-
-async function putSubmission(
-  call: Call,
-  sub: EvidenceSubmission,
-  existing: EvidenceSubmission | undefined,
-): Promise<WriteResult> {
-  if (call.side === 'provider') return forbid('permission');
-  const { actor } = call;
-  const approving = sub.status === 'approved' && existing?.status !== 'approved';
-
-  if (approving) {
-    // Identity fields come from the stored submission; the caller only decides.
-    const base = existing ?? sub;
-    const assignments = await call.all<RoleAssignment>('roleAssignments');
-    const roles = await call.all<Role>('roles');
-    const users = await call.all<UserAccount>('users');
-    const activeUsers = new Set(
-      users
-        .filter((u) => u.clientId === base.clientId && u.side === 'client' && u.status === 'active')
-        .map((u) => u.id),
-    );
-    const now = new Date(actor.ctx.now);
-    const activeAdmins = new Set(
-      assignments.filter((a) => activeUsers.has(a.userId) && isAssignmentActive(a, now)).map((a) => a.userId),
-    );
-    const isAccountOwner = assignments.some(
-      (a) =>
-        a.userId === actor.user.id &&
-        isAssignmentActive(a, now) &&
-        a.roleIds.some((id) => {
-          const r = roles.find((x) => x.id === id);
-          return r?.system === true && r.systemKey === OWNER_KEYS.client;
-        }),
-    );
-    const result = canApproveEvidence(
-      { userId: actor.user.id, personId: actor.user.personId ?? '', permissions: actor.perms, isAccountOwner },
-      { clientId: base.clientId, siteId: base.siteId, personId: base.personId, uploadedBy: base.uploadedBy },
-      {
-        adminCount: activeAdmins.size,
-        clientSettings: { allowSelfApproval: actor.client?.settings.allowSelfApproval ?? false },
-      },
-    );
-    if (!result.allowed)
-      return forbid(result.reason === 'noPermission' || !result.reason ? 'permission' : result.reason);
-    checkAccountState(call, false);
-
-    const evidenceId = existing?.evidenceId ?? call.newId();
-    const stored: EvidenceSubmission = {
-      ...base,
-      ...(sub.decisionNote === undefined ? {} : { decisionNote: sub.decisionNote }),
-      status: 'approved',
-      reviewerId: actor.user.id,
-      reviewedAt: actor.ctx.now,
-      evidenceId,
-    };
-    const evidence: Evidence = {
-      id: evidenceId,
-      clientId: base.clientId,
-      personId: base.personId,
-      requirementId: base.requirementId,
-      kind: 'external',
-      completedAt: base.completedAt,
-      ...(base.expiresAt === undefined ? {} : { expiresAt: base.expiresAt }),
-      attachmentId: base.fileAttachmentId,
-      siteIdAtTime: base.siteId,
-      submissionId: base.id,
-      approvedBy: actor.user.id,
-      approvedAt: actor.ctx.now,
-      ...(result.selfApproved ? { selfApproved: true } : {}),
-    };
-    return {
-      record: stored,
-      extra: [
-        { type: 'put', store: 'evidence', key: keyOf('evidence', evidence), record: evidence },
-        audit(
-          call,
-          base.clientId,
-          'evidence.approved',
-          `evidenceSubmission:${base.id}`,
-          { submissionId: base.id, status: base.status },
-          { submissionId: base.id, status: 'approved', evidenceId },
-          result.selfApproved ? 'selfApproved' : undefined,
-        ),
-      ],
-    };
-  }
-
-  // An approved submission is immutable: its evidence already exists.
-  if (existing?.status === 'approved') forbid('permission');
-
-  const decisionFields = ['reviewerId', 'reviewedAt', 'decisionNote', 'rejectionReason', 'evidenceId'] as const;
-  const decisionsUnchanged = decisionFields.every((f) => sameJson(sub[f], existing?.[f]));
-
-  if (call.side === 'staff') {
-    const ownPerson = actor.user.personId;
-    const own = ownPerson !== undefined && sub.personId === ownPerson && sub.uploadedBy === actor.user.id;
-    if (!own) forbid('permission');
-    if (existing === undefined) {
-      // Staff create only their own, waiting for a check, with no decision fields.
-      if (sub.status !== 'awaitingCheck' || !decisionsUnchanged) forbid('permission');
-    } else {
-      const ownExisting = existing.personId === ownPerson && existing.uploadedBy === actor.user.id;
-      const withdrawing =
-        existing.status === 'awaitingCheck' &&
-        sub.status === 'withdrawn' &&
-        sameJson(sortedKeys({ ...existing, status: 'withdrawn' }), sortedKeys(sub));
-      if (!ownExisting || !withdrawing) forbid('permission');
-    }
-    checkAccountState(call, false);
-    return { record: sub, extra: [] };
-  }
-
-  const scopes = (siteId: string): Target => ({ clientId: sub.clientId, siteIds: [siteId] });
-  const siteIds = existing ? [existing.siteId, sub.siteId] : [sub.siteId];
-  const allowed = (ids: string[]) => siteIds.every((siteId) => canAny(call, ids, scopes(siteId), 'write'));
-  if (existing && (existing.clientId !== sub.clientId || existing.personId !== sub.personId)) forbid('permission');
-
-  const statusChange = existing ? sub.status !== existing.status : sub.status !== 'awaitingCheck';
-  if (statusChange) {
-    // Rejecting, asking for a better copy or withdrawing is a decision: it needs evidence.approve and is audited.
-    if (!allowed(['evidence.approve'])) forbid('permission');
-    checkAccountState(call, false);
-    const stored: EvidenceSubmission = {
-      ...sub,
-      reviewerId: actor.user.id,
-      reviewedAt: actor.ctx.now,
-    };
-    return {
-      record: stored,
-      extra: [
-        audit(
-          call,
-          sub.clientId,
-          `evidence.${sub.status}`,
-          `evidenceSubmission:${sub.id}`,
-          existing ? { submissionId: sub.id, status: existing.status } : undefined,
-          { submissionId: sub.id, status: sub.status },
-        ),
-      ],
-    };
-  }
-  if (!allowed(['evidence.approve', 'evidence.uploadForOthers'])) forbid('permission');
-  if (!decisionsUnchanged && !allowed(['evidence.approve'])) forbid('permission');
-  checkAccountState(call, false);
-  return { record: sub, extra: [] };
-}

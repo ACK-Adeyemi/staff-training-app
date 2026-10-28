@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 import { createSpeech, type Speech } from './speech';
-import type { ActorContext, DataStore } from '@sta/data';
+import type { ActorContext, DataStore, PersonaListing } from '@sta/data';
 import type { Clock, DemoState, OutboxMessage } from '@sta/domain';
 import type { TFunction } from '@sta/content';
 
@@ -14,9 +14,15 @@ export type DemoApi = {
   listStaffUsers: (clientId: string) => Promise<{ userId: string; displayName: string; personId: string }[]>;
   /** Switches the demo persona to this staff user. */
   signInAs: (userId: string) => void | Promise<void>;
+  /** Client admins and staff of every client, for the presenter panel's Jump to persona. */
+  listPersonas: () => Promise<PersonaListing[]>;
+  /** Switches the client admin persona to this client user (saved in the demo state). */
+  signInAsClient: (userId: string) => void | Promise<void>;
   /** Device display settings for the provider side (no person to hold them). */
   setDisplayPrefs?: (prefs: NonNullable<DemoState['displayPrefs']>) => void | Promise<void>;
   setIndustry: (industry: DemoState['industry']) => void | Promise<void>;
+  /** Puts the selected client's account into Past due from now (D2). The demo shell knows which client. */
+  simulateFailedPayment?: () => void | Promise<void>;
 };
 
 export const DataStoreContext = createContext<DataStore | null>(null);

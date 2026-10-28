@@ -6,18 +6,18 @@ Things only the user can check, by milestone.
 
 ### Phone and live checks
 
-- [ ] Open the Pages URL on a phone: D1 shows, with the honest note and the three choices.
-- [ ] Staff, Client admin and Provider each open with their navigation; the tabs and More work with a thumb.
-- [ ] Long-press the Demo badge: the presenter panel opens; Fast-forward and Reset demo work; the Demo menu shows the version and build date.
-- [ ] Dark mode and large text on the phone look right.
+- [x] Open the Pages URL on a phone: D1 shows, with the honest note and the three choices.
+- [x] Staff, Client admin and Provider each open with their navigation; the tabs and More work with a thumb.
+- [x] Long-press the Demo badge: the presenter panel opens; Fast-forward and Reset demo work; the Demo menu shows the version and build date.
+- [x] Dark mode and large text on the phone look right.
 - [ ] `?reset=1` on the URL resets the demo, before the hash and at the end of the address (re-check after F1 fix).
-- [ ] On GitHub: the `checks` job passes, the deploy workflow publishes after a merge to main, and Pages is set to deploy from GitHub Actions.
+- [x] On GitHub: the `checks` job passes, the deploy workflow publishes after a merge to main, and Pages is set to deploy from GitHub Actions.
 
 ### Awaiting review
 
-- [ ] Draft nursery content: the renewal periods (safeguarding 24 months, paediatric first aid 36, food hygiene 36) are placeholders marked VERIFY in the nursery pack.
-- [ ] Action versions in `.github/workflows/deploy.yml` (configure-pages v6, upload-pages-artifact v5, deploy-pages v5) could not be checked against the releases pages from here; confirm they exist (logged in docs/decisions.md).
-- [ ] Free GitHub Pages usually needs a public repository (build pack 11.3, VERIFY).
+- [x] Draft nursery content: the renewal periods (safeguarding 24 months, paediatric first aid 36, food hygiene 36) are placeholders marked VERIFY in the nursery pack.
+- [x] Action versions in `.github/workflows/deploy.yml` (configure-pages v6, upload-pages-artifact v5, deploy-pages v5) could not be checked against the releases pages from here; confirm they exist (logged in docs/decisions.md).
+- [x] Free GitHub Pages usually needs a public repository (build pack 11.3, VERIFY).
 
 ## M1
 
@@ -59,3 +59,30 @@ Things only the user can check, by milestone.
 ### Awaiting review (M2)
 
 - [ ] Draft modules awaiting your review: Paediatric first aid and accidents, Safer eating, allergies and choking, Safer sleep, and What changed in September 2026 (details above under Awaiting content review).
+
+## M3
+
+### Awaiting review
+
+- [ ] M3 content (Draft): the Fire evacuation at Little Acorns module (`packages/content/src/packs/nursery/modules/fire-evacuation/`, fictional site details, no EYFS reference), the staff and client FAQs and the three release notes in `lang/en-GB.json`, the accepted providers (generic names) and approver checklists for Paediatric first aid, Safeguarding and Food hygiene in `packs/nursery.ts` (VERIFY), the default auto-assign rule due dates, and the theme preset colours.
+
+### M3 phone checks
+
+- [ ] As Mark: upload a photo of a certificate with the phone camera (also try a HEIC photo from an iPhone), then as Priya approve it and print the first aiders list.
+- [ ] As Jade: raise a ticket with two screenshots, blur one, and check the context list; add a calendar item and the .ics file to the phone calendar (iPhone and Android); give module feedback at the end of a module.
+- [ ] As Priya: paste a procedure into the Module Builder and check the phone preview; change the organisation name and check the staff app; try a theme that fails contrast; switch on the Christmas schedule with Fast-forward.
+- [ ] As Daniel: see the 2FA prompt, request the AI Assistant; as Priya approve it and check Explain this in simpler words (Demo AI).
+- [ ] Simulate failed payment and Fast-forward through the states; check each banner and the staff message; Pay now. Seeded billing amounts are fake.
+- [ ] As Fiona (Oak Tree): site switcher, grouped people, site comparison, Sites board regions.
+- [ ] Export all data and open the ZIP on a computer.
+- [ ] Live site only (not checkable here): the app opens at the base path /staff-training-app/, hash routes survive a reload and a shared link, the ZIP downloads on a phone and on a desktop, the .ics opens in a calendar app, and file upload (camera and file picker) works on a real phone.
+- [ ] Review placeholders, accepted provider names (VERIFY, generic), the Fire evacuation module text and reminder templates.
+
+### Awaiting review (M3, Draft content)
+
+- [ ] Fire evacuation at Little Acorns (new, `packages/content/src/packs/nursery/modules/fire-evacuation/`): three lessons, questions, fictional site details, no EYFS reference.
+- [ ] Staff and client FAQs and the three release notes in `packages/content/src/lang/en-GB.json`.
+- [ ] Nursery pack additions in `packs/nursery.ts`: accepted providers and approver checklists (Paediatric first aid, Safeguarding, Food hygiene), default auto-assign rule due dates, theme preset colours.
+- [ ] New starter induction (new, `packages/content/src/packs/nursery/modules/new-starter-induction/`): two lessons and six questions, written for the demo with no source citations. Draft content label stays on. Replace with real induction content.
+- [ ] No other module text was changed in M3.
+

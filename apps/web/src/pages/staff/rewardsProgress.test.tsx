@@ -31,7 +31,7 @@ async function expectedXp(handle: StoreHandle) {
   const ledger = xpLedger({
     events: d.learningEvents as never,
     attempts: d.attempts as never,
-    modules: nurseryModules,
+    modules: d.modules as never, // M3 adds Little Acorns' own Fire evacuation module
     evidence: d.evidence as never,
     requirements: d.requirements as never,
     weeklyGoalLessons: 1,

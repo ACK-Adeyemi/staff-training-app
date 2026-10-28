@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { Button, DataTable, Icon, PageHeader, StatusBadge, type DataTableRow } from '@sta/ui';
-import { can, matrixCsv, trainingMatrix, type MatrixCell, type RequirementStatusName } from '@sta/domain';
+import { can, formerlyNote, matrixCsv, trainingMatrix, type MatrixCell, type RequirementStatusName } from '@sta/domain';
 import type { MessageKey } from '@sta/content';
 import { useActor, useClock, useStore, useT } from '../../app/hooks';
+import { useSiteScope } from '../../app/siteScope';
 import { formatLondonDate, formatLondonDateTime } from '../../demo/format';
 import { focusLink } from '../staff/styles';
 import { PermissionGate } from './PermissionGate';
@@ -19,10 +20,15 @@ const WORDS: RequirementStatusName[] = [
 
 function useClientName() {
   const store = useStore();
+  const clock = useClock();
   const actor = useActor();
   return useQuery({
-    queryKey: ['clientName', actor.clientId],
-    queryFn: async () => (actor.clientId ? (await store.clients.get(actor, actor.clientId)).displayName : ''),
+    queryKey: ['clientNameNote', actor.clientId],
+    queryFn: async () => {
+      if (!actor.clientId) return { name: '', former: null };
+      const client = await store.clients.get(actor, actor.clientId);
+      return { name: client.displayName, former: formerlyNote(client, clock.now()) };
+    },
   });
 }
 
@@ -40,11 +46,12 @@ function MatrixBody() {
   const teams = useTeams();
   const clientName = useClientName();
   const perms = usePermissions();
+  const site = useSiteScope();
   if (data.isError || teams.isError || clientName.isError) return <p role="alert">{t('client.loadError')}</p>;
   if (!data.data || !teams.data || clientName.data === undefined) return <p>{t('shell.loading')}</p>;
   const { view } = data.data;
   const matrix = trainingMatrix({
-    people: view.people,
+    people: site === 'all' ? view.people : view.people.filter((p) => p.primarySiteId === site),
     requirements: view.requirements,
     evidence: view.evidence,
     submissions: view.submissions,
@@ -53,6 +60,10 @@ function MatrixBody() {
     now: view.now,
     amberWindowDays: view.amberWindowDays,
   });
+  const former = clientName.data.former;
+  const formerlyText = former
+    ? t('dataPage.readme.formerly', { old: former.old, date: formatLondonDate(former.changedAt) })
+    : null;
   const canExport =
     actor.clientId !== undefined && can(perms.data ?? [], 'reports.export', { clientId: actor.clientId });
 
@@ -80,7 +91,7 @@ function MatrixBody() {
   ]);
 
   const download = () => {
-    const csv = matrixCsv(matrix, (key) => t(key as MessageKey));
+    const csv = matrixCsv(matrix, (key) => t(key as MessageKey), formerlyText ?? undefined);
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
     const a = document.createElement('a');
     a.href = url;
@@ -119,7 +130,8 @@ function MatrixBody() {
         </div>
       </PageHeader>
       <div className="mb-3">
-        <p className="m-0 text-lg font-bold">{clientName.data}</p>
+        <p className="m-0 text-lg font-bold">{clientName.data.name}</p>
+        {formerlyText ? <p className="m-0">{formerlyText}</p> : null}
         <p className="m-0 font-semibold">{t('client.reports.matrix.auditTerm')}</p>
         <p className="m-0">
           {t('client.reports.matrix.generated', { when: formatLondonDateTime(clock.now().toISOString()) })}
@@ -142,7 +154,7 @@ function MatrixBody() {
         </ul>
       </section>
       <DataTable
-        caption={t('client.reports.matrix.caption', { client: clientName.data })}
+        caption={t('client.reports.matrix.caption', { client: clientName.data.name })}
         columns={columns}
         rows={rows}
         rowHeader
@@ -156,7 +168,7 @@ function MatrixBody() {
 /** C15: the training matrix, for the screen, for print and for CSV. */
 export function Matrix() {
   return (
-    <PermissionGate permission="reports.view" message="client.reports.noPermission">
+    <PermissionGate permission="reports.view" anyScope message="client.reports.noPermission">
       <MatrixBody />
     </PermissionGate>
   );

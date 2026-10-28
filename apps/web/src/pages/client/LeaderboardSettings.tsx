@@ -1,17 +1,28 @@
 // C14 Leaderboard settings: switch the standing boards on or off. Region, country and all-sites scopes come with M3.
 import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, Icon, PageHeader, Switch } from '@sta/ui';
-import { can, type BoardId, type StandingBoardSettings } from '@sta/domain';
+import { can, type BoardId, type LeaderboardScope, type Site, type StandingBoardSettings } from '@sta/domain';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { competitionErrorKey } from '../compete/errors';
 import { useBoardSettings } from '../compete/queries';
 import { BOARD_ORDER, boardTitle } from '../compete/shared';
-import { usePermissions } from './queries';
+import { orEmpty, usePermissions } from './queries';
+import { applicableScopes, FullRanking, ScopeChoices, SitesBoardSettings } from './SitesBoardSettings';
 
 const LATER_SCOPES = ['region', 'country', 'all'] as const;
 
-function Settings({ settings, canManage }: { settings: StandingBoardSettings; canManage: boolean }) {
+function Settings({
+  settings,
+  canManage,
+  sites,
+}: {
+  settings: StandingBoardSettings;
+  canManage: boolean;
+  sites: Site[];
+}) {
+  const multi = sites.length > 1;
+  const scopes = applicableScopes(sites);
   const t = useT();
   const store = useStore();
   const actor = useActor();
@@ -19,14 +30,20 @@ function Settings({ settings, canManage }: { settings: StandingBoardSettings; ca
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
 
-  const toggle = async (board: BoardId, enabled: boolean) => {
+  const change = async (board: BoardId, patch: { enabled?: boolean; staffScopes?: LeaderboardScope[] }) => {
     setBusy(true);
     setProblem(null);
     try {
       const current = settings.boards[board];
       await store.leaderboards.saveSettings(actor, {
         ...settings,
-        boards: { ...settings.boards, [board]: { enabled, staffScopes: current?.staffScopes ?? ['site'] } },
+        boards: {
+          ...settings.boards,
+          [board]: {
+            enabled: patch.enabled ?? current?.enabled !== false,
+            staffScopes: patch.staffScopes ?? current?.staffScopes ?? ['site'],
+          },
+        },
       });
       await queryClient.invalidateQueries();
     } catch (e) {
@@ -51,31 +68,49 @@ function Settings({ settings, canManage }: { settings: StandingBoardSettings; ca
                 onLabel={t('leaderboard.on')}
                 offLabel={t('leaderboard.off')}
                 onChange={(v) => {
-                  void toggle(b, v);
+                  void change(b, { enabled: v });
                 }}
               />
+              {multi ? (
+                <ScopeChoices
+                  legend={t('leaderboard.boardScopes', { board: boardTitle(t, b) })}
+                  scopes={scopes}
+                  selected={settings.boards[b]?.staffScopes ?? ['site']}
+                  disabled={!canManage || busy}
+                  onChange={(next) => {
+                    void change(b, { staffScopes: next });
+                  }}
+                />
+              ) : null}
             </Card>
           </li>
         ))}
       </ul>
-      <section aria-labelledby="c14-scopes" className="mt-6">
-        <h2 id="c14-scopes" className="mb-2 text-xl font-bold">
-          {t('leaderboard.staffScopes')}
-        </h2>
-        <ul className="m-0 list-none p-0">
-          <li className="flex min-h-[var(--target-min)] flex-wrap items-center gap-2 py-1 font-semibold">
-            <Icon name="check" size={16} />
-            <span>{t('leaderboard.scopes.site')}</span>
-            <span className="font-normal">{t('leaderboard.selected')}</span>
-          </li>
-          {LATER_SCOPES.map((s) => (
-            <li key={s} className="flex min-h-[var(--target-min)] flex-wrap items-center gap-2 py-1">
-              <span className="font-semibold">{t(`leaderboard.scopes.${s}`)}</span>
-              <span>{t('leaderboard.scopeLater')}</span>
+      {multi ? (
+        <>
+          <SitesBoardSettings settings={settings} sites={sites} canManage={canManage} scopes={scopes} />
+          {canManage ? <FullRanking settings={settings} sites={sites} /> : null}
+        </>
+      ) : (
+        <section aria-labelledby="c14-scopes" className="mt-6">
+          <h2 id="c14-scopes" className="mb-2 text-xl font-bold">
+            {t('leaderboard.staffScopes')}
+          </h2>
+          <ul className="m-0 list-none p-0">
+            <li className="flex min-h-[var(--target-min)] flex-wrap items-center gap-2 py-1 font-semibold">
+              <Icon name="check" size={16} />
+              <span>{t('leaderboard.scopes.site')}</span>
+              <span className="font-normal">{t('leaderboard.selected')}</span>
             </li>
-          ))}
-        </ul>
-      </section>
+            {LATER_SCOPES.map((s) => (
+              <li key={s} className="flex min-h-[var(--target-min)] flex-wrap items-center gap-2 py-1">
+                <span className="font-semibold">{t(`leaderboard.scopes.${s}`)}</span>
+                <span>{t('leaderboard.scopeLater')}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <section aria-labelledby="c14-privacy" className="mt-6">
         <h2 id="c14-privacy" className="mb-2 text-xl font-bold">
           {t('leaderboard.privacyTitle')}
@@ -88,9 +123,14 @@ function Settings({ settings, canManage }: { settings: StandingBoardSettings; ca
 
 export function LeaderboardSettings() {
   const t = useT();
+  const store = useStore();
   const actor = useActor();
   const perms = usePermissions();
   const settings = useBoardSettings();
+  const sites = useQuery({
+    queryKey: ['leaderboardSites', actor.userId],
+    queryFn: () => orEmpty(store.sites.list(actor)),
+  });
   const header = <PageHeader title={t('leaderboard.settingsTitle')} />;
   if (!perms.data) return <p>{t('shell.loading')}</p>;
   const target = actor.clientId ? { clientId: actor.clientId } : undefined;
@@ -106,8 +146,12 @@ export function LeaderboardSettings() {
     <>
       {header}
       {settings.isError ? <p role="alert">{t('leaderboard.loadError')}</p> : null}
-      {settings.data ? (
-        <Settings settings={settings.data} canManage={can(perms.data, 'competitions.manage', target, 'write')} />
+      {settings.data && sites.data ? (
+        <Settings
+          settings={settings.data}
+          sites={sites.data.filter((x) => x.status === 'active')}
+          canManage={can(perms.data, 'competitions.manage', target, 'write')}
+        />
       ) : settings.isError ? null : (
         <p>{t('shell.loading')}</p>
       )}

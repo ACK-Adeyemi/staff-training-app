@@ -71,7 +71,7 @@ This repo is built unattended by an agent team on an isolated VM. Environment an
 - Use the subagents in .claude/agents for each milestone: planner (milestone plan from the build pack), test-writer, implementer, then security-reviewer and code-reviewer before a milestone is marked done. Details in scripts/BUILD_PROMPT.md.
 
 ## Status
-- Current milestone: M2 (M0, M1 done).
+- Current milestone: M4 (M0, M1, M2, M3 done).
 - Decisions: docs/brief.md section 3 and docs/decisions.md. Still open: docs/brief.md section 11.
 
 ## Working efficiently (added by the user)
@@ -82,3 +82,9 @@ Usage limits pace this build, so spend context and tokens on the work, not on re
 - scripts/check.sh is quiet: one line per passing step, the last 60 lines of a failing step, and the full output in .agent-logs/check/<step>.log. Read logs with `tail` or `rg`, never in full. Don't make it verbose again.
 - Official sources: fetch each page or PDF once and keep a plain-text copy in .sources-cache/ (git-ignored, kept between sessions), with the URL and fetch date on the first line and a line per source in .sources-cache/INDEX.md. PDFs: download into .sources-cache/ and convert with `pdftotext -layout`. Check the cache before fetching, and read only the lines you need.
 - Also protected (the user changes these): scripts/split-docs.py, docs/brief/, docs/build-pack/.
+
+## Processes (added by the user)
+- Never kill processes by name or pattern (pkill, killall, `ps ... | grep ... | xargs kill`, `kill $(pgrep ...)`). This Claude session's own process can match the pattern, and on 27 October 2026 a session ended itself that way. A hook blocks these commands.
+- Put `timeout` on commands that might hang, for example `timeout 600 pnpm exec playwright test <file>`. scripts/check.sh already limits every step.
+- Start a long-running server in the background only if you record its PID (`<command> & echo $! > /tmp/<name>.pid`), and stop it with `kill $(cat /tmp/<name>.pid)`.
+- If leftover processes get in the way, finish at a clean point and end the session: the build loop restarts the container before the next session.

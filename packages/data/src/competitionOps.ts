@@ -4,6 +4,7 @@
 // Business rules (metrics, ranking, winners, builder rules) live in @sta/domain.
 import {
   adminLeaderboardView,
+  availableScopes,
   boardIdSchema,
   checkLimit,
   competitionMetric,
@@ -14,6 +15,11 @@ import {
   featureAvailability,
   isEligible,
   leaderboardView,
+  leaderboardScopeSchema,
+  peopleInScope,
+  scopedDisplayName,
+  siteBoardView,
+  siteLeaderboard,
   rankEntries,
   selectWinners,
   standingBoard,
@@ -25,6 +31,8 @@ import {
   type Competition,
   type Entry,
   type Evidence,
+  type EvidenceSubmission,
+  type LeaderboardScope,
   type LearningEvent,
   type MetricResult,
   type Module,
@@ -32,9 +40,11 @@ import {
   type Ranked,
   type Requirement,
   type Site,
+  type SiteBoardAudience,
   type StandingBoardSettings,
   type Target,
   type Team,
+  type Client,
 } from '@sta/domain';
 import type { RawBackend, WriteOp } from './backend';
 import { audit, beginCall, canAny, checkAccountState, clientEntitlements, forbid, holds, type Call } from './policy';
@@ -49,6 +59,7 @@ import {
   type BoardView,
   type CompetitionsService,
   type LeaderboardsService,
+  type SitesBoardView,
   type StandingsView,
   type StoreOptions,
 } from './types';
@@ -93,9 +104,14 @@ async function gather(call: Call, clientId: string): Promise<Data> {
 }
 
 /** The ranked unit names and the people hidden from rankings, for a metric result. */
-function entriesOf(result: MetricResult, data: Data, siteNames: ReadonlyMap<string, string>) {
+function entriesOf(
+  result: MetricResult,
+  data: Data,
+  siteNames: ReadonlyMap<string, string>,
+  nameOf: (p: Person) => string = displayName,
+) {
   const names = new Map<string, string>();
-  if (result.unit === 'person') for (const p of data.people) names.set(p.id, displayName(p));
+  if (result.unit === 'person') for (const p of data.people) names.set(p.id, nameOf(p));
   else if (result.unit === 'team') for (const t of data.teams) names.set(t.id, t.name);
   else for (const [id, name] of siteNames) names.set(id, name);
   const unranked = result.unranked ?? new Set<string>();
@@ -198,9 +214,9 @@ export function createCompetitionOperations(backend: RawBackend, options: StoreO
   }
 
   function requireNew(call: Call): void {
-    const client = call.actor.client;
-    if (client && featureAvailability(client.accountState, 'newCompetitions') !== 'yes') {
-      throw new AccountStateError(client.accountState, 'newCompetitions');
+    const state = call.actor.accountState;
+    if (state && featureAvailability(state, 'newCompetitions') !== 'yes') {
+      throw new AccountStateError(state, 'newCompetitions');
     }
   }
 
@@ -454,7 +470,109 @@ export function createCompetitionOperations(backend: RawBackend, options: StoreO
     return structuredClone(stored ?? defaultBoardSettings(clientId));
   }
 
+  /** The caller's own person record (staff, or an admin who is also a member of staff), if there is one. */
+  async function personOf(call: Call): Promise<Person | undefined> {
+    const id = call.actor.user.personId;
+    const person = id === undefined ? undefined : await call.find<Person>('people', id);
+    return person && person.clientId === call.clientId ? person : undefined;
+  }
+
+  const SITE_MEASURES = ['compliance', 'onTime', 'participation', 'knowledge'] as const;
+  const SITE_PERIODS = ['thisMonth', 'thisQuarter'] as const;
+
   const leaderboards: LeaderboardsService = {
+    async scopes(ctx) {
+      const call = await reader(ctx);
+      const person = await personOf(call);
+      if (!person) return [];
+      const sites = (await call.all<Site>('sites')).filter((s) => s.clientId === call.clientId);
+      return availableScopes(sites, person.primarySiteId);
+    },
+
+    async sitesBoard(ctx, input): Promise<SitesBoardView> {
+      const call = await reader(ctx);
+      const scopeCheck = leaderboardScopeSchema.safeParse(input.scope);
+      if (
+        !scopeCheck.success ||
+        !(SITE_MEASURES as readonly string[]).includes(input.measure) ||
+        !(SITE_PERIODS as readonly string[]).includes(input.period)
+      ) {
+        throw new ValidationError(['siteBoard: choose a measure, period and scope that go together']);
+      }
+      const scope: LeaderboardScope = scopeCheck.data;
+      const clientId = call.clientId as string;
+      const client = call.actor.client as Client;
+      const settings = await settingsFor(call);
+      const sites = (await call.all<Site>('sites')).filter((s) => s.clientId === clientId);
+      const person = await personOf(call);
+      let audience: SiteBoardAudience;
+      let viewerSiteId = person?.primarySiteId ?? '';
+      if (call.side === 'staff') {
+        audience = 'staff';
+        if (!person) return forbid('permission');
+        const applies = availableScopes(sites, person.primarySiteId);
+        if (scope !== 'site' && !(applies.includes(scope) && settings.siteBoard.staffScopes.includes(scope))) {
+          throw new RuleError('invalidScope');
+        }
+        if (!settings.siteBoard.enabled) return { rows: [], own: null, toNext: null };
+      } else {
+        audience = canAny(call, ['competitions.manage'], { clientId }, 'write') ? 'group' : 'manager';
+        if (viewerSiteId === '') {
+          const readable = [...readableSites(call, clientId, sites)];
+          if (readable.length === 1) viewerSiteId = readable[0] as string;
+        }
+      }
+      const viewerSite = sites.find((s) => s.id === viewerSiteId);
+      // An admin may pick another region; then only that region's sites are shown.
+      const picked = call.side === 'client' ? input.region : undefined;
+      const region = picked ?? viewerSite?.region;
+      const inScope = (site: Site): boolean => {
+        switch (scope) {
+          case 'all':
+            return true;
+          case 'site':
+            return site.id === viewerSiteId;
+          case 'region':
+            return (
+              (picked === undefined && site.id === viewerSiteId) || (region !== undefined && site.region === region)
+            );
+          case 'country':
+            return viewerSite !== undefined && site.countryCode === viewerSite.countryCode;
+        }
+      };
+      const scopedSites = sites.filter(inScope);
+      const data = await gather(call, clientId);
+      const entries = siteLeaderboard(
+        input.measure,
+        input.period,
+        {
+          ...data,
+          sites: scopedSites,
+          submissions: (await call.all<EvidenceSubmission>('evidenceSubmissions')).filter(
+            (x) => x.clientId === clientId,
+          ),
+          amberWindowDays: client.settings.amberWindowDays,
+          now: call.actor.now,
+        },
+        { excludedSiteIds: settings.siteBoard.excludedSiteIds, smallSiteMin: settings.siteBoard.smallSiteMinActive },
+      );
+      const view = siteBoardView(entries, { viewerSiteId, audience, measure: input.measure });
+      const small = new Map(entries.map((e) => [e.siteId, e.small]));
+      const eligible = new Map(entries.map((e) => [e.siteId, e.eligible]));
+      const withSmall = <T extends { siteId: string }>(row: T) => ({
+        ...row,
+        small: small.get(row.siteId) ?? false,
+        eligible: eligible.get(row.siteId) ?? 0,
+        siteName: sites.find((x) => x.id === row.siteId)?.name ?? '',
+      });
+      return structuredClone({
+        rows: view.rows.map(withSmall),
+        own: view.own ? withSmall(view.own) : null,
+        toNext: view.toNext,
+        ...(view.detail ? { detail: view.detail } : {}),
+      });
+    },
+
     async settings(ctx) {
       const call = await reader(ctx);
       return settingsFor(call);
@@ -492,20 +610,41 @@ export function createCompetitionOperations(backend: RawBackend, options: StoreO
       if (settings.boards[board.data]?.enabled === false) return { visible: false, off: true };
 
       const data = await gather(call, clientId);
+      const scope = input.scope ?? 'site';
+      const sites = (await call.all<Site>('sites')).filter((s) => s.clientId === clientId);
       let viewer: Person | undefined;
       let scoped: Person[];
+      let nameOf: (p: Person) => string = displayName;
       if (call.side === 'staff') {
         const { person } = await staffCall(backend, options, ctx);
         viewer = person;
-        // M2: staff see their own site only (region, country and all-sites scopes are M3).
-        scoped = data.people.filter((p) => p.primarySiteId === person.primarySiteId);
+        // A scope needs to apply to this client's sites and to be switched on for the board (brief 13.5).
+        if (scope !== 'site') {
+          const switchedOn = settings.boards[board.data]?.staffScopes ?? ['site'];
+          if (!availableScopes(sites, person.primarySiteId).includes(scope) || !switchedOn.includes(scope)) {
+            throw new RuleError('invalidScope');
+          }
+        }
+        scoped = peopleInScope(scope, person.primarySiteId, sites, data.people);
+        if (scope !== 'site') {
+          nameOf = (p) => scopedDisplayName(p, sites.find((s) => s.id === p.primarySiteId) as Site, scope);
+        }
       } else {
-        const sites = (await call.all<Site>('sites')).filter((s) => s.clientId === clientId);
         const readable = readableSites(call, clientId, sites);
         if (input.siteId !== undefined && !readable.has(input.siteId)) throw new NotFoundError();
         scoped = data.people.filter((p) =>
           input.siteId !== undefined ? p.primarySiteId === input.siteId : readable.has(p.primarySiteId),
         );
+        if (scope !== 'site') {
+          // Admins are not held to the staff scopes; the scope only has to apply.
+          const own = await personOf(call);
+          const applies = own ? availableScopes(sites, own.primarySiteId) : availableScopes(sites, sites[0]?.id);
+          if (!applies.includes(scope)) throw new RuleError('invalidScope');
+          if (own) {
+            const inside = new Set(peopleInScope(scope, own.primarySiteId, sites, scoped).map((p) => p.id));
+            scoped = scoped.filter((p) => inside.has(p.id));
+          }
+        }
       }
       const inScope = new Set(scoped.flatMap((p) => p.teamIds));
       const teams = data.teams.filter((tm) => inScope.has(tm.id));
@@ -516,7 +655,7 @@ export function createCompetitionOperations(backend: RawBackend, options: StoreO
         now: call.actor.now,
       });
       const scopedData: Data = { ...data, teams, people: scoped };
-      const { entries, hiddenIds, unranked } = entriesOf(result, scopedData, new Map());
+      const { entries, hiddenIds, unranked } = entriesOf(result, scopedData, new Map(), nameOf);
       if (call.side === 'client') {
         const view = adminLeaderboardView({ entries, hiddenIds, idKey: idKeyOf(result.unit) });
         return { visible: true, rows: view.rows, of: view.of, unranked };

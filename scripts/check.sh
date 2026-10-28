@@ -8,6 +8,8 @@
 # Output is kept short on purpose: each step's full output goes to .agent-logs/check/<step>.log,
 # and only failures print their last lines here. Open the log when you need more detail.
 # In CI (CI=true) the full output is printed, because CI logs are read by humans.
+# Every step has a time limit (CHECK_STEP_TIMEOUT seconds, default 1800), so a hung test run fails
+# instead of blocking forever. The limit stops the step and everything it started.
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
 
@@ -17,23 +19,29 @@ failed=0
 ran=0
 LOG_DIR=".agent-logs/check"
 TAIL_LINES="${CHECK_TAIL_LINES:-60}"
+STEP_TIMEOUT="${CHECK_STEP_TIMEOUT:-1800}"
 mkdir -p "$LOG_DIR"
+
+timed_out() { case "$1" in 124|137) echo " - stopped after the ${STEP_TIMEOUT}s time limit (CHECK_STEP_TIMEOUT)" ;; esac; }
 
 step() {
   local name="$1"; shift
   local log
   log="$LOG_DIR/$(printf '%s' "$name" | tr -c 'A-Za-z0-9._-' '_' | cut -c1-60).log"
   ran=$((ran + 1))
+  local code=0
   if [ "${CI:-}" = "true" ]; then
     echo "==> $name"
-    if "$@"; then echo "    ok"; else echo "    FAILED: $name"; failed=1; fi
+    timeout --kill-after=30 "$STEP_TIMEOUT" "$@" || code=$?
+    if [ "$code" -eq 0 ]; then echo "    ok"; else echo "    FAILED: $name$(timed_out "$code")"; failed=1; fi
     return
   fi
   local start=$SECONDS
-  if "$@" > "$log" 2>&1; then
+  timeout --kill-after=30 "$STEP_TIMEOUT" "$@" > "$log" 2>&1 || code=$?
+  if [ "$code" -eq 0 ]; then
     echo "ok      $name ($((SECONDS - start))s)"
   else
-    echo "FAILED  $name ($((SECONDS - start))s). Last $TAIL_LINES lines (full output: $log):"
+    echo "FAILED  $name ($((SECONDS - start))s)$(timed_out "$code"). Last $TAIL_LINES lines (full output: $log):"
     tail -n "$TAIL_LINES" "$log" | sed 's/^/    /'
     failed=1
   fi
@@ -55,7 +63,8 @@ if [ -f package.json ]; then
     elif [ -f package-lock.json ]; then step "npm ci" npm ci
     else step "npm install" npm install; fi
   fi
-  if [ "$install" = 1 ]; then step "playwright install chromium" pnpm exec playwright install chromium; fi
+  # CI installs (and caches) Chromium itself and sets SKIP_PLAYWRIGHT_INSTALL=1 so it is not installed twice.
+  if [ "$install" = 1 ] && [ -z "${SKIP_PLAYWRIGHT_INSTALL:-}" ]; then step "playwright install chromium" pnpm exec playwright install chromium; fi
   # Order matters: e2e usually runs against the production build.
   for s in lint typecheck test build e2e; do
     if has_npm_script "$s"; then step "$PM run $s" "$PM" run "$s"; fi

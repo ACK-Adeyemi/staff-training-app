@@ -10,7 +10,10 @@
 # Progress: docs/progress.md.   Loop log: .agent-logs/build/loop.log.   Session logs: .agent-logs/build/.
 #
 # Each session is a fresh headless Claude Code run inside this app's dev container, in auto mode,
-# fed scripts/BUILD_PROMPT.md. It stops when docs/progress.md says BUILD COMPLETE or BLOCKED.
+# fed scripts/BUILD_PROMPT.md on standard input (not as an argument, so the prompt's text never
+# appears in the process list where a "kill everything matching X" command could hit it).
+# The dev container is restarted before each session, which clears processes the last one left
+# behind, and a session that runs longer than SESSION_TIMEOUT is stopped. It stops when docs/progress.md says BUILD COMPLETE or BLOCKED.
 # A failed session (usually a usage limit) waits and retries; waits don't count as sessions.
 set -u
 
@@ -30,6 +33,7 @@ MAX_SESSIONS="${MAX_SESSIONS:-250}"      # sessions that ran to completion
 MAX_FAILURES="${MAX_FAILURES:-200}"      # failed attempts in total (usage limits, network) before giving up
 WAIT_ON_ERROR="${WAIT_ON_ERROR:-1800}"   # seconds between retries after a failure
 WAIT_LONG="${WAIT_LONG:-7200}"           # after 6 failures in a row (e.g. a weekly limit), retry every 2 hours
+SESSION_TIMEOUT="${SESSION_TIMEOUT:-8h}" # a session is stopped after this long (normal sessions take 30 min to 5 h)
 
 PAUSE_FILE="$LOG_DIR/PAUSE"
 
@@ -77,22 +81,27 @@ while :; do
     continue
   fi
 
-  # Containers can stop if the VM rebooted; bring them back.
-  if [ -z "$("${COMPOSE[@]}" ps -q --status running dev 2>/dev/null)" ]; then
-    "${COMPOSE[@]}" up -d --wait >/dev/null || { failures=$((failures + 1)); log "Containers not up; waiting."; sleep "$WAIT_ON_ERROR"; continue; }
-  fi
+  # Restart the dev container so nothing from the previous session (test runners, preview
+  # servers) is still running, and bring the containers back if the VM rebooted.
+  "${COMPOSE[@]}" restart --timeout 5 dev >/dev/null 2>&1
+  "${COMPOSE[@]}" up -d --wait >/dev/null || { failures=$((failures + 1)); log "Containers not up; waiting."; sleep "$WAIT_ON_ERROR"; continue; }
   split_docs || log "Warning: scripts/split-docs.py failed; using the existing section files."
 
   ts="$(date +%Y%m%d-%H%M%S)"
   log "Session $((sessions + 1)) starting (log: $LOG_DIR/session-$ts.jsonl)"
   "${COMPOSE[@]}" exec -T -e AGENT_TASK=1 -e CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1 dev \
-    claude-agent -p "$(cat "$PROMPT_FILE")" \
+    timeout --kill-after=60 "$SESSION_TIMEOUT" \
+    claude-agent -p \
       --permission-mode auto --model "$MODEL" \
       --output-format stream-json --verbose \
-    < /dev/null > "$LOG_DIR/session-$ts.jsonl" 2> "$LOG_DIR/session-$ts.err"
+    < "$PROMPT_FILE" > "$LOG_DIR/session-$ts.jsonl" 2> "$LOG_DIR/session-$ts.err"
   code=$?
 
-  if [ "$code" -eq 0 ]; then
+  if [ "$code" -eq 124 ] || [ "$code" -eq 137 ]; then
+    failures=$((failures + 1))
+    log "Session stopped after SESSION_TIMEOUT=$SESSION_TIMEOUT. Uncommitted work stays in the working tree for the next session. Continuing in 1 min."
+    sleep 60
+  elif [ "$code" -eq 0 ]; then
     sessions=$((sessions + 1)); streak=0
     log "Session $sessions finished. $(status). Next: $(grep -m1 '^Next step:' docs/progress.md 2>/dev/null | cut -c12-)"
   else

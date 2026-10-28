@@ -3,7 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import { addDays, startOfLondonDay } from './dates';
 import type { DunningPolicy, Subscription } from './schemas/commercial';
-import { accountStateAt, nextTransition } from './accountState';
+import { accountStateAt, nextTransition, stateStartedAt } from './accountState';
 
 const policy: DunningPolicy = {
   graceDays: 14,
@@ -53,5 +53,13 @@ describe('stored state starts at stateSince', () => {
   it('a stored past due state still treats stateSince as day 0', () => {
     expect(accountStateAt(sub('pastDue'), [], policy, day(14))).toBe('pastDue');
     expect(accountStateAt(sub('pastDue'), [], policy, day(15))).toBe('limited');
+  });
+});
+
+describe('stateStartedAt', () => {
+  it('is stateSince while the stored state applies, and the first day of the new state after', () => {
+    expect(stateStartedAt(sub('pastDue'), policy, day(3)).toISOString()).toBe(SINCE);
+    const limited = stateStartedAt(sub('pastDue'), policy, day(20));
+    expect(Math.round((limited.getTime() - Date.parse(SINCE)) / 86_400_000)).toBe(15);
   });
 });

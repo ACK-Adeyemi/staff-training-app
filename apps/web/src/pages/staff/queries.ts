@@ -1,13 +1,17 @@
 // Data loading for the staff screens. All reads go through the data layer; rules live in the domain package.
 import { useQuery } from '@tanstack/react-query';
 import { londonDateString, staffSummary, type StaffSummary } from '@sta/domain';
-import type { Assignment, Evidence, Module, Notification } from '@sta/domain';
+import type { Assignment, Evidence, EvidenceSubmission, Module, Notification } from '@sta/domain';
 import { useActor, useClock, useStore } from '../../app/hooks';
 
 export type StaffData = {
   summary: StaffSummary;
   modules: Module[];
   personName: string;
+  personId: string;
+  siteId: string;
+  /** This person's certificate submissions, newest first. */
+  submissions: EvidenceSubmission[];
   evidence: Evidence[];
   assignments: Assignment[];
 };
@@ -48,6 +52,11 @@ export function useStaffData() {
         summary,
         modules,
         personName: person.nickname ?? person.firstName,
+        personId: person.id,
+        siteId: person.primarySiteId,
+        submissions: submissions
+          .filter((s) => s.personId === person.id)
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
         evidence: evidence.filter((e) => e.personId === person.id),
         assignments: assignments.filter((a) => a.personId === person.id),
       };

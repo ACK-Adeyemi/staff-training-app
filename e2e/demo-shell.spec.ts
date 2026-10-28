@@ -169,17 +169,25 @@ test.describe('Presenter panel (D2)', () => {
     await panel(page).getByRole('button', { name: 'Reset demo' }).click();
     await page.getByRole('button', { name: 'Yes, reset' }).click();
     await expect(page.getByTestId('demo-badge')).toBeVisible();
-    await page.keyboard.press('Shift+Alt+KeyP');
-    await expect.poll(async () => dayNumber(await dateText(page))).toBe(today);
+    // The reset runs the scheduled jobs before it clears the offset, so it takes a few seconds: wait for it with the panel open.
+    await expect
+      .poll(
+        async () => {
+          if (!(await panel(page).isVisible())) await page.keyboard.press('Shift+Alt+KeyP');
+          return dayNumber(await dateText(page));
+        },
+        { timeout: 30_000 },
+      )
+      .toBe(today);
   });
 
   test('the later-build items are shown disabled', async ({ page }) => {
     await page.goto('./#/staff');
     await page.keyboard.press('Shift+Alt+KeyP');
-    for (const name of ['Simulate failed payment', 'Toggle system status', 'Clear prospect branding']) {
+    for (const name of ['Toggle system status', 'Clear prospect branding']) {
       await expect(panel(page).getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true');
     }
-    await expect(panel(page).getByText('Arrives in a later build')).toHaveCount(3);
+    await expect(panel(page).getByText('Arrives in a later build')).toHaveCount(2);
   });
 
   test('Jump to Client admin and Open the outbox navigate and close the panel', async ({ page }) => {
@@ -204,12 +212,14 @@ test.describe('Presenter panel (D2)', () => {
 });
 
 test.describe('D3 outbox', () => {
-  test('shows the empty state', async ({ page }) => {
+  test('shows the seeded price notice for Brookfield Primary School', async ({ page }) => {
+    // Seed version 5 (M4) puts one message in the Outbox: the notice of the confirmed price change.
     await page.goto('./#/demo/outbox');
     await expect(page.getByRole('heading', { level: 1, name: 'Outbox' })).toBeVisible();
+    await expect(page.getByText(/Your plan price changes on/).first()).toBeVisible();
     await expect(
       page.getByText('Nothing has been sent yet. In the demo, messages are shown here instead of being sent.'),
-    ).toBeVisible();
+    ).toHaveCount(0);
   });
 });
 

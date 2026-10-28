@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Badge, Button, Card, GoalRing, LinkButton, PageHeader, ProgressRing } from '@sta/ui';
+import { useQuery } from '@tanstack/react-query';
+import { Badge, Banner as InfoBanner, Button, Card, GoalRing, LinkButton, PageHeader, ProgressRing } from '@sta/ui';
 import {
   competitionStatus,
   daysBetween,
@@ -11,7 +12,7 @@ import {
   type StaffSummary,
 } from '@sta/domain';
 import type { MessageKey } from '@sta/content';
-import { useClock, useT } from '../../app/hooks';
+import { useActor, useClock, useStore, useT } from '../../app/hooks';
 import { formatLondonDate } from '../../demo/format';
 import { CompetitionSheet } from '../compete/CompetitionSheet';
 import { useStaffData } from './queries';
@@ -179,6 +180,24 @@ function LatestBadge({ badges }: { badges: RewardsData['badges'] }) {
 }
 
 /** S2. */
+/** Staff see a neutral note when the account needs attention, never anything about payment (brief 24.8). */
+function AccountNotice() {
+  const t = useT();
+  const store = useStore();
+  const actor = useActor();
+  const clock = useClock();
+  const notice = useQuery({
+    queryKey: ['staffAccountNotice', actor.userId, clock.now().toISOString().slice(0, 10)],
+    queryFn: () => store.account.staffNotice(actor),
+  });
+  if (!notice.data) return null;
+  return (
+    <div data-testid="staff-account-notice" className="mb-3">
+      <InfoBanner tone="info">{t('staff.accountNotice.speakToManager')}</InfoBanner>
+    </div>
+  );
+}
+
 export function Home() {
   const t = useT();
   const q = useStaffData();
@@ -189,6 +208,7 @@ export function Home() {
   return (
     <>
       <PageHeader title={t('nav.staff.home')} />
+      <AccountNotice />
       <p className="m-0 text-lg">{t('staff.home.greeting', { name: personName })}</p>
       <div className="mb-4 flex flex-col items-center gap-2">
         <ProgressRing
@@ -222,6 +242,12 @@ export function Home() {
             ))}
           </ul>
         )}
+        <a
+          href="#/staff/calendar"
+          className={`mt-2 inline-flex min-h-[var(--target-min)] items-center underline ${focusLink}`}
+        >
+          {t('calendar.seeCalendar')}
+        </a>
       </Section>
       {rewards.data ? (
         <>
