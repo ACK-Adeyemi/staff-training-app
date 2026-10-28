@@ -13,6 +13,7 @@ import { runOwnershipTransferContract } from './ownershipTransfer';
 import { runProviderTeamContract } from './providerTeam';
 import { runCreateClientContract } from './createClient';
 import { runProviderPublishContract } from './providerPublish';
+import { runProviderCommsContract } from './providerComms';
 import { runProviderTicketsContract } from './providerTickets';
 import { runPackagingOptionContract } from './packagingOption';
 import { runLearningContract } from './learning';
@@ -60,3 +61,5 @@ runPackagingOptionContract('memory adapter', (options) => Promise.resolve(create
 runCreateClientContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 runProviderPublishContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 runProviderTicketsContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runProviderCommsContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
