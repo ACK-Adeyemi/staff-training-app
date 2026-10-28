@@ -9,10 +9,16 @@
 //     Owner holds both.
 //   - effectivePrice(ctx, clientId, listPrice, scope) reads the clock from ctx.now.
 import { describe, expect, it } from 'vitest';
-import { createRng, fixedClock, type PriceAdjustment } from '@sta/domain';
+import {
+  createRng,
+  fixedClock,
+  previewAdjustment,
+  type Invoice,
+  type PriceAdjustment,
+} from '@sta/domain';
 import { ForbiddenError, type ActorContext, type StoreHandle, type StoreName, type StoreOptions } from '../types';
 import { refusal, ruleOf } from './learning';
-import { buildWorld, TODAY } from './world';
+import { buildWorld, freshId, TODAY } from './world';
 
 export type PricingDraftInput = {
   clientIds: string[];
@@ -32,6 +38,11 @@ export type PricingStore = {
     confirm(ctx: ActorContext, id: string, stepUpCode: string): Promise<PriceAdjustment>;
     cancel(ctx: ActorContext, id: string): Promise<PriceAdjustment>;
     list(ctx: ActorContext): Promise<PriceAdjustment[]>;
+    /** Read-only: rows for every selected client, as domain previewAdjustment gives them. Writes nothing. */
+    preview(
+      ctx: ActorContext,
+      input: PricingDraftInput,
+    ): Promise<{ rows: ReturnType<typeof previewAdjustment>['rows']; warnings: string[] }>;
     effectivePrice(
       ctx: ActorContext,
       clientId: string,
@@ -77,6 +88,7 @@ export function runPricingContract(name: string, makeStore: (options: StoreOptio
     };
     return {
       store,
+      admin: handle.admin,
       fx,
       a,
       input,
@@ -157,6 +169,129 @@ export function runPricingContract(name: string, makeStore: (options: StoreOptio
       expect(await s.priceAt(new Date(Date.parse(effectiveAt) - 1000).toISOString())).toBe(LIST_PRICE);
       expect(await s.priceAt(effectiveAt)).toBe(NEW_PRICE);
       expect(await s.priceAt(new Date(Date.parse(effectiveAt) + DAY).toISOString())).toBe(NEW_PRICE);
+    });
+  });
+
+  // Part 2: notices, cancel and end date, replacement, issued invoices, preview.
+  // Assumption: one Outbox message per targeted client, whose `to` names both the billing contact and the Account Owner.
+  describe(`M4 provider price change operations: ${name}`, () => {
+    const confirmed = async (s: Awaited<ReturnType<typeof setup>>, patch: Partial<PricingDraftInput> = {}) => {
+      const draft = await s.store.pricing.draft(s.raj, { ...s.input, ...patch });
+      await s.store.pricing.submit(s.raj, draft.id);
+      return s.store.pricing.confirm(s.owner, draft.id, CODE);
+    };
+    const later = (days: number) => new Date(Date.parse(TODAY) + days * DAY).toISOString();
+
+    it('writes one Outbox notice per client to the billing contact and Account Owner for an increase, and none for a decrease', async () => {
+      const s = await setup();
+      const b = s.fx.ids.clients.b;
+      const before = (await s.admin.listOutbox()).length;
+      await confirmed(s, { value: 4000 });
+      await confirmed(s, { clientIds: [s.a, b], type: 'percent', value: -10 });
+      expect((await s.admin.listOutbox()).length).toBe(before);
+
+      await confirmed(s, { clientIds: [s.a, b], type: 'percent', value: 10 });
+      const sent = (await s.admin.listOutbox()).slice(before);
+      expect(sent).toHaveLength(2);
+      const users = await s.dump<{ id: string; email: string }>('users');
+      const subs = await s.dump<{ clientId: string; billingContact: string }>('subscriptions');
+      for (const [clientId, ownerId] of [
+        [s.a, s.fx.ids.users.priya],
+        [b, s.fx.ids.users.beth],
+      ] as const) {
+        const contact = subs.find((x) => x.clientId === clientId)!.billingContact;
+        const owner = users.find((u) => u.id === ownerId)!.email;
+        const hits = sent.filter((m) => m.to.includes(contact) && m.to.includes(owner));
+        expect(hits).toHaveLength(1);
+      }
+    });
+
+    it('restores the previous price after the would-be effective date when a scheduled change is cancelled', async () => {
+      const s = await setup();
+      const adj = await confirmed(s);
+      const cancelled = await s.store.pricing.cancel(s.owner, adj.id);
+      expect(cancelled.status).toBe('cancelled');
+      expect(await s.audit('pricing.cancel')).toHaveLength(1);
+      expect(await s.priceAt(later(31))).toBe(LIST_PRICE);
+      expect(await s.priceAt(later(90))).toBe(LIST_PRICE);
+    });
+
+    it('restores the previous price once the end date passes', async () => {
+      const s = await setup();
+      await confirmed(s, { endsAt: later(60) });
+      expect(await s.priceAt(later(45))).toBe(NEW_PRICE);
+      expect(await s.priceAt(later(59))).toBe(NEW_PRICE);
+      expect(await s.priceAt(later(60))).toBe(LIST_PRICE);
+      expect(await s.priceAt(later(90))).toBe(LIST_PRICE);
+    });
+
+    it('replaces an earlier change of the same scope and type for the same client when a second is confirmed', async () => {
+      const s = await setup();
+      const first = await confirmed(s, { value: 4000 });
+      const second = await confirmed(s, { value: 4500 });
+      const all = await s.store.pricing.list(s.owner);
+      expect(['scheduled', 'active']).not.toContain(all.find((x) => x.id === first.id)!.status);
+      expect(all.find((x) => x.id === second.id)!.status).toBe('scheduled');
+      expect(await s.priceAt(later(31))).toBe(4500);
+      expect(await s.priceAt(later(90))).toBe(4500);
+    });
+
+    it('leaves issued invoices byte-for-byte unchanged through draft, confirm and cancel', async () => {
+      const s = await setup();
+      const invoice: Invoice = {
+        id: freshId(4100),
+        number: 'INV-P1',
+        clientId: s.a,
+        issuedAt: TODAY,
+        dueAt: later(14),
+        billingNameAtIssue: 'Test Nursery Ltd',
+        billingAddressAtIssue: '1 Test Street',
+        lines: [{ label: 'Plan', amount: LIST_PRICE }],
+        tax: 1000,
+        total: 6000,
+        status: 'due',
+      };
+      await s.admin.bulkPut('invoices', [invoice]);
+      const snapshot = async () => JSON.stringify(await s.dump<Invoice>('invoices'));
+      const start = await snapshot();
+      const draft = await s.store.pricing.draft(s.raj, s.input);
+      expect(await snapshot()).toBe(start);
+      await s.store.pricing.submit(s.raj, draft.id);
+      await s.store.pricing.confirm(s.owner, draft.id, CODE);
+      expect(await snapshot()).toBe(start);
+      await s.store.pricing.cancel(s.owner, draft.id);
+      expect(await snapshot()).toBe(start);
+    });
+
+    it('previews every selected client exactly as the domain does, and writes nothing', async () => {
+      const s = await setup();
+      const b = s.fx.ids.clients.b;
+      const input = { ...s.input, clientIds: [s.a, b], type: 'percent' as const, value: 25 };
+      const stores = ['audit', 'priceAdjustments'] as const;
+      const before = await Promise.all(stores.map((n) => s.dump(n)));
+      const outboxBefore = await s.admin.listOutbox();
+      const result = await s.store.pricing.preview(s.owner, input);
+      expect(result.rows.map((r) => r.clientId)).toEqual([s.a, b]);
+      expect(result.rows.every((r) => r.currentPrice > 0)).toBe(true);
+      const expected = previewAdjustment({
+        clients: result.rows.map((r) => ({ clientId: r.clientId, listPrice: r.currentPrice })),
+        adjustment: {
+          id: 'preview',
+          clientIds: input.clientIds,
+          scope: input.scope,
+          type: input.type,
+          value: input.value,
+          reason: input.reason,
+          noticeDays: 30,
+          status: 'draft',
+          createdBy: s.owner.userId,
+        },
+        at: TODAY,
+      });
+      expect(result.rows).toEqual(expected.rows);
+      expect(result.warnings).toEqual(expected.warnings);
+      expect(await Promise.all(stores.map((n) => s.dump(n)))).toEqual(before);
+      expect(await s.admin.listOutbox()).toEqual(outboxBefore);
     });
   });
 }
