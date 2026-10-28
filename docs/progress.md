@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M4
 Milestone base commit: c7160e2
-Next step: M4 chunk 8c (This device telemetry list, P1/P2 overview reads), then chunk 9 per docs/plans/m4.md. Give the test-writer small briefs (one test file each); big briefs hit API errors.
+Next step: M4 chunk 9 (provider shell and P1-P3 with This device) per docs/plans/m4.md. Give the test-writer small briefs (one test file each); big briefs hit API errors.
 
 ## Milestones
 - [x] M0 Foundations
@@ -25,7 +25,7 @@ M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list):
 - [x] 5 Data ops B (5a ownership tests 3 commits ago, impl baf4f7a; 5b provider team tests 3c10b5f, impl a5f851c)
 - [x] 6 Data ops C (tests dca84ed, f9e6d35, impl ec3b521)
 - [x] 7 Data ops D (tests cb51eea, impl e4e99a3)
-- [ ] 8 Data ops E: 8a comms, maintenance, link check, Learn more counts done (tests 8ae4af0, impl c8ee98f); 8b recovery + profile/billing change ops done (tests 91be646, impl 0a6341c); 8c telemetry + overview reads (P1, P2) still to do
+- [x] 8 Data ops E: 8a comms, maintenance, link check, Learn more counts done (tests 8ae4af0, impl c8ee98f); 8b recovery + profile/billing change ops done (tests 91be646, impl 0a6341c); 8c telemetry + overview reads done (tests ea67a8a, impl 10447fa; seed v6, IndexedDB v6)
 - [ ] 9-18 see the plan
 M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 1 Decisions, schemas, stores and personas
@@ -174,3 +174,5 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - 2026-10-28 (session 2): M4 chunk 5 landed (baf4f7a, a5f851c), full check.sh green. Chunk 6 next.
 - 2026-10-28: merged origin/main; M4 chunk 6 data ops C landed (ec3b521); two-factor e2e race fixed in enrol().
 - 2026-10-28: e2e flake feedback.spec.ts:46 (phone) fixed. Cause: the forced radio click scrolled the control under the fixed bottom tab bar and hit the Progress tab. app.css now sets html scroll-padding-bottom. 16 of 16 pass repeated.
+
+- 2026-10-28 (session 3): M4 chunk 8c done. Full check.sh: all green except 3 e2e ENOENT artifact failures caused by an overlapping earlier run; the 2 files rerun alone 9/9 green.
