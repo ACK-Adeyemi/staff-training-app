@@ -14,6 +14,7 @@ import { runProviderTeamContract } from './providerTeam';
 import { runCreateClientContract } from './createClient';
 import { runProviderPublishContract } from './providerPublish';
 import { runProviderCommsContract } from './providerComms';
+import { runProviderRecoveryContract } from './providerRecovery';
 import { runProviderTicketsContract } from './providerTickets';
 import { runPackagingOptionContract } from './packagingOption';
 import { runLearningContract } from './learning';
@@ -63,3 +64,5 @@ runProviderPublishContract('memory adapter', (options) => Promise.resolve(create
 runProviderTicketsContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
 runProviderCommsContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runProviderRecoveryContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
