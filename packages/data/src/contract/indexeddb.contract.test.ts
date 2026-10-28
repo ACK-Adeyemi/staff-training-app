@@ -13,6 +13,7 @@ import { runPricingContract } from './pricing';
 import { runOwnershipTransferContract } from './ownershipTransfer';
 import { runProviderTeamContract } from './providerTeam';
 import { runCreateClientContract } from './createClient';
+import { runProviderPublishContract } from './providerPublish';
 import { runPackagingOptionContract } from './packagingOption';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
@@ -85,5 +86,8 @@ runPackagingOptionContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );
 runCreateClientContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runProviderPublishContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );
