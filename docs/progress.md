@@ -168,3 +168,4 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - 2026-10-28 (session 2): merged origin/main; fixed user feedback F2, F3, F4 (see User feedback). M4 chunk 5 next.
 - 2026-10-28 (session 2): M4 chunk 5 landed (baf4f7a, a5f851c), full check.sh green. Chunk 6 next.
 - 2026-10-28: merged origin/main; M4 chunk 6 data ops C landed (ec3b521); two-factor e2e race fixed in enrol().
+- 2026-10-28: e2e flake feedback.spec.ts:46 (phone) fixed. Cause: the forced radio click scrolled the control under the fixed bottom tab bar and hit the Progress tab. app.css now sets html scroll-padding-bottom. 16 of 16 pass repeated.
