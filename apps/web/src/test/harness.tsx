@@ -50,7 +50,7 @@ export function makeDemo(side: Side, keys: SeedKeys, handle?: StoreHandle) {
     signInAs: vi.fn(),
     signInAsClient: vi.fn(),
     listPersonas: () => (handle ? handle.admin.listPersonas() : Promise.resolve([])),
-    listOutbox: () => Promise.resolve([] as OutboxMessage[]),
+    listOutbox: () => (handle ? handle.admin.listOutbox() : Promise.resolve([] as OutboxMessage[])),
   };
 }
 
