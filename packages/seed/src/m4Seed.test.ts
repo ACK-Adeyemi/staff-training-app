@@ -29,8 +29,8 @@ async function world() {
 }
 
 describe('seed version 5', () => {
-  it('is 5', () => {
-    expect(SEED_VERSION).toBe(5);
+  it('is 6 after chunk 8c', () => {
+    expect(SEED_VERSION).toBe(6);
   });
 
   it('parses every new record with its schema', async () => {

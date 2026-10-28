@@ -8,8 +8,9 @@ export type { SeedKeys } from './world';
 
 /** Version of the seeded world. 1 was M0; 2 adds modules, learning data and Little Acorns' policy (M1); 3 adds history, notes, organising data and
  * competitions (M2); 4 adds own modules, feedback, tickets, rules, themes, invoices and sign-in states (M3);
- * 5 adds price changes, profile changes, the link check, Other entries, comms and a recovery request (M4). */
-export const SEED_VERSION = 5;
+ * 5 adds price changes, profile changes, the link check, Other entries, comms and a recovery request (M4);
+ * 6 adds simulated provider telemetry (usage, error groups, health scores). */
+export const SEED_VERSION = 6;
 export const DEFAULT_SEED_VALUE = 20261019;
 /** Used only when nothing is stored and the caller gave no date. The web app passes the real first-load date. */
 export const DEFAULT_TODAY = '2026-10-19T09:00:00.000Z';
@@ -72,12 +73,18 @@ const storeOrder: (keyof SeedData)[] = [
   'savedReplies',
   'profileChangeRequests',
   'linkCheckResults',
+  'usageDaily',
+  'errorGroups',
+  'healthScores',
 ];
 
 /** Replaces everything in the store with the seeded world, and stores the seed value and today. */
 export async function load(admin: DemoAdmin, options: SeedMeta): Promise<SeedKeys> {
   const { data, keys } = buildWorld(options);
+  // This device's own telemetry is real, not demo data: it survives Load, Reset and a seed upgrade.
+  const local = ((await admin.dumpAll()) as Record<string, unknown[]>)['localTelemetry'] ?? [];
   await admin.clearAll();
+  await admin.bulkPut('localTelemetry', local);
   for (const store of storeOrder) await admin.bulkPut(store, data[store]);
   await admin.setSeedMeta({ seedValue: options.seedValue, today: options.today, seedVersion: SEED_VERSION });
   return keys;

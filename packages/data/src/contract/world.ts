@@ -102,6 +102,9 @@ const SEED_LEARNING_STORES = new Set([
   'savedReplies',
   'profileChangeRequests',
   'linkCheckResults',
+  'usageDaily',
+  'errorGroups',
+  'healthScores',
 ]);
 
 /** The M2 shape of the seeded records that version 4 changes: no sign-in states, name history, theme or extra submissions. */

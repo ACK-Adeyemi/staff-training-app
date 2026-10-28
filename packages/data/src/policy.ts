@@ -200,6 +200,10 @@ const UNWIRED_STORES: ReadonlySet<StoreName> = new Set<StoreName>([
   'profileChangeRequests',
   'linkCheckResults',
   'moduleNotices',
+  'usageDaily',
+  'errorGroups',
+  'healthScores',
+  'localTelemetry',
 ]);
 
 /**

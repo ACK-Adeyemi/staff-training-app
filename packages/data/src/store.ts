@@ -25,6 +25,7 @@ import { createProviderTicketOperations } from './providerTicketOps';
 import { createProviderCommsOperations } from './providerCommsOps';
 import { createProviderRecoveryOperations } from './providerRecoveryOps';
 import { createPricingOperations } from './pricingOps';
+import { createProviderOverviewOperations } from './providerOverviewOps';
 import { createProviderOperations } from './providerOps';
 import { createBillingOperations, simulateFailedPayment } from './billingOps';
 import { keyOf, validate, type RawBackend, type SettingsRecord, type WriteOp } from './backend';
@@ -305,6 +306,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const providerTicketOps = createProviderTicketOperations(backend, options);
   const commsOps = createProviderCommsOperations(backend, options);
   const recoveryOps = createProviderRecoveryOperations(backend, options);
+  const overviewOps = createProviderOverviewOperations(backend, options);
   const authoringOps = createAuthoringOperations(backend, options);
   const evidenceFlow = createEvidenceOperations(backend, options);
   const support = createSupportOperations(backend, options);
@@ -351,6 +353,8 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     linkCheck: commsOps.linkCheck,
     learnMore: commsOps.learnMore,
     recovery: recoveryOps.recovery,
+    providerOverview: overviewOps.providerOverview,
+    telemetry: overviewOps.telemetry,
     profileChanges: recoveryOps.profileChanges,
     billingChanges: recoveryOps.billingChanges,
     addOnRequests: billingOps.addOnRequests,

@@ -57,6 +57,7 @@ const V4_ALL = [
   'ticketMessages',
   'faqVotes',
 ];
+const V6_STORES = ['usageDaily', 'errorGroups', 'healthScores', 'localTelemetry'];
 const V5_STORES = [
   'priceAdjustments',
   'ownershipTransfers',
@@ -89,8 +90,8 @@ async function makeV4(name: string): Promise<void> {
 }
 
 describe('indexeddb schema upgrade from version 4 to 5', () => {
-  it('declares version 5', () => {
-    expect(DB_VERSION).toBe(5);
+  it('declares version 6', () => {
+    expect(DB_VERSION).toBe(6);
   });
 
   it('keeps the version 4 records and adds the M4 stores, with client indexes where records are client-owned', async () => {
@@ -101,8 +102,8 @@ describe('indexeddb schema upgrade from version 4 to 5', () => {
     backend.close();
 
     const db = await openDB('upgrade-v4-a');
-    expect(db.version).toBe(5);
-    expect([...db.objectStoreNames].sort()).toEqual([...V4_ALL, ...V5_STORES].sort());
+    expect(db.version).toBe(6);
+    expect([...db.objectStoreNames].sort()).toEqual([...V4_ALL, ...V5_STORES, ...V6_STORES].sort());
     for (const s of V5_CLIENT_INDEXED) {
       expect([...db.transaction(s).store.indexNames], s).toContain('clientId');
       expect(clientIndexed.has(s as never), `${s} in clientIndexed`).toBe(true);

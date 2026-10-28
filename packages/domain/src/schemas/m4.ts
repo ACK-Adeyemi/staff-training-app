@@ -234,3 +234,61 @@ export const moduleNoticeSchema = z
   })
   .refine((n) => n.toVersion > n.fromVersion, { message: 'The version must go up', path: ['toVersion'] });
 export type ModuleNotice = z.infer<typeof moduleNoticeSchema>;
+
+// ---------- Provider telemetry (M4 chunk 8c; build pack 6 "Provider telemetry"). Seeded and simulated in the PoC. ----------
+const dayKeySchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use a date like 2026-10-19');
+
+/** One feature's use by one client on one day. Keyed by client, date and feature. */
+export const usageDailySchema = z.object({
+  clientId: idSchema,
+  date: dayKeySchema,
+  feature: z.string().min(1),
+  count: z.number().int().nonnegative(),
+  activeUsers: z.number().int().nonnegative(),
+});
+export type UsageDaily = z.infer<typeof usageDailySchema>;
+
+export const errorGroupSchema = z.object({
+  id: idSchema,
+  message: z.string().min(1),
+  count: z.number().int().nonnegative(),
+  firstSeen: isoDateSchema,
+  lastSeen: isoDateSchema,
+  clientIds: z.array(idSchema),
+  siteIds: z.array(idSchema),
+  usersAffected: z.number().int().nonnegative(),
+  status: z.enum(['open', 'acknowledged', 'resolved']),
+});
+export type ErrorGroup = z.infer<typeof errorGroupSchema>;
+
+export const logEntrySchema = z.object({
+  id: idSchema,
+  at: isoDateSchema,
+  severity: z.enum(['info', 'warning', 'error']),
+  clientId: idSchema.optional(),
+  siteId: idSchema.optional(),
+  feature: z.string().min(1),
+  event: z.string().min(1),
+  message: z.string(),
+  sessionId: z.string().min(1),
+});
+export type LogEntry = z.infer<typeof logEntrySchema>;
+
+/** A client's health on one day, 0 to 100, with plain-English reasons. Keyed by client and date. */
+export const healthScoreSchema = z.object({
+  clientId: idSchema,
+  date: dayKeySchema,
+  score: z.number().int().min(0).max(100),
+  reasons: z.array(z.string().min(1)),
+});
+export type HealthScore = z.infer<typeof healthScoreSchema>;
+
+/** Real, on this device only: an event or error this browser recorded. Never seeded, never sent anywhere. */
+export const localTelemetrySchema = z.object({
+  id: idSchema,
+  kind: z.enum(['event', 'error']),
+  name: z.string().min(1).max(120),
+  message: z.string().max(500).optional(),
+  at: isoDateSchema,
+});
+export type LocalTelemetryEntry = z.infer<typeof localTelemetrySchema>;

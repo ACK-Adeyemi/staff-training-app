@@ -46,10 +46,10 @@ async function world() {
 }
 
 describe('seed version 4 (assumption 53)', () => {
-  it('is 5 (M4), and load stores it in the seed metadata', async () => {
-    expect(SEED_VERSION).toBe(5);
+  it('is 6 (M4), and load stores it in the seed metadata', async () => {
+    expect(SEED_VERSION).toBe(6);
     const { admin } = await seeded();
-    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 5 });
+    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 6 });
   });
 
   it('reseeds a stored version 3 world with the same seed value and today', async () => {
@@ -59,7 +59,7 @@ describe('seed version 4 (assumption 53)', () => {
     await admin.setSeedMeta({ ...SEED, seedVersion: 3 });
     const keys = await ensureCurrentSeed(admin);
     expect(keys).not.toBeNull();
-    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 5 });
+    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 6 });
     const dump = (await admin.dumpAll()) as Dump;
     expect(dump['moduleFeedback']!.length).toBeGreaterThan(20);
     // Seed version 5 (M4) adds tickets from other clients; Little Acorns still has its three.
@@ -133,6 +133,9 @@ describe('seed version 4: earlier streams and compliance untouched', () => {
     const sam = (await seeded()).keys.personas['sam']!;
     const sel: Record<string, unknown[]> = {};
     for (const s of Object.keys(EARLIER).filter((k) => !k.startsWith('la'))) sel[s] = dump[s]!;
+    // Version 6 gives Harbour Cafe Group its four sites; every other site is still the version 3 one.
+    const harbour = (await seeded()).keys.clients['harbourCafe'];
+    sel['sites'] = dump['sites']!.filter((s) => s.clientId !== harbour);
     sel['laEvents'] = dump['learningEvents']!.filter((e) => e.clientId === la && nursery.has(e.moduleId));
     sel['laAttempts'] = dump['attempts']!.filter((e) => e.clientId === la && nursery.has(e.moduleId));
     sel['laAssignments'] = dump['assignments']!.filter((a) => a.clientId === la && a.personId !== sam);

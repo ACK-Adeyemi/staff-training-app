@@ -2,6 +2,10 @@
 import type {
   AccountState,
   Announcement,
+  ErrorGroup,
+  HealthScore,
+  LocalTelemetryEntry,
+  UsageDaily,
   ProfileChangeRequest,
   RecoveryRequest,
   LinkCheckResult,
@@ -147,6 +151,10 @@ export const storeNames = [
   'profileChangeRequests',
   'linkCheckResults',
   'moduleNotices',
+  'usageDaily',
+  'errorGroups',
+  'healthScores',
+  'localTelemetry',
 ] as const;
 export type StoreName = (typeof storeNames)[number];
 
@@ -943,6 +951,55 @@ export interface ProviderOpsService {
   createClient(ctx: ActorContext, input: CreateClientInput): Promise<CreateClientResult>;
 }
 
+/** One row of the provider client list (P2). Counts: all sites, and people with status 'active'. */
+export type ProviderClientRow = {
+  clientId: string;
+  displayName: string;
+  accountState: AccountState;
+  packageId: string;
+  siteCount: number;
+  peopleCount: number;
+  /** The latest seeded health score, where one exists. Simulated. */
+  healthScore?: number;
+};
+
+/** The provider overview (P1). Counts are real records; `attention` comes from the simulated health scores. */
+export type ProviderOverview = {
+  simulated: true;
+  clientCount: number;
+  byAccountState: Partial<Record<AccountState, number>>;
+  siteCount: number;
+  peopleCount: number;
+  /** Clients needing attention. A reason is plain English from the health score, or a code starting `accountState.`. */
+  attention: { clientId: string; reasons: string[] }[];
+};
+
+/** Provider overview and client list (M4 chunk 8c). Provider side only, needs clients.read. */
+export interface ProviderOverviewService {
+  overview(ctx: ActorContext): Promise<ProviderOverview>;
+  clients(ctx: ActorContext, filter?: { accountState?: AccountState }): Promise<ProviderClientRow[]>;
+}
+
+/** Telemetry (M4 chunk 8c). Local records are real and stay on this device; the rest is seeded and simulated. */
+export interface TelemetryService {
+  /** No actor: an error handler has none. The time comes from the injected Clock. */
+  recordLocalEvent(input: { name: string }): Promise<LocalTelemetryEntry>;
+  recordLocalError(input: { name: string; message: string }): Promise<LocalTelemetryEntry>;
+  /** Provider only (clients.read). Newest first. */
+  listLocal(ctx: ActorContext): Promise<LocalTelemetryEntry[]>;
+  /** Provider only (clients.read). Seeded usage, error groups and latest health score of one client. */
+  simulated(
+    ctx: ActorContext,
+    clientId: string,
+  ): Promise<{
+    simulated: true;
+    clientId: string;
+    usageDaily: UsageDaily[];
+    errorGroups: ErrorGroup[];
+    healthScore: HealthScore | undefined;
+  }>;
+}
+
 /** Provider announcements (M4 chunk 8a). Listing and creating need comms.send; banners are for any client or staff actor. */
 export interface ProviderCommsService {
   listAnnouncements(ctx: ActorContext): Promise<Announcement[]>;
@@ -1020,6 +1077,8 @@ export interface DataStore {
   linkCheck: LinkCheckService;
   learnMore: LearnMoreService;
   providerOps: ProviderOpsService;
+  providerOverview: ProviderOverviewService;
+  telemetry: TelemetryService;
   providerTeam: ProviderTeamService;
   providerTickets: ProviderTicketsService;
   savedReplies: SavedRepliesService;
