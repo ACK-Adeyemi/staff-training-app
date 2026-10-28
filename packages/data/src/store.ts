@@ -19,6 +19,7 @@ import { createSupportOperations } from './supportOps';
 import { createThemesOperations } from './themesOps';
 import { createDataRightsOperations } from './dataRightsOps';
 import { createRulesOperations, newPersonPrefs } from './rulesOps';
+import { createPricingOperations } from './pricingOps';
 import { createBillingOperations, simulateFailedPayment } from './billingOps';
 import { keyOf, validate, type RawBackend, type SettingsRecord, type WriteOp } from './backend';
 import {
@@ -283,6 +284,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const competitionOps = createCompetitionOperations(backend, options);
   const identity = createIdentityOperations(backend, options);
   const billingOps = createBillingOperations(backend, options);
+  const pricing = createPricingOperations(backend, options);
   const authoringOps = createAuthoringOperations(backend, options);
   const evidenceFlow = createEvidenceOperations(backend, options);
   const support = createSupportOperations(backend, options);
@@ -317,6 +319,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     packages: withoutRemove('packages'),
     addOns: { ...withoutRemove('addOns'), ...billingOps.addOnOps },
     billing: billingOps.billing,
+    pricing,
     addOnRequests: billingOps.addOnRequests,
     account: billingOps.account,
     ai: billingOps.ai,

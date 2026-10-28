@@ -9,13 +9,7 @@
 //     Owner holds both.
 //   - effectivePrice(ctx, clientId, listPrice, scope) reads the clock from ctx.now.
 import { describe, expect, it } from 'vitest';
-import {
-  createRng,
-  fixedClock,
-  previewAdjustment,
-  type Invoice,
-  type PriceAdjustment,
-} from '@sta/domain';
+import { createRng, fixedClock, previewAdjustment, type Invoice, type PriceAdjustment } from '@sta/domain';
 import { ForbiddenError, type ActorContext, type StoreHandle, type StoreName, type StoreOptions } from '../types';
 import { refusal, ruleOf } from './learning';
 import { buildWorld, freshId, TODAY } from './world';

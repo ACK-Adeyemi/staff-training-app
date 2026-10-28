@@ -3,6 +3,8 @@ import type {
   AccountState,
   AddOn,
   AddOnSubscription,
+  PriceAdjustment,
+  previewAdjustment,
   EffectiveEntitlements,
   Assignment,
   Attachment,
@@ -792,7 +794,39 @@ export interface RetentionService {
   update(ctx: ActorContext, patch: Partial<RetentionPolicy>): Promise<RetentionPolicy>;
 }
 
+export type PricingDraftInput = {
+  clientIds: string[];
+  scope: PriceAdjustment['scope'];
+  type: PriceAdjustment['type'];
+  value: number;
+  reason: PriceAdjustment['reason'];
+  noticeDays?: number;
+  endsAt?: string;
+  note?: string;
+};
+
+/** Provider price changes (M4 BP-7). Provider side only; billing.draftPriceChanges to draft, billing.confirmPriceChanges plus the step-up code to confirm. */
+export interface PricingService {
+  draft(ctx: ActorContext, input: PricingDraftInput): Promise<PriceAdjustment>;
+  submit(ctx: ActorContext, id: string): Promise<PriceAdjustment>;
+  confirm(ctx: ActorContext, id: string, stepUpCode: string): Promise<PriceAdjustment>;
+  cancel(ctx: ActorContext, id: string): Promise<PriceAdjustment>;
+  list(ctx: ActorContext): Promise<PriceAdjustment[]>;
+  /** Read-only: one row per selected client. Writes nothing. */
+  preview(
+    ctx: ActorContext,
+    input: PricingDraftInput,
+  ): Promise<{ rows: ReturnType<typeof previewAdjustment>['rows']; warnings: string[] }>;
+  effectivePrice(
+    ctx: ActorContext,
+    clientId: string,
+    listPrice: number,
+    scope: PriceAdjustment['scope'],
+  ): Promise<number>;
+}
+
 export interface DataStore {
+  pricing: PricingService;
   clients: WriteRepo<Client>;
   sites: RemovableRepo<Site>;
   teams: RemovableRepo<Team>;
