@@ -229,7 +229,9 @@
       "notAwaitingCheck": "This certificate is not waiting for a check any more.",
       "invalidFeedback": "Check your feedback and try again.",
       "invalidTicket": "Check the details of your request and try again.",
-      "invalidReply": "Write a reply of up to 2,000 characters."
+      "invalidReply": "Write a reply of up to 2,000 characters.",
+      "invalidClient": "Check the organisation name, sites, industry pack, package and first admin's email, then try again.",
+      "invalidPublish": "Choose at least one client, write what changed, and make sure the module has a saved draft to publish."
     },
     "notEntitled": {
       "liveCompetitions": "You have reached the number of live competitions in your package. End or cancel one first.",

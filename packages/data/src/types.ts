@@ -73,6 +73,8 @@ import type {
   Invoice,
   AutoAssignRule,
   ClientSettings,
+  ModuleNotice,
+  OnboardingChecklist,
 } from '@sta/domain';
 
 export type Id = string;
@@ -267,7 +269,9 @@ export type RuleName =
   | 'notAwaitingCheck'
   | 'invalidFeedback'
   | 'invalidTicket'
-  | 'invalidReply';
+  | 'invalidReply'
+  | 'invalidClient'
+  | 'invalidPublish';
 
 /** A business rule said no (for example "finish every lesson first"). The web app maps `rule` to `errors.rule.<rule>`. */
 export class RuleError extends DataError {
@@ -687,6 +691,16 @@ export interface AuthoringService {
   /** Snapshots of earlier published versions, oldest first. */
   versions(ctx: ActorContext, moduleId: Id): Promise<ModuleVersion[]>;
   getVersion(ctx: ActorContext, moduleId: Id, version: number): Promise<Module>;
+  /**
+   * Provider only, content.write. Publishes the pending draft of a published provider module as the next version and
+   * tells the chosen clients: a placement if they have none and a ModuleNotice each, in one batch.
+   * RuleError('invalidPublish') for a bad client list, a blank summary or no pending draft.
+   */
+  publishToClients(
+    ctx: ActorContext,
+    moduleId: Id,
+    input: { summary: string; clientIds: string[] },
+  ): Promise<{ module: Module; notices: ModuleNotice[] }>;
   drafts: { get(ctx: ActorContext, moduleId: Id): Promise<ModuleDraft | null> };
 }
 
@@ -859,7 +873,32 @@ export interface ProviderTeamService {
   deleteRole(ctx: ActorContext, roleId: string): Promise<void>;
 }
 
+export type CreateClientInput = {
+  displayName: string;
+  industryPackId: string;
+  packageId: string;
+  sites: { name: string; countryCode?: string; timezone?: string }[];
+  billingContact: string;
+  trialDays?: number;
+  firstAdmin: { email: string; displayName: string; roleKey: 'accountOwner' };
+};
+export type CreateClientResult = {
+  client: Client;
+  sites: Site[];
+  subscription: Subscription;
+  placements: ModulePlacement[];
+  checklist: OnboardingChecklist;
+  invitation: Invitation;
+};
+
+/** Provider-only client management (M4 chunk 6a). */
+export interface ProviderOpsService {
+  /** Needs clients.write. RuleError('invalidClient') for a bad name, sites, pack, package or admin email. */
+  createClient(ctx: ActorContext, input: CreateClientInput): Promise<CreateClientResult>;
+}
+
 export interface DataStore {
+  providerOps: ProviderOpsService;
   providerTeam: ProviderTeamService;
   pricing: PricingService;
   ownership: OwnershipService;

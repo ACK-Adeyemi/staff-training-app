@@ -22,6 +22,7 @@ import { createRulesOperations, newPersonPrefs } from './rulesOps';
 import { createOwnershipOperations } from './ownershipOps';
 import { createProviderTeamOperations } from './providerTeamOps';
 import { createPricingOperations } from './pricingOps';
+import { createProviderOperations } from './providerOps';
 import { createBillingOperations, simulateFailedPayment } from './billingOps';
 import { keyOf, validate, type RawBackend, type SettingsRecord, type WriteOp } from './backend';
 import {
@@ -295,6 +296,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const identity = createIdentityOperations(backend, options);
   const billingOps = createBillingOperations(backend, options);
   const pricing = createPricingOperations(backend, options);
+  const providerOps = createProviderOperations(backend, options);
   const ownership = createOwnershipOperations(backend, options);
   const providerTeam = createProviderTeamOperations(backend, options);
   const authoringOps = createAuthoringOperations(backend, options);
@@ -332,6 +334,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     addOns: { ...withoutRemove('addOns'), ...billingOps.addOnOps },
     billing: billingOps.billing,
     pricing,
+    providerOps,
     ownership,
     providerTeam,
     addOnRequests: billingOps.addOnRequests,
