@@ -21,6 +21,7 @@ import { createDataRightsOperations } from './dataRightsOps';
 import { createRulesOperations, newPersonPrefs } from './rulesOps';
 import { createOwnershipOperations } from './ownershipOps';
 import { createProviderTeamOperations } from './providerTeamOps';
+import { createProviderTicketOperations } from './providerTicketOps';
 import { createPricingOperations } from './pricingOps';
 import { createProviderOperations } from './providerOps';
 import { createBillingOperations, simulateFailedPayment } from './billingOps';
@@ -299,6 +300,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const providerOps = createProviderOperations(backend, options);
   const ownership = createOwnershipOperations(backend, options);
   const providerTeam = createProviderTeamOperations(backend, options);
+  const providerTicketOps = createProviderTicketOperations(backend, options);
   const authoringOps = createAuthoringOperations(backend, options);
   const evidenceFlow = createEvidenceOperations(backend, options);
   const support = createSupportOperations(backend, options);
@@ -337,6 +339,9 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     providerOps,
     ownership,
     providerTeam,
+    providerTickets: providerTicketOps.providerTickets,
+    savedReplies: providerTicketOps.savedReplies,
+    otherEntries: providerTicketOps.otherEntries,
     addOnRequests: billingOps.addOnRequests,
     account: billingOps.account,
     ai: billingOps.ai,

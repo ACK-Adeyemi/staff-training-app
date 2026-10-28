@@ -59,7 +59,7 @@ export function runProviderTicketsContract(
 ): void {
   async function setup() {
     const handle = await makeStore({ clock: fixedClock(TODAY), rng: createRng(7) });
-    const fx = await buildWorld(handle.admin);
+    const fx = await buildWorld(handle.admin, { keepSupportSeed: true });
     const s = handle.store as unknown as ProviderTicketsStore & { tickets: TicketsService };
     const u = fx.ids.users;
     const provider = (userId: string): ActorContext => ({ userId, side: 'provider', now: TODAY });

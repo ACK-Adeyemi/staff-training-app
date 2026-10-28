@@ -124,19 +124,29 @@ function m2Shape(store: string, records: unknown[], keys: { submissions: Record<
   });
 }
 
-export async function buildWorld(admin: DemoAdmin) {
+/** The seeded support data (tickets, Other phrases and saved replies), which only the provider inbox suite wants. */
+const SEED_SUPPORT_STORES = new Set(['tickets', 'ticketMessages', 'otherEntryGroups', 'savedReplies']);
+
+export async function buildWorld(admin: DemoAdmin, opts: { keepSupportSeed?: boolean } = {}) {
   const keys = await load(admin, { seedValue: SEED_VALUE, today: TODAY });
   // The contract suite builds its own learning records (see learning.ts), so it starts without the seed's M1 ones
   // and with the M0 shape of the seed metadata.
   const full = (await admin.dumpAll()) as Record<string, unknown[]>;
   await admin.clearAll();
   for (const [store, records] of Object.entries(full)) {
-    if (SEED_LEARNING_STORES.has(store)) continue;
+    if (SEED_LEARNING_STORES.has(store) && !(opts.keepSupportSeed && SEED_SUPPORT_STORES.has(store))) continue;
     await admin.bulkPut(
       store as StoreName,
       store === 'clients' || store === 'users' || store === 'evidenceSubmissions'
         ? m2Shape(store, records, keys)
-        : records,
+        : store === 'tickets'
+          ? // The seed assigns one ticket to the support user; the inbox suite starts with nothing assigned.
+            (records as { assigneeId?: string }[]).map((t) => {
+              const copy = { ...t };
+              delete copy.assigneeId;
+              return copy;
+            })
+          : records,
     );
   }
   await admin.setSeedMeta({ seedValue: SEED_VALUE, today: TODAY });

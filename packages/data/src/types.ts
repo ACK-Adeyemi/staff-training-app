@@ -1,6 +1,8 @@
 // Public types of the data layer (build pack 4.3). The UI talks to a DataStore and nothing else.
 import type {
   AccountState,
+  OtherEntryGroup,
+  SavedReply,
   AddOn,
   AddOnSubscription,
   PriceAdjustment,
@@ -873,6 +875,45 @@ export interface ProviderTeamService {
   deleteRole(ctx: ActorContext, roleId: string): Promise<void>;
 }
 
+export type ProviderTicketRow = { ticket: Ticket; responseDueAt?: string; breached: boolean };
+export type ProviderTicketFilter = {
+  status?: Ticket['status'];
+  clientId?: string;
+  assigneeId?: string;
+  impact?: Ticket['impact'];
+};
+
+/** Provider ticket inbox (M4 chunk 7). Provider side only; reading needs tickets.read, changing needs tickets.write. */
+export interface ProviderTicketsService {
+  list(ctx: ActorContext, filter?: ProviderTicketFilter): Promise<ProviderTicketRow[]>;
+  assign(ctx: ActorContext, id: string, assigneeId: string | null): Promise<Ticket>;
+  /** A reply the customer sees; sets firstResponseAt the first time. */
+  reply(ctx: ActorContext, id: string, input: { body: string }): Promise<TicketMessage>;
+  /** An internal note: provider eyes only. */
+  addNote(ctx: ActorContext, id: string, input: { body: string }): Promise<TicketMessage>;
+  setStatus(ctx: ActorContext, id: string, status: Ticket['status']): Promise<Ticket>;
+  /** Replies and internal notes. */
+  messages(ctx: ActorContext, id: string): Promise<TicketMessage[]>;
+}
+
+export interface SavedRepliesService {
+  list(ctx: ActorContext): Promise<SavedReply[]>;
+  create(ctx: ActorContext, input: { title: string; body: string }): Promise<SavedReply>;
+  /** The reply text with {{firstName}} replaced by the ticket raiser's first name. */
+  insertText(ctx: ActorContext, replyId: string, ticketId: string): Promise<string>;
+}
+
+export type OtherEntryGroupRow = OtherEntryGroup & { clientCount: number; trending: boolean };
+
+export interface OtherEntriesService {
+  review(ctx: ActorContext, field: 'feature' | 'issueType'): Promise<OtherEntryGroupRow[]>;
+  /** Re-tags only the chosen tickets, which must all belong to the group. */
+  createIssueType(
+    ctx: ActorContext,
+    input: { groupId: string; name: string; ticketIds: string[] },
+  ): Promise<{ issueTypeId: string; retagged: number; group: OtherEntryGroup }>;
+}
+
 export type CreateClientInput = {
   displayName: string;
   industryPackId: string;
@@ -900,6 +941,9 @@ export interface ProviderOpsService {
 export interface DataStore {
   providerOps: ProviderOpsService;
   providerTeam: ProviderTeamService;
+  providerTickets: ProviderTicketsService;
+  savedReplies: SavedRepliesService;
+  otherEntries: OtherEntriesService;
   pricing: PricingService;
   ownership: OwnershipService;
   clients: WriteRepo<Client>;

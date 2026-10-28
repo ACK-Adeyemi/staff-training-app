@@ -67,6 +67,9 @@ export * from './ownership';
 export * from './recovery';
 export * from './comms';
 // normaliseOtherText stays exported from './support' (a looser version for ticket validation).
+export { responseStatus } from './responseTarget';
+export type { ResponseStatus } from './responseTarget';
 export { groupOtherEntries, retagEntries, trendingPhrase } from './otherEntries';
+export { normaliseOtherText as normaliseOtherEntry } from './otherEntries';
 export type { OtherField, OtherGroupView } from './otherEntries';
 export * from './billingNames';
