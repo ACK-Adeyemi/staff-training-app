@@ -23,6 +23,7 @@ import {
   type LearningEvent,
   type LinkCheckResult,
   type MaintenanceApp,
+  type UserAccount,
 } from '@sta/domain';
 import { load } from '@sta/seed';
 import { ForbiddenError, type ActorContext, type StoreHandle, type StoreOptions } from '../types';
@@ -182,8 +183,11 @@ export function runProviderCommsContract(
     });
 
     it('shows the seeded live banner and not the seeded expired one', async () => {
-      const t = await setup();
-      const titles = (await t.s.providerComms.banners(t.priya)).map((a) => a.title);
+      // buildWorld drops the seeded announcements, so this test loads the plain seed and acts as a seeded client admin.
+      const t = await seededSetup();
+      const admin = (await t.dump<UserAccount>('users')).find((x) => x.side === 'client' && x.clientId !== undefined)!;
+      const actor: ActorContext = { userId: admin.id, side: 'client', clientId: admin.clientId!, now: TODAY };
+      const titles = (await t.s.providerComms.banners(actor)).map((a) => a.title);
       expect(titles).toContain('New module: Fire evacuation template');
       expect(titles).not.toContain('Planned maintenance on Sunday morning');
     });
@@ -202,7 +206,9 @@ export function runProviderCommsContract(
       const events = await audits(t.dump, 'announcement.create');
       expect(events).toHaveLength(2);
       expect(events[0]).toMatchObject({ actorId: t.u.support, actorSide: 'provider', at: TODAY });
-      const text = JSON.stringify(events[0]);
+      // Event ids are random under a fixed Clock, so the dump order is not creation order: find this one by its target.
+      const mine = events.find((e) => e.target.includes(made.id))!;
+      const text = JSON.stringify(mine);
       expect(text).toContain(made.id);
       expect(text).toContain(t.fx.ids.clients.b);
       expect(text).not.toContain('Very private');

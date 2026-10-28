@@ -1,6 +1,9 @@
 // Public types of the data layer (build pack 4.3). The UI talks to a DataStore and nothing else.
 import type {
   AccountState,
+  Announcement,
+  LinkCheckResult,
+  MaintenanceApp,
   OtherEntryGroup,
   SavedReply,
   AddOn,
@@ -938,7 +941,46 @@ export interface ProviderOpsService {
   createClient(ctx: ActorContext, input: CreateClientInput): Promise<CreateClientResult>;
 }
 
+/** Provider announcements (M4 chunk 8a). Listing and creating need comms.send; banners are for any client or staff actor. */
+export interface ProviderCommsService {
+  listAnnouncements(ctx: ActorContext): Promise<Announcement[]>;
+  createAnnouncement(
+    ctx: ActorContext,
+    input: {
+      title: string;
+      body: string;
+      audience: Announcement['audience'];
+      channels: Announcement['channels'];
+      publishAt: string;
+      expiresAt?: string;
+    },
+  ): Promise<Announcement>;
+  /** Live banner announcements for the actor's own client, package, pack and side. */
+  banners(ctx: ActorContext): Promise<Announcement[]>;
+}
+
+/** Maintenance flags per app. Setting needs ops.write; reading is open to every actor. */
+export interface MaintenanceService {
+  set(ctx: ActorContext, input: { app: MaintenanceApp; on: boolean }): Promise<Record<MaintenanceApp, boolean>>;
+  flags(ctx: ActorContext): Promise<Record<MaintenanceApp, boolean>>;
+}
+
+/** The simulated Learn more link check (no network request). Needs content.write to run. */
+export interface LinkCheckService {
+  run(ctx: ActorContext): Promise<{ checkedAt: string; results: LinkCheckResult[]; broken: LinkCheckResult[] }>;
+  last(ctx: ActorContext): Promise<LinkCheckResult[]>;
+}
+
+/** Learn more open counts per link, with no learner identity. Needs content.write. */
+export interface LearnMoreService {
+  counts(ctx: ActorContext): Promise<{ linkId: string; opens: number }[]>;
+}
+
 export interface DataStore {
+  providerComms: ProviderCommsService;
+  maintenance: MaintenanceService;
+  linkCheck: LinkCheckService;
+  learnMore: LearnMoreService;
   providerOps: ProviderOpsService;
   providerTeam: ProviderTeamService;
   providerTickets: ProviderTicketsService;
