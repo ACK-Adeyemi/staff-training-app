@@ -4,6 +4,7 @@ import type {
   AddOn,
   AddOnSubscription,
   PriceAdjustment,
+  OwnershipTransfer,
   previewAdjustment,
   EffectiveEntitlements,
   Assignment,
@@ -825,8 +826,27 @@ export interface PricingService {
   ): Promise<number>;
 }
 
+export type OwnershipRequestInput = {
+  side: 'client' | 'provider';
+  clientId?: string;
+  toUserId: string;
+  demoteFromTo: string;
+};
+
+/** Ownership transfer (M4 chunk 5). The owner of one side hands the owner role to another user there; the sides never cross. */
+export interface OwnershipService {
+  request(ctx: ActorContext, input: OwnershipRequestInput): Promise<OwnershipTransfer>;
+  accept(ctx: ActorContext, id: string): Promise<OwnershipTransfer>;
+  confirmWithCode(ctx: ActorContext, id: string, code: string): Promise<OwnershipTransfer>;
+  complete(ctx: ActorContext, id: string): Promise<OwnershipTransfer>;
+  cancel(ctx: ActorContext, id: string): Promise<OwnershipTransfer>;
+  /** Only transfers the actor is part of, on their own side. */
+  list(ctx: ActorContext): Promise<OwnershipTransfer[]>;
+}
+
 export interface DataStore {
   pricing: PricingService;
+  ownership: OwnershipService;
   clients: WriteRepo<Client>;
   sites: RemovableRepo<Site>;
   teams: RemovableRepo<Team>;
