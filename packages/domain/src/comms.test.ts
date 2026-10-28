@@ -109,7 +109,11 @@ describe('maintenance flags', () => {
     const w = win(31, ['staff', 'client', 'provider'], '2026-03-10T12:00:00.000Z', '2026-03-10T14:00:00.000Z');
     const off = { staff: false, client: false, provider: false };
     expect(maintenanceFlags([w], fixedClock('2026-03-10T11:59:59.000Z'))).toEqual(off);
-    expect(maintenanceFlags([w], fixedClock('2026-03-10T12:00:00.000Z'))).toEqual({ staff: true, client: true, provider: true });
+    expect(maintenanceFlags([w], fixedClock('2026-03-10T12:00:00.000Z'))).toEqual({
+      staff: true,
+      client: true,
+      provider: true,
+    });
     expect(maintenanceFlags([w], fixedClock('2026-03-10T14:00:00.000Z'))).toEqual(off);
   });
 });
