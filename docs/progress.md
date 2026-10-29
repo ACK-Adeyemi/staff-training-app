@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M5
 Milestone base commit: 431ae38
-Next step: M5 chunk 6 (Polish staff strings, 6a then 6b) per docs/plans/m5.md. Then 7, 8, 9-10, 11-12, 13-15. Full check.sh not yet run since chunk 3 (do after chunk 6). Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn.
+Next step: M5 chunk 7 (translated sample module) per docs/plans/m5.md. Then 8, 9-10, 11-12, 13-15. Full check.sh not yet run since chunk 3 (do after chunk 8). Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn.
 
 ## Milestones
 - [x] M0 Foundations
