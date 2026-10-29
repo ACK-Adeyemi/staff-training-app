@@ -956,3 +956,11 @@ Chunk 1 choices:
 - The seeded live announcement "Fire evacuation template" now shows in the staff shell, so the three S13 notification tests that searched the whole page for /Fire evacuation/ now search inside `<main>`. Their expectations are unchanged.
 - `systemBanners.test.tsx`: only its 7 lint errors were fixed (braces on arrow functions, unnecessary `?.` and `as string`). No expectation was changed.
 - `routes.test.tsx` provider `/provider/comms` ("Comms" heading) already failed before this chunk (P14 heading is not "Comms"); not touched here.
+
+## M4 chunk 15a: P18 Team and roles
+
+- The page is `Team` in apps/web/src/pages/provider/ProviderTeam.tsx at /provider/team. The nav label stays "Team and security" (`nav.provider.teamSecurity`) and the page h1 is "Team and roles", so routes.test.tsx and e2e/routes.ts now expect that heading for this route (as for P7, P11 and P14). The unused `page()` placeholder helper in routes.tsx was removed.
+- Fix to a test (not a weakening): the seeded transfer in providerTeam.test.tsx used id 'transfer-ready', which the schema refuses (ids are 26-character ULIDs). It now uses a valid id; assertions are unchanged.
+- The Start transfer form stays on screen while a transfer is open (the tests look for its fields afterwards); its button is disabled until the open transfer is done or cancelled.
+- Extra keys beyond the test contract: area names, `changeError`, `saveError`, `cancelEdit`, `chooseRole`, `none`, `grantedDirectly`, `transfer.accept`, `transfer.error`, `transfer.status.confirmedOne` and `.ready` (shown once cooling-off has ended). The transfer region also shows for someone with an open transfer but no owner.transfer, so the receiver can accept it.
+- Owner and Co-Owner are left out of the invite and change-role lists (not just disabled) for people without owner.manageOwnerRoles; the data layer still refuses them independently.

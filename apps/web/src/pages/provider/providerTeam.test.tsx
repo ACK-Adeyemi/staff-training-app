@@ -395,7 +395,7 @@ describe('P18 Team and roles: ownership transfer', () => {
         const admin = (dump['roles'] as Role[]).find((r) => r.system && r.systemKey === 'providerAdmin')!;
         const past = new Date(new Date(TODAY).getTime() - 3_600_000).toISOString();
         const t: OwnershipTransfer = {
-          id: 'transfer-ready',
+          id: '01HZX0000000000000000TRANS',
           side: 'provider',
           fromUserId: keys.users['providerOwner'],
           toUserId: keys.users['sophie'],

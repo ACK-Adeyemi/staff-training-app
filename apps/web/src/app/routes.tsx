@@ -1,6 +1,5 @@
 import type { RouteObject } from 'react-router';
-import type { MessageKey } from '@sta/content';
-import { NotFound, Placeholder } from '../pages/pages';
+import { NotFound } from '../pages/pages';
 import { Landing } from '../demo/pages/Landing';
 import { Outbox } from '../demo/pages/Outbox';
 import { RootLayout } from '../demo/RootLayout';
@@ -41,11 +40,6 @@ import { Overview } from '../pages/provider/Overview';
 import { Clients } from '../pages/provider/Clients';
 import { ClientDetail } from '../pages/provider/ClientDetail';
 import { RouteError } from './RouteError';
-
-const page = (path: string, title: MessageKey, body: MessageKey): RouteObject => ({
-  path,
-  element: <Placeholder titleKey={title} bodyKey={body} />,
-});
 
 // S14 to S16 for staff and C23 for admins: the same components, told apart by the signed-in side.
 const helpRoutes: RouteObject[] = [
@@ -281,7 +275,10 @@ export const routes: RouteObject[] = [
             path: 'status',
             lazy: async () => ({ Component: (await import('../pages/provider/Status')).Status }),
           },
-          page('team', 'nav.provider.teamSecurity', 'placeholder.provider.teamSecurity'),
+          {
+            path: 'team',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProviderTeam')).Team }),
+          },
         ],
       },
       { path: '*', element: <NotFound /> },
