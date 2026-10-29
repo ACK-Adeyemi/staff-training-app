@@ -1,6 +1,6 @@
 // Learning schemas (build pack 6, plan Chunk 2): link safety, question refines, quiz settings, module keys.
 import { describe, expect, it } from 'vitest';
-import { learnMoreLinkSchema, moduleSchema, questionSchema, quizSettingsSchema } from './learning';
+import { learnMoreLinkSchema, lessonSchema, moduleSchema, questionSchema, quizSettingsSchema } from './learning';
 import { bank, mcq, moduleWith, scenario, settings, trueFalse } from '../quiz/testFixtures';
 
 const goodLink = {
@@ -182,5 +182,44 @@ describe('moduleSchema', () => {
 
   it('refuses a local key that is not lower-case kebab', () => {
     expect(moduleSchema.safeParse(moduleWith([mcq('Bad_Key')])).success).toBe(false);
+  });
+});
+
+// M5 chunk 1, F-7: optional AI-drafted flags on lessons and questions (brief 20.7).
+describe('AI-drafted flags', () => {
+  const REVIEWER = '01HZX0000000000000000000C1';
+  const lesson = { id: 'l1', title: 'Lesson', minutes: 3, blocks: [] };
+
+  it('keeps existing lessons and questions valid without the flags', () => {
+    expect(lessonSchema.safeParse(lesson).success).toBe(true);
+    expect(questionSchema.safeParse(trueFalse('q1')).success).toBe(true);
+  });
+  it('keeps aiDrafted and aiReviewedBy on a lesson', () => {
+    const r = lessonSchema.safeParse({ ...lesson, aiDrafted: true, aiReviewedBy: REVIEWER });
+    expect(r.success).toBe(true);
+    expect(r.data).toMatchObject({ aiDrafted: true, aiReviewedBy: REVIEWER });
+  });
+  it('keeps aiDrafted and aiReviewedBy on a question', () => {
+    const r = questionSchema.safeParse({ ...trueFalse('q2'), aiDrafted: true, aiReviewedBy: REVIEWER });
+    expect(r.success).toBe(true);
+    expect(r.data).toMatchObject({ aiDrafted: true, aiReviewedBy: REVIEWER });
+  });
+  it('rejects a non-boolean aiDrafted on a lesson and on a question', () => {
+    expect(lessonSchema.safeParse({ ...lesson, aiDrafted: 'yes' }).success).toBe(false);
+    expect(questionSchema.safeParse({ ...trueFalse('q3'), aiDrafted: 'yes' }).success).toBe(false);
+  });
+  it('rejects an aiReviewedBy that is not an id', () => {
+    expect(lessonSchema.safeParse({ ...lesson, aiDrafted: true, aiReviewedBy: 'not an id' }).success).toBe(false);
+    expect(questionSchema.safeParse({ ...trueFalse('q4'), aiDrafted: true, aiReviewedBy: '' }).success).toBe(false);
+  });
+  it('carries the flags through a whole module', () => {
+    const m = {
+      ...moduleWith([{ ...trueFalse('q5'), aiDrafted: true, aiReviewedBy: REVIEWER }]),
+      lessons: [{ ...lesson, aiDrafted: true }],
+    };
+    const r = moduleSchema.safeParse(m);
+    expect(r.success).toBe(true);
+    expect(r.data?.lessons[0]?.aiDrafted).toBe(true);
+    expect(r.data?.questions[0]?.aiReviewedBy).toBe(REVIEWER);
   });
 });
