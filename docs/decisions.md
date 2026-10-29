@@ -929,3 +929,7 @@ Chunk 1 choices:
 - **P12 gaps.** Re-tag, merge and link on the ticket detail are not built either.
 - Both are carried to docs/progress.md Known issues.
 - The P13 page shows nothing but a loading line until its first data arrives, so the heading never appears over an empty page.
+
+## M4 chunk 14a: incidents and data requests services
+
+`store.incidents` (list, post, update need `incidents.post`; `current` is open to any signed-in actor, including limited accounts) and `store.dataRequests` (`dataRequests.manage`) are in `packages/data/src/providerIncidentsOps.ts`, provider side only. Checks run in the order permission, validation, existence/state (NotFound, then RuleError `notApplicable` for a resolved incident or a non-open request). `dueAt` is `addMonths(receivedAt, 1)`; `dueInDays` is calendar days from the Clock in London time (negative when overdue). Reject appends its reason to `notes`. The overall status is the highest-severity unresolved incident (newest wins a tie), else Normal with no title. Audit holds ids, level, status and kind only. No new language strings were needed.

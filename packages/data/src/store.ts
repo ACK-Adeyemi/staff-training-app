@@ -23,6 +23,7 @@ import { createOwnershipOperations } from './ownershipOps';
 import { createProviderTeamOperations } from './providerTeamOps';
 import { createProviderTicketOperations } from './providerTicketOps';
 import { createProviderCommsOperations } from './providerCommsOps';
+import { createProviderIncidentsOperations } from './providerIncidentsOps';
 import { createProviderRecoveryOperations } from './providerRecoveryOps';
 import { createPricingOperations } from './pricingOps';
 import { createDunningOperations } from './dunningOps';
@@ -306,6 +307,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const providerTeam = createProviderTeamOperations(backend, options);
   const providerTicketOps = createProviderTicketOperations(backend, options);
   const commsOps = createProviderCommsOperations(backend, options);
+  const incidentOps = createProviderIncidentsOperations(backend, options);
   const recoveryOps = createProviderRecoveryOperations(backend, options);
   const dunningOps = createDunningOperations(backend, options);
   const overviewOps = createProviderOverviewOperations(backend, options);
@@ -351,6 +353,8 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     savedReplies: providerTicketOps.savedReplies,
     otherEntries: providerTicketOps.otherEntries,
     providerComms: commsOps.providerComms,
+    incidents: incidentOps.incidents,
+    dataRequests: incidentOps.dataRequests,
     maintenance: commsOps.maintenance,
     linkCheck: commsOps.linkCheck,
     learnMore: commsOps.learnMore,

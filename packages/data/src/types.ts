@@ -2,6 +2,8 @@
 import type {
   AccountState,
   Announcement,
+  DataRequest,
+  Incident,
   ErrorGroup,
   HealthScore,
   LocalTelemetryEntry,
@@ -1092,11 +1094,39 @@ export interface BillingChangesService {
   decline(ctx: ActorContext, id: string, reason: string): Promise<BillingChangeRequest>;
 }
 
+/** Provider incident notices (M4 chunk 14a). list, post and update need incidents.post; current is open to any signed-in actor. */
+export interface IncidentsService {
+  list(ctx: ActorContext): Promise<Incident[]>;
+  post(
+    ctx: ActorContext,
+    input: { level: Incident['level']; title: string; message: string; status?: Incident['updates'][number]['status'] },
+  ): Promise<Incident>;
+  update(
+    ctx: ActorContext,
+    id: string,
+    input: { status: Incident['updates'][number]['status']; message: string },
+  ): Promise<Incident>;
+  current(ctx: ActorContext): Promise<{ level: Incident['level']; title?: string; message?: string }>;
+}
+
+/** The data request log (M4 chunk 14a). Provider side only; needs dataRequests.manage. */
+export interface DataRequestsService {
+  list(ctx: ActorContext): Promise<(DataRequest & { dueInDays: number })[]>;
+  create(
+    ctx: ActorContext,
+    input: { kind: DataRequest['kind']; requester: string; clientId?: string; notes: string; receivedAt?: string },
+  ): Promise<DataRequest>;
+  complete(ctx: ActorContext, id: string, input: { evidence: string }): Promise<DataRequest>;
+  reject(ctx: ActorContext, id: string, input: { notes: string }): Promise<DataRequest>;
+}
+
 export interface DataStore {
   recovery: RecoveryService;
   profileChanges: ProfileChangesService;
   billingChanges: BillingChangesService;
   providerComms: ProviderCommsService;
+  incidents: IncidentsService;
+  dataRequests: DataRequestsService;
   maintenance: MaintenanceService;
   linkCheck: LinkCheckService;
   learnMore: LearnMoreService;

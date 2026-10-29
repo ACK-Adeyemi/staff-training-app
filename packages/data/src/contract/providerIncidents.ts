@@ -35,7 +35,7 @@ type NewDataRequest = {
   requester: string;
   clientId?: string;
   notes: string;
-  receivedAt?: string;
+  receivedAt?: string | undefined;
 };
 type IncidentsStore = {
   incidents: {
