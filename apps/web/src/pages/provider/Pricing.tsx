@@ -242,16 +242,19 @@ function NewChange({ clients, onDone }: { clients: Client[]; onDone: (message: s
         ? several
         : [one || clients[0]?.clientId].filter((x): x is string => !!x);
   const number = Number(value);
+  const noticeDays =
+    notice.trim() !== '' && Number.isInteger(Number(notice)) && Number(notice) >= 0 ? Number(notice) : null;
   const input = (): PricingDraftInput => ({
     clientIds,
     scope: scope === 'addOn' ? { kind: 'addOn', addOnId: addOnId || addOns[0]?.id || '' } : { kind: scope },
     type: type === 'override' ? 'override' : 'percent',
     value: type === 'override' ? Math.round(number * 100) : type === 'discount' ? -number : number,
     reason,
-    noticeDays: Math.max(0, Math.round(Number(notice) || 0)),
+    noticeDays: noticeDays ?? 0,
     ...(endsAt ? { endsAt: `${endsAt}T00:00:00.000Z` } : {}),
   });
-  const valid = clientIds.length > 0 && value.trim() !== '' && Number.isFinite(number) && number >= 0;
+  const valid =
+    noticeDays !== null && clientIds.length > 0 && value.trim() !== '' && Number.isFinite(number) && number >= 0;
 
   const previewing = useMutation({
     mutationFn: () => store.pricing.preview(actor, input()),
@@ -420,10 +423,18 @@ function NewChange({ clients, onDone }: { clients: Client[]; onDone: (message: s
           step={1}
           className={fieldClass}
           value={notice}
+          aria-invalid={noticeDays === null}
+          aria-describedby={noticeDays === null ? 'price-notice-days-error' : undefined}
           onChange={(e) => {
             setNotice(e.target.value);
+            setPreview(null);
           }}
         />
+        {noticeDays === null ? (
+          <span id="price-notice-days-error" role="alert" className="font-normal">
+            {t('provider.pricing.noticeInvalid')}
+          </span>
+        ) : null}
       </label>
       <label className="grid gap-1 font-semibold">
         {t('provider.pricing.endsAt')}

@@ -8,6 +8,7 @@ import {
   previewAdjustment,
   priceFor,
   replacedBy,
+  supersede,
   submitAdjustment,
 } from './index';
 
@@ -145,8 +146,7 @@ describe('invoiceLinesFor', () => {
     expect(lines).toHaveLength(2);
     expect(lines[0]).toEqual({ label: 'Standard plan', amount: 10000 });
     expect(lines[1]?.amount).toBe(-1000);
-    expect(lines[1]?.label.toLowerCase()).toContain('loyalty');
-    expect(lines[1]?.label).toContain('minus 10 per cent');
+    expect(lines[1]?.adjustment).toEqual({ reason: 'loyalty', direction: 'discount', type: 'percent', value: -10 });
     const total = lines.reduce((s, l) => s + l.amount, 0);
     expect(total).toBe(priceFor({ listPrice: 10000, scope: a.scope, adjustments: [a], at: AT }));
   });
@@ -156,5 +156,71 @@ describe('invoiceLinesFor', () => {
     expect(invoiceLinesFor({ listPrice: 10000, adjustments: [a], at: AT, label: 'Standard plan' })).toEqual([
       { label: 'Standard plan', amount: 10000 },
     ]);
+  });
+});
+
+describe('supersede', () => {
+  const old = adj({
+    id: 'old',
+    status: 'active',
+    effectiveAt: '2026-10-01T00:00:00.000Z',
+    confirmedBy: 'u2',
+    clientIds: ['client-1', 'client-2'],
+    value: -20,
+  });
+  const incoming = adj({
+    id: 'new',
+    status: 'scheduled',
+    effectiveAt: '2026-12-01T00:00:00.000Z',
+    confirmedBy: 'u2',
+    value: -5,
+  });
+  let n = 0;
+  const newId = () => `copy-${String(++n)}`;
+
+  it('ends a fully replaced change at the new effective date, so the old price holds during notice', () => {
+    const only = { ...old, clientIds: ['client-1'] };
+    const { updates, replacedIds } = supersede([only], incoming, newId);
+    expect(replacedIds).toEqual(['old']);
+    expect(updates).toEqual([{ ...only, endsAt: incoming.effectiveAt }]);
+    const price = (at: string) =>
+      priceFor({ listPrice: 10000, scope: only.scope, adjustments: [...updates, incoming], at });
+    expect(price('2026-11-15T00:00:00.000Z')).toBe(8000);
+    expect(price('2026-12-01T00:00:00.000Z')).toBe(9500);
+  });
+
+  it('with partial client overlap, the other clients stay on the old change and the overlap ends at the switch', () => {
+    const { updates } = supersede([old], incoming, newId);
+    const kept = updates.find((u) => u.id === 'old');
+    const copy = updates.find((u) => u.id !== 'old');
+    expect(kept).toMatchObject({ clientIds: ['client-2'] });
+    expect(kept?.endsAt).toBeUndefined();
+    expect(copy).toMatchObject({ clientIds: ['client-1'], endsAt: incoming.effectiveAt, value: -20 });
+  });
+
+  it('a change that has not started yet and would start later never applies', () => {
+    const later = {
+      ...old,
+      clientIds: ['client-1'],
+      status: 'scheduled' as const,
+      effectiveAt: '2026-12-15T00:00:00.000Z',
+    };
+    expect(supersede([later], incoming, newId).updates).toEqual([{ ...later, status: 'ended' }]);
+  });
+
+  it('leaves a change that already ends before the switch alone', () => {
+    const ending = { ...old, clientIds: ['client-1'], endsAt: '2026-11-20T00:00:00.000Z' };
+    expect(supersede([ending], incoming, newId)).toEqual({ updates: [], replacedIds: [] });
+  });
+});
+
+describe('confirming with an end date', () => {
+  it('refuses an end date on or before the effective date', () => {
+    expect(() =>
+      confirmAdjustment(adj({ status: 'submitted', endsAt: '2026-11-20T00:00:00.000Z' }), {
+        confirmerId: 'u2',
+        confirmedAt: CONFIRMED,
+      }),
+    ).toThrow();
   });
 });

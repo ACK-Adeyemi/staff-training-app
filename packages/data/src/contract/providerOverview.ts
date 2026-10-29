@@ -209,6 +209,18 @@ export function runProviderOverviewContract(
       expect(listed.map((e) => e.at)).toEqual([later, TODAY]);
     });
 
+    it('lists only the newest 200 local telemetry entries', async () => {
+      const t = await setup();
+      for (let i = 0; i < 205; i += 1) {
+        await t.s.telemetry.recordLocalEvent({ name: `event.${String(i)}` });
+        t.advance(1000);
+      }
+      const listed = await t.s.telemetry.listLocal(t.owner);
+      expect(listed).toHaveLength(200);
+      expect(listed[0]!.name).toBe('event.204');
+      expect(listed[199]!.name).toBe('event.5');
+    });
+
     it('stores local telemetry in the localTelemetry store on this device and not in the seed', async () => {
       const t = await setup();
       expect(await t.dump('localTelemetry')).toEqual([]);

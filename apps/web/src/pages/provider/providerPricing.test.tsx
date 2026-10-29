@@ -196,6 +196,25 @@ describe('P25 Price changes: new change and preview', () => {
     expect(rows).toHaveLength(clients.length);
   });
 
+  it('asks for a whole number of notice days when the field is blank or not a whole number, and blocks the buttons', async () => {
+    const view = await openP25();
+    const keys = await openForm(view);
+    await fillOneClient(keys.littleAcorns, 'discount', '12');
+    const notice = screen.getByRole('spinbutton', { name: 'Notice days' });
+    await userEvent.clear(notice);
+    expect((await screen.findByRole('alert')).textContent).toBe(
+      'Enter the notice as a whole number of days, 0 or more.',
+    );
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Preview' }).disabled).toBe(true);
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Save draft' }).disabled).toBe(true);
+    await userEvent.type(notice, '2.5');
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Save draft' }).disabled).toBe(true);
+    await userEvent.clear(notice);
+    await userEvent.type(notice, '14');
+    expect(screen.queryByText('Enter the notice as a whole number of days, 0 or more.')).toBeNull();
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Save draft' }).disabled).toBe(false);
+  });
+
   it('previews only the ticked clients for Several clients', async () => {
     const view = await openP25();
     const keys = await openForm(view);

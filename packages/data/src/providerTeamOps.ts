@@ -145,6 +145,7 @@ export function createProviderTeamOperations(backend: RawBackend, options: Store
             name: u.displayName,
             email: u.email ?? '',
             status: u.status,
+            roleIds: [...new Set(ids)].filter((id) => roles.some((r) => r.id === id)),
             roleNames: [...new Set(ids)].flatMap((id) => roles.find((r) => r.id === id)?.name ?? []),
           };
         });

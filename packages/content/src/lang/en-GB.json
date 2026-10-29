@@ -271,7 +271,10 @@
       "invoice": "Your next invoice",
       "percent": "{what} changes by {amount} from {date}.",
       "amount": "{what} changes to {amount} from {date}.",
-      "until": "This lasts until {date}."
+      "until": "This lasts until {date}.",
+      "emailSubject": "A change to your price",
+      "emailBody": "Your price will change from {oldPrice} to {newPrice} from {date}. Invoices already issued are not changed.",
+      "emailAsk": "To ask about this change, reply to this email or raise a ticket from Help."
     },
     "status": {
       "overdue": "Overdue",
@@ -2478,6 +2481,23 @@
     "title": "Plan and billing",
     "plan": "Your plan",
     "price": "{amount} a month",
+    "listPrice": "List price: {amount} a month",
+    "yourPrice": "Your price: {amount} a month",
+    "adjustment": {
+      "discount": "{reason} discount, {detail}: {amount}",
+      "increase": "{reason} increase, {detail}: {amount}",
+      "minus": "minus {size} per cent",
+      "plus": "plus {size} per cent",
+      "fixed": "fixed price",
+      "reason": {
+        "loyalty": "Loyalty",
+        "retention": "Retention",
+        "introductory": "Introductory offer",
+        "annualReview": "Annual review",
+        "correction": "Correction",
+        "other": "Price change"
+      }
+    },
     "nextInvoice": "Next invoice on {date}",
     "invoices": "Invoices",
     "invoice": "Invoice {number}",
@@ -3935,6 +3955,7 @@
     },
     "pricing": {
       "heading": "Price changes",
+      "noticeInvalid": "Enter the notice as a whole number of days, 0 or more.",
       "noAccess": "You do not have access to price changes.",
       "loadError": "Could not load price changes.",
       "failed": "That did not work. Please try again.",

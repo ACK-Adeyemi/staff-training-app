@@ -1,7 +1,7 @@
 // M4 chunk 8b contract tests: account recovery, organisation name changes and billing detail change requests
 // (plan docs/plans/m4.md chunk 8, BP-2 and BP-12 data parts). Written before the implementation, so the new services
 // are described by local types. All of them are provider side only; every customer actor is Forbidden.
-//   - store.recovery (domain recovery.ts over the Clock, 24 hours cooling off):
+//   - store.recovery (domain recovery.ts over the Clock, 48 hours cooling off):
 //       list(ctx) -> RecoveryRequest[]                          needs recovery.start
 //       request(ctx, { clientId, subjectUserId, reason, outcome? }) -> RecoveryRequest   recovery.start, requester = ctx.userId
 //       approve(ctx, id) / complete(ctx, id)                    need recovery.approve
@@ -179,7 +179,7 @@ export function runProviderRecoveryContract(
 
   describe(`M4 provider recovery and profile changes: ${name}`, () => {
     // ------------------------------------------------------------------ A) recovery
-    it('opens a recovery request with the requester, the 24 hour cooling off and no approvals', async () => {
+    it('opens a recovery request with the requester, the 48 hour cooling off and no approvals', async () => {
       const t = await setup();
       const r = await newRecovery(t);
       expect(r).toMatchObject({
@@ -189,9 +189,18 @@ export function runProviderRecoveryContract(
         approvals: [],
         status: 'open',
         outcome: 'reset2fa',
-        coolingOffEndsAt: new Date(Date.parse(TODAY) + DAY).toISOString(),
+        coolingOffEndsAt: new Date(Date.parse(TODAY) + 2 * DAY).toISOString(),
       });
       expect((await t.s.recovery.list(t.support)).map((x) => x.id)).toContain(r.id);
+    });
+
+    it('starts the waiting period at the second approval, not at the request', async () => {
+      const t = await setup();
+      const r = await newRecovery(t);
+      await t.s.recovery.approve(t.owner, r.id);
+      t.advance(DAY);
+      const done = await t.s.recovery.approve(t.meganCtx, r.id);
+      expect(done.coolingOffEndsAt).toBe(new Date(Date.parse(TODAY) + 3 * DAY).toISOString());
     });
 
     it('needs two different approvers: the same approver twice is refused with a rule error', async () => {
@@ -241,7 +250,7 @@ export function runProviderRecoveryContract(
       await ruleOf(t.s.recovery.complete(t.owner, r.id));
       await t.s.recovery.approve(t.meganCtx, r.id);
       await ruleOf(t.s.recovery.complete(t.owner, r.id));
-      t.advance(DAY - 1000);
+      t.advance(2 * DAY - 1000);
       await ruleOf(t.s.recovery.complete(t.owner, r.id));
       const stored = (await t.dump<UserAccount>('users')).find((x) => x.id === t.u.priya)!;
       expect(stored.twoFactor).toBeDefined();
@@ -250,7 +259,7 @@ export function runProviderRecoveryContract(
     it('completes after the cooling off, marks it done and clears the subject two-step enrolment', async () => {
       const t = await setup();
       const r = await approved(t);
-      t.advance(DAY + 1000);
+      t.advance(2 * DAY + 1000);
       expect(await t.s.recovery.complete(t.owner, r.id)).toMatchObject({ id: r.id, status: 'done' });
       const stored = (await t.dump<UserAccount>('users')).find((x) => x.id === t.u.priya)!;
       expect(stored.twoFactor).toBeUndefined();
@@ -269,7 +278,7 @@ export function runProviderRecoveryContract(
     it('audits every recovery step with ids only and never the reason', async () => {
       const t = await setup();
       const r = await approved(t);
-      t.advance(DAY + 1000);
+      t.advance(2 * DAY + 1000);
       await t.s.recovery.complete(t.owner, r.id);
       const other = await newRecovery(t);
       await t.s.recovery.reject(t.support, other.id);

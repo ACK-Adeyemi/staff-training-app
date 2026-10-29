@@ -591,6 +591,16 @@ export type BillingOverview = {
   packageId: Id;
   /** Package band price per site for the active staff count, times active sites (assumption 41). Pence. */
   planPrice: { perSite: number; sites: number; total: number };
+  /** What the organisation pays after any price change in force now (pence). Equals planPrice.total when none applies. */
+  yourPrice: number;
+  /** The separate discount or increase line, as codes the screen words from the language file. amount is signed pence. */
+  adjustment?: {
+    reason: PriceAdjustment['reason'];
+    direction: 'discount' | 'increase';
+    type: PriceAdjustment['type'];
+    value: number;
+    amount: number;
+  };
   period: 'monthly' | 'annual';
   state: AccountState;
   renewalAt: string;
@@ -893,6 +903,7 @@ export type ProviderTeamMember = {
   name: string;
   email: string;
   status: string;
+  roleIds: string[];
   roleNames: string[];
 };
 export type ProviderRoleInput = { name: string; description: string; permissionIds: string[] };

@@ -10,7 +10,14 @@
 //   - effectivePrice(ctx, clientId, listPrice, scope) reads the clock from ctx.now.
 import { describe, expect, it } from 'vitest';
 import { createRng, fixedClock, previewAdjustment, type Invoice, type PriceAdjustment } from '@sta/domain';
-import { ForbiddenError, type ActorContext, type StoreHandle, type StoreName, type StoreOptions } from '../types';
+import {
+  ForbiddenError,
+  ValidationError,
+  type ActorContext,
+  type StoreHandle,
+  type StoreName,
+  type StoreOptions,
+} from '../types';
 import { refusal, ruleOf } from './learning';
 import { buildWorld, freshId, TODAY } from './world';
 
@@ -187,6 +194,8 @@ export function runPricingContract(name: string, makeStore: (options: StoreOptio
       await confirmed(s, { clientIds: [s.a, b], type: 'percent', value: 10 });
       const sent = (await s.admin.listOutbox()).slice(before);
       expect(sent).toHaveLength(2);
+      expect(sent[0]!.body).toMatch(/from £[\d.]+ to £[\d.]+ from \d{4}-\d{2}-\d{2}/);
+      expect(sent[0]!.body).toContain('To ask about this change');
       const users = await s.dump<{ id: string; email: string }>('users');
       const subs = await s.dump<{ clientId: string; billingContact: string }>('subscriptions');
       for (const [clientId, ownerId] of [
@@ -228,6 +237,58 @@ export function runPricingContract(name: string, makeStore: (options: StoreOptio
       expect(all.find((x) => x.id === second.id)!.status).toBe('scheduled');
       expect(await s.priceAt(later(31))).toBe(4500);
       expect(await s.priceAt(later(90))).toBe(4500);
+    });
+
+    const confirmAt = async (s: Awaited<ReturnType<typeof setup>>, days: number, patch: Partial<PricingDraftInput>) => {
+      const draft = await s.store.pricing.draft(s.provider('raj', later(days)), { ...s.input, ...patch });
+      await s.store.pricing.submit(s.provider('raj', later(days)), draft.id);
+      return s.store.pricing.confirm(s.provider('providerOwner', later(days)), draft.id, CODE);
+    };
+    const priceOf = (s: Awaited<ReturnType<typeof setup>>, clientId: string, days: number) =>
+      s.store.pricing.effectivePrice(s.provider('providerOwner', later(days)), clientId, LIST_PRICE, PLAN);
+
+    it('keeps the old price until the replacement starts, so there is no gap during the notice period', async () => {
+      const s = await setup();
+      const first = await confirmAt(s, 0, { value: 4000 });
+      const second = await confirmAt(s, 40, { value: 4500 });
+      expect(second.effectiveAt).toBe(later(70));
+      const stored = (await s.store.pricing.list(s.owner)).find((x) => x.id === first.id)!;
+      expect(stored.endsAt).toBe(later(70));
+      expect(await priceOf(s, s.a, 35)).toBe(4000);
+      expect(await priceOf(s, s.a, 50)).toBe(4000);
+      expect(await priceOf(s, s.a, 69)).toBe(4000);
+      expect(await priceOf(s, s.a, 70)).toBe(4500);
+    });
+
+    it('with partial client overlap, only the overlapping clients move to the new change', async () => {
+      const s = await setup();
+      const b = s.fx.ids.clients.b;
+      await confirmAt(s, 0, { clientIds: [s.a, b], value: 4000 });
+      await confirmAt(s, 40, { clientIds: [s.a], value: 4500 });
+      expect(await priceOf(s, s.a, 50)).toBe(4000);
+      expect(await priceOf(s, s.a, 70)).toBe(4500);
+      expect(await priceOf(s, b, 50)).toBe(4000);
+      expect(await priceOf(s, b, 90)).toBe(4000);
+      expect(await priceOf(s, b, 200)).toBe(4000);
+    });
+
+    it('refuses an end date that is not after the date the change starts', async () => {
+      const s = await setup();
+      await expect(s.store.pricing.draft(s.raj, { ...s.input, endsAt: later(30) })).rejects.toBeInstanceOf(
+        ValidationError,
+      );
+      await expect(s.store.pricing.draft(s.raj, { ...s.input, endsAt: later(31) })).resolves.toMatchObject({
+        status: 'draft',
+      });
+    });
+
+    it('warns about a fixed price that raises the price by more than a fifth, and about one below the floor', async () => {
+      const s = await setup();
+      const current = (await s.store.pricing.preview(s.owner, { ...s.input, value: 1 })).rows[0]!.currentPrice;
+      const high = await s.store.pricing.preview(s.owner, { ...s.input, value: Math.ceil(current * 1.3) });
+      expect(high.warnings).toContain('increaseOver20');
+      const low = await s.store.pricing.preview(s.owner, { ...s.input, value: 100 });
+      expect(low.warnings).toContain('belowFloor');
     });
 
     it('leaves issued invoices byte-for-byte unchanged through draft, confirm and cancel', async () => {

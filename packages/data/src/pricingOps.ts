@@ -9,9 +9,12 @@ import {
   previewAdjustment,
   priceAdjustmentSchema,
   priceFor,
-  replacedBy,
+  supersede,
+  DEFAULT_NOTICE_DAYS,
+  effectiveDateFor,
   submitAdjustment,
   type AddOn,
+  type AddOnSubscription,
   type Client,
   type OutboxMessage,
   type Package,
@@ -23,6 +26,7 @@ import {
   type Subscription,
   type UserAccount,
 } from '@sta/domain';
+import { createT, languages } from '@sta/content';
 import type { RawBackend, WriteOp } from './backend';
 import { audit, beginCall, forbid, holds, type Call } from './policy';
 import {
@@ -41,6 +45,9 @@ const READ = ['billing.read', DRAFT, CONFIRM];
 
 const put = (store: WriteOp['store'], key: string, record: unknown): WriteOp => ({ type: 'put', store, key, record });
 const text = (v: unknown): string => (typeof v === 'string' ? v : '');
+// Placeholder lowest monthly price (£10.00) that raises the below-floor warning until the real floor is decided.
+const PLACEHOLDER_FLOOR_PENCE = 1000;
+const say = createT(languages['en-GB'].messages);
 const pounds = (pence: number): string => `£${(pence / 100).toFixed(2)}`;
 
 export function createPricingOperations(backend: RawBackend, options: StoreOptions): PricingService {
@@ -77,13 +84,24 @@ export function createPricingOperations(backend: RawBackend, options: StoreOptio
       type: i.type,
       value: i.value,
       reason: i.reason,
-      noticeDays: i.noticeDays ?? 30,
+      noticeDays: i.noticeDays ?? DEFAULT_NOTICE_DAYS,
       status: 'draft',
       createdBy: call.actor.user.id,
     };
     if (i.endsAt !== undefined) raw['endsAt'] = input.endsAt;
     if (i.note !== undefined) raw['note'] = input.note;
     const parsed = priceAdjustmentSchema.safeParse(raw);
+    const firstEffective = effectiveDateFor(
+      call.actor.ctx.now,
+      typeof raw['noticeDays'] === 'number' ? raw['noticeDays'] : 0,
+    );
+    if (
+      parsed.success &&
+      parsed.data.endsAt !== undefined &&
+      Date.parse(parsed.data.endsAt) <= Date.parse(firstEffective)
+    ) {
+      throw new ValidationError(['endsAt: the end date must be after the change starts']);
+    }
     if (!parsed.success) {
       throw new ValidationError(parsed.error.issues.map((i) => `${i.path.map(String).join('.')}: ${i.message}`));
     }
@@ -95,7 +113,24 @@ export function createPricingOperations(backend: RawBackend, options: StoreOptio
       const addOn = await call.find<AddOn>('addOns', scope.addOnId);
       return addOn?.pricing.kind === 'flat' ? addOn.pricing.price : 0;
     }
-    if (scope.kind === 'invoice') return 0;
+    const plan = await planListPrice(call, clientId);
+    if (scope.kind === 'invoice') {
+      // The whole monthly invoice: the plan plus each active flat-price add-on.
+      const subs = (await call.all<AddOnSubscription>('addOnSubscriptions')).filter(
+        (s) =>
+          s.clientId === clientId && s.status !== 'off' && (s.endsAt === undefined || s.endsAt > call.actor.ctx.now),
+      );
+      let total = plan;
+      for (const s of subs) {
+        const addOn = await call.find<AddOn>('addOns', s.addOnId);
+        if (addOn?.pricing.kind === 'flat') total += addOn.pricing.price;
+      }
+      return total;
+    }
+    return plan;
+  }
+
+  async function planListPrice(call: Call, clientId: string): Promise<number> {
     const sub = (await call.all<Subscription>('subscriptions')).find((s) => s.clientId === clientId);
     const pkg = sub ? await call.find<Package>('packages', sub.packageId) : undefined;
     if (!pkg) return 0;
@@ -117,6 +152,7 @@ export function createPricingOperations(backend: RawBackend, options: StoreOptio
         adjustment: adj,
         at: call.actor.ctx.now,
         existing: existing.filter((e) => e.clientIds.includes(clientId)),
+        floorPence: PLACEHOLDER_FLOOR_PENCE,
       });
       rows.push(...result.rows);
       for (const w of result.warnings) if (!warnings.includes(w)) warnings.push(w);
@@ -125,7 +161,11 @@ export function createPricingOperations(backend: RawBackend, options: StoreOptio
   }
 
   /** One message per client to the billing contact and the Account Owner. */
-  async function noticeFor(call: Call, clientId: string, row: { newPrice: number; effectiveAt: string }) {
+  async function noticeFor(
+    call: Call,
+    clientId: string,
+    row: { currentPrice: number; newPrice: number; effectiveAt: string },
+  ) {
     const sub = (await call.all<Subscription>('subscriptions')).find((s) => s.clientId === clientId);
     const roles = await call.all<Role>('roles');
     const ownerRoles = new Set(roles.filter((r) => r.system && r.systemKey === OWNER_KEYS.client).map((r) => r.id));
@@ -145,8 +185,12 @@ export function createPricingOperations(backend: RawBackend, options: StoreOptio
       id: call.newId(),
       channel: 'email',
       to: to.join(', '),
-      subject: 'A change to your price',
-      body: `Your price will change to ${pounds(row.newPrice)} from ${row.effectiveAt.slice(0, 10)}. Invoices already issued are not changed.`,
+      subject: say('client.priceNotice.emailSubject'),
+      body: `${say('client.priceNotice.emailBody', {
+        oldPrice: pounds(row.currentPrice),
+        newPrice: pounds(row.newPrice),
+        date: row.effectiveAt.slice(0, 10),
+      })} ${say('client.priceNotice.emailAsk')}`,
       at: call.actor.ctx.now,
       reason: 'pricing.increaseNotice',
     };
@@ -193,12 +237,13 @@ export function createPricingOperations(backend: RawBackend, options: StoreOptio
         confirmAdjustment(before, { confirmerId: call.actor.user.id, confirmedAt: ctx.now }),
       );
       const existing = await all(call);
-      const ended = replacedBy(existing, next).map((e): PriceAdjustment => ({ ...e, status: 'ended' }));
-      const ops: WriteOp[] = ended.map((e) => put('priceAdjustments', e.id, e));
+      // The old change keeps applying until this one starts (no gap during notice); see supersede.
+      const { updates, replacedIds } = supersede(existing, next, () => call.newId());
+      const ops: WriteOp[] = updates.map((e) => put('priceAdjustments', e.id, e));
       ops.push(put('priceAdjustments', next.id, next));
       // Notices go out for increases only: the change must raise the price over what the client would pay
       // on the same date without it (replaced changes dropped).
-      const dropped = new Set(ended.map((e) => e.id));
+      const dropped = new Set(replacedIds);
       const kept = existing.filter((e) => !dropped.has(e.id) && e.id !== before.id);
       const { rows } = await previewFor(call, { ...before, status: 'draft' });
       for (const row of rows) {
@@ -219,7 +264,7 @@ export function createPricingOperations(backend: RawBackend, options: StoreOptio
           'pricing.confirm',
           next.id,
           { status: before.status },
-          { status: next.status, effectiveAt: next.effectiveAt, replaced: ended.map((e) => e.id) },
+          { status: next.status, effectiveAt: next.effectiveAt, replaced: replacedIds },
         ),
       );
       await backend.apply(ops);

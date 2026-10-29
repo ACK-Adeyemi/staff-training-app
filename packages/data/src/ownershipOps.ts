@@ -20,7 +20,7 @@ import {
   type UserAccount,
 } from '@sta/domain';
 import type { RawBackend, WriteOp } from './backend';
-import { audit, beginCall, forbid, type Call } from './policy';
+import { audit, beginCall, forbid, holds, type Call } from './policy';
 import {
   NotFoundError,
   RuleError,
@@ -95,7 +95,8 @@ export function createOwnershipOperations(backend: RawBackend, options: StoreOpt
       const mine = (await call.all<RoleAssignment>('roleAssignments')).filter(
         (a) => a.userId === call.actor.user.id && a.status === 'active' && a.roleIds.some((r) => owners.has(r)),
       );
-      if (mine.length === 0) return forbid('permission');
+      // The provider catalogue has owner.transfer; the client catalogue has no such permission (the Account Owner role is the gate).
+      if (mine.length === 0 || (i.side === 'provider' && !holds(call, ['owner.transfer']))) return forbid('permission');
 
       const to = (await call.all<UserAccount>('users')).find((u) => u.id === text(i.toUserId));
       if (!to || to.status !== 'active' || to.side !== call.side || to.clientId !== call.clientId) {

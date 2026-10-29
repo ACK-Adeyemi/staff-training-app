@@ -75,6 +75,17 @@ describe('ownership transfer', () => {
     expect(r.ok).toBe(false);
   });
 
+  it('a late accept and confirm still leaves the full 7 day cooling-off from the confirmation', () => {
+    const a = acceptTransfer(requestTransfer(input, start), input.toUserId, offsetClock(start, 5 * DAY));
+    if (!a.ok) throw new Error('accept failed');
+    const confirmAt = offsetClock(start, 6 * DAY);
+    const c = confirmTransferTwoFactor(a.transfer, input.fromUserId, confirmAt);
+    if (!c.ok) throw new Error('2FA failed');
+    expect(c.transfer.coolingOffEndsAt).toBe(new Date(start.now().getTime() + 13 * DAY).toISOString());
+    expect(completeTransfer(c.transfer, offsetClock(start, 8 * DAY)).ok).toBe(false);
+    expect(completeTransfer(c.transfer, offsetClock(start, 13 * DAY)).ok).toBe(true);
+  });
+
   it('completion is refused without acceptance and 2FA, even after the cooling-off', () => {
     const late = offsetClock(start, 8 * DAY);
     expect(completeTransfer(requestTransfer(input, start), late).ok).toBe(false);

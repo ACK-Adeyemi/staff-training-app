@@ -2,7 +2,7 @@
 import type { Clock } from './clock';
 import type { RecoveryRequest } from './schemas/m4';
 
-export const RECOVERY_COOLING_OFF_HOURS = 24;
+export const RECOVERY_COOLING_OFF_HOURS = 48;
 const HOUR_MS = 60 * 60 * 1000;
 const APPROVALS_NEEDED = 2;
 
@@ -39,15 +39,16 @@ export const approveRecovery = (r: RecoveryRequest, approverUserId: string, cloc
   if (approverUserId === r.requester) return fail('The person who asked for this recovery cannot approve it.');
   if (r.approvals.includes(approverUserId)) return fail('You have already approved this request.');
   const approvals = [...r.approvals, approverUserId];
+  const approved = approvals.length >= APPROVALS_NEEDED;
+  const endsFromNow = new Date(clock.now().getTime() + RECOVERY_COOLING_OFF_HOURS * HOUR_MS).toISOString();
   return {
     ok: true,
     request: {
       ...r,
       approvals,
-      status: approvals.length >= APPROVALS_NEEDED ? 'approved' : 'open',
-      // A request with no waiting period yet (such as the seeded one) starts it now; one already set is kept.
-      coolingOffEndsAt:
-        r.coolingOffEndsAt ?? new Date(clock.now().getTime() + RECOVERY_COOLING_OFF_HOURS * HOUR_MS).toISOString(),
+      status: approved ? 'approved' : 'open',
+      // The waiting period runs from the second approval. Before that, a period already set is kept.
+      coolingOffEndsAt: approved ? endsFromNow : (r.coolingOffEndsAt ?? endsFromNow),
     },
   };
 };

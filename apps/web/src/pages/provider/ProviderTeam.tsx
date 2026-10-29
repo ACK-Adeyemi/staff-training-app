@@ -147,7 +147,7 @@ export function Team() {
     }
   };
 
-  const currentRole = (m: ProviderTeamMember): Role | undefined => roles.find((r) => r.name === m.roleNames[0]);
+  const currentRole = (m: ProviderTeamMember): Role | undefined => roles.find((r) => r.id === m.roleIds[0]);
 
   const effectiveRows = (userId: string) =>
     effectiveWithSources(

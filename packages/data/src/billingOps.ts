@@ -2,6 +2,7 @@
 // authorises, applies the domain rules and then writes in ONE batch. Money is integer pence. The payment is a mock: no
 // card number is ever entered or stored. Business rules live in @sta/domain; this file only calls them.
 import {
+  invoiceLinesFor,
   addDays,
   competitionStatus,
   defaultDunningPolicy,
@@ -192,7 +193,18 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
       const { activeStaff, activeSites } = await activeStaffAndSites(call, clientId);
       const price = planPrice(pkg, activeStaff, activeSites);
       const profile = await profileOf(call, clientId);
+      const lines = invoiceLinesFor({
+        listPrice: price.total,
+        adjustments: (await call.all<PriceAdjustment>('priceAdjustments')).filter((a) =>
+          a.clientIds.includes(clientId),
+        ),
+        at: call.actor.ctx.now,
+        label: '',
+      });
+      const change = lines[1];
       const result: BillingOverview = {
+        ...(change?.adjustment ? { adjustment: { ...change.adjustment, amount: change.amount } } : {}),
+        yourPrice: lines.reduce((sum, l) => sum + l.amount, 0),
         packageId: sub.packageId,
         planPrice: { perSite: price.perSite, sites: price.sites, total: price.total },
         period: sub.period,

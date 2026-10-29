@@ -35,6 +35,7 @@ export type ProviderOverviewOperations = {
 /** A health score below this needs attention. */
 const ATTENTION_BELOW = 60;
 const MAX_NAME = 120;
+const MAX_LISTED = 200;
 const MAX_MESSAGE = 500;
 
 const newestFirst = <T extends { date: string }>(a: T, b: T): number =>
@@ -146,7 +147,9 @@ export function createProviderOverviewOperations(
     async listLocal(ctx) {
       const call = await providerCall(ctx);
       const all = await call.all<LocalTelemetryEntry>('localTelemetry');
-      return structuredClone([...all].sort((a, b) => (a.at === b.at ? (a.id < b.id ? 1 : -1) : a.at < b.at ? 1 : -1)));
+      return structuredClone(
+        [...all].sort((a, b) => (a.at === b.at ? (a.id < b.id ? 1 : -1) : a.at < b.at ? 1 : -1)).slice(0, MAX_LISTED),
+      );
     },
 
     async simulated(ctx, clientId) {

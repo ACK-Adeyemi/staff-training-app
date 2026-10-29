@@ -32,6 +32,7 @@ type Member = {
   name: string;
   email: string;
   status: string;
+  roleIds: string[];
   roleNames: string[];
 };
 type RoleInput = { name: string; description: string; permissionIds: string[] };
@@ -80,6 +81,8 @@ export function runProviderTeamContract(
         status: 'active',
         roleNames: ['Owner'],
       });
+      const owner = list.find((m) => m.userId === s.u.provOwner)!;
+      expect(owner.roleIds).toHaveLength(1);
     });
 
     it('refuses to limit an invited person to selected clients, because that scoping is not built', async () => {
