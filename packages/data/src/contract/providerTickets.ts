@@ -21,7 +21,7 @@ import {
   type Ticket,
   type TicketMessage,
 } from '@sta/domain';
-import { ForbiddenError, type ActorContext, type StoreHandle, type StoreOptions, type TicketsService } from '../types';
+import { ForbiddenError, NotFoundError, type ActorContext, type StoreHandle, type StoreOptions, type TicketsService } from '../types';
 import { refusal } from './learning';
 import { buildWorld, TODAY } from './world';
 
@@ -38,6 +38,7 @@ type ProviderTicketsStore = {
     addNote(ctx: ActorContext, id: string, input: { body: string }): Promise<TicketMessage>;
     setStatus(ctx: ActorContext, id: string, status: Ticket['status']): Promise<Ticket>;
     messages(ctx: ActorContext, id: string): Promise<TicketMessage[]>;
+    raiserName(ctx: ActorContext, id: string): Promise<string>;
   };
   savedReplies: {
     list(ctx: ActorContext): Promise<SavedReply[]>;
@@ -233,6 +234,18 @@ export function runProviderTicketsContract(
         t.s.otherEntries.createIssueType(t.support, { groupId: group.id, name: 'X type', ticketIds: [t.raised.id] }),
       ).rejects.toBeDefined();
       expect(await t.dump<Ticket>('tickets')).toEqual(before);
+    });
+
+    it('returns the display name of the person who raised the ticket, and refuses unknown ids and actors without tickets.read', async () => {
+      const t = await setup();
+      const users = await t.dump<{ id: string; displayName: string }>('users');
+      const expected = users.find((x) => x.id === t.u.priya)!.displayName;
+      expect(expected.length).toBeGreaterThan(0);
+      expect(await t.s.providerTickets.raiserName(t.support, t.raised.id)).toBe(expected);
+      for (const actor of [t.raj, t.priya, t.jade]) {
+        expect(await refusal(t.s.providerTickets.raiserName(actor, t.raised.id))).toBeInstanceOf(ForbiddenError);
+      }
+      expect(await refusal(t.s.providerTickets.raiserName(t.support, 'no-such-ticket'))).toBeInstanceOf(NotFoundError);
     });
 
     it('denies a provider user without the ticket permission, and every customer actor, changing anything', async () => {
