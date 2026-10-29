@@ -60,7 +60,11 @@ describe('every shell route renders its title as the page heading', () => {
   const all: [Side, Page][] = [
     ...[...staffTabs, ...staffExtra].map((p): [Side, Page] => ['staff', p]),
     ...[...clientBar, ...clientMore].map((p): [Side, Page] => ['client', p]),
-    ...[...providerBar, ...providerMore].map((p): [Side, Page] => ['provider', p]),
+    ...[...providerBar, ...providerMore].map((p): [Side, Page] => [
+      'provider',
+      // P7 has its own screen title; the nav item is the section name "Commercial".
+      p.path === '/provider/packages' ? { ...p, label: t('provider.packages.heading') } : p,
+    ]),
   ];
   it.each(all)('%s %j', async (side, page) => {
     await renderRoute(page.path, side);
