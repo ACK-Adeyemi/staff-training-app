@@ -112,6 +112,14 @@ export function Tickets() {
         <p role="alert">{t('provider.tickets.noPermission')}</p>
       ) : (
         <>
+          <p className="mb-4">
+            <a
+              href="#/provider/support-settings"
+              className="inline-flex min-h-[var(--target-min)] items-center underline"
+            >
+              {t('provider.supportSettings.link')}
+            </a>
+          </p>
           <section aria-label={t('provider.tickets.savedViews')} className="mb-4 flex flex-wrap gap-3">
             {(['needsReply', 'breached'] as View[]).map((v) => (
               <button

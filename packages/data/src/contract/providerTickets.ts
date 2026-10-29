@@ -21,7 +21,14 @@ import {
   type Ticket,
   type TicketMessage,
 } from '@sta/domain';
-import { ForbiddenError, NotFoundError, type ActorContext, type StoreHandle, type StoreOptions, type TicketsService } from '../types';
+import {
+  ForbiddenError,
+  NotFoundError,
+  type ActorContext,
+  type StoreHandle,
+  type StoreOptions,
+  type TicketsService,
+} from '../types';
 import { refusal } from './learning';
 import { buildWorld, TODAY } from './world';
 

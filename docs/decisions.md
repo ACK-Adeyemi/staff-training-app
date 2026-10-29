@@ -922,3 +922,10 @@ Chunk 1 choices:
 
 - **Edit price never writes.** Brief 23.11: price changes apply only after a step-up code on P25 Price changes. So the P8 "Edit price" button (shown with `billing.write`) only navigates to `#/provider/pricing`; it does not call `store.addOns.put`. P25 is not built yet, so that route shows not-found until it is.
 - P8 reads the catalogue from `@sta/content` (`addOns`, `addOnCopy`) and needs `billing.read`.
+
+## M4 chunk 13 (P11 to P13 gaps)
+
+- **P13 built read-and-create only.** Archive, merge, reorder and aliases of issue types and features are not built: there are no data ops for them and BP-10/BP-11 do not need them. P13 shows the catalogue lists, Other entries review with Create issue type, and saved replies.
+- **P12 gaps.** Re-tag, merge and link on the ticket detail are not built either.
+- Both are carried to docs/progress.md Known issues.
+- The P13 page shows nothing but a loading line until its first data arrives, so the heading never appears over an empty page.
