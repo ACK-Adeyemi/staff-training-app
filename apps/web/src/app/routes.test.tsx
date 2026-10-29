@@ -57,6 +57,7 @@ const providerMore: Page[] = [
   { path: '/provider/security', label: t('nav.provider.security') },
   { path: '/provider/audit', label: t('nav.provider.audit') },
   { path: '/provider/global', label: t('nav.provider.global') },
+  { path: '/provider/profile-changes', label: t('nav.provider.profileChanges') },
   { path: '/provider/ai', label: t('nav.provider.ai') },
 ];
 

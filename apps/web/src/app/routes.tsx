@@ -294,6 +294,10 @@ export const routes: RouteObject[] = [
             lazy: async () => ({ Component: (await import('../pages/provider/GlobalContent')).GlobalContent }),
           },
           {
+            path: 'profile-changes',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProfileChanges')).ProfileChanges }),
+          },
+          {
             path: 'ai',
             lazy: async () => ({ Component: (await import('../pages/provider/AiSettings')).AiSettings }),
           },
