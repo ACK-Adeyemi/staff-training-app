@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M4
 Milestone base commit: c7160e2
-Next step: M4 chunk 11 (P5 to P8: content links panel, packs, packages Option A/B, add-ons) per docs/plans/m4.md. P3 tabs Sites, Staff, API, Support tickets, Billing, Modules, Competitions, Audit are still stubs: fill them in the chunks that own those screens (P3 Billing in chunk 12/17, tickets in 13) before M4 is done. Give the test-writer small briefs (one test file each); big briefs hit API errors.
+Next step: M4 chunk 11b-d (11a P5 links panel done, ebfd2f4; remaining: P6 packs, P7 packages Option A/B, P8 add-ons, one test file each) per docs/plans/m4.md. P3 tabs Sites, Staff, API, Support tickets, Billing, Modules, Competitions, Audit are still stubs: fill them in the chunks that own those screens (P3 Billing in chunk 12/17, tickets in 13) before M4 is done. Give the test-writer small briefs (one test file each); big briefs hit API errors.
 
 ## Milestones
 - [x] M0 Foundations
@@ -28,7 +28,8 @@ M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list):
 - [x] 8 Data ops E: 8a comms, maintenance, link check, Learn more counts done (tests 8ae4af0, impl c8ee98f); 8b recovery + profile/billing change ops done (tests 91be646, impl 0a6341c); 8c telemetry + overview reads done (tests ea67a8a, impl 10447fa; seed v6, IndexedDB v6)
 - [x] 9 Provider shell and P1-P3 (tests 5bf1716, impl cac7c7f, check.sh green)
 - [x] 10 P4 New client wizard (tests 61ad087, impl 0a421bd, check.sh green)
-- [ ] 11-18 see the plan
+- [ ] 11 P5 to P8: 11a P5 Learn more links panel done (tests 0730264, impl ebfd2f4, check.sh green); 11b P6, 11c P7, 11d P8 to do
+- [ ] 12-18 see the plan
 M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 1 Decisions, schemas, stores and personas
 - [x] 2 Domain: sites, leaderboards, calendar, rules, reminders
@@ -92,6 +93,7 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - M3 code review leftovers (not fixed, by decision): placeholders not all in adminConfig; ModuleLibrary stats computed in the UI; duplicate London-day helpers; .ics DTSTAMP hour rounding; reminders e2e cap check is loose; affected-now preview ignores the actor's scope; reports.test privacy check is narrow; ContrastCheck formula duplicated in the UI.
 
 ## Session log
+- 2026-10-29: M4 chunk 11a (P5 links panel) landed (ebfd2f4), check.sh green (full run takes ~30 min on this VM). Stopping at a clean point; 11b next.
 - 2026-10-28: M4 chunk 8b landed (0a6341c), check.sh green. Stopping at a clean point; 8c next.
 - 2026-10-28: M4 chunk 8a landed (c8ee98f), check.sh green. Stopping at a clean point; 8b next.
 - 2026-10-28: M4 chunk 7 (provider tickets, saved replies, other entries) landed (e4e99a3), check.sh green. Stopping at a clean point; chunk 8 next.
