@@ -113,7 +113,7 @@ const permRow = (id: string) =>
   within(screen.getByRole('region', { name: 'Role editor' }))
     .getAllByTestId('perm-row')
     .find((r) => r.getAttribute('data-permission-id') === id)!;
-const box = (id: string) => within(permRow(id)).getByRole('checkbox') as HTMLInputElement;
+const box = (id: string) => within(permRow(id)).getByRole<HTMLInputElement>('checkbox');
 const openNewRole = async () => {
   await userEvent.click(screen.getByRole('button', { name: 'New role' }));
   await screen.findByRole('region', { name: 'Role editor' });
@@ -378,7 +378,7 @@ describe('P18 Team and roles: ownership transfer', () => {
     await waitFor(() => {
       expect(transferRow().textContent).toContain('Confirmed. Cooling off ends in 7 days');
     });
-    const complete = within(transferRow()).getByRole('button', { name: 'Complete transfer' }) as HTMLButtonElement;
+    const complete = within(transferRow()).getByRole<HTMLButtonElement>('button', { name: 'Complete transfer' });
     expect(complete.disabled).toBe(true);
     expect(transferRow().textContent).toContain('Complete is available when the cooling-off period has ended.');
     await userEvent.click(within(transferRow()).getByRole('button', { name: 'Cancel transfer' }));
@@ -408,7 +408,7 @@ describe('P18 Team and roles: ownership transfer', () => {
         await handle.admin.bulkPut('ownershipTransfers', [t]);
       },
     });
-    const complete = within(transferRow()).getByRole('button', { name: 'Complete transfer' }) as HTMLButtonElement;
+    const complete = within(transferRow()).getByRole<HTMLButtonElement>('button', { name: 'Complete transfer' });
     expect(complete.disabled).toBe(false);
     expect(transferRow().textContent).not.toContain('Complete is available when the cooling-off period has ended.');
     await userEvent.click(complete);
