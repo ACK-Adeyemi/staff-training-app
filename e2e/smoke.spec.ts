@@ -90,7 +90,8 @@ const routes: Route[] = [
       // Invoices belong to several clients, so take the first link the signed-in client's own billing page shows.
       await page.goto('./#/client/billing');
       const href = await page.getByRole('region', { name: 'Invoices' }).getByRole('link').first().getAttribute('href');
-      return String(href).slice(String(href).indexOf('#'));
+      const invoiceId = String(href).split('/invoices/')[1]?.split('/')[0] ?? '';
+      return `#/client/billing/invoices/${invoiceId}/print`;
     },
   },
   {

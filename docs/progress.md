@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M5
 Milestone base commit: 431ae38
-Next step: M5 Polish and demo readiness: record the milestone base commit, delegate docs/plans/m5.md to the planner (build pack section 10, M5), commit it, then start chunk 1. Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn.
+Next step: M5 chunk 2 (Content A: Tier 2 modules 1 to 3) per docs/plans/m5.md. Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn.
 
 ## Milestones
 - [x] M0 Foundations
@@ -17,6 +17,8 @@ Next step: M5 Polish and demo readiness: record the milestone base commit, deleg
 - [ ] M7 Battle Room
 
 ## Current milestone chunks
+M5 (plan docs/plans/m5.md, 15 chunks; base 431ae38):
+- [x] 1 Decisions and groundwork (tests 00190bf, impl + print-route fix; check.sh full run deferred to end of chunk group 1-3)
 M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list): 
 - [x] 1 Decisions, schemas and seed additions (tests 8bd8188, impl 125c3aa)
 - [x] 2 Domain: price engine (tests 1ee83ad, 002b093, impl ceba2fd)
