@@ -18,7 +18,7 @@ export const tagKey = (id: string): MessageKey | undefined =>
   feedbackTags.find((x) => x.id === id)?.labelKey as MessageKey | undefined;
 
 export const fieldClass =
-  'min-h-[var(--target-min)] rounded-[var(--radius-md)] border-2 border-[var(--color-border)] bg-[var(--color-bg)] px-3 text-[var(--color-text)] focus-visible:outline-[length:3px] focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]';
+  'min-h-[var(--target-min)] max-w-full rounded-[var(--radius-md)] border-2 border-[var(--color-border)] bg-[var(--color-bg)] px-3 text-[var(--color-text)] focus-visible:outline-[length:3px] focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]';
 
 export type FeedbackData = { items: ModuleFeedback[]; people: Person[]; modules: Module[] };
 

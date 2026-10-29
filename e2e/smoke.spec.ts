@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { readStore } from './helpers/idb';
-import { m2Routes, m3AllRoutes, shellRoutes } from './routes';
+import { m2Routes, m3AllRoutes, m4Routes, shellRoutes } from './routes';
 
 // M1 routes with ids: the module id is the seed's Safeguarding module; lessons come from its module.json;
 // people and attachments are read from the app's own IndexedDB once the seed has loaded.
@@ -62,6 +62,12 @@ const routes: Route[] = [
     hash: r.hash,
     name: `M3 ${r.hash} ${r.label}`,
   })),
+  ...m4Routes.map((r) => ({ hash: r.hash, name: `M4 ${r.hash} ${r.label}` })),
+  {
+    hash: '',
+    name: 'P12 ticket detail',
+    resolve: async (page) => `#/provider/tickets/${await firstId(page, 'tickets')}`,
+  },
   // M3 routes with ids (F-5): builder edit and lesson preview, evidence review.
   {
     hash: '',
@@ -104,7 +110,9 @@ for (const colorScheme of ['light', 'dark'] as const) {
 for (const colorScheme of ['light', 'dark'] as const) {
   test.describe(`high contrast, ${colorScheme}`, () => {
     test.use({ colorScheme });
-    for (const route of [...m2Routes, ...m3AllRoutes]) {
+    for (const route of [...m2Routes, ...m3AllRoutes, ...m4Routes].filter(
+      (r, i, all) => all.findIndex((x) => x.hash === r.hash) === i,
+    )) {
       test(`${route.hash} passes axe with high contrast (${colorScheme})`, async ({ page }) => {
         await page.goto(`./${route.hash}`);
         await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();

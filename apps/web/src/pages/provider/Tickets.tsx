@@ -73,7 +73,7 @@ export function Tickets() {
     set: (v: string) => void,
     options: { value: string; label: string }[],
   ) => (
-    <div className="flex flex-col gap-1">
+    <div className="flex min-w-0 max-w-full flex-col gap-1">
       <label htmlFor={id} className="font-semibold">
         {label}
       </label>

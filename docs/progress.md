@@ -35,7 +35,7 @@ M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list):
 - [x] 15 P18 (15a tests 14cf3c2/573788d, impl 2f7d7d5); P19, P20, P23 (15b tests 55c481f, impl 06c0376, check.sh green)
 - [x] 16 P21 Global content, P22 AI settings (tests 8e1e806, impl 8b9234c, check.sh green)
 - [x] 17 P24 (tests bde9b9f, impl 8cf2905, fix after), P25 + P3 panel (tests 99b7fc7, impl f9b31bb), client price notice (tests 3b335dd, impl 8816023); check.sh green except lint (prettier, fixed)
-- [ ] 18 Track B e2e, a11y and docs (see the plan)
+- [x] 18 Track B e2e, a11y and docs: 18a tests (80449a3, 1cdf28d), 18b gaps fixed and provider routes in smoke/high-contrast/200% text, demo script Track B, review checklist (see docs/decisions.md 'M4 chunk 18b'); coordinator runs the full check.sh
 M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 1 Decisions, schemas, stores and personas
 - [x] 2 Domain: sites, leaderboards, calendar, rules, reminders
@@ -90,6 +90,7 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - F4 (CI): ci.yml caches ~/.cache/ms-playwright keyed on the Playwright version, installs Chromium once (check.sh skips its own install when SKIP_PLAYWRIGHT_INSTALL=1), adds install-deps on a cache hit. actions/cache@v5 is unverified (VERIFY). Playwright workers left at the default: more workers raised flakes locally. Awaiting user re-check.
 
 ## Known issues
+- M4 chunk 18b: a provider user invited with Selected clients has the scope stored and shown, but provider reads (Clients, Tickets, Dunning and so on) do not yet filter to those clients. See docs/decisions.md 'M4 chunk 18b'.
 - M4 chunk 13: P13 archive, merge, reorder and aliases of issue types and features are not built (no data ops); P12 re-tag, merge and link are not built. See docs/decisions.md 'M4 chunk 13'.
 - Chunk 14: C19 usage omits Battle Rooms limit (data layer has no count); C6 preview is minimal until chunk 15.
 - e2e 'C1 updates in one tab when Jade passes the refresher in another tab' (client-dashboard.spec.ts) failed once, passed on rerun: possible flake, watch it.

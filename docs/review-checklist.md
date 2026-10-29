@@ -86,3 +86,21 @@ Things only the user can check, by milestone.
 - [ ] New starter induction (new, `packages/content/src/packs/nursery/modules/new-starter-induction/`): two lessons and six questions, written for the demo with no source citations. Draft content label stays on. Replace with real induction content.
 - [ ] No other module text was changed in M3.
 
+## M4
+
+### M4 phone and live checks
+
+- [ ] On a real phone, open the provider app (`#/provider`) and walk Track B (docs/demo-script.md): Overview, Clients, a client's tabs, Ticket inbox and a ticket with its screenshot, Dunning, Team and roles (invite with Selected clients), Price changes, Security. Check nothing needs sideways scrolling at 200% text and the tab rows can be reached.
+- [ ] Open a ticket with a screenshot on a phone and check the picture fits the screen.
+- [ ] Fast-forward 7 days after Simulate failed payment and check the provider Clients list, Dunning and the client banner all say Limited.
+- [ ] Create a price change and confirm it with the step-up code on a phone keyboard (the demo code is shown on the page).
+- [ ] Live site only (not checkable here): `#/provider/...` links survive a reload and a shared link at the base path /staff-training-app/, and the provider sign-in (`#/provider/signin`) works with a real authenticator app if you want to try one.
+- [ ] After pulling this build, a browser that already holds the demo will reload its data once (seed version 7) to pick up the new ticket screenshot. Check that Reset still works.
+
+### Awaiting review (M4, Draft content)
+
+- [ ] Provider-facing wording (all in `packages/content/src/lang/en-GB.json` under `provider.`): the Security commitments list, dunning and recovery wording, the incident and release-note examples, the saved replies and Other-entries phrases.
+- [ ] The Support features and issue types list, and the module feedback reasons shown on Content.
+- [ ] The fictional screenshot on the Willow Lane "progress bar" ticket (a plain generated picture, no real content).
+- [ ] Price change reasons and the notice wording shown to clients.
+

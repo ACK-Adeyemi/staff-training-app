@@ -25,7 +25,19 @@ Running the automated version: `pnpm build && pnpm exec playwright test e2e/trac
 
 ## Track B
 
-To be written from build pack section 8 in M1, M4 and M6.
+The provider tour, about 6 minutes (build pack 8.2). Open the landing page, choose Nursery, and use the Presenter panel (Shift+Alt+P) to become the provider owner. A second phone-sized window plays Willow Lane's client and staff views. Everything on the provider side is labelled Simulated data where the numbers are made up.
+
+1. Overview and clients (1 minute). Open Overview: client counts by account state, people and sites, and "Needs attention" with the reasons. Open Clients: filter by account state. Willow Lane shows Past due. On Profile changes, show that an organisation name change can be reviewed, and that Keep billing name leaves the invoice name alone.
+2. One client (1 minute). Open Little Acorns. Usage shows uses by feature and active people. Errors and logs shows grouped errors with how many times and how many people, each with a status. Audit lists what people did for this client (for example Priya turning ticket raising off on the client Settings page), newest first. Open Content: module feedback is shown without names, question reports come first, and Check links finds the broken link (simulated).
+3. Support (1 minute). Open Ticket inbox, choose Willow Lane Nursery, and open the progress bar ticket: the thread, the ticket details and the customer's screenshot. Reply with a saved reply, set In progress, add an internal note (only the provider team sees it). In Other entries, re-tag the five "Certificate won't download" tickets into one issue type.
+4. Guardrails (1 minute). Dunning lists Willow Lane as Past due with the amount outstanding. As Gemma on the phone, the banner says Fix this now. Use Simulate failed payment on any client, then Fast-forward 7 days: the client banner, the Dunning page and the provider Clients list all say Limited, staff keep training, and exports stay open. Pay now on the mock page and everything returns.
+5. Control (45 seconds). Open Team and roles: the permission matrix, then New role (Account manager north), where picking Write for tickets also adds Read. Compare it with the seeded Account manager. Invite someone by email with the role preset and Selected clients only (Harbour Cafe Group and Summit Builders). The member shows "Selected clients only: 2" and the invitation is in the Outbox (Presenter panel, Outbox).
+6. Pricing (45 seconds). Price changes, New change: Several clients, Harbour Cafe Group and Summit Builders, Type Discount, Applies to Plan, value 15, reason Retention, notice days 0, end date 19 January 2027. Preview shows the new prices and revenue effect. Save, submit, and confirm with the demo authenticator code (step-up). Open Harbour Cafe Group, Billing tab: the -15% line, its status and "Ends 19 January 2027".
+7. Close (15 seconds). Open Security: the "Our security and data commitments" list (two-step sign-in, the audit log, staged account states, exports never held back, the retention schedule) and the honest note that this demo simulates authentication, payments and messaging. The Audit log link opens the full log.
+
+Limit to say out loud: in this demo an invitation's client scope is stored and shown, but the provider screens do not yet hide other clients from that person (docs/decisions.md, M4 chunk 18b).
+
+Running the automated version: `pnpm build && pnpm exec playwright test e2e/track-b.spec.ts` (desktop viewport; the second page is sized 390 by 844). It pins the clock to 19 October 2026, 09:00 UTC. Each step is its own test.
 
 ## Track C
 

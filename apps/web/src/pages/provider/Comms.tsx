@@ -285,7 +285,7 @@ export function Comms() {
 
             {error ? <p role="alert">{t('provider.comms.failed')}</p> : null}
             <div>
-              <Button type="submit" disabled={send.isPending}>
+              <Button type="submit" disabled={send.isPending} className="max-w-full">
                 {t('provider.comms.send')}
               </Button>
             </div>
