@@ -34,7 +34,7 @@ export function SystemStatus({ side }: { side: Side }) {
   return (
     <span
       data-testid="system-status"
-      {...(side === 'provider' ? { role: 'group', 'aria-label': t('systemNotices.statusLabel') } : {})}
+      {...(side === 'provider' ? { role: 'status', 'aria-label': t('systemNotices.statusLabel') } : {})}
       className="inline-flex min-h-[var(--target-min)] flex-wrap items-center gap-1 rounded-[var(--radius-sm)] border-2 border-[var(--color-border)] px-2 text-sm font-semibold"
     >
       <Icon name={incident.level === 'normal' ? 'check' : 'alert'} />

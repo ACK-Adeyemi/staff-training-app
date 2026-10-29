@@ -203,7 +203,9 @@ export function ProfileChanges() {
   const actor = useActor();
   const queryClient = useQueryClient();
   const perms = usePermissions();
-  const canRead = perms.data ? holdsAnywhere(perms.data, 'clients.read') : false;
+  const canRead = perms.data
+    ? holdsAnywhere(perms.data, 'clients.reviewNameChanges') && holdsAnywhere(perms.data, 'clients.editBilling')
+    : false;
   const canEdit = perms.data ? holdsAnywhere(perms.data, 'clients.editBilling') : false;
   const [messages, setMessages] = useState<Record<string, string>>({});
   const [error, setError] = useState(false);

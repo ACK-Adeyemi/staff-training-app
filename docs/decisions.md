@@ -982,3 +982,7 @@ were needed. The prize list starts as the nursery pack's list until first edited
 kill switch is read by `access.features` and `ai.explain`. Added rule name `duplicate`. The P22 test looked for a single
 `role=status` on the whole page, but the shell header always has one (system status), so the test now looks inside the
 "Usage by client" region.
+
+## M4 chunk 17a: P24 Profile changes
+- Route `/provider/profile-changes`, in the provider "More" navigation. Reviewed name changes stay on screen for the visit (the service lists only pending ones).
+- **Test correction (not a weakening).** The first P24 test expected `tom` (clients.read only) to see rows with disabled buttons. The data layer (and its contract tests) refuse both lists without `clients.reviewNameChanges` and `clients.editBilling`, so the page shows the no-access message to anyone lacking either; the test now says so. The status-message lookups in that test are scoped to `<main>` because the provider header indicator is also `role="status"`; the header role was left as it was.

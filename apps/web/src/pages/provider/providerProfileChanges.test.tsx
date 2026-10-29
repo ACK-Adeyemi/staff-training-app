@@ -92,7 +92,7 @@ describe('P24 Profile changes: name changes', () => {
     const req = (await storedPc(view))[0]!;
     const before = await billingNameOf(view, req.clientId);
     await userEvent.click(within(pcRow()).getByRole('button', { name: 'Keep billing name' }));
-    expect((await screen.findByRole('status')).textContent).toContain('Billing name kept.');
+    expect((await within(screen.getByRole('main')).findByRole('status')).textContent).toContain('Billing name kept.');
     const after = (await storedPc(view))[0]!;
     expect(after.status).toBe('billingKept');
     expect(after.reviewerId).toBe(view.keys.users['providerOwner']);
@@ -107,7 +107,7 @@ describe('P24 Profile changes: name changes', () => {
     const view = await openP24();
     const req = (await storedPc(view))[0]!;
     await userEvent.click(within(pcRow()).getByRole('button', { name: 'Update billing name to match' }));
-    expect((await screen.findByRole('status')).textContent).toContain('Billing name updated for future invoices.');
+    expect((await within(screen.getByRole('main')).findByRole('status')).textContent).toContain('Billing name updated for future invoices.');
     expect((await storedPc(view))[0]!.status).toBe('billingUpdated');
     expect(await billingNameOf(view, req.clientId)).toBe('Oak Tree Nurseries Group');
     await waitFor(() => {
@@ -118,7 +118,7 @@ describe('P24 Profile changes: name changes', () => {
   it('Ask the client records the request and confirms', async () => {
     const view = await openP24();
     await userEvent.click(within(pcRow()).getByRole('button', { name: 'Ask the client' }));
-    expect((await screen.findByRole('status')).textContent).toContain(
+    expect((await within(screen.getByRole('main')).findByRole('status')).textContent).toContain(
       'We have asked the client to confirm their billing details.',
     );
     expect((await storedPc(view))[0]!.status).toBe('clientAsked');
@@ -131,7 +131,7 @@ describe('P24 Profile changes: name changes', () => {
     const view = await openP24();
     const req = (await storedPc(view))[0]!;
     await userEvent.click(within(pcRow()).getByRole('button', { name: 'Revert display name' }));
-    expect((await screen.findByRole('status')).textContent).toContain('Display name reverted.');
+    expect((await within(screen.getByRole('main')).findByRole('status')).textContent).toContain('Display name reverted.');
     expect((await storedPc(view))[0]!.status).toBe('reverted');
     expect(await nameOf(view, req.clientId)).toBe('Oak Tree Nurseries');
     await waitFor(() => {
@@ -228,15 +228,11 @@ describe('P24 Profile changes: billing detail requests', () => {
 });
 
 describe('P24 Profile changes: permissions', () => {
-  it('shows the rows but disables every action for someone without clients.editBilling', async () => {
-    const view = await openP24(as('tom'));
-    expect(pcRow().textContent).toContain('Oak Tree Nurseries Group');
-    const buttons = [
-      ...within(pcRow()).getAllByRole('button'),
-      ...within(bcRow()).getAllByRole('button'),
-    ] as HTMLButtonElement[];
-    expect(buttons.length).toBeGreaterThanOrEqual(7);
-    expect(buttons.every((b) => b.disabled)).toBe(true);
+  it('shows only a no-access message to someone without the review permissions (the lists are refused by the data layer)', async () => {
+    const view = await renderRoute('/provider/profile-changes', 'provider', as('tom'));
+    expect((await screen.findByText('You do not have access to profile changes.')).textContent).toBeTruthy();
+    expect(screen.queryAllByTestId('pc-row')).toHaveLength(0);
+    expect(screen.queryAllByTestId('bc-row')).toHaveLength(0);
     expect((await storedPc(view))[0]!.status).toBe('pendingReview');
   });
 
