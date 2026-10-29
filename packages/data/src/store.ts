@@ -25,6 +25,7 @@ import { createProviderTicketOperations } from './providerTicketOps';
 import { createProviderCommsOperations } from './providerCommsOps';
 import { createProviderRecoveryOperations } from './providerRecoveryOps';
 import { createPricingOperations } from './pricingOps';
+import { createDunningOperations } from './dunningOps';
 import { createProviderOverviewOperations } from './providerOverviewOps';
 import { createProviderOperations } from './providerOps';
 import { createBillingOperations, simulateFailedPayment } from './billingOps';
@@ -306,6 +307,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const providerTicketOps = createProviderTicketOperations(backend, options);
   const commsOps = createProviderCommsOperations(backend, options);
   const recoveryOps = createProviderRecoveryOperations(backend, options);
+  const dunningOps = createDunningOperations(backend, options);
   const overviewOps = createProviderOverviewOperations(backend, options);
   const authoringOps = createAuthoringOperations(backend, options);
   const evidenceFlow = createEvidenceOperations(backend, options);
@@ -354,6 +356,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     learnMore: commsOps.learnMore,
     recovery: recoveryOps.recovery,
     providerOverview: overviewOps.providerOverview,
+    dunning: dunningOps.dunning,
     telemetry: overviewOps.telemetry,
     profileChanges: recoveryOps.profileChanges,
     billingChanges: recoveryOps.billingChanges,

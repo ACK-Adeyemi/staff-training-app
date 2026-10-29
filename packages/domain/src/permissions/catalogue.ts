@@ -73,6 +73,7 @@ export const providerCatalogue: Permission[] = build([
   ['billing.draftPriceChanges', 'Draft price changes', { requires: ['billing.write'] }],
   ['billing.confirmPriceChanges', 'Confirm price changes', { ...S, requires: ['billing.draftPriceChanges'] }],
   ['billing.applyCredits', 'Apply credits', { ...S, requires: ['billing.write'] }],
+  ['billing.manageDunning', 'Extend grace and pause the dunning timeline', { ...S, requires: ['billing.write'] }],
   ['billing.export', 'Export billing data', { ...S, requires: ['billing.read'] }],
   ['ops.read', 'See operations'],
   ['ops.write', 'Change operations settings', { requires: ['ops.read'] }],

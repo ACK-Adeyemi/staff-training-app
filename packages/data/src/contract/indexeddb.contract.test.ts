@@ -90,9 +90,7 @@ runProviderTeamContract('indexeddb adapter', (options) =>
 runPackagingOptionContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );
-runDunningContract('indexeddb adapter', (options) =>
-  createIndexedDbStore(options, `contract-${String(counter++)}`),
-);
+runDunningContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
 runCreateClientContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );

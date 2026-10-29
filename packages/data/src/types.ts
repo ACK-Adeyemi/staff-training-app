@@ -980,6 +980,26 @@ export interface ProviderOverviewService {
   clients(ctx: ActorContext, filter?: { accountState?: AccountState }): Promise<ProviderClientRow[]>;
 }
 
+/** One client in the provider dunning view (M4 chunk 12a). */
+export type DunningRow = {
+  clientId: Id;
+  clientName: string;
+  state: AccountState;
+  amountOutstandingPence: number;
+  nextState?: { state: AccountState; at: string };
+  daysToNextState?: number;
+  daysToDeletion?: number;
+};
+export type DunningOverview = { rows: DunningRow[]; recoveryRatePercent: number | null; outstandingPence: number };
+
+/** Provider dunning (M4 chunk 12a). overview needs billing.read; the two changes need billing.manageDunning. */
+export interface DunningService {
+  overview(ctx: ActorContext): Promise<DunningOverview>;
+  /** Pushes the next state change back by `days` (1 to 30). Only while the account is Past due or Limited. */
+  extendGrace(ctx: ActorContext, clientId: Id, days: number): Promise<void>;
+  setPaused(ctx: ActorContext, clientId: Id, paused: boolean): Promise<void>;
+}
+
 /** Telemetry (M4 chunk 8c). Local records are real and stay on this device; the rest is seeded and simulated. */
 export interface TelemetryService {
   /** No actor: an error handler has none. The time comes from the injected Clock. */
@@ -1078,6 +1098,7 @@ export interface DataStore {
   learnMore: LearnMoreService;
   providerOps: ProviderOpsService;
   providerOverview: ProviderOverviewService;
+  dunning: DunningService;
   telemetry: TelemetryService;
   providerTeam: ProviderTeamService;
   providerTickets: ProviderTicketsService;
