@@ -13,14 +13,7 @@
 //     Audit actions: 'dataRequest.create', 'dataRequest.complete', 'dataRequest.reject': ids and kind/status only,
 //     never requester, notes or evidence text.
 import { describe, expect, it } from 'vitest';
-import {
-  addMonths,
-  createRng,
-  fixedClock,
-  type AuditEvent,
-  type DataRequest,
-  type Incident,
-} from '@sta/domain';
+import { addMonths, createRng, fixedClock, type AuditEvent, type DataRequest, type Incident } from '@sta/domain';
 import { load } from '@sta/seed';
 import {
   ForbiddenError,
@@ -118,9 +111,7 @@ export function runProviderIncidentsContract(
       const made = await t.s.incidents.post(t.support, incident());
       expect(made).toMatchObject({ level: 'degraded', title: 'Slow sign in', startedAt: TODAY });
       expect(made.resolvedAt).toBeUndefined();
-      expect(made.updates).toEqual([
-        { status: 'investigating', message: 'Sign in is slower than usual.', at: TODAY },
-      ]);
+      expect(made.updates).toEqual([{ status: 'investigating', message: 'Sign in is slower than usual.', at: TODAY }]);
       expect((await t.s.incidents.list(t.support)).map((i) => i.id)).toContain(made.id);
     });
 
@@ -152,7 +143,10 @@ export function runProviderIncidentsContract(
     it('appends an update and keeps the earlier ones', async () => {
       const t = await setup();
       const made = await t.s.incidents.post(t.support, incident());
-      const updated = await t.s.incidents.update(t.support, made.id, { status: 'monitoring', message: 'A fix is live.' });
+      const updated = await t.s.incidents.update(t.support, made.id, {
+        status: 'monitoring',
+        message: 'A fix is live.',
+      });
       expect(updated.updates.map((x) => x.status)).toEqual(['investigating', 'monitoring']);
       expect(updated.updates[1]).toMatchObject({ message: 'A fix is live.', at: TODAY });
       expect(updated.resolvedAt).toBeUndefined();
@@ -262,9 +256,9 @@ export function runProviderIncidentsContract(
         expect(await refusal(t.s.incidents.post(actor, incident({ title: '' })))).toBeInstanceOf(ForbiddenError);
         expect(await refusal(t.s.incidents.post(actor, incident()))).toBeInstanceOf(ForbiddenError);
         expect(await refusal(t.s.incidents.list(actor))).toBeInstanceOf(ForbiddenError);
-        expect(
-          await refusal(t.s.incidents.update(actor, made.id, { status: 'resolved', message: '' })),
-        ).toBeInstanceOf(ForbiddenError);
+        expect(await refusal(t.s.incidents.update(actor, made.id, { status: 'resolved', message: '' }))).toBeInstanceOf(
+          ForbiddenError,
+        );
         expect(
           await refusal(t.s.incidents.update(actor, freshId(78), { status: 'resolved', message: 'x' })),
         ).toBeInstanceOf(ForbiddenError);
@@ -302,9 +296,7 @@ export function runProviderIncidentsContract(
     it('refuses a blank requester and stores nothing', async () => {
       const t = await setup();
       for (const requester of ['', '   ']) {
-        expect(await refusal(t.s.dataRequests.create(t.owner, request({ requester })))).toBeInstanceOf(
-          ValidationError,
-        );
+        expect(await refusal(t.s.dataRequests.create(t.owner, request({ requester })))).toBeInstanceOf(ValidationError);
       }
       expect(await t.dump<DataRequest>('dataRequests')).toHaveLength(0);
       expect(await audits(t.dump, 'dataRequest.create')).toHaveLength(0);
@@ -373,9 +365,7 @@ export function runProviderIncidentsContract(
     it('refuses to reject without a reason', async () => {
       const t = await setup();
       const made = await t.s.dataRequests.create(t.owner, request());
-      expect(await refusal(t.s.dataRequests.reject(t.owner, made.id, { notes: '  ' }))).toBeInstanceOf(
-        ValidationError,
-      );
+      expect(await refusal(t.s.dataRequests.reject(t.owner, made.id, { notes: '  ' }))).toBeInstanceOf(ValidationError);
       expect((await t.dump<DataRequest>('dataRequests'))[0]!.status).toBe('open');
     });
 
