@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M5
 Milestone base commit: 431ae38
-Next step: M5 chunk 2 (Content A: Tier 2 modules 1 to 3) per docs/plans/m5.md. Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn.
+Next step: M5 chunk 4 (PWA offline and update prompt) per docs/plans/m5.md. Order after: 5-8, 9-10, 11-12, 13-15. Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn.
 
 ## Milestones
 - [x] M0 Foundations
@@ -18,7 +18,9 @@ Next step: M5 chunk 2 (Content A: Tier 2 modules 1 to 3) per docs/plans/m5.md. F
 
 ## Current milestone chunks
 M5 (plan docs/plans/m5.md, 15 chunks; base 431ae38):
-- [x] 1 Decisions and groundwork (tests 00190bf, impl + print-route fix; check.sh full run deferred to end of chunk group 1-3)
+- [x] 1 Decisions and groundwork (tests 00190bf, impl + print-route fix; full check.sh green except e2e count fixes, see below)
+- [x] 2 Content A: suitable-people, ratios, risk-assessment (tests 855ff2c, impl be8775b)
+- [x] 3 Content B: medicines, records, Coming soon, Mobile phone policy draft, seed v9 (tests e8f061a, impl 2618019; e2e count fixes after full check; track-b step 4c failed once in the full run, passed alone: watch)
 M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list): 
 - [x] 1 Decisions, schemas and seed additions (tests 8bd8188, impl 125c3aa)
 - [x] 2 Domain: price engine (tests 1ee83ad, 002b093, impl ceba2fd)

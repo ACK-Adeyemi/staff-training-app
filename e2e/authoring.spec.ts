@@ -57,7 +57,10 @@ test('Duplicate on a provider module makes an own draft with the responsibility 
   await item(page, PROVIDER_MODULE).getByRole('button', { name: 'Duplicate' }).click();
   await expect(page.getByRole('status').filter({ hasText: NOTE })).toBeVisible();
   await expect(ownItems(page)).toHaveCount(before + 1);
-  const draft = ownItems(page).filter({ hasText: 'Draft' }).filter({ hasNotText: 'Lone working' });
+  const draft = ownItems(page)
+    .filter({ hasText: 'Draft' })
+    .filter({ hasNotText: 'Lone working' })
+    .filter({ hasNotText: 'Mobile phone policy' });
   await expect(draft).toHaveCount(1);
   await expect(draft.getByRole('button', { name: 'Archive' })).toBeVisible();
   await draft.getByRole('link', { name: 'Edit' }).click();
@@ -81,8 +84,9 @@ test('filters and the cards or table toggle work, controls are at least 44px, an
   await expect(page.getByTestId('module-item').filter({ hasText: 'Provider' })).toHaveCount(0);
   await expect(page.getByTestId('module-item').first()).toContainText('Own');
   await page.getByRole('combobox', { name: 'Status' }).selectOption('Draft');
-  await expect(page.getByTestId('module-item')).toHaveCount(1);
-  await expect(page.getByTestId('module-item')).toContainText('Lone working');
+  await expect(page.getByTestId('module-item')).toHaveCount(2);
+  await expect(page.getByTestId('module-item').filter({ hasText: 'Lone working' })).toHaveCount(1);
+  await expect(page.getByTestId('module-item').filter({ hasText: 'Mobile phone policy' })).toHaveCount(1);
   await page.getByRole('combobox', { name: 'Status' }).selectOption('All');
   await page.getByRole('combobox', { name: 'Source' }).selectOption('All');
 
