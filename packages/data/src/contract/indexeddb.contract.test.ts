@@ -16,6 +16,7 @@ import { runCreateClientContract } from './createClient';
 import { runProviderPublishContract } from './providerPublish';
 import { runProviderCommsContract } from './providerComms';
 import { runProviderIncidentsContract } from './providerIncidents';
+import { runProviderGlobalAiContract } from './providerGlobalAi';
 import { runProviderOverviewContract } from './providerOverview';
 import { runProviderRecoveryContract } from './providerRecovery';
 import { runProviderTicketsContract } from './providerTickets';
@@ -111,5 +112,8 @@ runProviderRecoveryContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );
 runProviderOverviewContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runProviderGlobalAiContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );

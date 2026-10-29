@@ -15,6 +15,7 @@ import { runCreateClientContract } from './createClient';
 import { runProviderPublishContract } from './providerPublish';
 import { runProviderCommsContract } from './providerComms';
 import { runProviderIncidentsContract } from './providerIncidents';
+import { runProviderGlobalAiContract } from './providerGlobalAi';
 import { runProviderOverviewContract } from './providerOverview';
 import { runProviderRecoveryContract } from './providerRecovery';
 import { runProviderTicketsContract } from './providerTickets';
@@ -73,3 +74,4 @@ runProviderIncidentsContract('memory adapter', (options) => Promise.resolve(crea
 runProviderRecoveryContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
 runProviderOverviewContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runProviderGlobalAiContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
