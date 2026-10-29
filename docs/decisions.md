@@ -917,3 +917,8 @@ Chunk 1 choices:
 - **Audit content.** Ids, statuses, approval counts, field names only. Never the recovery reason, names or addresses.
 - **Name changes.** A review of a request that is not `pendingReview` is a rule error. Keep and ask work even when the client has no billing profile (the request is decided; nothing else changes); update-to-match without a profile is refused. Revert puts the client's `displayName` back to `oldName` and leaves billing alone. Issued invoices are never written.
 - **Billing changes.** Approve and edit-then-approve write the profile (`updatedBy` = reviewer); a decline needs a non-blank reason (ValidationError) and leaves the profile alone. A request with no billing profile to apply to is refused.
+
+## M4 chunk 11d (P8 Add-on catalogue)
+
+- **Edit price never writes.** Brief 23.11: price changes apply only after a step-up code on P25 Price changes. So the P8 "Edit price" button (shown with `billing.write`) only navigates to `#/provider/pricing`; it does not call `store.addOns.put`. P25 is not built yet, so that route shows not-found until it is.
+- P8 reads the catalogue from `@sta/content` (`addOns`, `addOnCopy`) and needs `billing.read`.

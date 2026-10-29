@@ -3261,6 +3261,18 @@
       "error": "Error",
       "event": "Event"
     },
+    "addOns": {
+      "heading": "Add-on catalogue",
+      "priceFlat": "{price} per month",
+      "priceUsage": "{price} per {unit}, {included} included each month",
+      "appliesTo": "Every add-on applies to: {options}",
+      "optionA": "Option A",
+      "optionB": "Option B",
+      "demoAi": "Demo AI",
+      "editPrice": "Edit price",
+      "editPriceHint": "Price changes are confirmed with a code on the Price changes page.",
+      "noPermission": "You don't have permission to see add-ons."
+    },
     "packages": {
       "heading": "Packages and entitlements",
       "optionRegion": "Packaging option",

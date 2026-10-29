@@ -87,8 +87,7 @@ describe('P8 Add-on catalogue', () => {
 
   it('gives a provider who can edit billing an Edit price button on every card', async () => {
     const cards = await openP8();
-    for (const card of cards)
-      expect(within(card).getByRole('button', { name: 'Edit price' })).toBeTruthy();
+    for (const card of cards) expect(within(card).getByRole('button', { name: 'Edit price' })).toBeTruthy();
   });
 
   it('shows no Edit price control to the read-only provider user', async () => {

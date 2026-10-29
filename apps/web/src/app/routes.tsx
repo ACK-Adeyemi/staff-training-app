@@ -245,6 +245,10 @@ export const routes: RouteObject[] = [
             path: 'packages',
             lazy: async () => ({ Component: (await import('../pages/provider/ProviderPackages')).ProviderPackages }),
           },
+          {
+            path: 'add-ons',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProviderAddOns')).ProviderAddOns }),
+          },
           page('tickets', 'nav.provider.support', 'placeholder.provider.support'),
           page('comms', 'nav.provider.comms', 'placeholder.provider.comms'),
           page('team', 'nav.provider.teamSecurity', 'placeholder.provider.teamSecurity'),
