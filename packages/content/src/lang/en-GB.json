@@ -117,6 +117,8 @@
       "support": "Support",
       "comms": "Comms",
       "teamSecurity": "Team and security",
+      "security": "Security",
+      "audit": "Audit log",
       "recovery": "Account recovery",
       "dataRequests": "Data requests",
       "status": "Status and incidents"
@@ -3541,6 +3543,51 @@
       "reads": "Read {count} times",
       "failed": "That could not be sent. Check the title, the audience, at least one channel and the times, then try again.",
       "noteDate": "Released {date}"
+    },
+    "audit": {
+      "heading": "Audit log",
+      "noAccess": "You do not have access to the audit log.",
+      "action": "Action",
+      "allActions": "All actions",
+      "client": "Client",
+      "allClients": "All clients",
+      "empty": "No events match.",
+      "actor": "Who",
+      "when": "When",
+      "unknownActor": "Unknown person"
+    },
+    "security": {
+      "heading": "Security",
+      "demoOnly": "Demo only",
+      "policy": "Two-step sign-in is required for all provider team members, with a few days grace to set it up.",
+      "yourStatus": "Your two-step sign-in",
+      "status": {
+        "enrolled": "On",
+        "notYet": "Not set up yet"
+      },
+      "sessions": "Sessions",
+      "thisDevice": "This device",
+      "signOutAll": "Sign out everywhere",
+      "signedOut": "Signed out everywhere on this demo.",
+      "trustTitle": "Trusted device",
+      "trust": "Trust this device for 30 days",
+      "on": "On",
+      "off": "Off"
+    },
+    "signin": {
+      "title": "Provider sign in",
+      "demoOnly": "Demo only: any email and password work.",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "intro": "Enter the code from your authenticator app.",
+      "code": "Sign-in code",
+      "confirm": "Confirm",
+      "useRecovery": "Use a recovery code",
+      "useAppCode": "Use the app code",
+      "recoveryLabel": "Recovery code",
+      "wrong": "That code is not right. Try again.",
+      "locked": "Too many tries. Wait a little and try again."
     },
     "team": {
       "heading": "Team and roles",

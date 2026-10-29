@@ -2,6 +2,7 @@
 import { useState, type SyntheticEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
+import type { MessageKey } from '@sta/content';
 import { Button, CodeInput, PageHeader, QrCode } from '@sta/ui';
 import { RuleError } from '@sta/data';
 import type { TwoFactorStatus } from '@sta/domain';
@@ -18,8 +19,46 @@ function firstStep(status: TwoFactorStatus, setup: boolean): Step {
   return 'credentials';
 }
 
+/** The words that differ between the client and provider sign in pages; the rest of the flow is shared. */
+export type SignInCopy = {
+  title: MessageKey;
+  demoOnly: MessageKey;
+  email: MessageKey;
+  password: MessageKey;
+  signIn: MessageKey;
+  intro: MessageKey;
+  code: MessageKey;
+  confirm: MessageKey;
+  useRecovery: MessageKey;
+  useAppCode: MessageKey;
+  recoveryLabel: MessageKey;
+  wrong: MessageKey;
+  locked: MessageKey;
+};
+
+const clientCopy: SignInCopy = {
+  title: 'twoFactor.title',
+  demoOnly: 'twoFactor.demoOnly',
+  email: 'twoFactor.email',
+  password: 'twoFactor.password',
+  signIn: 'twoFactor.signIn',
+  intro: 'twoFactor.intro',
+  code: 'twoFactor.code',
+  confirm: 'twoFactor.confirm',
+  useRecovery: 'twoFactor.useRecovery',
+  useAppCode: 'twoFactor.useAppCode',
+  recoveryLabel: 'twoFactor.recoveryCodeLabel',
+  wrong: 'twoFactor.wrong',
+  locked: 'twoFactor.locked',
+};
+
 /** Where to go once the person is in: the client dashboard. */
 export function SignIn() {
+  return <TwoFactorSignIn destination="/client" copy={clientCopy} />;
+}
+
+/** The sign in and two-step flow shared by the client (C26) and provider (P23) pages. */
+export function TwoFactorSignIn({ destination, copy }: { destination: string; copy: SignInCopy }) {
   const t = useT();
   const store = useStore();
   const actor = useActor();
@@ -58,11 +97,11 @@ export function SignIn() {
     setStep(next);
   };
   const finish = () => {
-    void navigate('/client');
+    void navigate(destination);
   };
   const fail = (e: unknown) => {
     if (e instanceof RuleError && (e.rule === 'wrongCode' || e.rule === 'codeLocked')) {
-      setProblem(t(e.rule === 'codeLocked' ? 'twoFactor.locked' : 'twoFactor.wrong'));
+      setProblem(t(e.rule === 'codeLocked' ? copy.locked : copy.wrong));
     } else {
       setProblem(t(foundationsErrorKey(e)));
     }
@@ -113,13 +152,13 @@ export function SignIn() {
 
   return (
     <Standalone>
-      <PageHeader title={t('twoFactor.title')} />
+      <PageHeader title={t(copy.title)} />
       {current === 'credentials' ? (
         <form onSubmit={signIn} className="flex flex-col gap-4">
-          <p className="m-0">{t('twoFactor.demoOnly')}</p>
+          <p className="m-0">{t(copy.demoOnly)}</p>
           <div className="flex flex-col gap-1">
             <label htmlFor="c26-email" className="font-semibold">
-              {t('twoFactor.email')}
+              {t(copy.email)}
             </label>
             <input
               id="c26-email"
@@ -134,7 +173,7 @@ export function SignIn() {
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="c26-password" className="font-semibold">
-              {t('twoFactor.password')}
+              {t(copy.password)}
             </label>
             <input
               id="c26-password"
@@ -148,20 +187,20 @@ export function SignIn() {
             />
           </div>
           <div>
-            <Button type="submit">{t('twoFactor.signIn')}</Button>
+            <Button type="submit">{t(copy.signIn)}</Button>
           </div>
         </form>
       ) : null}
 
       {current === 'code' || current === 'recovery' ? (
         <form onSubmit={confirm} className="flex flex-col gap-4">
-          <p className="m-0">{t('twoFactor.intro')}</p>
+          <p className="m-0">{t(copy.intro)}</p>
           {current === 'code' ? (
-            <CodeInput label={t('twoFactor.code')} value={code} onChange={setCode} />
+            <CodeInput label={t(copy.code)} value={code} onChange={setCode} />
           ) : (
             <div className="flex flex-col gap-1">
               <label htmlFor="c26-recovery" className="font-semibold">
-                {t('twoFactor.recoveryCodeLabel')}
+                {t(copy.recoveryLabel)}
               </label>
               <input
                 id="c26-recovery"
@@ -177,14 +216,14 @@ export function SignIn() {
           )}
           {alert}
           <div className="flex flex-wrap gap-2">
-            <Button type="submit">{t('twoFactor.confirm')}</Button>
+            <Button type="submit">{t(copy.confirm)}</Button>
             <Button
               variant="quiet"
               onClick={() => {
                 go(current === 'code' ? 'recovery' : 'code');
               }}
             >
-              {current === 'code' ? t('twoFactor.useRecovery') : t('twoFactor.useAppCode')}
+              {current === 'code' ? t(copy.useRecovery) : t(copy.useAppCode)}
             </Button>
           </div>
           <p className="m-0 text-sm">{t('twoFactor.demoNote')}</p>
@@ -209,10 +248,10 @@ export function SignIn() {
             alt={t('twoFactor.qrAlt')}
             textAlternative={t('twoFactor.secret', { secret: enrolment.secret })}
           />
-          <CodeInput label={t('twoFactor.code')} value={code} onChange={setCode} />
+          <CodeInput label={t(copy.code)} value={code} onChange={setCode} />
           {alert}
           <div>
-            <Button type="submit">{t('twoFactor.confirm')}</Button>
+            <Button type="submit">{t(copy.confirm)}</Button>
           </div>
           <p className="m-0 text-sm">{t('twoFactor.demoNote')}</p>
         </form>

@@ -147,6 +147,8 @@ export function ProviderShell() {
           item('/provider/data-requests', t('nav.provider.dataRequests'), 'book'),
           item('/provider/status', t('nav.provider.status'), 'bell'),
           item('/provider/team', t('nav.provider.teamSecurity'), 'user'),
+          item('/provider/security', t('nav.provider.security'), 'user'),
+          item('/provider/audit', t('nav.provider.audit'), 'book'),
         ],
         headerLinks: [item('/provider/comms', t('provider.shell.notifications'), 'bell')],
       }}

@@ -17,6 +17,7 @@ import { Onboarding } from '../pages/client/Onboarding';
 import { DataRetention } from '../pages/client/DataRetention';
 import { Settings } from '../pages/client/Settings';
 import { SignIn as ClientSignIn } from '../pages/client/SignIn';
+import { ProviderSignIn } from '../pages/provider/ProviderSignIn';
 import { Team } from '../pages/client/Team';
 import { Display } from '../pages/me/Display';
 import { Me } from '../pages/me/Me';
@@ -58,6 +59,7 @@ export const routes: RouteObject[] = [
       { path: '/staff/signin', element: <SignIn /> },
       // Outside the client shell, so an admin who must set up two-step sign-in can still reach it.
       { path: '/client/signin', element: <ClientSignIn /> },
+      { path: '/provider/signin', element: <ProviderSignIn /> },
       // Outside the staff chrome: a certificate prints cleanly and an organisation document opens in its own tab.
       { path: '/staff/module/:moduleId/certificate', element: <Certificate /> },
       { path: '/staff/progress/record', element: <TrainingRecord /> },
@@ -278,6 +280,14 @@ export const routes: RouteObject[] = [
           {
             path: 'team',
             lazy: async () => ({ Component: (await import('../pages/provider/ProviderTeam')).Team }),
+          },
+          {
+            path: 'security',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProviderSecurity')).Security }),
+          },
+          {
+            path: 'audit',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProviderAudit')).Audit }),
           },
         ],
       },

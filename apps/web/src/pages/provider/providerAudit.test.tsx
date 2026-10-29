@@ -33,7 +33,7 @@ const ev = (
   clientId?: string,
   extra: Partial<AuditEvent> = {},
 ): AuditEvent => ({
-  id: `01HZX00000000000000000AU${String(n).padStart(2, '0')}`,
+  id: `01HZX00000000000000000AD${String(n).padStart(2, '0')}`,
   actorId,
   actorSide: 'provider',
   ...(clientId ? { clientId } : {}),
@@ -62,7 +62,7 @@ const openP20 = async (opts?: Opts) => {
 const mine = () =>
   screen
     .getAllByTestId('audit-row')
-    .filter((r) => /^01HZX00000000000000000AU/.test(r.getAttribute('data-event-id') ?? ''));
+    .filter((r) => /^01HZX00000000000000000AD/.test(r.getAttribute('data-event-id') ?? ''));
 const ids = () => mine().map((r) => r.getAttribute('data-event-id')!.slice(-2));
 
 describe('P20 Audit log', () => {

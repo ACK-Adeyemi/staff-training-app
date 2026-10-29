@@ -964,3 +964,13 @@ Chunk 1 choices:
 - The Start transfer form stays on screen while a transfer is open (the tests look for its fields afterwards); its button is disabled until the open transfer is done or cancelled.
 - Extra keys beyond the test contract: area names, `changeError`, `saveError`, `cancelEdit`, `chooseRole`, `none`, `grantedDirectly`, `transfer.accept`, `transfer.error`, `transfer.status.confirmedOne` and `.ready` (shown once cooling-off has ended). The transfer region also shows for someone with an open transfer but no owner.transfer, so the receiver can accept it.
 - Owner and Co-Owner are left out of the invite and change-role lists (not just disabled) for people without owner.manageOwnerRoles; the data layer still refuses them independently.
+
+## M4 chunk 15b: P19 Security, P20 Audit log, P23 Provider sign in
+
+- Pages: `Security` (ProviderSecurity.tsx, /provider/security), `Audit` (ProviderAudit.tsx, /provider/audit, needs `audit.read` held anywhere) and `ProviderSignIn` (ProviderSignIn.tsx, standalone at /provider/signin, outside the provider shell). Nav: "Security" and "Audit log" join "Team and security" in the More menu. routes.test.tsx and e2e/routes.ts expect the h1 "Security" and "Audit log" (nav labels equal the headings).
+- **P23 reuses C26.** `TwoFactorSignIn` in pages/client/SignIn.tsx now holds the whole flow and takes the destination and a `SignInCopy` (the language keys that differ); the client `SignIn` and `ProviderSignIn` are thin wrappers. Set-up and recovery-code steps still use the shared `twoFactor.*` words.
+- **Data layer change (small).** `twoFactor.startEnrolment`, `confirmEnrolment` and the code check behind `verify` and `useRecoveryCode` refused every non-client actor, so a provider team member could not sign in with a code (the P23 tests need it, brief 22.6 requires two-step for the provider team). They now refuse only staff. Everything else (lockout after five wrong codes, hashes, audit) is unchanged.
+- **Test corrections (not weakenings).**
+  1. providerAudit.test.tsx: seeded ids used the prefix `...AU..`, and `U` is not a ULID character, so `bulkPut` refused them. Prefix is now `AD` (the test's own regex follows).
+  2. providerSecurity.test.tsx: the sign-out confirmation was found with `screen.findByRole('status')`, but the provider header's System status indicator is also `role="status"` (required by providerOverview.test.tsx), so the lookup always found two. It is now scoped to the Sessions region; the assertion text is the same.
+- Audit rows show action, target, actor name and time only (never before, after or reason). Actor names come from `users.list`; an actor the reader cannot see shows "Unknown person". Sessions and Trust this device are simulated and live in component state only.

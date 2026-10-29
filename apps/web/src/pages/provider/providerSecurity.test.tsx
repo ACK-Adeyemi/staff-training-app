@@ -50,7 +50,7 @@ describe('P19 Security', () => {
     expect(rows).toHaveLength(1);
     expect(rows[0]!.textContent).toContain('This device');
     await userEvent.click(within(region).getByRole('button', { name: 'Sign out everywhere' }));
-    expect((await screen.findByRole('status')).textContent).toContain('Signed out everywhere on this demo.');
+    expect((await within(region).findByRole('status')).textContent).toContain('Signed out everywhere on this demo.');
   });
 
   it('has a Trust this device for 30 days switch that is off by default and can be turned on and off', async () => {

@@ -54,6 +54,8 @@ const providerMore: Page[] = [
   { path: '/provider/tickets', label: t('nav.provider.support') },
   { path: '/provider/comms', label: t('nav.provider.comms') },
   { path: '/provider/team', label: t('nav.provider.teamSecurity') },
+  { path: '/provider/security', label: t('nav.provider.security') },
+  { path: '/provider/audit', label: t('nav.provider.audit') },
 ];
 
 describe('every shell route renders its title as the page heading', () => {
@@ -62,7 +64,7 @@ describe('every shell route renders its title as the page heading', () => {
     ...[...clientBar, ...clientMore].map((p): [Side, Page] => ['client', p]),
     ...[...providerBar, ...providerMore].map((p): [Side, Page] => [
       'provider',
-      // P7, P11, P14 and P18 have their own screen titles; the nav items are the section names.
+      // P7, P11, P14, P18, P19 and P20 have their own screen titles; the nav items are the section names.
       p.path === '/provider/packages'
         ? { ...p, label: t('provider.packages.heading') }
         : p.path === '/provider/tickets'
@@ -71,7 +73,11 @@ describe('every shell route renders its title as the page heading', () => {
             ? { ...p, label: t('provider.comms.heading') }
             : p.path === '/provider/team'
               ? { ...p, label: t('provider.team.heading') }
-              : p,
+              : p.path === '/provider/security'
+                ? { ...p, label: t('provider.security.heading') }
+                : p.path === '/provider/audit'
+                  ? { ...p, label: t('provider.audit.heading') }
+                  : p,
     ]),
   ];
   it.each(all)('%s %j', async (side, page) => {
