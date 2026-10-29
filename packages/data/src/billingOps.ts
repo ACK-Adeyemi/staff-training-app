@@ -40,6 +40,7 @@ import {
 } from '@sta/domain';
 import type { RawBackend, WriteOp } from './backend';
 import { moduleFor } from './ops';
+import { killedClientIds } from './providerGlobalAiOps';
 import { audit, beginCall, clientEntitlements, forbid, holds, type Call } from './policy';
 import {
   AccountStateError,
@@ -637,6 +638,7 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
   async function features(ctx: ActorContext): Promise<{ aiAssistant: boolean }> {
     const call = await beginCall(backend, options, ctx);
     if (call.side === 'provider') return forbid('permission');
+    if ((await killedClientIds(backend)).includes(call.clientId as string)) return { aiAssistant: false };
     const ents = await clientEntitlements(call, call.clientId as string);
     return { aiAssistant: ents ? entitled(ents, 'aiAssistant') : false };
   }
@@ -647,6 +649,7 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
       if (call.side === 'provider') return forbid('permission');
       const clientId = call.clientId as string;
       requireUsageAddOns(call);
+      if ((await killedClientIds(backend)).includes(clientId)) throw new NotEntitledError('aiAssistant');
       const ents = await clientEntitlements(call, clientId);
       if (!ents || !entitled(ents, 'aiAssistant')) throw new NotEntitledError('aiAssistant');
       const module = await moduleFor(call, text(input.moduleId));

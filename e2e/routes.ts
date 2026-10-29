@@ -38,6 +38,8 @@ export const providerMore: NavEntry[] = [
   { hash: '#/provider/team', label: 'Team and security', heading: 'Team and roles' },
   { hash: '#/provider/security', label: 'Security' },
   { hash: '#/provider/audit', label: 'Audit log' },
+  { hash: '#/provider/global', label: 'Global content' },
+  { hash: '#/provider/ai', label: 'AI settings', heading: 'AI add-on settings' },
 ];
 
 /** The 21 shell routes. */

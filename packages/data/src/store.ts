@@ -27,6 +27,7 @@ import { createProviderIncidentsOperations } from './providerIncidentsOps';
 import { createProviderRecoveryOperations } from './providerRecoveryOps';
 import { createPricingOperations } from './pricingOps';
 import { createDunningOperations } from './dunningOps';
+import { createProviderGlobalAiOperations } from './providerGlobalAiOps';
 import { createProviderOverviewOperations } from './providerOverviewOps';
 import { createProviderOperations } from './providerOps';
 import { createBillingOperations, simulateFailedPayment } from './billingOps';
@@ -310,6 +311,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const incidentOps = createProviderIncidentsOperations(backend, options);
   const recoveryOps = createProviderRecoveryOperations(backend, options);
   const dunningOps = createDunningOperations(backend, options);
+  const globalAiOps = createProviderGlobalAiOperations(backend, options);
   const overviewOps = createProviderOverviewOperations(backend, options);
   const authoringOps = createAuthoringOperations(backend, options);
   const evidenceFlow = createEvidenceOperations(backend, options);
@@ -361,6 +363,8 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     learnMore: commsOps.learnMore,
     recovery: recoveryOps.recovery,
     providerOverview: overviewOps.providerOverview,
+    globalContent: globalAiOps.globalContent,
+    aiSettings: globalAiOps.aiSettings,
     dunning: dunningOps.dunning,
     telemetry: overviewOps.telemetry,
     profileChanges: recoveryOps.profileChanges,

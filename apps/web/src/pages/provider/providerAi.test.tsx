@@ -121,7 +121,9 @@ describe('P22 AI add-on settings', () => {
     const name = await clientName(ctx);
     const row = await littleRow(ctx);
     await userEvent.click(within(row).getByRole('button', { name: `Switch off AI for ${name}` }));
-    expect((await screen.findByRole('status')).textContent).toContain(`AI switched off for ${name}.`);
+    expect(
+      (await within(screen.getByRole('region', { name: 'Usage by client' })).findByRole('status')).textContent,
+    ).toContain(`AI switched off for ${name}.`);
     await waitFor(async () => {
       const after = await littleRow(ctx);
       expect(after.textContent).toContain('AI switched off by the provider');
@@ -149,7 +151,9 @@ describe('P22 AI add-on settings', () => {
     await waitFor(async () => {
       expect((await littleRow(ctx)).textContent).not.toContain('AI switched off by the provider');
     });
-    expect((await screen.findByRole('status')).textContent).toContain(`AI switched back on for ${name}.`);
+    expect(
+      (await within(screen.getByRole('region', { name: 'Usage by client' })).findByRole('status')).textContent,
+    ).toContain(`AI switched back on for ${name}.`);
     expect(
       (await aiStore(ctx).overview(ownerActor(ctx))).find((r) => r.clientId === ctx.keys.clients['littleAcorns'])!
         .killSwitch,

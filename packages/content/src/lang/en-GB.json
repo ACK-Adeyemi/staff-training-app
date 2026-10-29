@@ -121,7 +121,9 @@
       "audit": "Audit log",
       "recovery": "Account recovery",
       "dataRequests": "Data requests",
-      "status": "Status and incidents"
+      "status": "Status and incidents",
+      "global": "Global content",
+      "ai": "AI settings"
     }
   },
   "placeholder": {
@@ -249,7 +251,8 @@
       "invalidTicket": "Check the details of your request and try again.",
       "invalidReply": "Write a reply of up to 2,000 characters.",
       "invalidClient": "Check the organisation name, sites, industry pack, package and first admin's email, then try again.",
-      "invalidPublish": "Choose at least one client, write what changed, and make sure the module has a saved draft to publish."
+      "invalidPublish": "Choose at least one client, write what changed, and make sure the module has a saved draft to publish.",
+      "duplicate": "That is already in the list."
     },
     "notEntitled": {
       "liveCompetitions": "You have reached the number of live competitions in your package. End or cancel one first.",
@@ -3595,7 +3598,11 @@
       "readOnly": "You can look at the team but not change anything here.",
       "loadError": "We could not load the team. Please try again.",
       "members": "Members",
-      "status": { "active": "Active", "invited": "Invited", "suspended": "Suspended" },
+      "status": {
+        "active": "Active",
+        "invited": "Invited",
+        "suspended": "Suspended"
+      },
       "invite": {
         "heading": "Invite someone",
         "email": "Email",
@@ -3722,8 +3729,17 @@
       "noAccess": "You do not have access to data requests.",
       "note": "The client is the controller of its staff's personal data. The provider helps the client answer each request and keeps this log.",
       "list": "Requests",
-      "kind": { "access": "Access", "correction": "Correction", "erasure": "Erasure", "other": "Other" },
-      "status": { "open": "Open", "done": "Done", "rejected": "Rejected" },
+      "kind": {
+        "access": "Access",
+        "correction": "Correction",
+        "erasure": "Erasure",
+        "other": "Other"
+      },
+      "status": {
+        "open": "Open",
+        "done": "Done",
+        "rejected": "Rejected"
+      },
       "received": "Received {date}",
       "due": "Due {date}",
       "dueIn": "Due in {count} days",
@@ -3753,7 +3769,12 @@
       "current": "Current status",
       "incidents": "Incidents",
       "none": "There are no incidents.",
-      "level": { "normal": "Normal", "degraded": "Degraded", "maintenance": "Maintenance", "incident": "Incident" },
+      "level": {
+        "normal": "Normal",
+        "degraded": "Degraded",
+        "maintenance": "Maintenance",
+        "incident": "Incident"
+      },
       "levelMessage": {
         "normal": "Everything is working as expected.",
         "degraded": "Some things are slower than usual.",
@@ -3780,9 +3801,60 @@
       },
       "maintenance": "Maintenance",
       "maintenanceHelp": "Turn an app on to show the maintenance banner to its users. The banner will say that the app is being updated and to try again soon.",
-      "app": { "staff": "Staff", "client": "Client", "provider": "Provider" },
+      "app": {
+        "staff": "Staff",
+        "client": "Client",
+        "provider": "Provider"
+      },
       "on": "On",
       "off": "Off"
+    },
+    "global": {
+      "heading": "Global content",
+      "noAccess": "You do not have access to global content.",
+      "readOnly": "You can look at global content but not change it.",
+      "themes": "Seasonal themes",
+      "prizes": "Prize suggestions",
+      "faqs": "Global FAQs",
+      "badges": "Badges",
+      "levels": "Levels",
+      "level": "Level {level}",
+      "levelFrom": "{xp} XP",
+      "prizeDisclaimer": "The client provides and pays for the prize and is responsible for any tax, payroll or legal implications.",
+      "newPrize": "New prize suggestion",
+      "addPrize": "Add prize suggestion",
+      "removePrize": "Remove {text}",
+      "prizeAdded": "Added to the prize suggestions.",
+      "prizeRemoved": "Removed from the prize suggestions.",
+      "prizeDuplicate": "That suggestion is already in the list.",
+      "prizeInvalid": "Type a suggestion of up to 120 characters.",
+      "loadError": "Could not load global content."
+    },
+    "ai": {
+      "heading": "AI add-on settings",
+      "noAccess": "You do not have access to AI settings.",
+      "demo": "Demo AI",
+      "demoNote": "This is Demo AI: scripted answers, no real model and no network requests.",
+      "guardrails": "Guardrails",
+      "guardrail": {
+        "grounded": "Answers use only the client's approved modules and policies, and cite them.",
+        "noAdvice": "No legal advice and no predictions about inspection outcomes.",
+        "personalData": "Staff are warned not to paste personal data. Children's data is never included.",
+        "draft": "AI output is always a draft that a person must review before it is published."
+      },
+      "usage": "Usage by client",
+      "used": "{used} of {included} questions used",
+      "status": {
+        "off": "Off",
+        "on": "On",
+        "trial": "Trial"
+      },
+      "killSwitchOn": "AI switched off by the provider",
+      "switchOff": "Switch off AI for {name}",
+      "switchBackOn": "Switch AI back on for {name}",
+      "switchedOff": "AI switched off for {name}.",
+      "switchedOn": "AI switched back on for {name}.",
+      "loadError": "Could not load AI settings."
     }
   }
 }

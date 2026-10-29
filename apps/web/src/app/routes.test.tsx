@@ -56,6 +56,8 @@ const providerMore: Page[] = [
   { path: '/provider/team', label: t('nav.provider.teamSecurity') },
   { path: '/provider/security', label: t('nav.provider.security') },
   { path: '/provider/audit', label: t('nav.provider.audit') },
+  { path: '/provider/global', label: t('nav.provider.global') },
+  { path: '/provider/ai', label: t('nav.provider.ai') },
 ];
 
 describe('every shell route renders its title as the page heading', () => {
@@ -77,7 +79,9 @@ describe('every shell route renders its title as the page heading', () => {
                 ? { ...p, label: t('provider.security.heading') }
                 : p.path === '/provider/audit'
                   ? { ...p, label: t('provider.audit.heading') }
-                  : p,
+                  : p.path === '/provider/ai'
+                    ? { ...p, label: t('provider.ai.heading') }
+                    : p,
     ]),
   ];
   it.each(all)('%s %j', async (side, page) => {

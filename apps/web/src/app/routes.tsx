@@ -289,6 +289,14 @@ export const routes: RouteObject[] = [
             path: 'audit',
             lazy: async () => ({ Component: (await import('../pages/provider/ProviderAudit')).Audit }),
           },
+          {
+            path: 'global',
+            lazy: async () => ({ Component: (await import('../pages/provider/GlobalContent')).GlobalContent }),
+          },
+          {
+            path: 'ai',
+            lazy: async () => ({ Component: (await import('../pages/provider/AiSettings')).AiSettings }),
+          },
         ],
       },
       { path: '*', element: <NotFound /> },

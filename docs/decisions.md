@@ -974,3 +974,11 @@ Chunk 1 choices:
   1. providerAudit.test.tsx: seeded ids used the prefix `...AU..`, and `U` is not a ULID character, so `bulkPut` refused them. Prefix is now `AD` (the test's own regex follows).
   2. providerSecurity.test.tsx: the sign-out confirmation was found with `screen.findByRole('status')`, but the provider header's System status indicator is also `role="status"` (required by providerOverview.test.tsx), so the lookup always found two. It is now scoped to the Sessions region; the assertion text is the same.
 - Audit rows show action, target, actor name and time only (never before, after or reason). Actor names come from `users.list`; an actor the reader cannot see shows "Unknown person". Sessions and Trust this device are simulated and live in component state only.
+
+## M4 chunk 16: global prize list and AI kill switch stored as settings records
+The provider's global prize suggestion list and the set of clients whose AI is switched off are two records in the existing
+`settings` store (`provider.prizeSuggestions`, `provider.aiKillSwitches`), so no new object store and no IndexedDB version bump
+were needed. The prize list starts as the nursery pack's list until first edited. Reset and Load restore the defaults. The
+kill switch is read by `access.features` and `ai.explain`. Added rule name `duplicate`. The P22 test looked for a single
+`role=status` on the whole page, but the shell header always has one (system status), so the test now looks inside the
+"Usage by client" region.

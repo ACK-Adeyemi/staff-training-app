@@ -289,7 +289,8 @@ export type RuleName =
   | 'invalidTicket'
   | 'invalidReply'
   | 'invalidClient'
-  | 'invalidPublish';
+  | 'invalidPublish'
+  | 'duplicate';
 
 /** A business rule said no (for example "finish every lesson first"). The web app maps `rule` to `errors.rule.<rule>`. */
 export class RuleError extends DataError {
@@ -1127,7 +1128,33 @@ export interface DataRequestsService {
   reject(ctx: ActorContext, id: string, input: { notes: string }): Promise<DataRequest>;
 }
 
+/** Provider global content (M4 chunk 16). content.read to look, content.write to change the prize suggestion list. */
+export interface GlobalContentService {
+  get(ctx: ActorContext): Promise<{ prizeSuggestions: string[] }>;
+  /** Trims; blank or over 120 characters is a ValidationError; a repeat is RuleError 'duplicate'. */
+  addPrizeSuggestion(ctx: ActorContext, text: string): Promise<{ prizeSuggestions: string[] }>;
+  /** A text not in the list is NotFoundError. */
+  removePrizeSuggestion(ctx: ActorContext, text: string): Promise<{ prizeSuggestions: string[] }>;
+}
+
+export type AiSettingsRow = {
+  clientId: Id;
+  clientName: string;
+  status: 'off' | 'on' | 'trial';
+  usageThisPeriod: number;
+  includedUnits: number;
+  killSwitch: boolean;
+};
+
+/** Provider AI add-on settings (M4 chunk 16). ai.manage. While a client's kill switch is on, its AI is unavailable. */
+export interface AiSettingsService {
+  overview(ctx: ActorContext): Promise<AiSettingsRow[]>;
+  setKillSwitch(ctx: ActorContext, clientId: Id, on: boolean): Promise<AiSettingsRow>;
+}
+
 export interface DataStore {
+  globalContent: GlobalContentService;
+  aiSettings: AiSettingsService;
   recovery: RecoveryService;
   profileChanges: ProfileChangesService;
   billingChanges: BillingChangesService;
