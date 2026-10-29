@@ -5,6 +5,7 @@ import { useCurrentUser, useT } from '../app/hooks';
 import { useDesktop } from '../app/useDesktop';
 import { useUnreadCount } from '../pages/staff/queries';
 import { DemoBadgeSlot } from '../demo/RootLayout';
+import { SystemBanners, SystemStatus } from './systemNotices';
 
 export type ShellConfig = {
   side: 'staff' | 'client' | 'provider';
@@ -74,6 +75,7 @@ export function Shell({ config }: { config: ShellConfig }) {
           <span className="font-semibold">{user.data?.displayName ?? t('shell.loading')}</span>
           <div className="flex flex-wrap items-center gap-2">
             {config.headerExtra}
+            <SystemStatus side={config.side} />
             {config.side === 'provider' ? <Badge tone="simulated">{t('demo.simulatedData')}</Badge> : null}
             <DemoBadgeSlot />
             {config.headerLinks.map((item) => {
@@ -97,6 +99,7 @@ export function Shell({ config }: { config: ShellConfig }) {
             })}
           </div>
         </header>
+        <SystemBanners side={config.side} />
         <main className="px-4 pb-28 print:p-0 md:pb-6">
           {config.top ? <div className="mt-3 flex flex-col gap-2 print:hidden">{config.top}</div> : null}
           <Outlet />

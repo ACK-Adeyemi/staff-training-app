@@ -61,6 +61,19 @@
     "personaClientAdmins": "Client admins",
     "personaStaff": "Staff"
   },
+  "systemNotices": {
+    "statusLabel": "System status",
+    "level": {
+      "normal": "Normal",
+      "degraded": "Degraded",
+      "maintenance": "Maintenance",
+      "incident": "Incident"
+    },
+    "maintenanceBanner": "Maintenance: we are making improvements. Some things may be slow or unavailable for a short time. Your progress is safe.",
+    "incidentBanner": "{level}: {title}",
+    "announcementDismiss": "Dismiss",
+    "announcementDismissFor": "Dismiss: {title}"
+  },
   "shell": {
     "skipToContent": "Skip to main content",
     "mainNavigation": "Main navigation",
@@ -3612,7 +3625,12 @@
         "maintenance": "Planned maintenance is under way.",
         "incident": "There is a problem we are working on."
       },
-      "update": { "investigating": "Investigating", "identified": "Identified", "monitoring": "Monitoring", "resolved": "Resolved" },
+      "update": {
+        "investigating": "Investigating",
+        "identified": "Identified",
+        "monitoring": "Monitoring",
+        "resolved": "Resolved"
+      },
       "updateStatus": "Status",
       "message": "Message",
       "addUpdate": "Add update",

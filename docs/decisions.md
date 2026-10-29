@@ -947,3 +947,12 @@ Chunk 1 choices:
 - Routes `#/provider/data-requests` and `#/provider/status`, both in the provider "More" navigation. P16 needs `dataRequests.manage`; P17 needs `incidents.post` for the page and `ops.write` to use the maintenance switches (disabled otherwise).
 - Language keys follow the test headers, with two shape changes: `provider.status.post` is an object (heading, level, title, submit, titleError, failed) so the post form keys do not clash with a string key, and the "Due soon" badge shows for open requests due within 7 days, including overdue ones.
 - The "link to the client's exports" on P16 is not built (no client exports route yet). The persona choices in the tests (`raj`, `tom`) were correct; no test was changed.
+
+## M4 chunk 14d: banners in three apps
+
+- New `apps/web/src/shells/systemNotices.tsx`, used by the shared `Shell`: a header status indicator (all three shells), system banners (this app's maintenance flag, or an open incident; `role="status"`, no dismiss, rendered outside `<main>`) and announcement banners (staff and client only; Dismiss hides until reload; session state lives in the shell, so it survives navigation). It reads `maintenance.flags`, `incidents.current` and `providerComms.banners` in one query, which the existing live-update invalidation refreshes. Text is under `systemNotices.*` in en-GB.json; the staff maintenance wording has no billing or payment words.
+- Only the provider indicator carries `role="status"` and the name "System status" (the P1 test needs it). Staff and client show the same text without a live-region role, and announcement banners use a labelled `section` rather than `role="status"`, because extra status regions broke many existing `findByRole('status')` toast checks.
+- The old `ProviderStatus` ("All systems working (Simulated)") is replaced by the shared indicator. `providerChrome.tsx` is deleted.
+- The seeded live announcement "Fire evacuation template" now shows in the staff shell, so the three S13 notification tests that searched the whole page for /Fire evacuation/ now search inside `<main>`. Their expectations are unchanged.
+- `systemBanners.test.tsx`: only its 7 lint errors were fixed (braces on arrow functions, unnecessary `?.` and `as string`). No expectation was changed.
+- `routes.test.tsx` provider `/provider/comms` ("Comms" heading) already failed before this chunk (P14 heading is not "Comms"); not touched here.

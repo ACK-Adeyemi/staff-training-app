@@ -14,7 +14,15 @@ const DUE_SOON_DAYS = 7;
 
 const box = 'mb-6 rounded-[var(--radius-md)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] p-4';
 
-function RequestRow({ row, clientName, onChanged }: { row: Row; clientName?: string | undefined; onChanged: () => Promise<void> }) {
+function RequestRow({
+  row,
+  clientName,
+  onChanged,
+}: {
+  row: Row;
+  clientName?: string | undefined;
+  onChanged: () => Promise<void>;
+}) {
   const t = useT();
   const store = useStore();
   const actor = useActor();
@@ -65,7 +73,9 @@ function RequestRow({ row, clientName, onChanged }: { row: Row; clientName?: str
       <p className="m-0 flex flex-wrap items-center gap-2">
         <Badge>{t(`provider.dataRequests.status.${row.status}` as MessageKey)}</Badge>
         {open ? <span>{dueWords}</span> : null}
-        {open && row.dueInDays <= DUE_SOON_DAYS ? <Badge tone="simulated">{t('provider.dataRequests.dueSoon')}</Badge> : null}
+        {open && row.dueInDays <= DUE_SOON_DAYS ? (
+          <Badge tone="simulated">{t('provider.dataRequests.dueSoon')}</Badge>
+        ) : null}
       </p>
       {row.notes ? <p className="m-0">{row.notes}</p> : null}
       {row.status === 'done' && row.evidence ? (
@@ -200,12 +210,7 @@ export function DataRequests() {
             <h2 className="mt-0 text-lg font-bold">{t('provider.dataRequests.list')}</h2>
             <ul className="m-0 flex list-none flex-col gap-3 p-0">
               {(list.data ?? []).map((r) => (
-                <RequestRow
-                  key={r.id}
-                  row={r}
-                  clientName={clientNameOf(r.clientId)}
-                  onChanged={refresh}
-                />
+                <RequestRow key={r.id} row={r} clientName={clientNameOf(r.clientId)} onChanged={refresh} />
               ))}
             </ul>
           </section>

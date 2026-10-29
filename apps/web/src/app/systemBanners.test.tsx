@@ -66,9 +66,11 @@ describe('announcement banners', () => {
     const dismiss = within(banner).getByRole('button', { name: /dismiss/i });
     expect(dismiss.className).toMatch(/min-h-11|min-h-\[44px\]/);
     fireEvent.click(dismiss);
-    await waitFor(() => expect(screen.queryByTestId('announcement-banner')).toBeNull());
+    await waitFor(() => {
+      expect(screen.queryByTestId('announcement-banner')).toBeNull();
+    });
     expect(screen.getByRole('main')).toBeTruthy();
-    expect(screen.getByRole('main').textContent?.length).toBeGreaterThan(0);
+    expect(screen.getByRole('main').textContent.length).toBeGreaterThan(0);
   });
 
   it('keeps the banner dismissed when the learner moves to the Learn page', async () => {
@@ -76,7 +78,9 @@ describe('announcement banners', () => {
     const banner = await screen.findByTestId('announcement-banner');
     fireEvent.click(within(banner).getByRole('button', { name: /dismiss/i }));
     await router.navigate('/staff/learn');
-    await waitFor(() => expect(router.state.location.pathname).toBe('/staff/learn'));
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/staff/learn');
+    });
     expect(await screen.findByRole('main')).toBeTruthy();
     expect(screen.queryByTestId('announcement-banner')).toBeNull();
   });
@@ -115,7 +119,7 @@ describe('announcement banners', () => {
   it('never uses billing or payment wording in a learner banner area, even when the account is past due', async () => {
     await renderRoute('/staff', 'staff', {
       prepare: async (c) => {
-        await c.handle.admin.simulateFailedPayment(c.keys.clients['littleAcorns'] as string, TODAY);
+        await c.handle.admin.simulateFailedPayment(c.keys.clients['littleAcorns'], TODAY);
         await setMaintenance('staff')(c);
       },
     });
@@ -134,17 +138,20 @@ describe('maintenance banners', () => {
     expect(banner.textContent).toContain('Maintenance');
   });
 
-  it.each(SHELLS)('does not show the %s maintenance banner when only another app is in maintenance', async (app, path) => {
-    const other = app === 'staff' ? 'client' : 'staff';
-    await renderRoute(path, app, { prepare: setMaintenance(other) });
-    await screen.findByTestId('system-status');
-    expect(screen.queryByTestId('system-banner')).toBeNull();
-  });
+  it.each(SHELLS)(
+    'does not show the %s maintenance banner when only another app is in maintenance',
+    async (app, path) => {
+      const other = app === 'staff' ? 'client' : 'staff';
+      await renderRoute(path, app, { prepare: setMaintenance(other) });
+      await screen.findByTestId('system-status');
+      expect(screen.queryByTestId('system-banner')).toBeNull();
+    },
+  );
 
   it.each(SHELLS)('keeps the %s page content visible and has no way to dismiss it forever', async (app, path) => {
     await renderRoute(path, app, { prepare: setMaintenance(app) });
     const banner = await screen.findByTestId('system-banner');
-    expect(screen.getByRole('main').textContent?.length).toBeGreaterThan(0);
+    expect(screen.getByRole('main').textContent.length).toBeGreaterThan(0);
     expect(within(banner).queryByRole('button', { name: /dismiss|hide|close/i })).toBeNull();
     expect(banner.closest('main')).toBeNull();
   });
@@ -160,7 +167,9 @@ describe('status indicator', () => {
   it.each(SHELLS)('shows the open incident title and level in the %s shell', async (app, path) => {
     await renderRoute(path, app, { prepare: postIncident });
     const status = await screen.findByTestId('system-status');
-    await waitFor(() => expect(status.textContent).toContain('Incident'));
+    await waitFor(() => {
+      expect(status.textContent).toContain('Incident');
+    });
     expect(status.textContent).toContain('Sign-in is failing for some people');
     expect(status.textContent).not.toContain('Normal');
   });
@@ -168,6 +177,6 @@ describe('status indicator', () => {
   it.each(SHELLS)('keeps the %s page content visible during an incident', async (app, path) => {
     await renderRoute(path, app, { prepare: postIncident });
     await screen.findByTestId('system-status');
-    expect(screen.getByRole('main').textContent?.length).toBeGreaterThan(0);
+    expect(screen.getByRole('main').textContent.length).toBeGreaterThan(0);
   });
 });

@@ -296,7 +296,9 @@ describe('S13 Notifications', () => {
 
   it('shows a reminder notification with its training and unread state', async () => {
     await renderRoute('/staff/notifications', 'staff', { prepare: putReminder });
-    const item = (await screen.findByText(/Fire evacuation/)).closest('li') as HTMLElement;
+    const item = (await within(await screen.findByRole('main')).findByText(/Fire evacuation/)).closest(
+      'li',
+    ) as HTMLElement;
     expect(within(item).getByRole('button', { name: 'Mark as read' })).toBeTruthy();
   });
 
@@ -308,11 +310,13 @@ describe('S13 Notifications', () => {
         await putReminder(x);
       },
     });
-    const item = (await screen.findByText(/Fire evacuation/)).closest('li') as HTMLElement;
+    const item = (await within(await screen.findByRole('main')).findByText(/Fire evacuation/)).closest(
+      'li',
+    ) as HTMLElement;
     await userEvent.click(within(item).getByRole('button', { name: 'Remind me tomorrow' }));
     expect((await screen.findByRole('status')).textContent).toContain('We will remind you tomorrow.');
     await waitFor(() => {
-      expect(screen.queryByText(/Fire evacuation/)).toBeNull();
+      expect(within(screen.getByRole('main')).queryByText(/Fire evacuation/)).toBeNull();
     });
     const stored = need((await dump<Notification>(c.handle, 'notifications')).find((n) => n.id === reminderNote(c).id));
     // 19 October 2026 is British Summer Time (UTC+1), so 08:00 on the 20th is 07:00 UTC.
@@ -326,10 +330,10 @@ describe('S13 Notifications', () => {
     };
     await renderRoute('/staff/notifications', 'staff', { prepare: snoozed });
     await screen.findByRole('heading', { level: 1 });
-    expect(screen.queryByText(/Fire evacuation/)).toBeNull();
+    expect(within(screen.getByRole('main')).queryByText(/Fire evacuation/)).toBeNull();
     cleanup();
     await renderRoute('/staff/notifications', 'staff', { prepare: snoozed, now: '2026-10-20T07:00:00.000Z' });
-    expect(await screen.findByText(/Fire evacuation/)).toBeTruthy();
+    expect(await within(await screen.findByRole('main')).findByText(/Fire evacuation/)).toBeTruthy();
   });
 
   it('saves quiet hours to the person prefs', async () => {
