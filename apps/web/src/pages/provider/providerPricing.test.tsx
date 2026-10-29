@@ -67,8 +67,7 @@ const openP25 = async (opts?: Opts) => {
   return view;
 };
 type View = Awaited<ReturnType<typeof openP25>>;
-const stored = async (view: View) =>
-  (await view.handle.admin.dumpAll())['priceAdjustments'] as PriceAdjustment[];
+const stored = async (view: View) => (await view.handle.admin.dumpAll())['priceAdjustments'] as PriceAdjustment[];
 const clientName = async (view: View, id: string) =>
   ((await view.handle.admin.dumpAll())['clients'] as { id: string; displayName: string }[]).find((c) => c.id === id)!
     .displayName;
@@ -101,9 +100,12 @@ describe('P25 Price changes: list', () => {
     expect(within(group('scheduled')!).getByRole('heading', { level: 2 }).textContent).toBe('Scheduled');
     expect(within(group('active')!).getByRole('heading', { level: 2 }).textContent).toBe('Active');
     const all = await stored(view);
-    expect(screen.getAllByTestId('price-row').map((r) => r.getAttribute('data-adjustment-id')).sort()).toEqual(
-      all.map((a) => a.id).sort(),
-    );
+    expect(
+      screen
+        .getAllByTestId('price-row')
+        .map((r) => r.getAttribute('data-adjustment-id'))
+        .sort(),
+    ).toEqual(all.map((a) => a.id).sort());
   });
 
   it('shows client, status and value on each seeded row', async () => {
@@ -128,17 +130,17 @@ describe('P25 Price changes: new change and preview', () => {
     await openForm(view);
     expect(screen.getByRole<HTMLInputElement>('spinbutton', { name: 'Notice days' }).value).toBe('30');
     const type = screen.getByRole('combobox', { name: 'Type' });
-    expect(within(type).getAllByRole('option').map((o) => o.textContent)).toEqual([
-      'Price override',
-      'Percentage discount',
-      'Percentage increase',
-    ]);
+    expect(
+      within(type)
+        .getAllByRole('option')
+        .map((o) => o.textContent),
+    ).toEqual(['Price override', 'Percentage discount', 'Percentage increase']);
     const scope = screen.getByRole('combobox', { name: 'Applies to' });
-    expect(within(scope).getAllByRole('option').map((o) => o.textContent)).toEqual([
-      'Plan',
-      'One add-on',
-      'Whole invoice',
-    ]);
+    expect(
+      within(scope)
+        .getAllByRole('option')
+        .map((o) => o.textContent),
+    ).toEqual(['Plan', 'One add-on', 'Whole invoice']);
     for (const name of ['One client', 'Several clients', 'All clients'])
       expect(screen.getByRole('radio', { name })).toBeTruthy();
     expect(screen.getByRole<HTMLInputElement>('radio', { name: 'One client' }).checked).toBe(true);

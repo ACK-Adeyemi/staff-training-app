@@ -107,7 +107,9 @@ describe('P24 Profile changes: name changes', () => {
     const view = await openP24();
     const req = (await storedPc(view))[0]!;
     await userEvent.click(within(pcRow()).getByRole('button', { name: 'Update billing name to match' }));
-    expect((await within(screen.getByRole('main')).findByRole('status')).textContent).toContain('Billing name updated for future invoices.');
+    expect((await within(screen.getByRole('main')).findByRole('status')).textContent).toContain(
+      'Billing name updated for future invoices.',
+    );
     expect((await storedPc(view))[0]!.status).toBe('billingUpdated');
     expect(await billingNameOf(view, req.clientId)).toBe('Oak Tree Nurseries Group');
     await waitFor(() => {
@@ -131,7 +133,9 @@ describe('P24 Profile changes: name changes', () => {
     const view = await openP24();
     const req = (await storedPc(view))[0]!;
     await userEvent.click(within(pcRow()).getByRole('button', { name: 'Revert display name' }));
-    expect((await within(screen.getByRole('main')).findByRole('status')).textContent).toContain('Display name reverted.');
+    expect((await within(screen.getByRole('main')).findByRole('status')).textContent).toContain(
+      'Display name reverted.',
+    );
     expect((await storedPc(view))[0]!.status).toBe('reverted');
     expect(await nameOf(view, req.clientId)).toBe('Oak Tree Nurseries');
     await waitFor(() => {
