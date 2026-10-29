@@ -1,6 +1,6 @@
 // M5 chunk 2 (F-1): content minimums for nursery modules (build pack 2.4, 9.1, 9.3, 9.5) and the first three Tier 2
 // modules by id: Suitable people and vetting, Ratios and qualifications, Risk assessment and outings.
-// Plan docs/plans/m5.md, Chunks item 2 and Assumptions 4 and 5. Chunk 3 adds Medicines and Records.
+// Plan docs/plans/m5.md, Chunks item 2 and Assumptions 4 and 5. Chunk 3 adds Medicines (3.60 to 3.62) and Records (3.95 to 3.100).
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -31,7 +31,7 @@ const checkQuestions = (mod: Module): void => {
 
 describe('every nursery provider module meets the minimums', () => {
   it('has at least one module to check', () => {
-    expect(nurseryModules.length).toBeGreaterThanOrEqual(6);
+    expect(nurseryModules.length).toBeGreaterThanOrEqual(11);
   });
 
   it.each(nurseryModules.map((m) => [m.title, m] as const))('%s', (_t, mod) => {
@@ -73,6 +73,24 @@ const tier2: Tier2[] = [
     folder: 'risk-assessment',
     category: 'healthAndSafety',
     paragraphs: range(91, 93),
+  },
+  // Chunk 3. Ranges checked against .sources-cache/eyfs-group.txt: 3.60 to 3.62 cover illness procedure and
+  // administering medicines (3.61 policy, 3.62 written permission and record); 3.95 to 3.100 cover information and
+  // record keeping (3.95 maintain records, 3.96 access, 3.97 privacy, 3.98 retention, 3.99 child information,
+  // 3.100 information shared with parents).
+  {
+    name: 'Medicines',
+    key: 'medicines',
+    folder: 'medicines',
+    category: 'healthAndSafety',
+    paragraphs: range(60, 62),
+  },
+  {
+    name: 'Records, confidentiality and data protection',
+    key: 'records',
+    folder: 'records',
+    category: 'ourPolicies',
+    paragraphs: range(95, 100),
   },
 ];
 

@@ -13,9 +13,9 @@ const sgId = moduleIds.safeguardingAndWhistleblowing;
 
 describe('seed version', () => {
   it('is 7 after M4 chunk 18b (3 was M2) and is stored in SeedMeta by load', async () => {
-    expect(SEED_VERSION).toBe(8);
+    expect(SEED_VERSION).toBe(9);
     const { admin } = await seeded();
-    expect(await admin.getSeedMeta()).toMatchObject({ seedValue: SEED.seedValue, today: TODAY, seedVersion: 8 });
+    expect(await admin.getSeedMeta()).toMatchObject({ seedValue: SEED.seedValue, today: TODAY, seedVersion: 9 });
   });
 });
 
@@ -218,7 +218,7 @@ describe('ensureCurrentSeed (Assumption 19)', () => {
     await admin.setSeedMeta({ seedValue: 777, today: TODAY }); // what M0 stored: no version
     const keys = await ensureCurrentSeed(admin);
     expect(keys).not.toBeNull();
-    expect(await admin.getSeedMeta()).toMatchObject({ seedValue: 777, today: TODAY, seedVersion: 8 });
+    expect(await admin.getSeedMeta()).toMatchObject({ seedValue: 777, today: TODAY, seedVersion: 9 });
     const dump = (await admin.dumpAll()) as Record<string, any[]>;
     expect(dump['modules']!.length).toBeGreaterThan(0);
     expect(
@@ -233,7 +233,7 @@ describe('ensureCurrentSeed (Assumption 19)', () => {
     await admin.setSeedMeta({ seedValue: SEED.seedValue, today: TODAY, seedVersion: 1 });
     await admin.bulkPut('assignments', []);
     expect(await ensureCurrentSeed(admin)).not.toBeNull();
-    expect((await admin.getSeedMeta())?.seedVersion).toBe(8);
+    expect((await admin.getSeedMeta())?.seedVersion).toBe(9);
   });
 
   it('does nothing when the stored version is current, keeping local changes', async () => {

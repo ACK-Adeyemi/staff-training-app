@@ -47,9 +47,9 @@ async function world() {
 
 describe('seed version 4 (assumption 53)', () => {
   it('is 7 (M4), and load stores it in the seed metadata', async () => {
-    expect(SEED_VERSION).toBe(8);
+    expect(SEED_VERSION).toBe(9);
     const { admin } = await seeded();
-    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 8 });
+    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 9 });
   });
 
   it('reseeds a stored version 3 world with the same seed value and today', async () => {
@@ -59,7 +59,7 @@ describe('seed version 4 (assumption 53)', () => {
     await admin.setSeedMeta({ ...SEED, seedVersion: 3 });
     const keys = await ensureCurrentSeed(admin);
     expect(keys).not.toBeNull();
-    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 8 });
+    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 9 });
     const dump = (await admin.dumpAll()) as Dump;
     expect(dump['moduleFeedback']!.length).toBeGreaterThan(20);
     // Seed version 5 (M4) adds tickets from other clients; Little Acorns still has its three.
@@ -250,7 +250,8 @@ describe('seed version 4: Little Acorns own modules (assumption 54)', () => {
     expect(draft!.version).toBe(1);
     expect(draft!.owner).toMatchObject({ clientId: la });
     const own = (dump['modules'] as Module[]).filter((m) => m.owner !== 'provider' && m.owner.clientId === la);
-    expect(own.map((m) => m.title).sort()).toEqual([FIRE_TITLE, LONE_TITLE].sort());
+    // Seed version 9 (M5 chunk 3) adds the "Mobile phone policy" draft beside Lone working.
+    expect(own.map((m) => m.title).sort()).toEqual([FIRE_TITLE, LONE_TITLE, 'Mobile phone policy'].sort());
   });
 
   it('gives Fire evacuation lesson 2 the biggest drop-off in the lesson funnel', async () => {
