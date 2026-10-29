@@ -60,7 +60,7 @@ const openP9 = async (opts?: Opts) => {
 };
 
 const rowFor = (rows: HTMLElement[], id: string) => rows.find((r) => r.getAttribute('data-client-id') === id)!;
-const daysIn = (row: HTMLElement) => Number(/Next: .* in (\d+) days?/.exec(row.textContent ?? '')?.[1]);
+const daysIn = (row: HTMLElement) => Number(/Next: .* in (\d+) days?/.exec(row.textContent)?.[1]);
 
 describe('P9 Dunning', () => {
   it('lists every non-active client in overview order with name, state as text, amount outstanding and days to next state', async () => {
@@ -69,7 +69,7 @@ describe('P9 Dunning', () => {
     expect(overview.rows.length).toBeGreaterThan(0);
     expect(rows.map((r) => r.getAttribute('data-client-id'))).toEqual(overview.rows.map((r) => r.clientId));
     for (const o of overview.rows) {
-      const text = rowFor(rows, o.clientId).textContent ?? '';
+      const text = rowFor(rows, o.clientId).textContent;
       expect(text).toContain(o.clientName);
       expect(text).toContain(t(`provider.accountState.${o.state}` as Parameters<typeof t>[0]));
       expect(text).toContain(`Outstanding: ${formatPounds(o.amountOutstandingPence)}`);
@@ -85,7 +85,7 @@ describe('P9 Dunning', () => {
   it('shows the total outstanding and the recovery rate in the summary', async () => {
     const { view } = await openP9();
     const overview = await view.handle.store.dunning.overview(actorFor('provider', view.keys));
-    const summary = (await screen.findByTestId('dunning-summary')).textContent ?? '';
+    const summary = (await screen.findByTestId('dunning-summary')).textContent;
     expect(summary).toContain(`Total outstanding: ${formatPounds(overview.outstandingPence)}`);
     if (overview.recoveryRatePercent === null) expect(summary).toContain('No payment failures yet');
     else expect(summary).toContain(`Recovery rate: ${overview.recoveryRatePercent}%`);
@@ -96,9 +96,9 @@ describe('P9 Dunning', () => {
     const overview = await view.handle.store.dunning.overview(actorFor('provider', view.keys));
     const closed = overview.rows.find((r) => r.state === 'closed')!;
     expect(closed.daysToDeletion).toBeGreaterThan(0);
-    const text = rowFor(rows, closed.clientId).textContent ?? '';
+    const text = rowFor(rows, closed.clientId).textContent;
     expect(text).toContain(`Deleted in ${closed.daysToDeletion} day`);
-    const others = rows.filter((r) => r.getAttribute('data-client-id') !== closed.clientId && !r.textContent?.includes('Closed'));
+    const others = rows.filter((r) => r.getAttribute('data-client-id') !== closed.clientId && !r.textContent.includes('Closed'));
     for (const r of others) expect(r.textContent).not.toContain('Deleted in');
   });
 
@@ -118,7 +118,7 @@ describe('P9 Dunning', () => {
 
   it('extends the grace period: Confirm after choosing days raises the days to the next state by that amount', async () => {
     const { view, rows } = await openP9();
-    const willow = view.keys.clients['willowLane']!;
+    const willow = view.keys.clients['willowLane'];
     const row = rowFor(rows, willow);
     const before = daysIn(row);
     expect(before).toBeGreaterThan(0);
@@ -127,7 +127,7 @@ describe('P9 Dunning', () => {
     await userEvent.clear(input);
     await userEvent.type(input, '7');
     await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
-    await waitFor(() => expect(daysIn(rowFor(screen.getAllByTestId('dunning-row'), willow))).toBe(before + 7));
+    await waitFor(() => { expect(daysIn(rowFor(screen.getAllByTestId('dunning-row'), willow))).toBe(before + 7); });
   });
 
   it('offers Extend grace and Pause timeline with a Sensitive marker only on Payment overdue and Limited rows, and toggles to Resume timeline', async () => {
@@ -140,17 +140,17 @@ describe('P9 Dunning', () => {
       expect(within(row).queryAllByRole('button', { name: /^(Pause|Resume) timeline$/ })).toHaveLength(eligible ? 1 : 0);
       if (eligible) expect(row.textContent).toContain('Sensitive');
     }
-    const willow = rowFor(rows, view.keys.clients['willowLane']!);
+    const willow = rowFor(rows, view.keys.clients['willowLane']);
     await userEvent.click(within(willow).getByRole('button', { name: 'Pause timeline' }));
     await waitFor(() => {
-      const again = rowFor(screen.getAllByTestId('dunning-row'), view.keys.clients['willowLane']!);
+      const again = rowFor(screen.getAllByTestId('dunning-row'), view.keys.clients['willowLane']);
       expect(within(again).getByRole('button', { name: 'Resume timeline' })).toBeTruthy();
       expect(within(again).queryAllByRole('button', { name: 'Pause timeline' })).toHaveLength(0);
     });
   });
 
   it('shows the read-only provider user the rows but no Extend grace or timeline buttons', async () => {
-    await openP9({ actor: (keys) => ({ ...actorFor('provider', keys), userId: keys.users['tom']! }) });
+    await openP9({ actor: (keys) => ({ ...actorFor('provider', keys), userId: keys.users['tom'] }) });
     expect(screen.getAllByTestId('dunning-row').length).toBeGreaterThan(0);
     expect(screen.queryAllByRole('button', { name: 'Extend grace' })).toHaveLength(0);
     expect(screen.queryAllByRole('button', { name: /timeline$/ })).toHaveLength(0);
