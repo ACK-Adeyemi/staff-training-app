@@ -140,13 +140,18 @@ export function createProviderRecoveryOperations(
         approveRecovery(r, call.actor.user.id, options.clock),
       ),
 
-    complete: (ctx, id) =>
-      recoveryStep(
+    complete: async (ctx, id, outcome) => {
+      await providerCall(ctx, 'recovery.approve');
+      const given: unknown = outcome;
+      if (given !== undefined && given !== 'reset2fa' && given !== 'transferOwner') {
+        throw new ValidationError(['outcome: reset2fa or transferOwner']);
+      }
+      return recoveryStep(
         ctx,
         id,
         'recovery.approve',
         'recovery.complete',
-        (r) => completeRecovery(r, options.clock),
+        (r) => completeRecovery(outcome === undefined ? r : { ...r, outcome }, options.clock),
         async (r, call) => {
           if (r.outcome !== 'reset2fa') return [];
           const subject = (await call.all<UserAccount>('users')).find((u) => u.id === r.subjectUserId);
@@ -155,7 +160,8 @@ export function createProviderRecoveryOperations(
           Reflect.deleteProperty(rest, 'twoFactor');
           return [put('users', rest)];
         },
-      ),
+      );
+    },
 
     reject: (ctx, id) =>
       recoveryStep(ctx, id, 'recovery.start', 'recovery.reject', (r, call) =>

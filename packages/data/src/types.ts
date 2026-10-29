@@ -10,6 +10,7 @@ import type {
   UsageDaily,
   ProfileChangeRequest,
   RecoveryRequest,
+  ReleaseNote,
   LinkCheckResult,
   MaintenanceApp,
   OtherEntryGroup,
@@ -1044,6 +1045,11 @@ export interface ProviderCommsService {
   banners(ctx: ActorContext): Promise<Announcement[]>;
 }
 
+/** Release notes (M4 chunk 14b). Readable by any provider actor, newest first. */
+export interface ReleaseNotesService {
+  list(ctx: ActorContext): Promise<ReleaseNote[]>;
+}
+
 /** Maintenance flags per app. Setting needs ops.write; reading is open to every actor. */
 export interface MaintenanceService {
   set(ctx: ActorContext, input: { app: MaintenanceApp; on: boolean }): Promise<Record<MaintenanceApp, boolean>>;
@@ -1069,7 +1075,8 @@ export interface RecoveryService {
     input: { clientId: string; subjectUserId: string; reason: string; outcome?: 'reset2fa' | 'transferOwner' },
   ): Promise<RecoveryRequest>;
   approve(ctx: ActorContext, id: string): Promise<RecoveryRequest>;
-  complete(ctx: ActorContext, id: string): Promise<RecoveryRequest>;
+  /** `outcome`, when given, is the outcome chosen at completion; otherwise the one on the request is used. */
+  complete(ctx: ActorContext, id: string, outcome?: 'reset2fa' | 'transferOwner'): Promise<RecoveryRequest>;
   reject(ctx: ActorContext, id: string): Promise<RecoveryRequest>;
 }
 
@@ -1125,6 +1132,7 @@ export interface DataStore {
   profileChanges: ProfileChangesService;
   billingChanges: BillingChangesService;
   providerComms: ProviderCommsService;
+  releaseNotes: ReleaseNotesService;
   incidents: IncidentsService;
   dataRequests: DataRequestsService;
   maintenance: MaintenanceService;

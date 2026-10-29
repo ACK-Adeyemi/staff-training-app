@@ -23,6 +23,7 @@ import {
   type LearningEvent,
   type LinkCheckResult,
   type MaintenanceApp,
+  type ReleaseNote,
   type UserAccount,
 } from '@sta/domain';
 import { load } from '@sta/seed';
@@ -317,6 +318,21 @@ export function runProviderCommsContract(
       const t = await setup();
       for (const actor of [t.priya, t.jade]) {
         expect(await refusal(t.s.learnMore.counts(actor))).toBeInstanceOf(ForbiddenError);
+      }
+    });
+
+    it('lists the seeded release notes newest first for any provider actor and refuses everyone else', async () => {
+      const t = await setup();
+      const seeded = await seededSetup();
+      const notes = await (
+        seeded.s as unknown as { releaseNotes: { list(c: ActorContext): Promise<ReleaseNote[]> } }
+      ).releaseNotes.list(seeded.owner);
+      expect(notes).toHaveLength(3);
+      expect(notes.map((n) => n.date)).toEqual([...notes.map((n) => n.date)].sort().reverse());
+      const reader = t.s as unknown as { releaseNotes: { list(c: ActorContext): Promise<ReleaseNote[]> } };
+      await expect(reader.releaseNotes.list(t.support)).resolves.toBeDefined();
+      for (const actor of [t.priya, t.jade]) {
+        expect(await refusal(reader.releaseNotes.list(actor))).toBeInstanceOf(ForbiddenError);
       }
     });
   });

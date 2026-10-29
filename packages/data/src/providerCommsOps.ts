@@ -11,6 +11,7 @@ import {
   type LinkCheckResult,
   type MaintenanceApp,
   type MaintenanceWindow,
+  type ReleaseNote,
   type Module,
   type Subscription,
 } from '@sta/domain';
@@ -24,11 +25,13 @@ import {
   type LinkCheckService,
   type MaintenanceService,
   type ProviderCommsService,
+  type ReleaseNotesService,
   type StoreOptions,
 } from './types';
 
 export type ProviderCommsOperations = {
   providerComms: ProviderCommsService;
+  releaseNotes: ReleaseNotesService;
   maintenance: MaintenanceService;
   linkCheck: LinkCheckService;
   learnMore: LearnMoreService;
@@ -106,6 +109,17 @@ export function createProviderCommsOperations(backend: RawBackend, options: Stor
           { clientId: client.id, packageId: sub?.packageId ?? client.packageId, packId: client.industryPackId, side },
           options.clock,
         ),
+      );
+    },
+  };
+
+  const releaseNotes: ReleaseNotesService = {
+    async list(ctx) {
+      const call = await beginCall(backend, options, ctx);
+      if (call.side !== 'provider' || call.actor.user.side !== 'provider') return forbid('permission');
+      const rows = await call.all<ReleaseNote>('releaseNotes');
+      return structuredClone(
+        [...rows].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.id < b.id ? -1 : 1)),
       );
     },
   };
@@ -214,5 +228,5 @@ export function createProviderCommsOperations(backend: RawBackend, options: Stor
     },
   };
 
-  return { providerComms, maintenance, linkCheck, learnMore };
+  return { providerComms, releaseNotes, maintenance, linkCheck, learnMore };
 }

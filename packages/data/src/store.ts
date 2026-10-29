@@ -353,6 +353,7 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     savedReplies: providerTicketOps.savedReplies,
     otherEntries: providerTicketOps.otherEntries,
     providerComms: commsOps.providerComms,
+    releaseNotes: commsOps.releaseNotes,
     incidents: incidentOps.incidents,
     dataRequests: incidentOps.dataRequests,
     maintenance: commsOps.maintenance,
