@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { createRng, fixedClock, type PriceAdjustment } from '@sta/domain';
 import { ForbiddenError, type ActorContext, type StoreHandle, type StoreOptions } from '../types';
 import { refusal } from './learning';
-import type { PricingStore } from './pricing';
+import type { PricingDraftInput, PricingStore } from './pricing';
 import { buildWorld, TODAY } from './world';
 
 export type PriceNotice = {
@@ -39,14 +39,14 @@ export function runPriceNoticesContract(
     });
     const a = fx.ids.clients.a;
     const b = fx.ids.clients.b;
-    const input = {
+    const input: PricingDraftInput = {
       clientIds: [a],
       scope: { kind: 'plan' },
       type: 'percent',
       value: 8,
       reason: 'annualReview',
-    } as const;
-    const submit = async (patch: Partial<typeof input> | { clientIds: string[] } = {}) => {
+    };
+    const submit = async (patch: Partial<PricingDraftInput> = {}) => {
       const d = await store.pricing.draft(prov('raj'), { ...input, ...patch });
       await store.pricing.submit(prov('raj'), d.id);
       return d;

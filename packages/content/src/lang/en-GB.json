@@ -264,6 +264,15 @@
     "twoFactorRequired": "Set up two-step sign-in to carry on."
   },
   "client": {
+    "priceNotice": {
+      "title": "Price change",
+      "plan": "Your plan price",
+      "addOn": "The price of an add-on",
+      "invoice": "Your next invoice",
+      "percent": "{what} changes by {amount} from {date}.",
+      "amount": "{what} changes to {amount} from {date}.",
+      "until": "This lasts until {date}."
+    },
     "status": {
       "overdue": "Overdue",
       "expiringSoon": "Expiring soon",

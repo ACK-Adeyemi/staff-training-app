@@ -622,7 +622,18 @@ export interface BillingService {
   changePlan(ctx: ActorContext, packageId: Id, code: string): Promise<void>;
   /** Mock payment: pays everything owed and returns the account to Active. */
   payNow(ctx: ActorContext): Promise<void>;
+  /** Your organisation's scheduled or active price changes, with no other client's details. Needs `billing.view`. */
+  priceNotices(ctx: ActorContext): Promise<PriceNotice[]>;
 }
+
+export type PriceNotice = {
+  id: Id;
+  type: PriceAdjustment['type'];
+  scope: PriceAdjustment['scope'];
+  value: number;
+  effectiveAt: string;
+  endAt?: string;
+};
 
 export type AddOnListing = {
   addOnId: Id;

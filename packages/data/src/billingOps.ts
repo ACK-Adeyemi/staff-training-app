@@ -31,6 +31,7 @@ import {
   type OutboxMessage,
   type Package,
   type PaymentAttempt,
+  type PriceAdjustment,
   type Person,
   type Role,
   type RoleAssignment,
@@ -228,6 +229,30 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
       const found = (await call.all<Invoice>('invoices')).find((i) => i.id === id && i.clientId === call.clientId);
       if (!found) throw new NotFoundError();
       return structuredClone(found);
+    },
+
+    async priceNotices(ctx) {
+      const call = await clientCall(ctx, 'billing.view');
+      const now = call.actor.ctx.now;
+      return (await call.all<PriceAdjustment>('priceAdjustments'))
+        .filter(
+          (a) =>
+            a.clientIds.includes(call.clientId as string) &&
+            (a.status === 'scheduled' || a.status === 'active') &&
+            a.effectiveAt !== undefined &&
+            (a.endsAt === undefined || a.endsAt > now),
+        )
+        .sort((a, b) => ((a.effectiveAt as string) < (b.effectiveAt as string) ? -1 : a.id < b.id ? -1 : 1))
+        .map((a) =>
+          structuredClone({
+            id: a.id,
+            type: a.type,
+            scope: a.scope,
+            value: a.value,
+            effectiveAt: a.effectiveAt as string,
+            ...(a.endsAt ? { endAt: a.endsAt } : {}),
+          }),
+        );
     },
 
     async plans(ctx) {
