@@ -39,7 +39,7 @@ import { actorFor, renderRoute, TODAY } from '../../test/harness';
 afterEach(cleanup);
 
 type Opts = Parameters<typeof renderRoute>[2];
-type Prepare = NonNullable<Opts>['prepare'];
+type Prepare = (ctx: Parameters<NonNullable<NonNullable<Opts>['prepare']>>[0]) => Promise<void>;
 const as = (key: string): Opts => ({ actor: (keys) => ({ ...actorFor('provider', keys), userId: keys.users[key]! }) });
 const HOUR = 3_600_000;
 const iso = (offsetHours: number) => new Date(new Date(TODAY).getTime() + offsetHours * HOUR).toISOString();
