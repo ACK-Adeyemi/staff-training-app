@@ -116,3 +116,8 @@ Things only the user can check, by milestone.
 - [ ] New starter induction now has an official Learn more link on each question (EYFS 3.4, 3.5, 3.78, 3.81, 3.100). The question wording is still the demo's own. Check the links fit.
 
 - [ ] Offline and install (M5 chunk 4): after the next deploy, open the live site on a phone, install it to the home screen (it opens the staff app), then redeploy; the already-installed copy shows "A new version is ready" with Update and Later, Update loads the new version, and Later keeps working. The Demo menu shows "Update available" until then. Also check a lesson can be finished with the phone in aeroplane mode after one online visit.
+
+## Polish translation review by a speaker
+- [ ] A Polish speaker reads pl-PL.json (staff screens) for natural wording, consistent terms and gender-neutral phrasing (forms like "ukończył(a)" and "gotowy lub gotowa").
+- [ ] Check the number wording that avoids plural agreement ("Moduły: 3", "Zostało dni: 5") and the abbreviated renewal periods ("2 l.", "6 mies.").
+- [ ] Check the terms: "Pokój bitwy" (Battle Room), "Punkty XP", "Rywalizacja", "Zgłoś sprawę" (raise a ticket), "bez zaglądania do materiałów" (closed-book).
