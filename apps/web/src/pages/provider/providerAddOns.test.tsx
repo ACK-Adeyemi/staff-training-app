@@ -56,16 +56,16 @@ describe('P8 Add-on catalogue', () => {
     const cards = await openP8();
     const translation = addOns.find((a) => a.id === addOnIds.translation)!;
     if (translation.pricing.kind !== 'flat') throw new Error('fixture changed');
-    const flat = cardFor(cards, addOnIds.translation).textContent ?? '';
+    const flat = cardFor(cards, addOnIds.translation).textContent;
     expect(flat).toContain(`${formatPounds(translation.pricing.price)} per month`);
     expect(flat).toContain('£15.00 per month');
 
     const ai = addOns.find((a) => a.id === addOnIds.aiAssistant)!;
     if (ai.pricing.kind !== 'usage') throw new Error('fixture changed');
-    const usage = cardFor(cards, addOnIds.aiAssistant).textContent ?? '';
+    const usage = cardFor(cards, addOnIds.aiAssistant).textContent;
     expect(usage).toContain(`${formatPounds(ai.pricing.pricePerUnit)} per ${ai.pricing.unit}`);
     expect(usage).toContain('£0.05 per question');
-    const sms = cardFor(cards, addOnIds.reminders).textContent ?? '';
+    const sms = cardFor(cards, addOnIds.reminders).textContent;
     expect(sms).toContain('£0.04 per message');
   });
 
@@ -93,7 +93,7 @@ describe('P8 Add-on catalogue', () => {
 
   it('shows no Edit price control to the read-only provider user', async () => {
     await renderRoute('/provider/add-ons', 'provider', {
-      actor: (keys) => ({ ...actorFor('provider', keys), userId: keys.users['tom']! }),
+      actor: (keys) => ({ ...actorFor('provider', keys), userId: keys.users['tom'] }),
     });
     await screen.findByRole('heading', { level: 1, name: 'Add-on catalogue' });
     await screen.findByText(/don't have permission|Applies to/i);
