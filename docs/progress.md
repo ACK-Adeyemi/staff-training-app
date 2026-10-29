@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M4
 Milestone base commit: c7160e2
-Next step (note: do not leave a background check.sh running when a turn ends; poll it inside the turn with sleep): M4 chunk 15b (P19 security, P20 audit, P23 sign-in/2FA, per docs/plans/m4.md; P18 team and ownership transfer UI done in 15a, 2f7d7d5; start with a small test-writer brief per page). P8 Edit price navigates to /provider/pricing (P25, chunk 17). P6-P9 are linked from a Commercial pages list on P7. P3 tabs Sites, Staff, API, Support tickets, Billing, Modules, Competitions, Audit are still stubs. Full check.sh takes ~40 min: run it in the background (timeout 3300) and poll. Give the test-writer small briefs (one test file each).
+Next step (note: do not leave a background check.sh running when a turn ends; poll it inside the turn with sleep): M4 chunk 16 (P21 global content and P22 AI add-on settings, per docs/plans/m4.md; chunk 15 done: P18 in 15a, P19/P20/P23 in 15b, tests 55c481f, impl 06c0376, check.sh green). P8 Edit price navigates to /provider/pricing (P25, chunk 17). P6-P9 are linked from a Commercial pages list on P7. P3 tabs Sites, Staff, API, Support tickets, Billing, Modules, Competitions, Audit are still stubs. Full check.sh takes ~40 min: run it in the background (timeout 3300) and poll. Give the test-writer small briefs (one test file each).
 
 ## Milestones
 - [x] M0 Foundations
@@ -32,7 +32,7 @@ M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list):
 - [x] 12 P9 Dunning: 12a dunning service (tests 6b8189d, impl 5010ba5), 12b P9 page (tests in 3 commits, impl c6c393c); D2 Simulate failed payment/Fast-forward/persona jump already existed from M3. The BP-9 e2e walk (client and staff views) goes into the Track B e2e in chunk 18
 - [x] 13 P11 to P13 tickets: 13a P11 inbox (tests b9fc124, impl 100148a), 13b P12 detail (tests f75fe33, impl 5f14f73, adds providerTickets.raiserName, contract bd3eb7e), 13c P13 support settings (tests 0feb2a4, impl efcb64e); gaps under Known issues
 - [x] 14 P14 to P17 and banners: 14a incidents/data requests services (tests 2431a7d, impl 5596566); 14b P14 comms + P15 recovery (tests f958ccf, e48374b, impl 2c5db85..70fb818, adds store.releaseNotes, recovery.complete outcome, approveRecovery sets cooling-off 24h when unset); 14c P16 + P17 (impl 0ed160b); 14d banners and status indicator in three shells (impl b7e3e64). Full check: all steps green except 2 nav e2e headings (P14 title), fixed in routes.ts and rerun green
-- [ ] 15 P18 done (15a tests 14cf3c2/573788d, impl 2f7d7d5, query-key fix after nav e2e); P19, P20, P23 remain (15b)
+- [x] 15 P18 (15a tests 14cf3c2/573788d, impl 2f7d7d5); P19, P20, P23 (15b tests 55c481f, impl 06c0376, check.sh green)
 - [ ] 16-18 see the plan
 M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 1 Decisions, schemas, stores and personas
@@ -98,6 +98,7 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - M3 code review leftovers (not fixed, by decision): placeholders not all in adminConfig; ModuleLibrary stats computed in the UI; duplicate London-day helpers; .ics DTSTAMP hour rounding; reminders e2e cap check is loose; affected-now preview ignores the actor's scope; reports.test privacy check is narrow; ContrastCheck formula duplicated in the UI.
 
 ## Session log
+- 2026-10-29 (session 5): F2-F4 already handled. M4 chunk 15b (P19, P20, P23) landed (06c0376), check.sh green. Chunk 16 next.
 - 2026-10-29 (session 4): M4 chunk 14 landed (14a-14d). Chunk 15 next.
 - 2026-10-29: M4 chunk 11a (P5 links panel) landed (ebfd2f4), check.sh green (full run takes ~30 min on this VM). Stopping at a clean point; 11b next.
 - 2026-10-28: M4 chunk 8b landed (0a6341c), check.sh green. Stopping at a clean point; 8c next.
