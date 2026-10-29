@@ -3,7 +3,7 @@ Status: IN PROGRESS
 Mode: unattended
 Branch: agent/poc-build
 Current milestone: M5
-Milestone base commit: c7160e2
+Milestone base commit: 431ae38
 Next step: M5 Polish and demo readiness: record the milestone base commit, delegate docs/plans/m5.md to the planner (build pack section 10, M5), commit it, then start chunk 1. Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn.
 
 ## Milestones
