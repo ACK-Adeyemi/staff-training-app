@@ -24,6 +24,7 @@ import { runProviderTicketsContract } from './providerTickets';
 import { runPackagingOptionContract } from './packagingOption';
 import { runDunningContract } from './dunning';
 import { runLearningContract } from './learning';
+import { runTranslatedModuleContract } from './translatedModule';
 import { runM3FoundationContract } from './m3Foundation';
 import { runExportsRetentionContract } from './exportsRetention';
 import { runLeaderboardsThemesContract } from './leaderboardsThemes';
@@ -38,6 +39,9 @@ runContractSuite('indexeddb adapter', (options) => createIndexedDbStore(options,
 runAdminCountContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
 
 runLearningContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
+runTranslatedModuleContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
 
 runEngagementContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
 

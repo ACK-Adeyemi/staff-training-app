@@ -23,6 +23,7 @@ import { runProviderTicketsContract } from './providerTickets';
 import { runPackagingOptionContract } from './packagingOption';
 import { runDunningContract } from './dunning';
 import { runLearningContract } from './learning';
+import { runTranslatedModuleContract } from './translatedModule';
 import { runM3FoundationContract } from './m3Foundation';
 import { runExportsRetentionContract } from './exportsRetention';
 import { runLeaderboardsThemesContract } from './leaderboardsThemes';
@@ -35,6 +36,7 @@ runContractSuite('memory adapter', (options) => Promise.resolve(createMemoryStor
 runAdminCountContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
 runLearningContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runTranslatedModuleContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
 runEngagementContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
