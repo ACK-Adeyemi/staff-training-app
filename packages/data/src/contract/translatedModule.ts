@@ -6,13 +6,7 @@
 //   - Safer sleep style statistics (moduleStats with translations) include the Polish attempt and completion.
 //   - A failed Polish attempt writes no Evidence and leaves the original assignment open.
 import { describe, expect, it } from 'vitest';
-import {
-  createRng,
-  fixedClock,
-  moduleStats,
-  type Evidence,
-  type Module,
-} from '@sta/domain';
+import { createRng, fixedClock, moduleStats, type Evidence, type Module } from '@sta/domain';
 import type { ActorContext, StoreHandle, StoreOptions } from '../types';
 import { buildWorld, freshId, TODAY } from './world';
 import { addLearningFixture, answerAll, completeLessons, type LearningHandle } from './learning';

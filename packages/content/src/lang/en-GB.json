@@ -4047,5 +4047,14 @@
       },
       "noChanges": "There are no price changes yet."
     }
+  },
+  "translation": {
+    "alsoIn": "Also in: {language}",
+    "openVersion": "Open the {language} version",
+    "machineTranslated": "Machine translated",
+    "englishIsOfficial": "The English version is the official text",
+    "openEnglish": "Read the English version",
+    "languageEn": "English",
+    "languagePl": "Polski"
   }
 }

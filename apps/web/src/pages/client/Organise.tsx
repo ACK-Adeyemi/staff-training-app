@@ -38,7 +38,8 @@ function OrganiseLists({ canManage }: { canManage: boolean }) {
   const placements = usePlacements();
   const modulesQ = useQuery({
     queryKey: ['organiseModules', actor.userId],
-    queryFn: async (): Promise<Module[]> => (await store.modules.list(actor)).filter((m) => m.status === 'published'),
+    queryFn: async (): Promise<Module[]> =>
+      (await store.modules.list(actor)).filter((m) => m.status === 'published' && m.translatedFrom === undefined),
   });
   const [dlg, setDlg] = useState<Dlg | null>(null);
   const [picked, setPicked] = useState<ReadonlySet<string>>(new Set());

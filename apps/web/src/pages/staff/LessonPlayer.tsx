@@ -8,7 +8,8 @@ import { useActor, useStore, useT } from '../../app/hooks';
 import { ExplainThis } from '../ExplainThis';
 import { LessonThumbs } from './FeedbackWidgets';
 import { LearnMoreGroups } from './LearnMoreList';
-import { ReadAloud } from './ReadAloud';
+import { ReadAloud, readAloudLang } from './ReadAloud';
+import { TranslationLabel } from './TranslationNotice';
 import { LearningFrame } from './LearningFrame';
 import { NoteSheet, NotesButton } from './Notes';
 import { focusLink } from './styles';
@@ -84,7 +85,17 @@ function blockText(block: ContentBlock | undefined): string {
   }
 }
 
-function Player({ module, lesson, organisationName }: { module: Module; lesson: Lesson; organisationName: string }) {
+function Player({
+  module,
+  lesson,
+  organisationName,
+  translations,
+}: {
+  module: Module;
+  lesson: Lesson;
+  organisationName: string;
+  translations: Module[];
+}) {
   const t = useT();
   const store = useStore();
   const actor = useActor();
@@ -117,9 +128,10 @@ function Player({ module, lesson, organisationName }: { module: Module; lesson: 
 
   return (
     <>
-      <EnglishOnly>
+      <EnglishOnly lang={module.language}>
         <PageHeader title={lesson.title} />
       </EnglishOnly>
+      <TranslationLabel module={module} versions={translations} />
       <Stepper
         current={step + 1}
         total={total}
@@ -127,11 +139,11 @@ function Player({ module, lesson, organisationName }: { module: Module; lesson: 
         progressLabel={t('staff.lesson.progress')}
       />
       <div className="mt-4">
-        <ReadAloud text={blockText(block)} />
+        <ReadAloud text={blockText(block)} {...readAloudLang(module.language)} />
       </div>
       <div className="my-4 min-h-40">
         {block ? (
-          <EnglishOnly>
+          <EnglishOnly lang={module.language}>
             <Block
               block={block}
               acknowledged={ticked[step] === true}
@@ -223,7 +235,7 @@ export function LessonPlayer() {
   const { lessonId } = useParams();
   return (
     <LearningFrame>
-      {({ module, client }) => {
+      {({ module, client, translations }) => {
         const lesson = module.lessons.find((l) => l.id === lessonId);
         if (!lesson) {
           return (
@@ -233,7 +245,15 @@ export function LessonPlayer() {
             </>
           );
         }
-        return <Player key={lesson.id} module={module} lesson={lesson} organisationName={client.displayName} />;
+        return (
+          <Player
+            key={lesson.id}
+            module={module}
+            lesson={lesson}
+            organisationName={client.displayName}
+            translations={translations}
+          />
+        );
       }}
     </LearningFrame>
   );

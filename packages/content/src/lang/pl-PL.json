@@ -1254,5 +1254,14 @@
     "accountNotice": {
       "speakToManager": "Konto Twojej organizacji wymaga uwagi. Porozmawiaj ze swoim przełożonym."
     }
+  },
+  "translation": {
+    "alsoIn": "Także dostępne: {language}",
+    "openVersion": "Otwórz wersję: {language}",
+    "machineTranslated": "Tłumaczenie maszynowe",
+    "englishIsOfficial": "Oficjalnym tekstem jest wersja angielska",
+    "openEnglish": "Przeczytaj wersję angielską",
+    "languageEn": "angielski",
+    "languagePl": "polski"
   }
 }

@@ -96,6 +96,7 @@ function LibraryBody() {
     return s && s.total > 0 ? s.done / s.total : 0;
   };
   const shown = modules
+    .filter((m) => m.translatedFrom === undefined) // language versions are reached from the original (plan M5, F-5)
     .filter((m) => (source === '' ? true : source === 'own' ? isOwn(m) : !isOwn(m)))
     .filter((m) => status === '' || m.status === status)
     .filter((m) => category === '' || placements.some((p) => p.moduleId === m.id && p.categoryId === category))

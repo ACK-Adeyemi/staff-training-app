@@ -48,6 +48,13 @@ const asKasia = {
   },
 };
 
+// Messages are nested objects; keys are dotted paths (the test first read them as flat keys, which never exist).
+const msg = (messages: unknown, key: string): string | undefined => {
+  let node = messages;
+  for (const part of key.split('.')) node = (node as Record<string, unknown> | undefined)?.[part];
+  return typeof node === 'string' ? node : undefined;
+};
+
 const hrefTo = (id: string) => (a: Element) => (a.getAttribute('href') ?? '').endsWith(`/staff/module/${id}`);
 const linksTo = (id: string) => screen.queryAllByRole('link').filter(hrefTo(id));
 
@@ -124,8 +131,9 @@ describe('machine translated label on S4, S5 and S6', () => {
 
 describe('Polish interface labels', () => {
   it('has the translation keys in en-GB and in pl-PL, translated and with the same placeholders', async () => {
-    const en = languages['en-GB'].messages as unknown as Record<string, string>;
-    const pl = (await languages['pl-PL'].load()) as unknown as Record<string, string>;
+    const en = (key: string) => msg(languages['en-GB'].messages, key);
+    const plMessages = await languages['pl-PL'].load();
+    const pl = (key: string) => msg(plMessages, key);
     for (const key of [
       'translation.alsoIn',
       'translation.machineTranslated',
@@ -133,21 +141,22 @@ describe('Polish interface labels', () => {
       'translation.openEnglish',
       'translation.openVersion',
     ]) {
-      expect(en[key], `en-GB ${key}`).toBeTruthy();
-      expect(pl[key], `pl-PL ${key}`).toBeTruthy();
-      expect(pl[key], `${key} is translated`).not.toBe(en[key]);
-      expect(pl[key]!.match(/\{\w+\}/g) ?? [], key).toEqual(en[key]!.match(/\{\w+\}/g) ?? []);
+      expect(en(key), `en-GB ${key}`).toBeTruthy();
+      expect(pl(key), `pl-PL ${key}`).toBeTruthy();
+      expect(pl(key), `${key} is translated`).not.toBe(en(key));
+      expect(pl(key)!.match(/\{\w+\}/g) ?? [], key).toEqual(en(key)!.match(/\{\w+\}/g) ?? []);
     }
-    expect(en['translation.machineTranslated']).toBe('Machine translated');
-    expect(en['translation.englishIsOfficial']).toBe('The English version is the official text');
-    expect(en['translation.alsoIn']).toBe('Also in: {language}');
+    expect(en('translation.machineTranslated')).toBe('Machine translated');
+    expect(en('translation.englishIsOfficial')).toBe('The English version is the official text');
+    expect(en('translation.alsoIn')).toBe('Also in: {language}');
   });
 
   it('shows the label in Polish for Kasia, with a link to the English module', async () => {
-    const pl = (await languages['pl-PL'].load()) as unknown as Record<string, string>;
+    const plMessages = await languages['pl-PL'].load();
+    const pl = (key: string) => msg(plMessages, key) ?? '';
     await renderRoute(PL, 'staff', asKasia);
-    expect(await screen.findByText(pl['translation.machineTranslated']!)).toBeTruthy();
-    expect(screen.getByText(pl['translation.englishIsOfficial']!)).toBeTruthy();
+    expect(await screen.findByText(pl('translation.machineTranslated'))).toBeTruthy();
+    expect(screen.getByText(pl('translation.englishIsOfficial'))).toBeTruthy();
     expect(screen.queryByText('Machine translated')).toBeNull();
     expect(linksTo(EN_ID).length).toBeGreaterThan(0);
   });

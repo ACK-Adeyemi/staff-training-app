@@ -17,9 +17,10 @@ import { useActor, useClock, useStore, useT } from '../../app/hooks';
 import { ConfirmDialog } from './ConfirmDialog';
 import { ReportQuestion } from './FeedbackWidgets';
 import { NotesPanel } from './Notes';
-import { ReadAloud } from './ReadAloud';
+import { ReadAloud, readAloudLang } from './ReadAloud';
 import { LearnMoreGroups } from './LearnMoreList';
 import { LearningFrame } from './LearningFrame';
+import { TranslationLabel } from './TranslationNotice';
 import { useModuleId, type LearningData } from './learningQueries';
 import { focusLink } from './styles';
 
@@ -194,7 +195,7 @@ function QuestionView({
         {question.prompt}
       </h2>
       <div className="mb-3">
-        <ReadAloud text={spokenText} />
+        <ReadAloud text={spokenText} {...readAloudLang(module.language)} />
       </div>
       {question.type === 'scenario' && step ? <p className="mt-0 text-lg">{step.text}</p> : null}
       {question.type !== 'scenario' && feedback ? (
@@ -484,6 +485,7 @@ export function Quiz() {
           <PageHeader title={t('staff.quiz.title', { title: data.module.title })}>
             {data.module.draftContent ? <Badge>{t('staff.module.draft')}</Badge> : null}
           </PageHeader>
+          <TranslationLabel module={data.module} versions={data.translations} />
           {data.allLessonsDone ? (
             <Runner data={data} />
           ) : (

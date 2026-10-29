@@ -2,15 +2,17 @@
 // Remote voices could send lesson text off the device, so they are never used.
 
 export interface Speech {
-  /** True when this device has at least one local voice. */
-  available: () => boolean;
-  speak: (text: string, opts: { rate: number; onEnd: () => void }) => void;
+  /** True when this device has a local voice (for the language, when one is given). */
+  available: (lang?: string) => boolean;
+  /** With lang, only a local voice for that language is used; none means nothing is said and onEnd is called. */
+  speak: (text: string, opts: { rate: number; onEnd: () => void; lang?: string }) => void;
   stop: () => void;
   /** Calls back when the list of voices changes; returns an unsubscribe function. */
   onVoicesChanged: (listener: () => void) => () => void;
 }
 
 type VoiceLike = { lang: string; localService: boolean };
+const primary = (lang: string): string => lang.toLowerCase().split('-')[0] ?? '';
 type SynthLike = {
   getVoices: () => VoiceLike[];
   speak: (utterance: unknown) => void;
@@ -39,8 +41,14 @@ const browserEnv = (): SpeechEnv =>
 /** The adapter. Pass an environment in tests; by default it reads the browser's at the time of each call. */
 export function createSpeech(env?: SpeechEnv): Speech {
   const get = (): SpeechEnv => env ?? browserEnv();
-  const localVoice = (synth: SynthLike): VoiceLike | undefined => {
+  const localVoice = (synth: SynthLike, lang?: string): VoiceLike | undefined => {
     const local = synth.getVoices().filter((v) => v.localService);
+    if (lang) {
+      return (
+        local.find((v) => v.lang.toLowerCase() === lang.toLowerCase()) ??
+        local.find((v) => primary(v.lang) === primary(lang))
+      );
+    }
     return (
       local.find((v) => v.lang.toLowerCase().startsWith('en-gb')) ??
       local.find((v) => v.lang.startsWith('en')) ??
@@ -48,13 +56,13 @@ export function createSpeech(env?: SpeechEnv): Speech {
     );
   };
   return {
-    available() {
+    available(lang) {
       const { synth, Utterance } = get();
-      return Boolean(synth && Utterance && localVoice(synth));
+      return Boolean(synth && Utterance && localVoice(synth, lang));
     },
-    speak(text, { rate, onEnd }) {
+    speak(text, { rate, onEnd, lang }) {
       const { synth, Utterance } = get();
-      const voice = synth ? localVoice(synth) : undefined;
+      const voice = synth ? localVoice(synth, lang) : undefined;
       if (!synth || !Utterance || !voice) {
         onEnd();
         return;

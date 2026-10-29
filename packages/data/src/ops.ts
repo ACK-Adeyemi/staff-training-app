@@ -264,9 +264,13 @@ export function createOperations(backend: RawBackend, options: StoreOptions): Op
         ];
         const evidence: Evidence[] = [];
         if (passed) {
+          // A translation counts for its original: the original's requirements and assignments (plan M5, F-5).
+          const original = module.translatedFrom
+            ? await moduleFor(call, module.translatedFrom.moduleId).catch(() => module)
+            : module;
           const site = await call.find<Site>('sites', person.primarySiteId);
           const requirements = await call.all<Requirement>('requirements');
-          for (const requirementId of module.requirementIds) {
+          for (const requirementId of original.requirementIds) {
             const requirement = requirements.find((r) => r.id === requirementId);
             if (!requirement || !site || !requirementApplies(requirement, person, site)) continue;
             const row: Evidence = {
@@ -292,7 +296,7 @@ export function createOperations(backend: RawBackend, options: StoreOptions): Op
               a.personId === person.id &&
               a.status === 'open' &&
               'moduleId' in a.target &&
-              a.target.moduleId === module.id
+              (a.target.moduleId === module.id || a.target.moduleId === original.id)
             ) {
               ops.push(put('assignments', doneCopy(a)));
             }

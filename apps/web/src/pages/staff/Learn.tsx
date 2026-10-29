@@ -17,6 +17,7 @@ import {
   fold,
   findRanges,
   groupProgress,
+  preferredVersion,
   searchModules,
   searchTerms,
   type CatalogueFilters,
@@ -24,7 +25,7 @@ import {
   type CatalogueSort,
   type ModuleStatus,
 } from '@sta/domain';
-import { useT } from '../../app/hooks';
+import { useLanguage, useT } from '../../app/hooks';
 import { useDisplayPrefs } from '../../app/display/context';
 import { catToken, countKey } from '../organise/queries';
 import { useLearnCatalogue } from './learnQueries';
@@ -55,6 +56,7 @@ const isActive = (f: CatalogueFilters): boolean => Object.keys(f).length > 0;
 /** S3. */
 export function Learn() {
   const t = useT();
+  const language = useLanguage();
   const q = useLearnCatalogue();
   const { prefs } = useDisplayPrefs();
   const [search, setSearch] = useState('');
@@ -114,36 +116,44 @@ export function Learn() {
     return terms.flatMap((term) => findRanges(folded, term));
   };
 
-  const rowBody = (r: CatalogueRow, big: boolean) => (
-    <>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <a
-          href={`#/staff/module/${r.module.id}`}
-          className={`inline-flex min-h-[var(--target-min)] items-center ${big ? 'text-xl' : 'text-lg'} font-semibold underline ${focusLink}`}
-        >
-          <Highlight text={r.module.title} ranges={result.highlights[r.module.id] ?? []} />
-        </a>
-        <Badge tone={r.required ? 'demo' : 'neutral'}>
-          {r.required ? t('staff.learn.required') : t('staff.learn.optional')}
-        </Badge>
-      </div>
-      <p className="mt-1 mb-0">
-        {t('staff.learn.minutes', { count: r.minutes })}
-        {' · '}
-        {t(STATUSES.find((s) => s.id === r.status)?.key ?? 'staff.learn.status')}
-        {r.dueState === 'dueSoon' ? ` · ${t('staff.learn.dueLabel')}` : ''}
-        {r.dueState === 'overdue' ? ` · ${t('staff.learn.overdueLabel')}` : ''}
-      </p>
-      {r.category ? (
-        <p className="mt-1 mb-0 inline-flex items-center gap-1 text-sm">
-          <Icon name={r.category.icon} size={16} />
-          <span>
-            <Highlight text={r.category.name} ranges={catRanges(r)} />
-          </span>
+  const rowBody = (r: CatalogueRow, big: boolean) => {
+    // One row per module; the link opens the version in the learner's language (plan M5, F-5).
+    const shown = preferredVersion(r.module, r.translations ?? [], language);
+    return (
+      <>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <a
+            href={`#/staff/module/${shown.id}`}
+            {...(shown.language === language ? {} : { lang: shown.language })}
+            className={`inline-flex min-h-[var(--target-min)] items-center ${big ? 'text-xl' : 'text-lg'} font-semibold underline ${focusLink}`}
+          >
+            <Highlight
+              text={shown.title}
+              ranges={shown.id === r.module.id ? (result.highlights[r.module.id] ?? []) : []}
+            />
+          </a>
+          <Badge tone={r.required ? 'demo' : 'neutral'}>
+            {r.required ? t('staff.learn.required') : t('staff.learn.optional')}
+          </Badge>
+        </div>
+        <p className="mt-1 mb-0">
+          {t('staff.learn.minutes', { count: r.minutes })}
+          {' · '}
+          {t(STATUSES.find((s) => s.id === r.status)?.key ?? 'staff.learn.status')}
+          {r.dueState === 'dueSoon' ? ` · ${t('staff.learn.dueLabel')}` : ''}
+          {r.dueState === 'overdue' ? ` · ${t('staff.learn.overdueLabel')}` : ''}
         </p>
-      ) : null}
-    </>
-  );
+        {r.category ? (
+          <p className="mt-1 mb-0 inline-flex items-center gap-1 text-sm">
+            <Icon name={r.category.icon} size={16} />
+            <span>
+              <Highlight text={r.category.name} ranges={catRanges(r)} />
+            </span>
+          </p>
+        ) : null}
+      </>
+    );
+  };
 
   return (
     <>

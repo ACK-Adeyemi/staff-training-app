@@ -4,8 +4,11 @@ import { plainText } from '../../app/speech';
 import { useDisplayPrefs } from '../../app/display/context';
 import { useSpeech, useT } from '../../app/hooks';
 
+/** English text keeps the default voice choice; any other module language needs a local voice for it. */
+export const readAloudLang = (language: string): { lang?: string } => (language === 'en-GB' ? {} : { lang: language });
+
 /** Reads the given text aloud with the chosen speed. Hidden when Read aloud is off; says so when no local voice exists. */
-export function ReadAloud({ text }: { text: string }) {
+export function ReadAloud({ text, lang }: { text: string; lang?: string }) {
   const t = useT();
   const speech = useSpeech();
   const { prefs } = useDisplayPrefs();
@@ -13,7 +16,7 @@ export function ReadAloud({ text }: { text: string }) {
   const [readingText, setReadingText] = useState<string | null>(null);
   const available = useSyncExternalStore(
     (cb) => speech.onVoicesChanged(cb),
-    () => speech.available(),
+    () => speech.available(lang),
   );
   const spoken = plainText(text);
   const reading = readingText === spoken;
@@ -45,6 +48,7 @@ export function ReadAloud({ text }: { text: string }) {
         setReadingText(spoken);
         speech.speak(spoken, {
           rate: prefs.readAloudRate,
+          ...(lang ? { lang } : {}),
           onEnd: () => {
             setReadingText(null);
           },

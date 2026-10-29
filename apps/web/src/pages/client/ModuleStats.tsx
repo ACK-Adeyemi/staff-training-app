@@ -6,6 +6,7 @@ import {
   holdsAnywhere,
   lessonFunnel,
   moduleStats,
+  translationsFor,
   peopleRows,
   scoreDistribution,
   statusBar,
@@ -69,6 +70,8 @@ function StatsBody({ moduleId }: { moduleId: string | undefined }) {
     events: inSite(extra.data.events),
     evidence: view.evidence,
     now: view.now,
+    // Language versions count for the original module (plan M5, F-5).
+    translations: module.translatedFrom ? [] : translationsFor(module.id, modules),
   };
   return <StatsContent module={module} input={input} people={view.people} perms={perms.data} />;
 }
