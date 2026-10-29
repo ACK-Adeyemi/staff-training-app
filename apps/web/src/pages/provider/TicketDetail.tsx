@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import { issueTypes, supportFeatures, type MessageKey } from '@sta/content';
@@ -11,23 +11,20 @@ import { useProviderClients } from './queries';
 
 type Shot = { id: string; alt: string; mime: string; data: Uint8Array };
 
-/** One screenshot, shown from a local object address (no network). */
+/** One screenshot, shown from a data address made here (no network, nothing to clean up). */
 function Screenshot({ shot }: { shot: Shot }) {
-  const [url, setUrl] = useState<string | null>(null);
-  useEffect(() => {
-    const next = URL.createObjectURL(new Blob([new Uint8Array(shot.data)], { type: shot.mime }));
-    setUrl(next);
-    return () => {
-      URL.revokeObjectURL(next);
-    };
+  const url = useMemo(() => {
+    let binary = '';
+    for (const byte of shot.data) binary += String.fromCharCode(byte);
+    return `data:${shot.mime};base64,${btoa(binary)}`;
   }, [shot]);
-  return url ? (
+  return (
     <img
       src={url}
       alt={shot.alt}
       className="max-w-full rounded-[var(--radius-md)] border-2 border-[var(--color-border)]"
     />
-  ) : null;
+  );
 }
 
 const STATUSES: Ticket['status'][] = ['received', 'inProgress', 'waitingForCustomer', 'resolved', 'closed'];
