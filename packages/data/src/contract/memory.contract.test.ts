@@ -18,6 +18,7 @@ import { runProviderOverviewContract } from './providerOverview';
 import { runProviderRecoveryContract } from './providerRecovery';
 import { runProviderTicketsContract } from './providerTickets';
 import { runPackagingOptionContract } from './packagingOption';
+import { runDunningContract } from './dunning';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
 import { runExportsRetentionContract } from './exportsRetention';
@@ -60,6 +61,7 @@ runPricingContract('memory adapter', (options) => Promise.resolve(createMemorySt
 runOwnershipTransferContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 runProviderTeamContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 runPackagingOptionContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runDunningContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 runCreateClientContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 runProviderPublishContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 runProviderTicketsContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
