@@ -74,3 +74,4 @@ export { groupOtherEntries, retagEntries, trendingPhrase } from './otherEntries'
 export { normaliseOtherText as normaliseOtherEntry } from './otherEntries';
 export type { OtherField, OtherGroupView } from './otherEntries';
 export * from './billingNames';
+export * from './tour';

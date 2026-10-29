@@ -1014,3 +1014,33 @@ kill switch is read by `access.features` and `ai.explain`. Added rule name `dupl
 - **Price notice email** now names the old price, the new price, the effective date and how to ask (words from `client.priceNotice.*`). Blank or invalid notice days show a plain-words error on P25 and block Preview and Save draft. Notice default uses `DEFAULT_NOTICE_DAYS`.
 - **Smaller fixes.** Local telemetry lists the newest 200 entries only (storage is not pruned). `ProviderTeamMember` has `roleIds` and P18 matches the current role by id, not by name.
 - **Left as known issues:** expiry of role assignments is not audited; Track B runs at desktop width only and has no Read-only or Closed account steps; price change reason codes are lost once a change is replaced into a notice email; the owner-role check (`OWNERISH`) is duplicated across data ops; the P3 Billing panel gap above; receiver 2FA for ownership transfer.
+
+## M5 assumptions
+Defaults where the build pack is silent (docs/plans/m5.md, "Assumptions and conflicts").
+1. Second language is Polish (`pl-PL`), because the seed gives Kasia `pl-PL`. Staff interface only; client, provider and demo shell stay English (brief 21.4).
+2. Translations are written by Claude and labelled Machine translated with a review flag. FAQs, What's new, release notes, announcements and every module except the sample stay English and are marked `lang="en-GB"`.
+3. The sample translated module is Safer sleep (two lessons).
+4. Tier 2 modules are one lesson and at least 5 questions (build pack 2.4), provider-owned, `draftContent: true`, optional unless the nursery pack already has a matching requirement.
+5. Tier 2 topics leave the Coming soon list; Tier 3 stays.
+6. Completing a translated module counts for the original module's requirement and stats; Evidence records the language taken (brief 21.4).
+7. Tour checkpoints advance only on Next, never on timers or detected actions (build pack 8.4). Show me jumps persona and route.
+8. Starting or restarting a tour runs Reset demo after a confirm. Tour progress lives in localStorage (brief 9).
+9. Track A tour and test cover steps 1 to 9; step 10 (Battle Room) waits for M7. Track B covers steps 1 to 7, step 5 without client scoping (known issue).
+10. "Main flows" for keyboard-only use are the six flows under BP-4.
+11. The update prompt says "A new version is ready", shows on every surface, and never reloads by itself.
+12. Demo AI uses buttons only, no free-text prompt, so no out-of-scope answer path. Practice quiz has 3 questions (placeholder). No new AI interaction log: the existing usage count is the log and holds no personal data.
+13. AI-drafted items need a per-item Mark as checked before publishing; the checker's id is stored (`aiReviewedBy`) and the data layer enforces the rule.
+14. Lighthouse is measured, not gated; targets stay placeholders (VERIFY).
+15. Draft content labels stay on; BP-6 is left for the user.
+16. Read-aloud Pause is stop-and-resume at the current paragraph.
+17. In the Polish interface, dates use the active language only where a shared formatter exists; other en-GB call sites are a known limit.
+
+M5 conflicts and resolutions:
+1. Build pack 9.3 names the client draft "Mobile phone policy"; M3 seeded "Lone working at the end of the day". Add the Mobile phone policy draft and keep Lone working (update module-count tests where needed).
+2. Brief 21.4 asks for play and pause, skip by paragraph and highlighting; M2 dropped pause. Follow the brief in M5.
+3. Tracks A and B ran on desktop only; build pack 11.1 says every demo step runs at both viewports. Run both.
+4. D1 Client tour and Provider tour start guided tours instead of plain links; the `demo.test.tsx` link assertions change (spec change, not a weakening).
+5. `categories.test.ts` asserts 5 Tier 2 Coming soon topics; it becomes 0 because the modules now exist.
+6. BP-6 says labels are removed in M5; deferred to the user's review and listed in the review checklist.
+
+Chunk 1 note: four router paths were missing from the e2e axe sweep (training record, module preview, invoice print view, competition edit); all four were added to e2e/smoke.spec.ts with seeded ids, none allow-listed.

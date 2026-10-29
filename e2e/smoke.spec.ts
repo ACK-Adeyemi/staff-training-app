@@ -81,6 +81,23 @@ const routes: Route[] = [
     name: 'P3 client detail',
     resolve: async (page) => `#/provider/clients/${await firstId(page, 'clients')}`,
   },
+  { hash: '#/staff/progress/record', name: 'S8b training record' },
+  { hash: `#/client/modules/${moduleId}/preview`, name: 'C6 module preview' },
+  {
+    hash: '',
+    name: 'C19 invoice print view',
+    resolve: async (page) => {
+      // Invoices belong to several clients, so take the first link the signed-in client's own billing page shows.
+      await page.goto('./#/client/billing');
+      const href = await page.getByRole('region', { name: 'Invoices' }).getByRole('link').first().getAttribute('href');
+      return String(href).slice(String(href).indexOf('#'));
+    },
+  },
+  {
+    hash: '',
+    name: 'C16 competition edit',
+    resolve: async (page) => `#/client/competitions/${await firstId(page, 'competitions')}/edit`,
+  },
   {
     hash: '',
     name: 'C27 evidence review',

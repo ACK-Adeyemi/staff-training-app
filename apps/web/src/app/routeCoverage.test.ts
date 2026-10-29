@@ -18,11 +18,12 @@ function flatten(list: RouteObject[], base = ''): string[] {
     if (r.path === '*') continue;
     const joined =
       r.path === undefined ? base : r.path.startsWith('/') ? r.path : `${base}/${r.path}`.replace(/\/+/g, '/');
-    const hasPage = r.index === true || r.path !== undefined;
-    if (hasPage && (r.children === undefined || r.index === true || r.element !== undefined || r.lazy !== undefined)) {
+    const isIndex = r.index === true;
+    const hasPage = isIndex || r.path !== undefined;
+    if (hasPage && (r.children === undefined || isIndex || r.element !== undefined || r.lazy !== undefined)) {
       // Layout routes with children only count as pages when they render something at their own path;
       // an index child covers the shell root, so the shell itself is counted once via its index route.
-      if (r.index === true || r.children === undefined) out.push(joined || '/');
+      if (isIndex || r.children === undefined) out.push(joined || '/');
     }
     if (r.children) out.push(...flatten(r.children, joined));
   }
