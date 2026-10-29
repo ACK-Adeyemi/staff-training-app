@@ -290,7 +290,19 @@ describe('D1 landing', () => {
 
 describe('D3 outbox', () => {
   it('shows the empty state when nothing has been sent', async () => {
-    await renderRoute('/demo/outbox', 'staff');
+    // The seed now carries a sent message (price change notice), so give the page an empty outbox explicitly.
+    const { handle, keys } = await seededStore();
+    const router = createMemoryRouter(routes, { initialEntries: ['/demo/outbox'] });
+    render(
+      <AppProviders
+        store={handle.store}
+        clock={fixedClock(TODAY)}
+        actor={actorFor('staff', keys)}
+        demo={makeDemo('staff', keys)}
+      >
+        <RouterProvider router={router} />
+      </AppProviders>,
+    );
     expect(await screen.findByRole('heading', { level: 1, name: 'Outbox' })).toBeTruthy();
     expect(
       await screen.findByText('Nothing has been sent yet. In the demo, messages are shown here instead of being sent.'),

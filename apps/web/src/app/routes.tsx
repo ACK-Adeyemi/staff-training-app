@@ -224,6 +224,10 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <Overview /> },
           { path: 'clients', element: <Clients /> },
+          {
+            path: 'clients/new',
+            lazy: async () => ({ Component: (await import('../pages/provider/NewClient')).NewClient }),
+          },
           { path: 'clients/:id', element: <ClientDetail /> },
           {
             path: 'content',

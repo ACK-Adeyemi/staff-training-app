@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { MessageKey } from '@sta/content';
 import { accountStateSchema, type AccountState } from '@sta/domain';
-import { Card, PageHeader } from '@sta/ui';
+import { Card, LinkButton, PageHeader } from '@sta/ui';
 import { useT } from '../../app/hooks';
 import { fieldClass } from '../client/feedbackShared';
 import { ClientsReadGate } from './Gate';
@@ -73,6 +73,9 @@ export function Clients() {
     <>
       <PageHeader title={t('provider.clients.title')} />
       <ClientsReadGate>
+        <LinkButton href="#/provider/clients/new" variant="secondary" className="mb-4">
+          {t('provider.clients.new')}
+        </LinkButton>
         <Body />
       </ClientsReadGate>
     </>
