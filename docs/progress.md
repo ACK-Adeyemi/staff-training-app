@@ -2,16 +2,16 @@
 Status: IN PROGRESS
 Mode: unattended
 Branch: agent/poc-build
-Current milestone: M4
+Current milestone: M5
 Milestone base commit: c7160e2
-Next step: M4 chunk 18 (Track B e2e `e2e/track-b.spec.ts` from build pack 8.2, flow specs for P24, wizard, price change, team/transfer, tickets, banners; axe/200% text/dark/no-network additions; docs/demo-script.md Track B; review-checklist M4 entries), then security-reviewer and code-reviewer on `git diff c7160e2...HEAD`. Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn. Test-writer briefs: one test file each.
+Next step: M5 Polish and demo readiness: record the milestone base commit, delegate docs/plans/m5.md to the planner (build pack section 10, M5), commit it, then start chunk 1. Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn.
 
 ## Milestones
 - [x] M0 Foundations
 - [x] M1 Client story core
 - [x] M2 Engagement
 - [x] M3 Client admin depth
-- [ ] M4 Provider story
+- [x] M4 Provider story
 - [ ] M5 Polish and demo readiness
 - [ ] M6 Luxury retail pack
 - [ ] M7 Battle Room
@@ -82,6 +82,8 @@ M2 (final commit 6425abe, scripts/check.sh fully green): BP-1 to BP-8 and F-1 to
 
 M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed in that commit and rerun green alone, 48 of 48): every acceptance criterion in docs/plans/m3.md 'Acceptance criteria' is proven by the domain, contract (both adapters), seed, component and Playwright tests listed in the plan (Track A steps for M3, axe, 200% text, dark mode, no-network). Pass. Phone checks and Draft content deferred to user in docs/review-checklist.md. Security review: findings fixed in 832c5f8 (see docs/decisions.md 'M3 security review'). Code review: Must fixes done (docs/decisions.md 'M3 review fixes'); leftovers under Known issues.
 
+M4 (final commit 76ca260; last full check.sh: lint, typecheck, unit, build, audit and all e2e green except two text-scale e2e checks that failed intermittently under load; their cause was a hash-only goto reading the old page, fixed in 76ca260 and 48 of 48 pass repeated): every acceptance criterion in docs/plans/m4.md is proven by domain, contract (both adapters), seed, component and Playwright tests (Track B in e2e/track-b.spec.ts, desktop only; axe, dark, high contrast, 200% text and no-network on provider routes). Pass, with gaps under Known issues. Live and phone checks deferred to user in docs/review-checklist.md. Security review: FAIL first pass (1 High: provider client scope not enforced, fixed by removing the option, deferred in decisions.md; 1 Medium requester-can-approve fixed; Lows fixed or accepted), fixes e7c0a31. Code review: CHANGES REQUESTED, 5 Must fixes and most Shoulds done in 1ef8cf7; leftovers in docs/decisions.md 'M4 review fixes'. The last fixes (1ef8cf7) were verified by the full check except the two text-scale checks above.
+
 ## User feedback
 - F1 (M0, ?reset=1): fixed; awaiting user re-check. Cause: editing only the hash (`#/staff?reset=1`) never reloads the page and the hash form was not read. Both forms now work (resetParam.ts, hashchange reload), with e2e for both against the base-path build. Fix commit: see git log "fix: ?reset=1 works before the hash".
 - F2 (M3, calendar at 200% text with wider fonts): the MonthGrid fix (earlier this session) holds with DejaVu Sans forced on every screen in text-scale.spec.ts (24 of 24 pass); added a permanent wide-font calendar test. Awaiting user re-check on GitHub.
@@ -102,6 +104,7 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - M3 code review leftovers (not fixed, by decision): placeholders not all in adminConfig; ModuleLibrary stats computed in the UI; duplicate London-day helpers; .ics DTSTAMP hour rounding; reminders e2e cap check is loose; affected-now preview ignores the actor's scope; reports.test privacy check is narrow; ContrastCheck formula duplicated in the UI.
 
 ## Session log
+- 2026-10-29 (session 8): M4 chunk 18, security and code reviews with fixes done. M4 complete. M5 next.
 - 2026-10-29 (session 7): F1-F4 already handled. M4 chunk 17 (P24, P25, client price notice) landed. Chunk 18 next.
 - 2026-10-29 (session 6): F1-F4 already handled. M4 chunk 16 (P21, P22) landed (8b9234c), check.sh green. Chunk 17 next.
 - 2026-10-29 (session 5): F2-F4 already handled. M4 chunk 15b (P19, P20, P23) landed (06c0376), check.sh green. Chunk 16 next.
