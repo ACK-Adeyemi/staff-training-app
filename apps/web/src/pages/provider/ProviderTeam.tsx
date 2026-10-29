@@ -76,7 +76,7 @@ export function Team() {
   const [transferError, setTransferError] = useState(false);
 
   const data = useQuery({
-    queryKey: ['providerTeam', actor.userId],
+    queryKey: ['providerTeamPage', actor.userId],
     queryFn: async () => {
       const [members, roles, assignments, transfers] = await Promise.all([
         store.providerTeam.list(actor),
@@ -89,7 +89,7 @@ export function Team() {
     enabled: canRead,
   });
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: ['providerTeam'] });
+  const refresh = () => queryClient.invalidateQueries({ queryKey: ['providerTeamPage'] });
 
   if (!perms.data || (canRead && !data.data && !data.isError)) return <p>{t('shell.loading')}</p>;
   if (!canRead) {
