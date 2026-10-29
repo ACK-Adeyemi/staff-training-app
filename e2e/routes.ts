@@ -33,7 +33,7 @@ export const providerBar: NavEntry[] = [
   { hash: '#/provider/packages', label: 'Commercial', heading: 'Packages and entitlements' },
 ];
 export const providerMore: NavEntry[] = [
-  { hash: '#/provider/tickets', label: 'Support' },
+  { hash: '#/provider/tickets', label: 'Support', heading: 'Ticket inbox' },
   { hash: '#/provider/comms', label: 'Comms' },
   { hash: '#/provider/team', label: 'Team and security' },
 ];

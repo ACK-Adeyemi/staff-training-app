@@ -184,7 +184,9 @@ describe('P11 Ticket inbox', () => {
 
     await userEvent.selectOptions(screen.getByLabelText('Assignee'), sophieId);
     await waitFor(() => {
-      expect(ids()).toEqual([target]);
+      // The seed already has a ticket assigned to Sophie, so expect it as well as the one assigned above.
+      expect(ids()).toEqual(wantIds((r) => r.ticket.assigneeId === sophieId));
+      expect(ids()).toContain(target);
     });
     await userEvent.selectOptions(screen.getByLabelText('Assignee'), '');
 

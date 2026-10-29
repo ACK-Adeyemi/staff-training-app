@@ -3296,6 +3296,43 @@
       "noPermission": "You don't have permission to see dunning.",
       "failed": "That change could not be saved. Check the number of days and try again."
     },
+    "tickets": {
+      "heading": "Ticket inbox",
+      "filters": {
+        "status": "Status",
+        "client": "Client",
+        "assignee": "Assignee",
+        "impact": "Impact",
+        "all": "All"
+      },
+      "unassigned": "Unassigned",
+      "assignToMe": "Assign to me",
+      "dueIn": "Response due in {count} hours",
+      "dueInOne": "Response due in 1 hour",
+      "overdueBy": "Response overdue by {count} hours",
+      "overdueByOne": "Response overdue by 1 hour",
+      "responded": "Resolved",
+      "status": {
+        "received": "Received",
+        "inProgress": "In progress",
+        "waitingForCustomer": "Waiting for customer",
+        "resolved": "Resolved",
+        "closed": "Closed"
+      },
+      "impact": {
+        "blocked": "Blocked",
+        "workaround": "Workaround available",
+        "question": "Question"
+      },
+      "savedViews": "Saved views",
+      "views": {
+        "needsReply": "Needs reply",
+        "breached": "Breached"
+      },
+      "empty": "No tickets match these filters",
+      "noPermission": "You don't have permission to see tickets.",
+      "assignFailed": "That ticket could not be assigned. Try again."
+    },
     "commercial": {
       "heading": "Commercial pages",
       "packs": "Industry packs",
