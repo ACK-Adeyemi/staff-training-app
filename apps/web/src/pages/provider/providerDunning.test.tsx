@@ -98,7 +98,9 @@ describe('P9 Dunning', () => {
     expect(closed.daysToDeletion).toBeGreaterThan(0);
     const text = rowFor(rows, closed.clientId).textContent;
     expect(text).toContain(`Deleted in ${closed.daysToDeletion} day`);
-    const others = rows.filter((r) => r.getAttribute('data-client-id') !== closed.clientId && !r.textContent.includes('Closed'));
+    const others = rows.filter(
+      (r) => r.getAttribute('data-client-id') !== closed.clientId && !r.textContent.includes('Closed'),
+    );
     for (const r of others) expect(r.textContent).not.toContain('Deleted in');
   });
 
@@ -127,7 +129,9 @@ describe('P9 Dunning', () => {
     await userEvent.clear(input);
     await userEvent.type(input, '7');
     await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
-    await waitFor(() => { expect(daysIn(rowFor(screen.getAllByTestId('dunning-row'), willow))).toBe(before + 7); });
+    await waitFor(() => {
+      expect(daysIn(rowFor(screen.getAllByTestId('dunning-row'), willow))).toBe(before + 7);
+    });
   });
 
   it('offers Extend grace and Pause timeline with a Sensitive marker only on Payment overdue and Limited rows, and toggles to Resume timeline', async () => {
@@ -137,7 +141,9 @@ describe('P9 Dunning', () => {
       const row = rowFor(rows, o.clientId);
       const eligible = o.state === 'pastDue' || o.state === 'limited';
       expect(within(row).queryAllByRole('button', { name: 'Extend grace' })).toHaveLength(eligible ? 1 : 0);
-      expect(within(row).queryAllByRole('button', { name: /^(Pause|Resume) timeline$/ })).toHaveLength(eligible ? 1 : 0);
+      expect(within(row).queryAllByRole('button', { name: /^(Pause|Resume) timeline$/ })).toHaveLength(
+        eligible ? 1 : 0,
+      );
       if (eligible) expect(row.textContent).toContain('Sensitive');
     }
     const willow = rowFor(rows, view.keys.clients['willowLane']);
