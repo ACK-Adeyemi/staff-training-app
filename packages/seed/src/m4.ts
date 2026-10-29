@@ -95,7 +95,7 @@ export function buildM4({ data, keys, today, clock, rng }: Input): void {
       billingName: name,
       address,
       billingContactEmail: sub.billingContact,
-      paymentMethod: { brand: 'Visa', last4: String(rng.int(1000, 9999)), expMonth: rng.int(1, 12), expYear: 2028 },
+      paymentMethod: { brand: 'Testcard', last4: String(rng.int(1000, 9999)), expMonth: rng.int(1, 12), expYear: 2028 },
       updatedBy,
       updatedAt: ago(150),
     };

@@ -3636,14 +3636,6 @@
         "submit": "Send invite",
         "error": "Check the email address and name, then try again."
       },
-      "scope": {
-        "legend": "Clients this person can see",
-        "allOption": "All clients",
-        "selectedOption": "Selected clients",
-        "clients": "Choose clients",
-        "all": "All clients",
-        "some": "Selected clients only: {count}"
-      },
       "changeRole": "Change role",
       "suspend": "Suspend",
       "reactivate": "Reactivate",

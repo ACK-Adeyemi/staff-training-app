@@ -74,6 +74,12 @@ describe('account recovery', () => {
     expect(res.ok).toBe(false);
   });
 
+  it('the person who asked for the recovery cannot approve it', () => {
+    const res = approveRecovery(requestRecovery({ ...input, requester: A }, start), A, start);
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.reason).toBe('The person who asked for this recovery cannot approve it.');
+  });
+
   it('two different approvers move the request to approved and it stays schema valid', () => {
     const r = approvedRequest();
     expect(r.status).toBe('approved');

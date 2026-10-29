@@ -90,7 +90,7 @@ Things only the user can check, by milestone.
 
 ### M4 phone and live checks
 
-- [ ] On a real phone, open the provider app (`#/provider`) and walk Track B (docs/demo-script.md): Overview, Clients, a client's tabs, Ticket inbox and a ticket with its screenshot, Dunning, Team and roles (invite with Selected clients), Price changes, Security. Check nothing needs sideways scrolling at 200% text and the tab rows can be reached.
+- [ ] On a real phone, open the provider app (`#/provider`) and walk Track B (docs/demo-script.md): Overview, Clients, a client's tabs, Ticket inbox and a ticket with its screenshot, Dunning, Team and roles (invite someone), Price changes, Security. Check nothing needs sideways scrolling at 200% text and the tab rows can be reached.
 - [ ] Open a ticket with a screenshot on a phone and check the picture fits the screen.
 - [ ] Fast-forward 7 days after Simulate failed payment and check the provider Clients list, Dunning and the client banner all say Limited.
 - [ ] Create a price change and confirm it with the step-up code on a phone keyboard (the demo code is shown on the page).

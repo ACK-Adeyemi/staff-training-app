@@ -420,24 +420,22 @@ test.describe('Track B: provider tour', () => {
     expect(outside).toEqual([]);
   });
 
-  // The scope is chosen when someone is invited (it sits on the role assignment, as in the permission model), so the
-  // control is on the invite form of P18, not in the role editor.
-  test('step 5b: an invitation can be limited to selected clients', async ({ page, context }) => {
+  // Limiting a provider user to selected clients is not built (docs/decisions.md 'M4 security review'), so the invite
+  // form offers no client choice and every invited person has access to all clients.
+  test('step 5b: the invite form offers no client scope', async ({ page, context }) => {
     test.setTimeout(120_000);
     await setUp(context);
     await openProvider(page, '/team', 'Team and roles');
     const invite = page.getByRole('region', { name: 'Invite someone' });
-    await invite.getByRole('textbox', { name: 'Email' }).fill('sam.scoped@example.test');
-    await invite.getByRole('textbox', { name: 'Name' }).fill('Sam Scoped');
+    await expect(invite.getByRole('radio', { name: 'Selected clients' })).toHaveCount(0);
+    await expect(invite.getByText('Clients this person can see')).toHaveCount(0);
+    await invite.getByRole('textbox', { name: 'Email' }).fill('sam.plain@example.test');
+    await invite.getByRole('textbox', { name: 'Name' }).fill('Sam Plain');
     await invite.getByLabel('Role').selectOption({ label: 'Account manager' });
-    await invite.getByRole('radio', { name: 'Selected clients' }).check();
-    const scope = invite.getByRole('group', { name: 'Choose clients' });
-    await scope.getByRole('checkbox', { name: 'Harbour Cafe Group' }).check();
-    await scope.getByRole('checkbox', { name: 'Summit Builders' }).check();
     await invite.getByRole('button', { name: 'Send invite' }).click();
-    await expect(page.getByTestId('member-row').filter({ hasText: 'Sam Scoped' })).toContainText(
-      'Selected clients only: 2',
-    );
+    const row = page.getByTestId('member-row').filter({ hasText: 'Sam Plain' });
+    await expect(row).toContainText('Invited');
+    await expect(row).not.toContainText('Selected clients only');
   });
 
   test('step 6: price changes, a 15 per cent retention discount for two at-risk clients, step-up confirm, visible on Harbour Cafe Group billing tab', async ({

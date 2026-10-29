@@ -975,7 +975,7 @@ export function buildBilling(
       billingName: client.displayName,
       address,
       billingContactEmail: need(data.subscriptions.find((s) => s.clientId === clientId)).billingContact,
-      paymentMethod: { brand: 'Visa', last4: String(rng.int(1000, 9999)), expMonth: rng.int(1, 12), expYear: 2028 },
+      paymentMethod: { brand: 'Testcard', last4: String(rng.int(1000, 9999)), expMonth: rng.int(1, 12), expYear: 2028 },
       updatedBy: owner.id,
       updatedAt: iso(ago(120)),
     };

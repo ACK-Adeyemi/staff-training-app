@@ -90,7 +90,7 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - F4 (CI): ci.yml caches ~/.cache/ms-playwright keyed on the Playwright version, installs Chromium once (check.sh skips its own install when SKIP_PLAYWRIGHT_INSTALL=1), adds install-deps on a cache hit. actions/cache@v5 is unverified (VERIFY). Playwright workers left at the default: more workers raised flakes locally. Awaiting user re-check.
 
 ## Known issues
-- M4 chunk 18b: a provider user invited with Selected clients has the scope stored and shown, but provider reads (Clients, Tickets, Dunning and so on) do not yet filter to those clients. See docs/decisions.md 'M4 chunk 18b'.
+- M4 security review: per-client scoping of provider users (build pack 8.2 step 5, 'scoped to selected clients') is deferred, not built. The invite form has no client choice and `providerTeam.invite` refuses `clientIds`. See docs/decisions.md 'M4 security review'.
 - M4 chunk 13: P13 archive, merge, reorder and aliases of issue types and features are not built (no data ops); P12 re-tag, merge and link are not built. See docs/decisions.md 'M4 chunk 13'.
 - Chunk 14: C19 usage omits Battle Rooms limit (data layer has no count); C6 preview is minimal until chunk 15.
 - e2e 'C1 updates in one tab when Jade passes the refresher in another tab' (client-dashboard.spec.ts) failed once, passed on rerun: possible flake, watch it.

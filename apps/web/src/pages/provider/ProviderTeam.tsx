@@ -20,7 +20,6 @@ import { Button, PageHeader } from '@sta/ui';
 import { useActor, useClock, useStore, useT } from '../../app/hooks';
 import { inputClass } from '../client/foundationsErrors';
 import { usePermissions } from '../client/queries';
-import { useProviderClients } from './queries';
 
 const DAY_MS = 86_400_000;
 const box = 'mb-6 rounded-[var(--radius-md)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] p-4';
@@ -65,9 +64,6 @@ export function Team() {
   const [inviteName, setInviteName] = useState('');
   const [inviteRole, setInviteRole] = useState('');
   const [inviteFailed, setInviteFailed] = useState(false);
-  const [inviteSelected, setInviteSelected] = useState(false);
-  const [inviteClients, setInviteClients] = useState<string[]>([]);
-  const clientList = useProviderClients();
   const [effectiveFor, setEffectiveFor] = useState<string | null>(null);
   const [editor, setEditor] = useState<Editor | null>(null);
   const [note, setNote] = useState('');
@@ -142,11 +138,8 @@ export function Team() {
         email: inviteEmail,
         displayName: inviteName,
         roleKey: role ? roleKeyOf(role) : '',
-        ...(inviteSelected ? { clientIds: inviteClients } : {}),
       });
       setInviteEmail('');
-      setInviteSelected(false);
-      setInviteClients([]);
       setInviteName('');
       await refresh();
     } catch {
@@ -287,11 +280,6 @@ export function Team() {
                 <p className="m-0 font-bold">{m.name}</p>
                 <p className="m-0">{m.roleNames.join(', ')}</p>
                 <p className="m-0">{t(`provider.team.status.${m.status}` as MessageKey)}</p>
-                <p className="m-0">
-                  {m.clientIds
-                    ? t('provider.team.scope.some', { count: m.clientIds.length })
-                    : t('provider.team.scope.all')}
-                </p>
                 <div className="mt-2 flex flex-wrap items-end gap-2">
                   <Button
                     variant="secondary"
@@ -419,42 +407,6 @@ export function Team() {
                 ))}
               </select>
             </Field>
-            <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
-              <legend className="font-semibold">{t('provider.team.scope.legend')}</legend>
-              {(['all', 'selected'] as const).map((k) => (
-                <label key={k} className="flex min-h-[var(--target-min)] items-center gap-2">
-                  <input
-                    type="radio"
-                    name="p18-invite-scope"
-                    checked={(k === 'selected') === inviteSelected}
-                    onChange={() => {
-                      setInviteSelected(k === 'selected');
-                    }}
-                  />
-                  {t(`provider.team.scope.${k}Option` as MessageKey)}
-                </label>
-              ))}
-              {inviteSelected ? (
-                <div role="group" aria-label={t('provider.team.scope.clients')} className="flex flex-col gap-1">
-                  {(clientList.data ?? []).map((c) => (
-                    <label key={c.clientId} className="flex min-h-[var(--target-min)] items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={inviteClients.includes(c.clientId)}
-                        onChange={(e) => {
-                          setInviteClients(
-                            e.target.checked
-                              ? [...inviteClients, c.clientId]
-                              : inviteClients.filter((x) => x !== c.clientId),
-                          );
-                        }}
-                      />
-                      {c.displayName}
-                    </label>
-                  ))}
-                </div>
-              ) : null}
-            </fieldset>
             {inviteFailed ? (
               <p role="alert" className="m-0 font-semibold">
                 {t('provider.team.invite.error')}

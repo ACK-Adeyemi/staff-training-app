@@ -10,7 +10,7 @@ export type { SeedKeys } from './world';
  * competitions (M2); 4 adds own modules, feedback, tickets, rules, themes, invoices and sign-in states (M3);
  * 5 adds price changes, profile changes, the link check, Other entries, comms and a recovery request (M4);
  * 6 adds simulated provider telemetry (usage, error groups, health scores). */
-export const SEED_VERSION = 7;
+export const SEED_VERSION = 8;
 export const DEFAULT_SEED_VALUE = 20261019;
 /** Used only when nothing is stored and the caller gave no date. The web app passes the real first-load date. */
 export const DEFAULT_TODAY = '2026-10-19T09:00:00.000Z';

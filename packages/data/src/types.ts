@@ -894,19 +894,14 @@ export type ProviderTeamMember = {
   email: string;
   status: string;
   roleNames: string[];
-  /** Set when the person's access is limited to selected clients. */
-  clientIds?: string[];
 };
 export type ProviderRoleInput = { name: string; description: string; permissionIds: string[] };
 
 /** Provider team and roles (M4 chunk 5b). Provider side only; Owner and Co-Owner roles need owner.manageOwnerRoles. */
 export interface ProviderTeamService {
   list(ctx: ActorContext): Promise<ProviderTeamMember[]>;
-  /** `clientIds` limits the new person to selected clients; leave it out (or empty) for all clients. */
-  invite(
-    ctx: ActorContext,
-    input: { email: string; displayName: string; roleKey: string; clientIds?: string[] },
-  ): Promise<UserAccount>;
+  /** Always for all clients: a `clientIds` key is refused (per-client scoping of provider users is not built). */
+  invite(ctx: ActorContext, input: { email: string; displayName: string; roleKey: string }): Promise<UserAccount>;
   setRole(ctx: ActorContext, userId: string, roleKey: string): Promise<void>;
   suspend(ctx: ActorContext, userId: string): Promise<void>;
   reactivate(ctx: ActorContext, userId: string): Promise<void>;

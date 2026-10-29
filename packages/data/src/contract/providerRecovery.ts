@@ -221,6 +221,19 @@ export function runProviderRecoveryContract(
       expect((await t.dump<RecoveryRequest>('recoveryRequests'))[0]!.approvals).toEqual([]);
     });
 
+    it('does not let the person who asked for the recovery approve it', async () => {
+      const t = await setup();
+      const r = await t.s.recovery.request(t.owner, {
+        clientId: t.a,
+        subjectUserId: t.u.priya,
+        reason: 'Lost phone, identity checked by phone',
+        outcome: 'reset2fa',
+      });
+      await ruleOf(t.s.recovery.approve(t.owner, r.id));
+      expect((await t.dump<RecoveryRequest>('recoveryRequests'))[0]!.approvals).toEqual([]);
+      expect(await t.s.recovery.approve(t.meganCtx, r.id)).toMatchObject({ status: 'open' });
+    });
+
     it('refuses to complete before two approvals and before the cooling off ends', async () => {
       const t = await setup();
       const r = await newRecovery(t);

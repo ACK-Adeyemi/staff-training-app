@@ -11,7 +11,6 @@ import {
   providerCatalogue,
   providerRoleTemplates,
   addDays,
-  type Client,
   type Invitation,
   type OutboxMessage,
   type Role,
@@ -124,19 +123,6 @@ export function createProviderTeamOperations(backend: RawBackend, options: Store
     return out;
   }
 
-  /** All clients, unless named clients are given; every id must be a real client. */
-  async function inviteScope(call: Call, clientIds: unknown): Promise<Scope> {
-    if (clientIds === undefined) return ALL;
-    if (!Array.isArray(clientIds) || clientIds.some((c) => typeof c !== 'string')) {
-      throw new ValidationError(['clientIds: not a list of clients']);
-    }
-    const unique = [...new Set(clientIds as string[])];
-    if (unique.length === 0) return ALL;
-    const known = new Set((await call.all<Client>('clients')).map((c) => c.id));
-    if (unique.some((c) => !known.has(c))) throw new ValidationError(['clientIds: unknown client']);
-    return { type: 'clients', ids: unique.sort() };
-  }
-
   async function customRole(call: Call, roleId: unknown): Promise<Role> {
     const role = await call.find<Role>('roles', text(roleId));
     if (!role || role.owner !== 'provider') throw new NotFoundError();
@@ -154,14 +140,12 @@ export function createProviderTeamOperations(backend: RawBackend, options: Store
         .map((u) => {
           const mine = assignments.filter((a) => a.userId === u.id);
           const ids = mine.flatMap((a) => a.roleIds);
-          const scoped = mine.find((a) => a.scope.type === 'clients');
           return {
             userId: u.id,
             name: u.displayName,
             email: u.email ?? '',
             status: u.status,
             roleNames: [...new Set(ids)].flatMap((id) => roles.find((r) => r.id === id)?.name ?? []),
-            ...(scoped && scoped.scope.type === 'clients' ? { clientIds: [...scoped.scope.ids] } : {}),
           };
         });
       return members.sort((a, b) => (a.name === b.name ? (a.userId < b.userId ? -1 : 1) : a.name < b.name ? -1 : 1));
@@ -180,7 +164,11 @@ export function createProviderTeamOperations(backend: RawBackend, options: Store
       }
       needOwnerRights(call, [role]);
       checkGrant(call, role.permissionIds);
-      const scope = await inviteScope(call, input.clientIds);
+      // Per-client scoping of provider users is not built (docs/decisions.md 'M4 security review'): refuse it rather
+      // than store a limit that nothing enforces.
+      if ('clientIds' in input)
+        throw new ValidationError(['clientIds: limiting a person to selected clients is not available']);
+      const scope = ALL;
 
       const now = ctx.now;
       const user: UserAccount = {
@@ -226,7 +214,6 @@ export function createProviderTeamOperations(backend: RawBackend, options: Store
         put('outbox', mail.id, mail),
         audit(call, undefined, 'team.invite', user.id, undefined, {
           roleId: role.id,
-          ...(scope.type === 'clients' ? { clientCount: scope.ids.length } : {}),
         }),
       ]);
       return structuredClone(user);
@@ -265,6 +252,8 @@ export function createProviderTeamOperations(backend: RawBackend, options: Store
     async suspend(ctx, userId) {
       const call = await providerCall(ctx, 'team.manage');
       const user = await target(call, userId);
+      // Someone who has not accepted yet cannot be suspended: reactivating would turn them active without accepting.
+      if (user.status === 'invited') throw new RuleError('notApplicable');
       needOwnerRights(call, await heldRoles(call, user.id));
       await guardOwner(call, user.id);
       const mine = (await call.all<RoleAssignment>('roleAssignments')).filter((a) => a.userId === user.id);

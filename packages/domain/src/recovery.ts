@@ -36,6 +36,7 @@ export const requestRecovery = (input: RecoveryInput, clock: Clock): RecoveryReq
 export const approveRecovery = (r: RecoveryRequest, approverUserId: string, clock: Clock): RecoveryResult => {
   if (r.status !== 'open') return fail('This recovery request is no longer open.');
   if (approverUserId === r.subjectUserId) return fail('The person being recovered cannot approve their own recovery.');
+  if (approverUserId === r.requester) return fail('The person who asked for this recovery cannot approve it.');
   if (r.approvals.includes(approverUserId)) return fail('You have already approved this request.');
   const approvals = [...r.approvals, approverUserId];
   return {

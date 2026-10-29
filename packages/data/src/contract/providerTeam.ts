@@ -16,7 +16,14 @@ import {
   type RoleAssignment,
   type UserAccount,
 } from '@sta/domain';
-import { ForbiddenError, ValidationError, type ActorContext, type StoreHandle, type StoreOptions } from '../types';
+import {
+  ForbiddenError,
+  RuleError,
+  ValidationError,
+  type ActorContext,
+  type StoreHandle,
+  type StoreOptions,
+} from '../types';
 import { refusal } from './learning';
 import { buildWorld, TODAY } from './world';
 
@@ -26,16 +33,12 @@ type Member = {
   email: string;
   status: string;
   roleNames: string[];
-  clientIds?: string[];
 };
 type RoleInput = { name: string; description: string; permissionIds: string[] };
 export type ProviderTeamStore = {
   providerTeam: {
     list(actor: ActorContext): Promise<Member[]>;
-    invite(
-      actor: ActorContext,
-      input: { email: string; displayName: string; roleKey: string; clientIds?: string[] },
-    ): Promise<UserAccount>;
+    invite(actor: ActorContext, input: { email: string; displayName: string; roleKey: string }): Promise<UserAccount>;
     setRole(actor: ActorContext, userId: string, roleKey: string): Promise<void>;
     suspend(actor: ActorContext, userId: string): Promise<void>;
     reactivate(actor: ActorContext, userId: string): Promise<void>;
@@ -79,24 +82,25 @@ export function runProviderTeamContract(
       });
     });
 
-    it('limits an invited person to selected clients, and refuses unknown clients', async () => {
+    it('refuses to limit an invited person to selected clients, because that scoping is not built', async () => {
       const s = await setup();
       const clientIds = [s.fx.ids.clients.a, s.fx.ids.clients.b];
-      await s.store.invite(s.owner, { ...invite, clientIds });
-      const user = (await s.userByEmail(invite.email))!;
-      const inv = (await s.dump<Invitation>('invitations')).find((i) => i.email === invite.email)!;
-      expect(inv.scope).toEqual({ type: 'clients', ids: [...clientIds].sort() });
-      const assignment = (await s.dump<RoleAssignment>('roleAssignments')).find((a) => a.userId === user.id)!;
-      expect(assignment.scope).toEqual({ type: 'clients', ids: [...clientIds].sort() });
-      expect((await s.store.list(s.owner)).find((m) => m.userId === user.id)?.clientIds).toEqual([...clientIds].sort());
       await expect(
-        s.store.invite(s.owner, { ...invite, email: 'other.person@example.test', clientIds: ['no-such-client'] }),
+        s.store.invite(s.owner, { ...invite, clientIds } as unknown as typeof invite),
       ).rejects.toBeInstanceOf(ValidationError);
-      await s.store.invite(s.owner, { ...invite, email: 'third.person@example.test', clientIds: [] });
-      const third = (await s.userByEmail('third.person@example.test'))!;
-      expect((await s.dump<RoleAssignment>('roleAssignments')).find((a) => a.userId === third.id)?.scope).toEqual({
-        type: 'all',
-      });
+      expect(await s.userByEmail(invite.email)).toBeUndefined();
+      await s.store.invite(s.owner, invite);
+      const user = (await s.userByEmail(invite.email))!;
+      const assignment = (await s.dump<RoleAssignment>('roleAssignments')).find((a) => a.userId === user.id)!;
+      expect(assignment.scope).toEqual({ type: 'all' });
+    });
+
+    it('does not let an invited person be suspended and then reactivated without accepting', async () => {
+      const s = await setup();
+      await s.store.invite(s.owner, invite);
+      const user = (await s.userByEmail(invite.email))!;
+      await expect(s.store.suspend(s.owner, user.id)).rejects.toBeInstanceOf(RuleError);
+      expect((await s.userByEmail(invite.email))?.status).toBe('invited');
     });
 
     it('invites a provider user with an invitation, role assignment, outbox email and audit', async () => {
