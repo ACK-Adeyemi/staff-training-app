@@ -11,6 +11,7 @@ import {
   providerCatalogue,
   providerRoleTemplates,
   addDays,
+  type Client,
   type Invitation,
   type OutboxMessage,
   type Role,
@@ -123,6 +124,19 @@ export function createProviderTeamOperations(backend: RawBackend, options: Store
     return out;
   }
 
+  /** All clients, unless named clients are given; every id must be a real client. */
+  async function inviteScope(call: Call, clientIds: unknown): Promise<Scope> {
+    if (clientIds === undefined) return ALL;
+    if (!Array.isArray(clientIds) || clientIds.some((c) => typeof c !== 'string')) {
+      throw new ValidationError(['clientIds: not a list of clients']);
+    }
+    const unique = [...new Set(clientIds as string[])];
+    if (unique.length === 0) return ALL;
+    const known = new Set((await call.all<Client>('clients')).map((c) => c.id));
+    if (unique.some((c) => !known.has(c))) throw new ValidationError(['clientIds: unknown client']);
+    return { type: 'clients', ids: unique.sort() };
+  }
+
   async function customRole(call: Call, roleId: unknown): Promise<Role> {
     const role = await call.find<Role>('roles', text(roleId));
     if (!role || role.owner !== 'provider') throw new NotFoundError();
@@ -138,13 +152,16 @@ export function createProviderTeamOperations(backend: RawBackend, options: Store
       const members: ProviderTeamMember[] = (await call.all<UserAccount>('users'))
         .filter((u) => u.side === 'provider')
         .map((u) => {
-          const ids = assignments.filter((a) => a.userId === u.id).flatMap((a) => a.roleIds);
+          const mine = assignments.filter((a) => a.userId === u.id);
+          const ids = mine.flatMap((a) => a.roleIds);
+          const scoped = mine.find((a) => a.scope.type === 'clients');
           return {
             userId: u.id,
             name: u.displayName,
             email: u.email ?? '',
             status: u.status,
             roleNames: [...new Set(ids)].flatMap((id) => roles.find((r) => r.id === id)?.name ?? []),
+            ...(scoped && scoped.scope.type === 'clients' ? { clientIds: [...scoped.scope.ids] } : {}),
           };
         });
       return members.sort((a, b) => (a.name === b.name ? (a.userId < b.userId ? -1 : 1) : a.name < b.name ? -1 : 1));
@@ -163,6 +180,7 @@ export function createProviderTeamOperations(backend: RawBackend, options: Store
       }
       needOwnerRights(call, [role]);
       checkGrant(call, role.permissionIds);
+      const scope = await inviteScope(call, input.clientIds);
 
       const now = ctx.now;
       const user: UserAccount = {
@@ -178,7 +196,7 @@ export function createProviderTeamOperations(backend: RawBackend, options: Store
         side: 'provider',
         email,
         roleIds: [role.id],
-        scope: ALL,
+        scope,
         invitedBy: call.actor.user.id,
         expiresAt: addDays(call.actor.now, INVITE_DAYS).toISOString(),
         status: 'invited',
@@ -187,7 +205,7 @@ export function createProviderTeamOperations(backend: RawBackend, options: Store
         id: call.newId(),
         userId: user.id,
         roleIds: [role.id],
-        scope: ALL,
+        scope,
         grants: [],
         denies: [],
         status: 'active',
@@ -206,7 +224,10 @@ export function createProviderTeamOperations(backend: RawBackend, options: Store
         put('invitations', invitation.id, invitation),
         put('roleAssignments', access.id, access),
         put('outbox', mail.id, mail),
-        audit(call, undefined, 'team.invite', user.id, undefined, { roleId: role.id }),
+        audit(call, undefined, 'team.invite', user.id, undefined, {
+          roleId: role.id,
+          ...(scope.type === 'clients' ? { clientCount: scope.ids.length } : {}),
+        }),
       ]);
       return structuredClone(user);
     },

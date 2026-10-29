@@ -46,10 +46,10 @@ async function world() {
 }
 
 describe('seed version 4 (assumption 53)', () => {
-  it('is 6 (M4), and load stores it in the seed metadata', async () => {
-    expect(SEED_VERSION).toBe(6);
+  it('is 7 (M4), and load stores it in the seed metadata', async () => {
+    expect(SEED_VERSION).toBe(7);
     const { admin } = await seeded();
-    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 6 });
+    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 7 });
   });
 
   it('reseeds a stored version 3 world with the same seed value and today', async () => {
@@ -59,7 +59,7 @@ describe('seed version 4 (assumption 53)', () => {
     await admin.setSeedMeta({ ...SEED, seedVersion: 3 });
     const keys = await ensureCurrentSeed(admin);
     expect(keys).not.toBeNull();
-    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 6 });
+    expect(await admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 7 });
     const dump = (await admin.dumpAll()) as Dump;
     expect(dump['moduleFeedback']!.length).toBeGreaterThan(20);
     // Seed version 5 (M4) adds tickets from other clients; Little Acorns still has its three.

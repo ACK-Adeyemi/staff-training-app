@@ -95,6 +95,9 @@ function Row({
       <h3 className="m-0 text-lg font-bold">{clientNames}</h3>
       <p className="m-0 font-semibold">{t(`provider.pricing.status.${status}` as MessageKey)}</p>
       <p className="m-0">{valueText(adjustment)}</p>
+      {adjustment.endsAt ? (
+        <p className="m-0">{t('provider.pricing.endsOn', { date: formatLondonDate(adjustment.endsAt) })}</p>
+      ) : null}
       <div className="mt-2 flex flex-wrap gap-2">
         {status === 'draft' && canDraft ? (
           <button

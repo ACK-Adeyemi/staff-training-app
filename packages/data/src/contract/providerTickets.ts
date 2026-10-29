@@ -14,6 +14,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createRng,
   fixedClock,
+  ulid,
   type AuditEvent,
   type OtherEntryGroup,
   type Person,
@@ -46,6 +47,7 @@ type ProviderTicketsStore = {
     setStatus(ctx: ActorContext, id: string, status: Ticket['status']): Promise<Ticket>;
     messages(ctx: ActorContext, id: string): Promise<TicketMessage[]>;
     raiserName(ctx: ActorContext, id: string): Promise<string>;
+    screenshots(ctx: ActorContext, id: string): Promise<{ id: string; title: string; alt: string; mime: string }[]>;
   };
   savedReplies: {
     list(ctx: ActorContext): Promise<SavedReply[]>;
@@ -83,6 +85,7 @@ export function runProviderTicketsContract(
     });
     return {
       s,
+      admin: handle.admin,
       u,
       fx,
       dump,
@@ -253,6 +256,47 @@ export function runProviderTicketsContract(
         expect(await refusal(t.s.providerTickets.raiserName(actor, t.raised.id))).toBeInstanceOf(ForbiddenError);
       }
       expect(await refusal(t.s.providerTickets.raiserName(t.support, 'no-such-ticket'))).toBeInstanceOf(NotFoundError);
+    });
+
+    it('returns only the customer screenshots of a ticket, and refuses actors without tickets.read', async () => {
+      const t = await setup();
+      expect(await t.s.providerTickets.screenshots(t.support, t.raised.id)).toEqual([]);
+      const ids = createRng(99);
+      const [shotId, msgId] = [ulid(fixedClock(TODAY), ids), ulid(fixedClock(TODAY), ids)] as [string, string];
+      const file = {
+        id: shotId,
+        clientId: t.raised.clientId,
+        kind: 'file',
+        purpose: 'ticketScreenshot',
+        title: 'Screenshot',
+        mime: 'image/png',
+        bytes: 3,
+        data: new Uint8Array([1, 2, 3]),
+        ownerUserId: t.u.priya,
+        redacted: false,
+        alt: 'A fictional screen',
+        createdAt: TODAY,
+      };
+      await t.admin.bulkPut('attachments', [file] as never);
+      await t.admin.bulkPut('ticketMessages', [
+        {
+          id: msgId,
+          ticketId: t.raised.id,
+          authorId: t.u.priya,
+          side: 'customer',
+          body: 'See the picture',
+          internal: false,
+          attachmentIds: [shotId],
+          createdAt: TODAY,
+        },
+      ] as never);
+      const shots = await t.s.providerTickets.screenshots(t.support, t.raised.id);
+      expect(shots).toHaveLength(1);
+      expect(shots[0]).toMatchObject({ id: shotId, alt: 'A fictional screen', mime: 'image/png' });
+      for (const actor of [t.raj, t.priya, t.jade]) {
+        expect(await refusal(t.s.providerTickets.screenshots(actor, t.raised.id))).toBeInstanceOf(ForbiddenError);
+      }
+      expect(await refusal(t.s.providerTickets.screenshots(t.support, 'no-such-ticket'))).toBeInstanceOf(NotFoundError);
     });
 
     it('denies a provider user without the ticket permission, and every customer actor, changing anything', async () => {

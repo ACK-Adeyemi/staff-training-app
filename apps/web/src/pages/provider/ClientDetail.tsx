@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import type { MessageKey } from '@sta/content';
 import { Card, PageHeader, focusClasses } from '@sta/ui';
-import { useT } from '../../app/hooks';
+import { useActor, useStore, useT } from '../../app/hooks';
+import { formatLondonDateTime } from '../../demo/format';
 import { ClientsReadGate } from './Gate';
 import { PriceChangesPanel } from './Pricing';
 import { useClientTelemetry, useLocalTelemetry, useProviderClients } from './queries';
@@ -66,6 +68,46 @@ function Errors({ clientId }: { clientId: string }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+function ClientAudit({ clientId }: { clientId: string }) {
+  const t = useT();
+  const store = useStore();
+  const actor = useActor();
+  const q = useQuery({
+    queryKey: ['providerClientAudit', actor.userId, clientId],
+    queryFn: async () => ({
+      events: await store.audit.list(actor),
+      users: await store.users.list(actor).catch(() => []),
+    }),
+  });
+  if (q.isError) return <p role="alert">{t('provider.loadError')}</p>;
+  if (!q.data) return <p>{t('shell.loading')}</p>;
+  const events = q.data.events
+    .filter((e) => e.clientId === clientId)
+    .sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
+  if (events.length === 0) return <p>{t('provider.client.auditEmpty')}</p>;
+  return (
+    <>
+      <p className="mt-0">{t('provider.client.auditIntro')}</p>
+      <ul className="m-0 flex list-none flex-col gap-2 p-0">
+        {events.map((e) => (
+          <li key={e.id} data-testid="audit-row">
+            <Card>
+              <p className="m-0 font-bold">{e.action}</p>
+              <p className="m-0 break-words">{e.target}</p>
+              <p className="m-0 text-sm">
+                {t('provider.client.auditLine', {
+                  who: q.data.users.find((u) => u.id === e.actorId)?.displayName ?? t('provider.audit.unknownActor'),
+                  when: formatLondonDateTime(e.at),
+                })}
+              </p>
+            </Card>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 
@@ -164,6 +206,8 @@ function Detail({ id }: { id: string }) {
           <Errors clientId={id} />
         ) : tab === 'billing' ? (
           <PriceChangesPanel clientId={id} />
+        ) : tab === 'audit' ? (
+          <ClientAudit clientId={id} />
         ) : tab === 'device' ? (
           <ThisDevice />
         ) : (

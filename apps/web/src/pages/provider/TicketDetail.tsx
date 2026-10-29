@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import { issueTypes, supportFeatures, type MessageKey } from '@sta/content';
@@ -8,6 +8,27 @@ import { useActor, useStore, useT } from '../../app/hooks';
 import { fieldClass } from '../client/feedbackShared';
 import { usePermissions } from '../client/queries';
 import { useProviderClients } from './queries';
+
+type Shot = { id: string; alt: string; mime: string; data: Uint8Array };
+
+/** One screenshot, shown from a local object address (no network). */
+function Screenshot({ shot }: { shot: Shot }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    const next = URL.createObjectURL(new Blob([new Uint8Array(shot.data)], { type: shot.mime }));
+    setUrl(next);
+    return () => {
+      URL.revokeObjectURL(next);
+    };
+  }, [shot]);
+  return url ? (
+    <img
+      src={url}
+      alt={shot.alt}
+      className="max-w-full rounded-[var(--radius-md)] border-2 border-[var(--color-border)]"
+    />
+  ) : null;
+}
 
 const STATUSES: Ticket['status'][] = ['received', 'inProgress', 'waitingForCustomer', 'resolved', 'closed'];
 const btn =
@@ -38,6 +59,11 @@ export function TicketDetail() {
   const messages = useQuery({
     queryKey: ['providerTicketMessages', actor.userId, id],
     queryFn: () => store.providerTickets.messages(actor, id),
+    enabled: canRead,
+  });
+  const screenshots = useQuery({
+    queryKey: ['providerTicketScreenshots', actor.userId, id],
+    queryFn: () => store.providerTickets.screenshots(actor, id),
     enabled: canRead,
   });
   const raiser = useQuery({
@@ -190,6 +216,18 @@ export function TicketDetail() {
           ))}
         </ul>
       </section>
+      {screenshots.data && screenshots.data.length > 0 ? (
+        <section aria-labelledby="ticket-shots-h" className={panel}>
+          <h2 id="ticket-shots-h" className="mt-0 text-lg font-bold">
+            {t('provider.ticket.screenshots')}
+          </h2>
+          <div className="flex flex-col gap-3">
+            {screenshots.data.map((shot) => (
+              <Screenshot key={shot.id} shot={shot} />
+            ))}
+          </div>
+        </section>
+      ) : null}
       {canWrite ? (
         <>
           <section className={`${panel} flex flex-wrap gap-4`}>

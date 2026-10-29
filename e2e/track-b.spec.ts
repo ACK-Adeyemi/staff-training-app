@@ -2,9 +2,7 @@
 // Desktop project only. The provider desktop page is the main page; a second page sized 390 by 844 plays the client
 // and staff views the tour shows (Willow Lane). Both pages share one browser context, so they share IndexedDB and
 // talk over BroadcastChannel like two tabs. The clock is fixed at PINNED before the first load.
-// Each tour step is its own test (a fresh context each), so a gap in one step does not hide the others. Steps whose
-// screen does not yet do what 8.2 says are marked test.fail() with a GAP note: they pass today because the assertion
-// fails, and will start failing (prompting removal of the mark) once the app catches up.
+// Each tour step is its own test (a fresh context each), so a gap in one step does not hide the others.
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import { readStore } from './helpers/idb';
@@ -142,10 +140,7 @@ test.describe('Track B: provider tour', () => {
     expect(outside).toEqual([]);
   });
 
-  // GAP: the Audit tab on P3 is a placeholder ("This section is not part of the demo yet."). Brief 8.2 step 2 wants
-  // Priya's Track A actions listed there. The action is made on the client page; the check is on the P3 Audit tab.
   test('step 2b: the Audit tab on Little Acorns lists what Priya did on this device', async ({ page, context }) => {
-    test.fail(true, 'GAP: P3 Audit tab is not built yet (placeholder text)');
     test.setTimeout(120_000);
     await setUp(context);
     await page.goto('./#/client/settings');
@@ -267,15 +262,12 @@ test.describe('Track B: provider tour', () => {
     expect(outside).toEqual([]);
   });
 
-  // GAP: the seed holds no ticket with a screenshot and P12 does not list attachments, so "a Willow Lane ticket with a
-  // screenshot" cannot be shown. Brief 8.2 step 3 opens one.
   test('step 3b: a Willow Lane ticket opens with its screenshot', async ({ page, context }) => {
-    test.fail(true, 'GAP: no seeded ticket screenshot, and P12 does not show attachments');
     test.setTimeout(120_000);
     await setUp(context);
     await openProvider(page, '/tickets', 'Ticket inbox');
     await page.getByLabel('Client').selectOption({ label: 'Willow Lane Nursery' });
-    await page.getByTestId('ticket-row').first().getByRole('link').click();
+    await page.getByTestId('ticket-row').filter({ hasText: 'progress bar' }).getByRole('link').click();
     await expect(page.getByRole('img', { name: /screenshot/i })).toBeVisible();
   });
 
@@ -349,10 +341,7 @@ test.describe('Track B: provider tour', () => {
     expect(outside).toEqual([]);
   });
 
-  // GAP: P1 and P2 read the stored account state, so after Fast-forward they still say Payment overdue while the
-  // client banner, the dunning page and the policy layer say Limited.
   test('step 4c: the provider client list follows Fast-forward to Limited', async ({ page, context }) => {
-    test.fail(true, 'GAP: P2 shows the stored account state, not the state at the demo date');
     test.setTimeout(120_000);
     await setUp(context);
     await openProvider(page, '/clients', 'Clients');
@@ -431,15 +420,24 @@ test.describe('Track B: provider tour', () => {
     expect(outside).toEqual([]);
   });
 
-  // GAP: roles and invitations have no "selected clients" scope control in P18 (brief 8.2 step 5).
-  test('step 5b: an Account manager role can be scoped to selected clients', async ({ page, context }) => {
-    test.fail(true, 'GAP: P18 has no client scope control for roles or invitations');
+  // The scope is chosen when someone is invited (it sits on the role assignment, as in the permission model), so the
+  // control is on the invite form of P18, not in the role editor.
+  test('step 5b: an invitation can be limited to selected clients', async ({ page, context }) => {
     test.setTimeout(120_000);
     await setUp(context);
     await openProvider(page, '/team', 'Team and roles');
-    await page.getByRole('button', { name: 'New role' }).click();
-    const editor = page.getByRole('region', { name: 'Role editor' });
-    await expect(editor.getByRole('group', { name: /scope|selected clients/i })).toBeVisible();
+    const invite = page.getByRole('region', { name: 'Invite someone' });
+    await invite.getByRole('textbox', { name: 'Email' }).fill('sam.scoped@example.test');
+    await invite.getByRole('textbox', { name: 'Name' }).fill('Sam Scoped');
+    await invite.getByLabel('Role').selectOption({ label: 'Account manager' });
+    await invite.getByRole('radio', { name: 'Selected clients' }).check();
+    const scope = invite.getByRole('group', { name: 'Choose clients' });
+    await scope.getByRole('checkbox', { name: 'Harbour Cafe Group' }).check();
+    await scope.getByRole('checkbox', { name: 'Summit Builders' }).check();
+    await invite.getByRole('button', { name: 'Send invite' }).click();
+    await expect(page.getByTestId('member-row').filter({ hasText: 'Sam Scoped' })).toContainText(
+      'Selected clients only: 2',
+    );
   });
 
   test('step 6: price changes, a 15 per cent retention discount for two at-risk clients, step-up confirm, visible on Harbour Cafe Group billing tab', async ({
@@ -501,9 +499,7 @@ test.describe('Track B: provider tour', () => {
     expect(outside).toEqual([]);
   });
 
-  // GAP: the P3 Billing panel lists price changes but shows no end date (brief 8.2 step 6 wants discount line and end date).
   test('step 6b: Harbour Cafe Group billing tab shows the end date of the discount', async ({ page, context }) => {
-    test.fail(true, 'GAP: P3 price panel row shows no end date');
     test.setTimeout(120_000);
     await setUp(context);
     await openProvider(page, '/pricing', 'Price changes');
@@ -537,10 +533,7 @@ test.describe('Track B: provider tour', () => {
     await noSeriousAxe(page);
   });
 
-  // GAP: there is no closing screen that lists the commitments in one place (2FA, audit log, staged account states,
-  // exports never held hostage, retention schedule) with the honest simulation note (brief 8.2 step 7).
   test('step 7b: a closing screen lists the commitments and the simulation note', async ({ page, context }) => {
-    test.fail(true, 'GAP: no closing screen for Track B (security page has the 2FA policy only)');
     test.setTimeout(120_000);
     await setUp(context);
     await openProvider(page, '/security', 'Security');

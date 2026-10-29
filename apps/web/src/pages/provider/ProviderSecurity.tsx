@@ -1,6 +1,7 @@
 // P19 Security (M4 chunk 15b, BP-8, brief 22.6). The person's own two-step status plus simulated, device-local
 // sessions and trusted-device choice. Nothing here is stored or sent anywhere.
 import { useState, type ReactNode } from 'react';
+import type { MessageKey } from '@sta/content';
 import { Button, PageHeader, Switch } from '@sta/ui';
 import { useT } from '../../app/hooks';
 import { useTwoFactorStatus } from '../client/foundationsQueries';
@@ -62,6 +63,20 @@ export function Security() {
             {t('provider.security.signedOut')}
           </p>
         ) : null}
+      </Region>
+      <Region id="p19-commitments" title={t('provider.security.commitments.heading')}>
+        <ul className="m-0 flex list-none flex-col gap-2 p-0">
+          {(['twoStep', 'auditLog', 'stagedStates', 'exports', 'retention', 'simulated'] as const).map((k) => (
+            <li key={k} data-testid="commitment">
+              {t(`provider.security.commitments.${k}` as MessageKey)}
+            </li>
+          ))}
+        </ul>
+        <p className="mb-0">
+          <a href="#/provider/audit" className="inline-flex min-h-[var(--target-min)] items-center underline">
+            {t('provider.security.commitments.auditLink')}
+          </a>
+        </p>
       </Region>
       <Region id="p19-trust" title={t('provider.security.trustTitle')}>
         <Switch

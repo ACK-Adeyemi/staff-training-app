@@ -12,10 +12,10 @@ const daysBetween = (a: string, b: string) => (new Date(b).getTime() - new Date(
 const sgId = moduleIds.safeguardingAndWhistleblowing;
 
 describe('seed version', () => {
-  it('is 6 after M4 (3 was M2) and is stored in SeedMeta by load', async () => {
-    expect(SEED_VERSION).toBe(6);
+  it('is 7 after M4 chunk 18b (3 was M2) and is stored in SeedMeta by load', async () => {
+    expect(SEED_VERSION).toBe(7);
     const { admin } = await seeded();
-    expect(await admin.getSeedMeta()).toMatchObject({ seedValue: SEED.seedValue, today: TODAY, seedVersion: 6 });
+    expect(await admin.getSeedMeta()).toMatchObject({ seedValue: SEED.seedValue, today: TODAY, seedVersion: 7 });
   });
 });
 
@@ -170,7 +170,11 @@ describe('organisation policy and overlays (Assumption 10)', () => {
 
   it('gives no other client an attachment or overlay', async () => {
     const { dump, clientId } = await littleAcorns();
-    expect((dump['attachments'] as Attachment[]).every((a) => a.clientId === clientId)).toBe(true);
+    // M4 adds one fictional ticket screenshot for Willow Lane (the support demo), which is not a policy attachment.
+    const policies = (dump['attachments'] as Attachment[]).filter(
+      (a) => !(a.kind === 'file' && a.purpose === 'ticketScreenshot'),
+    );
+    expect(policies.every((a) => a.clientId === clientId)).toBe(true);
     expect((dump['clientLinkOverlays'] as ClientLinkOverlay[]).every((o) => o.clientId === clientId)).toBe(true);
   });
 
@@ -214,7 +218,7 @@ describe('ensureCurrentSeed (Assumption 19)', () => {
     await admin.setSeedMeta({ seedValue: 777, today: TODAY }); // what M0 stored: no version
     const keys = await ensureCurrentSeed(admin);
     expect(keys).not.toBeNull();
-    expect(await admin.getSeedMeta()).toMatchObject({ seedValue: 777, today: TODAY, seedVersion: 6 });
+    expect(await admin.getSeedMeta()).toMatchObject({ seedValue: 777, today: TODAY, seedVersion: 7 });
     const dump = (await admin.dumpAll()) as Record<string, any[]>;
     expect(dump['modules']!.length).toBeGreaterThan(0);
     expect(
@@ -229,7 +233,7 @@ describe('ensureCurrentSeed (Assumption 19)', () => {
     await admin.setSeedMeta({ seedValue: SEED.seedValue, today: TODAY, seedVersion: 1 });
     await admin.bulkPut('assignments', []);
     expect(await ensureCurrentSeed(admin)).not.toBeNull();
-    expect((await admin.getSeedMeta())?.seedVersion).toBe(6);
+    expect((await admin.getSeedMeta())?.seedVersion).toBe(7);
   });
 
   it('does nothing when the stored version is current, keeping local changes', async () => {

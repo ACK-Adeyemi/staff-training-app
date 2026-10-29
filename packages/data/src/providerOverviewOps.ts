@@ -11,11 +11,12 @@ import {
   type LocalTelemetryEntry,
   type Person,
   type Site,
+  type Subscription,
   type UsageDaily,
 } from '@sta/domain';
 import { validate, type RawBackend } from './backend';
 import { put } from './ops';
-import { beginCall, forbid, holds, type Call } from './policy';
+import { beginCall, derivedAccountState, forbid, holds, type Call } from './policy';
 import {
   ValidationError,
   type ActorContext,
@@ -59,12 +60,14 @@ export function createProviderOverviewOperations(
   }
 
   async function rows(call: Call): Promise<ProviderClientRow[]> {
-    const [clients, sites, people, scores] = await Promise.all([
+    const [clients, sites, people, scores, subscriptions] = await Promise.all([
       call.all<Client>('clients'),
       call.all<Site>('sites'),
       call.all<Person>('people'),
       latestScores(call),
+      call.all<Subscription>('subscriptions'),
     ]);
+    const subOf = new Map(subscriptions.map((x) => [x.clientId, x]));
     const siteCount = new Map<string, number>();
     for (const s of sites) siteCount.set(s.clientId, (siteCount.get(s.clientId) ?? 0) + 1);
     const peopleCount = new Map<string, number>();
@@ -77,7 +80,8 @@ export function createProviderOverviewOperations(
         return {
           clientId: c.id,
           displayName: c.displayName,
-          accountState: c.accountState,
+          // Derived from the subscription and the demo date, as the client banner and Dunning do.
+          accountState: derivedAccountState(c, subOf.get(c.id), call.actor.now),
           packageId: c.packageId,
           siteCount: siteCount.get(c.id) ?? 0,
           peopleCount: peopleCount.get(c.id) ?? 0,

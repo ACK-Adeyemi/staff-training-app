@@ -3277,6 +3277,9 @@
         "device": "This device"
       },
       "laterStep": "This section is not part of the demo yet.",
+      "auditIntro": "What people did for this client, newest first.",
+      "auditEmpty": "Nothing has been recorded for this client yet.",
+      "auditLine": "{who} at {when}",
       "usageNone": "No usage recorded yet.",
       "usageLine": "{feature}: {count} uses, {users} active people",
       "errorsNone": "No errors recorded for this client.",
@@ -3397,6 +3400,7 @@
     },
     "ticket": {
       "back": "Back to Ticket inbox",
+      "screenshots": "Screenshots",
       "conversation": "Conversation",
       "internalNote": "Internal note",
       "context": "Ticket details",
@@ -3586,7 +3590,17 @@
       "trustTitle": "Trusted device",
       "trust": "Trust this device for 30 days",
       "on": "On",
-      "off": "Off"
+      "off": "Off",
+      "commitments": {
+        "heading": "Our security and data commitments",
+        "twoStep": "Everyone on the provider team signs in with two steps, and client administrators can be asked to as well.",
+        "auditLog": "Every sensitive change is written to an audit log that cannot be edited. It shows who, when and what, never the personal details.",
+        "stagedStates": "If a payment fails, the account moves through clear stages (Past due, Limited, then Read-only). Staff keep training through the early stages and nothing is deleted.",
+        "exports": "Exports of compliance records are never held back. Clients can download their records in every account state, up to and before deletion.",
+        "retention": "Each client sets a retention schedule for their records, and the data page shows what will be removed and when.",
+        "simulated": "This demo simulates authentication, payments and messaging. No real sign-in, card payment, email or text message is ever sent.",
+        "auditLink": "Open the audit log"
+      }
     },
     "signin": {
       "title": "Provider sign in",
@@ -3621,6 +3635,14 @@
         "role": "Role",
         "submit": "Send invite",
         "error": "Check the email address and name, then try again."
+      },
+      "scope": {
+        "legend": "Clients this person can see",
+        "allOption": "All clients",
+        "selectedOption": "Selected clients",
+        "clients": "Choose clients",
+        "all": "All clients",
+        "some": "Selected clients only: {count}"
       },
       "changeRole": "Change role",
       "suspend": "Suspend",
@@ -3972,6 +3994,7 @@
       },
       "noticeDays": "Notice days",
       "endsAt": "End date (optional)",
+      "endsOn": "Ends {date}",
       "preview": "Preview",
       "previewCols": {
         "client": "Client",

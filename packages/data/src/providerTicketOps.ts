@@ -7,6 +7,7 @@ import {
   responseStatus,
   retagEntries,
   trendingPhrase,
+  type Attachment,
   type OtherEntryGroup,
   type Package,
   type Person,
@@ -25,6 +26,7 @@ import {
   ValidationError,
   type ActorContext,
   type OtherEntriesService,
+  type ProviderTicketScreenshot,
   type ProviderTicketsService,
   type SavedRepliesService,
   type StoreOptions,
@@ -160,6 +162,24 @@ export function createProviderTicketOperations(backend: RawBackend, options: Sto
       const t = await ticketOf(call, id);
       const rows = (await call.all<TicketMessage>('ticketMessages')).filter((m) => m.ticketId === t.id);
       return structuredClone(rows.sort(byCreated));
+    },
+
+    async screenshots(ctx, id) {
+      const call = await providerCall(ctx, 'tickets.read');
+      const t = await ticketOf(call, id);
+      const ids = new Set(
+        (await call.all<TicketMessage>('ticketMessages'))
+          .filter((m) => m.ticketId === t.id && !m.internal && m.side === 'customer')
+          .flatMap((m) => m.attachmentIds),
+      );
+      const out: ProviderTicketScreenshot[] = [];
+      for (const aid of [...ids].sort()) {
+        const a = await call.find<Attachment>('attachments', aid);
+        if (!a || a.clientId !== t.clientId || a.kind !== 'file' || a.purpose !== 'ticketScreenshot') continue;
+        if (a.mime === 'application/pdf') continue;
+        out.push({ id: a.id, title: a.title, alt: a.alt ?? a.title, mime: a.mime, data: new Uint8Array(a.data) });
+      }
+      return out;
     },
 
     async raiserName(ctx, id) {

@@ -888,13 +888,25 @@ export interface OwnershipService {
   list(ctx: ActorContext): Promise<OwnershipTransfer[]>;
 }
 
-export type ProviderTeamMember = { userId: string; name: string; email: string; status: string; roleNames: string[] };
+export type ProviderTeamMember = {
+  userId: string;
+  name: string;
+  email: string;
+  status: string;
+  roleNames: string[];
+  /** Set when the person's access is limited to selected clients. */
+  clientIds?: string[];
+};
 export type ProviderRoleInput = { name: string; description: string; permissionIds: string[] };
 
 /** Provider team and roles (M4 chunk 5b). Provider side only; Owner and Co-Owner roles need owner.manageOwnerRoles. */
 export interface ProviderTeamService {
   list(ctx: ActorContext): Promise<ProviderTeamMember[]>;
-  invite(ctx: ActorContext, input: { email: string; displayName: string; roleKey: string }): Promise<UserAccount>;
+  /** `clientIds` limits the new person to selected clients; leave it out (or empty) for all clients. */
+  invite(
+    ctx: ActorContext,
+    input: { email: string; displayName: string; roleKey: string; clientIds?: string[] },
+  ): Promise<UserAccount>;
   setRole(ctx: ActorContext, userId: string, roleKey: string): Promise<void>;
   suspend(ctx: ActorContext, userId: string): Promise<void>;
   reactivate(ctx: ActorContext, userId: string): Promise<void>;
@@ -924,7 +936,17 @@ export interface ProviderTicketsService {
   messages(ctx: ActorContext, id: string): Promise<TicketMessage[]>;
   /** Display name of the person who raised the ticket. */
   raiserName(ctx: ActorContext, id: string): Promise<string>;
+  /** The screenshots attached to the ticket's customer messages (tickets.read). Never other file types. */
+  screenshots(ctx: ActorContext, id: string): Promise<ProviderTicketScreenshot[]>;
 }
+
+export type ProviderTicketScreenshot = {
+  id: string;
+  title: string;
+  alt: string;
+  mime: 'image/jpeg' | 'image/png' | 'image/webp';
+  data: Uint8Array;
+};
 
 export interface SavedRepliesService {
   list(ctx: ActorContext): Promise<SavedReply[]>;
