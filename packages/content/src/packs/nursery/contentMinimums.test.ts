@@ -82,7 +82,7 @@ function range(a: number, b: number): number[] {
 
 describe.each(tier2)('Tier 2 module: $name', (spec) => {
   const id = ids[spec.key];
-  const mod = nurseryModules.find((m) => id !== undefined && m.id === id) as Module | undefined;
+  const mod = nurseryModules.find((m) => id !== undefined && m.id === id);
   const dir = join(here, 'modules', spec.folder);
 
   it('has an id registered in moduleIds, distinct from the others', () => {
