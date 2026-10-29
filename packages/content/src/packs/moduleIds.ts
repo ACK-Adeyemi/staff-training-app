@@ -12,4 +12,6 @@ export const moduleIds = {
   suitablePeople: contentId(208),
   ratios: contentId(209),
   riskAssessment: contentId(210),
+  medicines: contentId(211),
+  records: contentId(212),
 } as const;

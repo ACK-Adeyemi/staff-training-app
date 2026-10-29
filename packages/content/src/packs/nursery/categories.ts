@@ -27,4 +27,6 @@ export const nurseryModuleCategory: Readonly<Record<string, string>> = {
   [moduleIds.suitablePeople]: 'safeguarding',
   [moduleIds.ratios]: 'healthAndSafety',
   [moduleIds.riskAssessment]: 'healthAndSafety',
+  [moduleIds.medicines]: 'healthAndSafety',
+  [moduleIds.records]: 'ourPolicies',
 };

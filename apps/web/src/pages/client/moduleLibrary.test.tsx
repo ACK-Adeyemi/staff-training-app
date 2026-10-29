@@ -101,7 +101,9 @@ async function ownModules({ handle, keys }: Ctx): Promise<Module[]> {
   return all.filter((m) => typeof m.owner !== 'string' && 'clientId' in m.owner);
 }
 const fireOf = async (c: Ctx) => need((await ownModules(c)).find((m) => m.status === 'published'));
-const loneOf = async (c: Ctx) => need((await ownModules(c)).find((m) => m.status === 'draft'));
+const loneOf = async (c: Ctx) =>
+  need((await ownModules(c)).find((m) => m.title === 'Lone working at the end of the day'));
+const phoneOf = async (c: Ctx) => need((await ownModules(c)).find((m) => m.title === 'Mobile phone policy'));
 const items = () => screen.findAllByTestId('module-item');
 const itemFor = async (id: string) => {
   const all = await items();
@@ -191,7 +193,10 @@ describe('C6 Module Library', () => {
     });
     await user.selectOptions(screen.getByRole('combobox', { name: 'Status' }), 'Draft');
     await waitFor(async () => {
-      expect((await items()).map((el) => el.getAttribute('data-module-id'))).toEqual([(await loneOf(c)).id]);
+      // M5 seed version 9 adds the draft Mobile phone policy beside the Lone working draft.
+      expect((await items()).map((el) => el.getAttribute('data-module-id')).sort()).toEqual(
+        [(await loneOf(c)).id, (await phoneOf(c)).id].sort(),
+      );
     });
     await user.selectOptions(screen.getByRole('combobox', { name: 'Source' }), 'Provider');
     expect(await screen.findByText(/no training matches/i)).toBeTruthy();
@@ -345,6 +350,9 @@ describe('C6 Module Library', () => {
         await handle.admin.bulkPut('subscriptions', [{ ...need(sub), packageId: packageIds.essentials }]);
         const client = need((await dump<Client>(handle, 'clients')).find((x) => x.id === clientId));
         await handle.admin.bulkPut('clients', [{ ...client, packageId: packageIds.essentials }]);
+        // Essentials allows three own modules; archive the seeded Mobile phone policy draft (M5) so one more fits.
+        const phone = need((await dump<Module>(handle, 'modules')).find((m) => m.title === 'Mobile phone policy'));
+        await handle.admin.bulkPut('modules', [{ ...phone, status: 'archived' }]);
       },
     });
     const user = userEvent.setup();

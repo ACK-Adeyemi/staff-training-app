@@ -31,6 +31,10 @@ import ratiosJson from './ratios/module.json';
 import ratiosLesson1 from './ratios/lesson-1.md?raw';
 import riskJson from './risk-assessment/module.json';
 import riskLesson1 from './risk-assessment/lesson-1.md?raw';
+import medicinesJson from './medicines/module.json';
+import medicinesLesson1 from './medicines/lesson-1.md?raw';
+import recordsJson from './records/module.json';
+import recordsLesson1 from './records/lesson-1.md?raw';
 
 const lessonFiles = [safeguardingLesson1, safeguardingLesson2, safeguardingLesson3, safeguardingLesson4];
 
@@ -64,4 +68,6 @@ export const nurseryModules: Module[] = [
   build(suitableJson, [suitableLesson1], moduleIds.suitablePeople, []),
   build(ratiosJson, [ratiosLesson1], moduleIds.ratios, []),
   build(riskJson, [riskLesson1], moduleIds.riskAssessment, []),
+  build(medicinesJson, [medicinesLesson1], moduleIds.medicines, []),
+  build(recordsJson, [recordsLesson1], moduleIds.records, []),
 ];

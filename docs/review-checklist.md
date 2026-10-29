@@ -111,5 +111,7 @@ Things only the user can check, by milestone.
 - [ ] Suitable people and vetting (nursery Tier 2, Draft content, optional, no requirement link): one lesson, 8 questions (one a scenario) drafted from EYFS 3.15 to 3.21 (`packages/content/src/packs/nursery/modules/suitable-people/`). Check wording, the `verify` list, page numbers in the Learn more links and the Open Government Licence line.
 - [ ] Ratios and qualifications (nursery Tier 2, Draft content, optional): one lesson, 8 questions (one a scenario) drafted from EYFS 3.44 to 3.49 and 3.57 (`.../ratios/`). The lesson does not give the ratios for children aged three and over (3.50 to 3.54 vary by setting type); VERIFY whether to add them.
 - [ ] Risk assessment and outings (nursery Tier 2, Draft content, optional): one lesson, 8 questions (one a scenario) drafted from EYFS 3.91 to 3.93 (`.../risk-assessment/`).
+- [ ] Medicines (nursery Tier 2, Draft content, optional): one lesson, 8 questions (one a scenario) drafted from EYFS 3.60 to 3.62 (`.../medicines/`). National rule only; check against a setting's own policy.
+- [ ] Records, confidentiality and data protection (nursery Tier 2, Draft content, optional): one lesson, 8 questions (one a scenario) drafted from EYFS 3.95 to 3.99 (`.../records/`). No retention period given (3.98 leaves it to the provider); VERIFY.
 - [ ] New starter induction now has an official Learn more link on each question (EYFS 3.4, 3.5, 3.78, 3.81, 3.100). The question wording is still the demo's own. Check the links fit.
 
