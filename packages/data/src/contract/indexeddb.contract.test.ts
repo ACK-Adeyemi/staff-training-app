@@ -10,6 +10,7 @@ import { runEvidenceFlowContract } from './evidenceFlow';
 import { runFeedbackTicketsContract } from './feedbackTickets';
 import { runIdentityOrgContract } from './identityOrg';
 import { runPricingContract } from './pricing';
+import { runPriceNoticesContract } from './priceNotices';
 import { runOwnershipTransferContract } from './ownershipTransfer';
 import { runProviderTeamContract } from './providerTeam';
 import { runCreateClientContract } from './createClient';
@@ -83,6 +84,9 @@ runRemindersLeftoversContract('indexeddb adapter', (options) =>
 );
 
 runPricingContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
+runPriceNoticesContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
 runOwnershipTransferContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );
