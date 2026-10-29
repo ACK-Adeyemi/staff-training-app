@@ -43,6 +43,7 @@ afterEach(() => {
 /** Keys that may stay English-only on a staff route. Keep short; each needs a real reason. */
 const ALLOWED: Record<string, string> = {
   'faq.staff.': 'FAQ questions are English-only content, shown inside lang="en-GB" (plan assumption 2)',
+  'whatsNew.': 'Release note titles and bodies are English-only content shown inside lang="en-GB" (plan assumption 2)',
 };
 const allowed = (key: string) => Object.keys(ALLOWED).some((k) => key === k || (k.endsWith('.') && key.startsWith(k)));
 
