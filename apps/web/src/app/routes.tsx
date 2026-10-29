@@ -273,6 +273,14 @@ export const routes: RouteObject[] = [
             path: 'recovery',
             lazy: async () => ({ Component: (await import('../pages/provider/Recovery')).Recovery }),
           },
+          {
+            path: 'data-requests',
+            lazy: async () => ({ Component: (await import('../pages/provider/DataRequests')).DataRequests }),
+          },
+          {
+            path: 'status',
+            lazy: async () => ({ Component: (await import('../pages/provider/Status')).Status }),
+          },
           page('team', 'nav.provider.teamSecurity', 'placeholder.provider.teamSecurity'),
         ],
       },

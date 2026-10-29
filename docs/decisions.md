@@ -941,3 +941,9 @@ Chunk 1 choices:
 - `store.recovery.complete(actor, id, outcome?)` takes the outcome chosen on the page; without it the request's own outcome is used. This makes the P15 "Outcome" control real.
 - Spec correction in the P14 test: language keys cannot be both `provider.comms.audience` (a string) and a parent of `provider.comms.audience.all`, so the radiogroup name is `provider.comms.audienceGroup` (and `channelGroup`). Likewise the recovery outcome keys are `outcomeLabel`, `outcomeReset2fa`, `outcomeTransferOwner`. The P15 test's "48 hours" expectation was left as is: that test sets `coolingOffEndsAt` to 48 hours itself, and the decided 24 hours applies only where none is set.
 - P15 is reachable from the provider "More" navigation (Account recovery).
+
+## M4 chunk 14c: P16 Data requests and P17 Status
+
+- Routes `#/provider/data-requests` and `#/provider/status`, both in the provider "More" navigation. P16 needs `dataRequests.manage`; P17 needs `incidents.post` for the page and `ops.write` to use the maintenance switches (disabled otherwise).
+- Language keys follow the test headers, with two shape changes: `provider.status.post` is an object (heading, level, title, submit, titleError, failed) so the post form keys do not clash with a string key, and the "Due soon" badge shows for open requests due within 7 days, including overdue ones.
+- The "link to the client's exports" on P16 is not built (no client exports route yet). The persona choices in the tests (`raj`, `tom`) were correct; no test was changed.

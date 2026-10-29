@@ -104,7 +104,9 @@
       "support": "Support",
       "comms": "Comms",
       "teamSecurity": "Team and security",
-      "recovery": "Account recovery"
+      "recovery": "Account recovery",
+      "dataRequests": "Data requests",
+      "status": "Status and incidents"
     }
   },
   "placeholder": {
@@ -3566,6 +3568,68 @@
       "requests": "Requests",
       "none": "There are no recovery requests.",
       "failed": "That could not be saved. Check the details and try again."
+    },
+    "dataRequests": {
+      "heading": "Data requests",
+      "noAccess": "You do not have access to data requests.",
+      "note": "The client is the controller of its staff's personal data. The provider helps the client answer each request and keeps this log.",
+      "list": "Requests",
+      "kind": { "access": "Access", "correction": "Correction", "erasure": "Erasure", "other": "Other" },
+      "status": { "open": "Open", "done": "Done", "rejected": "Rejected" },
+      "received": "Received {date}",
+      "due": "Due {date}",
+      "dueIn": "Due in {count} days",
+      "dueInOne": "Due in 1 day",
+      "dueToday": "Due today",
+      "overdue": "Overdue by {count} days",
+      "dueSoon": "Due soon",
+      "evidenceShown": "Evidence: {text}",
+      "new": "Log request",
+      "newKind": "Kind",
+      "newRequester": "Requester",
+      "newClient": "Client (optional)",
+      "noClient": "No client",
+      "newNotes": "Notes",
+      "submit": "Log request",
+      "requesterError": "Enter who made the request.",
+      "done": "Mark done",
+      "evidence": "Evidence of completion",
+      "reject": "Reject",
+      "reason": "Reason",
+      "confirm": "Save",
+      "failed": "That could not be saved. Check the details and try again."
+    },
+    "status": {
+      "heading": "Status and incidents",
+      "noAccess": "You do not have access to status and incidents.",
+      "current": "Current status",
+      "incidents": "Incidents",
+      "none": "There are no incidents.",
+      "level": { "normal": "Normal", "degraded": "Degraded", "maintenance": "Maintenance", "incident": "Incident" },
+      "levelMessage": {
+        "normal": "Everything is working as expected.",
+        "degraded": "Some things are slower than usual.",
+        "maintenance": "Planned maintenance is under way.",
+        "incident": "There is a problem we are working on."
+      },
+      "update": { "investigating": "Investigating", "identified": "Identified", "monitoring": "Monitoring", "resolved": "Resolved" },
+      "updateStatus": "Status",
+      "message": "Message",
+      "addUpdate": "Add update",
+      "updateFailed": "Enter a message for the update.",
+      "post": {
+        "heading": "Post incident",
+        "level": "Level",
+        "title": "Title",
+        "submit": "Post incident",
+        "titleError": "Enter a title for the incident.",
+        "failed": "That could not be posted. Check the details and try again."
+      },
+      "maintenance": "Maintenance",
+      "maintenanceHelp": "Turn an app on to show the maintenance banner to its users. The banner will say that the app is being updated and to try again soon.",
+      "app": { "staff": "Staff", "client": "Client", "provider": "Provider" },
+      "on": "On",
+      "off": "Off"
     }
   }
 }

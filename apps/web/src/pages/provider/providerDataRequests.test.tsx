@@ -46,7 +46,7 @@ const openP16 = async (opts?: Opts) => {
   return view;
 };
 const rows = () => screen.getAllByTestId('dr-row');
-const rowWith = (text: string) => rows().find((r) => r.textContent?.includes(text))!;
+const rowWith = (text: string) => rows().find((r) => r.textContent.includes(text))!;
 const stored = async (view: Awaited<ReturnType<typeof openP16>>) =>
   (await view.handle.admin.dumpAll())['dataRequests'] as DataRequest[];
 const OPEN_REQUESTER = 'A former member of staff';
@@ -113,7 +113,7 @@ describe('P16 Data requests', () => {
   it('explains that the client is the controller and the provider helps', async () => {
     await openP16();
     const note = screen.getByTestId('dr-note');
-    expect((note.textContent ?? '').trim().length).toBeGreaterThan(20);
+    expect(note.textContent.trim().length).toBeGreaterThan(20);
   });
 
   it('logs a request from the form with a due date one month after it was received', async () => {
@@ -163,7 +163,7 @@ describe('P16 Data requests', () => {
     const view = await openP16();
     const row = rowWith(OPEN_REQUESTER);
     await userEvent.click(within(row).getByRole('button', { name: 'Mark done' }));
-    const save = within(row).getByRole('button', { name: 'Save' }) as HTMLButtonElement;
+    const save = within(row).getByRole<HTMLButtonElement>('button', { name: 'Save' });
     expect(save.disabled).toBe(true);
     await userEvent.type(within(row).getByRole('textbox', { name: 'Evidence of completion' }), 'Export sent on 20 Oct');
     expect(save.disabled).toBe(false);
@@ -182,7 +182,7 @@ describe('P16 Data requests', () => {
     const view = await openP16();
     const row = rowWith(OPEN_REQUESTER);
     await userEvent.click(within(row).getByRole('button', { name: 'Reject' }));
-    const save = within(row).getByRole('button', { name: 'Save' }) as HTMLButtonElement;
+    const save = within(row).getByRole<HTMLButtonElement>('button', { name: 'Save' });
     expect(save.disabled).toBe(true);
     await userEvent.type(within(row).getByRole('textbox', { name: 'Reason' }), 'Could not verify identity');
     expect(save.disabled).toBe(false);

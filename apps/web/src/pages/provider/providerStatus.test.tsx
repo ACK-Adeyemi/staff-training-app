@@ -66,7 +66,7 @@ describe('P17 Status and incidents', () => {
   it('shows the current status as the word Normal with a short message, and the past resolved incident with updates in order', async () => {
     const view = await openP17();
     expect(current().textContent).toContain('Normal');
-    expect(current().textContent!.replace('Normal', '').replace('Current status', '').trim().length).toBeGreaterThan(5);
+    expect(current().textContent.replace('Normal', '').replace('Current status', '').trim().length).toBeGreaterThan(5);
     expect(rows()).toHaveLength(1);
     const seeded = (await stored(view))[0]!;
     const row = rows()[0]!;
@@ -75,7 +75,7 @@ describe('P17 Status and incidents', () => {
     expect(row.textContent).toContain('Resolved');
     const updates = within(row).getAllByTestId('incident-update');
     expect(updates).toHaveLength(seeded.updates.length);
-    const words = updates.map((u) => /Investigating|Identified|Monitoring|Resolved/.exec(u.textContent!)![0]);
+    const words = updates.map((u) => /Investigating|Identified|Monitoring|Resolved/.exec(u.textContent)![0]);
     expect(words).toEqual(['Investigating', 'Identified', 'Resolved']);
     seeded.updates.forEach((u, i) => {
       expect(updates[i]!.textContent).toContain(u.message);
@@ -134,7 +134,7 @@ describe('P17 Status and incidents', () => {
     });
     const words = within(rowOf())
       .getAllByTestId('incident-update')
-      .map((u) => /Investigating|Identified|Monitoring|Resolved/.exec(u.textContent!)![0]);
+      .map((u) => /Investigating|Identified|Monitoring|Resolved/.exec(u.textContent)![0]);
     expect(words).toEqual(['Investigating', 'Identified', 'Monitoring']);
     expect(current().textContent).toContain('Incident');
     expect((await stored(view)).find((i) => i.id === id)!.resolvedAt).toBeUndefined();
@@ -169,7 +169,7 @@ describe('P17 Status and incidents', () => {
       const sw = within(region).getByRole('switch', { name });
       expect(sw.getAttribute('aria-checked')).toBe('false');
     }
-    expect(region.textContent!.toLowerCase()).toContain('banner');
+    expect(region.textContent.toLowerCase()).toContain('banner');
   });
 
   it('turning on the Client switch calls maintenance.set and the flags reflect it, leaving the others off', async () => {
