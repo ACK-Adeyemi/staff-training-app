@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router';
 import { holdsAnywhere } from '@sta/domain';
 import { packages, type MessageKey } from '@sta/content';
 import { PageHeader } from '@sta/ui';
@@ -114,7 +115,28 @@ export function ProviderPackages() {
       {!perms.data ? (
         <p>{t('shell.loading')}</p>
       ) : holdsAnywhere(perms.data, 'billing.read') ? (
-        <Content canChange={holdsAnywhere(perms.data, 'billing.write')} />
+        <>
+          <Content canChange={holdsAnywhere(perms.data, 'billing.write')} />
+          <nav aria-label={t('provider.commercial.heading')} className="mt-6">
+            <h2 className="mt-0 mb-2 text-lg font-bold">{t('provider.commercial.heading')}</h2>
+            <ul className="m-0 flex list-none flex-col gap-2 p-0">
+              {(
+                [
+                  ['/provider/packs', 'provider.commercial.packs'],
+                  ['/provider/packages', 'provider.commercial.packages'],
+                  ['/provider/add-ons', 'provider.commercial.addOns'],
+                  ['/provider/dunning', 'provider.commercial.dunning'],
+                ] as const
+              ).map(([to, key]) => (
+                <li key={to}>
+                  <Link to={to} className="inline-flex min-h-[var(--target-min)] items-center font-bold underline">
+                    {t(key)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </>
       ) : (
         <p role="alert">{t('provider.packages.noPermission')}</p>
       )}

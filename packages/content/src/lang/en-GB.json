@@ -3273,6 +3273,36 @@
       "editPriceHint": "Price changes are confirmed with a code on the Price changes page.",
       "noPermission": "You don't have permission to see add-ons."
     },
+    "dunning": {
+      "heading": "Dunning",
+      "outstanding": "Total outstanding: {amount}",
+      "recoveryRate": "Recovery rate: {percent}%",
+      "noFailures": "No payment failures yet",
+      "amount": "Outstanding: {amount}",
+      "nextState": "Next: {state} in {count} days",
+      "nextStateOne": "Next: {state} in 1 day",
+      "deletion": "Deleted in {count} days",
+      "deletionOne": "Deleted in 1 day",
+      "extendGrace": "Extend grace",
+      "pause": "Pause timeline",
+      "resume": "Resume timeline",
+      "sensitive": "Sensitive",
+      "daysLabel": "Days to add (1 to 30)",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "dialogTitle": "Extend grace for {client}",
+      "empty": "No accounts need attention.",
+      "paused": "Timeline paused",
+      "noPermission": "You don't have permission to see dunning.",
+      "failed": "That change could not be saved. Check the number of days and try again."
+    },
+    "commercial": {
+      "heading": "Commercial pages",
+      "packs": "Industry packs",
+      "packages": "Packages and entitlements",
+      "addOns": "Add-on catalogue",
+      "dunning": "Dunning"
+    },
     "packages": {
       "heading": "Packages and entitlements",
       "optionRegion": "Packaging option",

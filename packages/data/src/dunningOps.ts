@@ -77,6 +77,7 @@ export function createDunningOperations(backend: RawBackend, options: StoreOptio
           state,
           amountOutstandingPence: owed,
         };
+        if (sub?.timelinePaused) row.paused = true;
         if (next) {
           row.nextState = { state: next.state, at: next.at.toISOString() };
           row.daysToNextState = daysUntil(now, next.at);
@@ -121,7 +122,8 @@ export function createDunningOperations(backend: RawBackend, options: StoreOptio
       }
       const next = nextTransition(sub, defaultDunningPolicy, now);
       if (!next) throw new ValidationError(['clientId: no state change is due']);
-      const until = new Date(next.at.getTime() + days * DAY_MS).toISOString();
+      // Whole London days: the extra 12 hours keeps the result on the right day across the clock change.
+      const until = startOfLondonDay(new Date(next.at.getTime() + days * DAY_MS + DAY_MS / 2)).toISOString();
       const updated: Subscription = { ...sub, graceExtendedUntil: until };
       await backend.apply([
         put('subscriptions', clientId, updated),

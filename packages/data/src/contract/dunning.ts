@@ -55,6 +55,7 @@ type DunningRow = {
   nextState?: { state: AccountState; at: string };
   daysToNextState?: number;
   daysToDeletion?: number;
+  paused?: boolean;
 };
 type DunningOverview = { rows: DunningRow[]; recoveryRatePercent: number | null; outstandingPence: number };
 type DunningStore = {
@@ -407,6 +408,7 @@ export function runDunningContract(name: string, makeStore: (options: StoreOptio
         expect(row.state).toBe('pastDue');
         expect(row.nextState).toBeUndefined();
         expect(row.daysToNextState).toBeUndefined();
+        expect(row.paused).toBe(true);
       });
 
       it('lets the state advance again when un-paused', async () => {
@@ -415,6 +417,7 @@ export function runDunningContract(name: string, makeStore: (options: StoreOptio
         await s.store.dunning.setPaused(s.owner, s.willow, true);
         await s.store.dunning.setPaused(s.owner, s.willow, false);
         expect((await s.subscriptionOf(s.willow)).timelinePaused).toBeFalsy();
+        expect(s.rowOf(await s.store.dunning.overview(s.owner), s.willow)!.paused).toBeUndefined();
         expect((await s.store.account.status(s.clientCtx(20))).state).toBe('limited');
       });
 

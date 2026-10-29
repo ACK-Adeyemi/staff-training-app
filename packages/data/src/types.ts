@@ -989,6 +989,8 @@ export type DunningRow = {
   nextState?: { state: AccountState; at: string };
   daysToNextState?: number;
   daysToDeletion?: number;
+  /** True while the provider has paused this client's timeline. */
+  paused?: boolean;
 };
 export type DunningOverview = { rows: DunningRow[]; recoveryRatePercent: number | null; outstandingPence: number };
 
