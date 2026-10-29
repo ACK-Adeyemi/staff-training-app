@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { holdsAnywhere, type ProviderFeedbackItem } from '@sta/domain';
 import { feedbackTags, type MessageKey } from '@sta/content';
 import { PageHeader } from '@sta/ui';
@@ -95,6 +95,77 @@ function FeedbackRegions() {
   );
 }
 
+function LinksPanel() {
+  const t = useT();
+  const store = useStore();
+  const actor = useActor();
+  const qc = useQueryClient();
+  const counts = useQuery({
+    queryKey: ['learnMoreCounts', actor.userId],
+    queryFn: () => store.learnMore.counts(actor),
+  });
+  const run = useMutation({
+    mutationFn: () => store.linkCheck.run(actor),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['learnMoreCounts', actor.userId] }),
+  });
+  const result = run.data;
+  return (
+    <section aria-labelledby="pl-links" className="mb-6">
+      <h2 id="pl-links" className="text-lg font-bold">
+        {t('provider.links.region')}
+      </h2>
+      <p className="mt-0">{t('provider.links.simulated')}</p>
+      <button
+        type="button"
+        onClick={() => {
+          run.mutate();
+        }}
+        disabled={run.isPending}
+        className="min-h-[var(--target-min)] rounded-[var(--radius-md)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-4 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
+      >
+        {run.isPending ? t('provider.links.checking') : t('provider.links.check')}
+      </button>
+      {run.isError ? <p role="alert">{t('provider.links.loadError')}</p> : null}
+      {result ? (
+        <div aria-live="polite">
+          <p>{t('provider.links.result', { checked: result.results.length, broken: result.broken.length })}</p>
+          {result.broken.length === 0 ? (
+            <p>{t('provider.links.noneBroken')}</p>
+          ) : (
+            <>
+              <h3 className="text-base font-bold">{t('provider.links.brokenHeading')}</h3>
+              <ul className="m-0 flex list-none flex-col gap-2 p-0">
+                {result.broken.map((b) => (
+                  <li
+                    key={b.linkId}
+                    data-testid="broken-link"
+                    data-link-id={b.linkId}
+                    className="rounded-[var(--radius-md)] border-2 border-[var(--color-border)] p-3 break-all"
+                  >
+                    {b.url}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      ) : null}
+      <h3 className="text-base font-bold">{t('provider.links.opensHeading')}</h3>
+      {counts.isError ? <p role="alert">{t('provider.links.loadError')}</p> : null}
+      {!counts.data && !counts.isError ? <p>{t('shell.loading')}</p> : null}
+      <ul className="m-0 flex list-none flex-col gap-2 p-0">
+        {(counts.data ?? []).map((c) => (
+          <li key={c.linkId} data-testid="link-open-count" data-link-id={c.linkId} data-opens={c.opens}>
+            <span className="break-all">{c.linkId}</span>
+            {': '}
+            {t('provider.links.opens', { count: c.opens })}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /** P5 (minimal in M3): the Content page plus module feedback on provider modules. The rest of P5 is M4. */
 export function ProviderContent() {
   const t = useT();
@@ -109,6 +180,11 @@ export function ProviderContent() {
         <FeedbackRegions />
       ) : (
         <p role="alert">{t('provider.feedback.noPermission')}</p>
+      )}
+      {!perms.data ? null : holdsAnywhere(perms.data, 'content.write') ? (
+        <LinksPanel />
+      ) : (
+        <p role="alert">{t('provider.links.noPermission')}</p>
       )}
     </>
   );

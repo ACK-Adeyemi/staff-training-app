@@ -3261,6 +3261,19 @@
       "error": "Error",
       "event": "Event"
     },
+    "links": {
+      "region": "Learn more links",
+      "check": "Check links",
+      "checking": "Checking links",
+      "simulated": "This check is simulated in the demo. No web requests are made.",
+      "result": "Checked {checked} links. {broken} broken.",
+      "noneBroken": "No broken links found.",
+      "brokenHeading": "Broken links",
+      "opensHeading": "Opens across all clients",
+      "opens": "{count} opens",
+      "loadError": "Could not load link information.",
+      "noPermission": "You don't have access to this. Ask your manager."
+    },
     "feedback": {
       "moduleRegion": "Module feedback",
       "ownRegion": "Our clients' own modules",
