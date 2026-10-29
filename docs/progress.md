@@ -93,7 +93,7 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - e2e 'C1 updates in one tab when Jade passes the refresher in another tab' (client-dashboard.spec.ts) failed once, passed on rerun: possible flake, watch it.
 - Action versions in deploy.yml unconfirmed (VERIFY, in review checklist). Commit b6146c5 touched protected files (docs/questions-for-user.md).
 
-- e2e flakes seen once each and passing on rerun: client-dashboard.spec.ts (C1 two tabs), track-a.spec.ts desktop. (FIXED in chunk 14: stale module progress after lesson finish; watch only) client-dashboard C1 two-tab flake had recurred in 3 full runs (chunks 11, 13): investigate its cause (cross-tab update timing) at the start of chunk 14 or in M2 review.
+- e2e flakes seen once each and passing on rerun: text-scale.spec.ts:37 desktop (scrollWidth 701, 8 of 8 pass alone, session 5), client-dashboard.spec.ts (C1 two tabs), track-a.spec.ts desktop. (FIXED in chunk 14: stale module progress after lesson finish; watch only) client-dashboard C1 two-tab flake had recurred in 3 full runs (chunks 11, 13): investigate its cause (cross-tab update timing) at the start of chunk 14 or in M2 review.
 
 - M3 code review leftovers (not fixed, by decision): placeholders not all in adminConfig; ModuleLibrary stats computed in the UI; duplicate London-day helpers; .ics DTSTAMP hour rounding; reminders e2e cap check is loose; affected-now preview ignores the actor's scope; reports.test privacy check is narrow; ContrastCheck formula duplicated in the UI.
 
