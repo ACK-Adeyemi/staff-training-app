@@ -5,10 +5,7 @@ import enGB from './lang/en-GB.json' with { type: 'json' };
 
 // Test messages are not the real file, so keys are cast to the real MessageKey type.
 const make = (messages: Record<string, unknown>, options?: { strict?: boolean }) => {
-  const t = createT(messages as never, options) as unknown as (
-    key: string,
-    params?: Record<string, string | number>,
-  ) => string;
+  const t = createT(messages, options) as unknown as (key: string, params?: Record<string, string | number>) => string;
   return t;
 };
 

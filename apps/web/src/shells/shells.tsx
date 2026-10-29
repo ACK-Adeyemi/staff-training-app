@@ -9,6 +9,7 @@ import { useTwoFactorStatus } from '../pages/client/foundationsQueries';
 import { useClientData, usePermissions } from '../pages/client/queries';
 import { AccountBannerView, SiteSwitch, TwoFactorBanner } from './clientChrome';
 import { Shell } from './Shell';
+import { StaffI18n } from './StaffI18n';
 
 const item = (path: string, label: string, icon: NavItem['icon']): NavItem => ({
   id: path,
@@ -18,6 +19,14 @@ const item = (path: string, label: string, icon: NavItem['icon']): NavItem => ({
 });
 
 export function StaffShell() {
+  return (
+    <StaffI18n>
+      <StaffShellBody />
+    </StaffI18n>
+  );
+}
+
+function StaffShellBody() {
   const t = useT();
   return (
     <Shell

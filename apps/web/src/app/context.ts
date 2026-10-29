@@ -2,7 +2,7 @@ import { createContext } from 'react';
 import { createSpeech, type Speech } from './speech';
 import type { ActorContext, DataStore, PersonaListing } from '@sta/data';
 import type { Clock, DemoState, OutboxMessage } from '@sta/domain';
-import type { TFunction } from '@sta/content';
+import type { LanguageCode, TFunction } from '@sta/content';
 
 export type DemoApi = {
   state: DemoState;
@@ -36,3 +36,6 @@ export const DemoContext = createContext<DemoApi | null>(null);
 
 /** The speech adapter. Tests and pages can swap it; the default talks to the browser's local voices. */
 export const SpeechContext = createContext<Speech>(createSpeech());
+
+/** The interface language of the surface. Client, provider and demo are always en-GB. */
+export const LanguageContext = createContext<LanguageCode>('en-GB');

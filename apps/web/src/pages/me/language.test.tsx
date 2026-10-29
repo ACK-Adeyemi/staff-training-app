@@ -25,6 +25,11 @@ afterEach(() => {
 });
 
 const root = () => document.documentElement;
+// <html lang="en-GB"> is an ancestor of everything, so "wrapped" means a closer element than the root carries it.
+const wrapper = (el: Element): Element | null => {
+  const found = el.closest('[lang="en-GB"]');
+  return found === root() ? null : found;
+};
 const lang = (o: unknown, path: string): string =>
   path.split('.').reduce<unknown>((n, p) => (n as Record<string, unknown>)[p], o) as string;
 const kasia = (keys: SeedKeys) => ({ ...actorFor('staff', keys), userId: keys.users['kasia'] });
@@ -38,7 +43,7 @@ const withKasia = { actor: kasia } as const;
 describe('S11 language picker', () => {
   it('offers English (UK) and Polski and notes the translation for Polish', async () => {
     await renderRoute('/staff/me', 'staff');
-    const group = await screen.findByRole('radiogroup', { name: t('me.languageTitle' as never) });
+    const group = await screen.findByRole('radiogroup', { name: t('me.languageTitle') });
     expect(within(group).getByRole('radio', { name: 'English (UK)' })).toBeTruthy();
     expect(within(group).getByRole('radio', { name: 'Polski' })).toBeTruthy();
     expect(screen.queryByText(/Machine translated/)).toBeNull();
@@ -118,7 +123,7 @@ describe('English-only content in the Polish interface', () => {
     await renderRoute('/staff/help', 'staff', withKasia);
     const question = await screen.findByRole('button', { name: new RegExp(esc(faqText.slice(0, 20))) });
     expect(question.closest('[lang]')?.getAttribute('lang')).toBe('en-GB');
-    expect(screen.getByRole('heading', { level: 1 }).closest('[lang="en-GB"]')).toBeNull();
+    expect(wrapper(screen.getByRole('heading', { level: 1 }))).toBeNull();
   });
 
   it('wraps an untranslated module lesson in lang="en-GB" in the Polish interface', async () => {
@@ -130,7 +135,7 @@ describe('English-only content in the Polish interface', () => {
   it('adds no lang="en-GB" wrapper around FAQs when the interface is English', async () => {
     await renderRoute('/staff/help', 'staff');
     const question = await screen.findByRole('button', { name: new RegExp(esc(faqText.slice(0, 20))) });
-    expect(question.closest('[lang="en-GB"]')).toBeNull();
+    expect(wrapper(question)).toBeNull();
   });
 });
 

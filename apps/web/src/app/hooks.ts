@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { ActorContext, DataStore } from '@sta/data';
 import type { Clock } from '@sta/domain';
-import type { TFunction } from '@sta/content';
+import type { LanguageCode, TFunction } from '@sta/content';
 import type { Speech } from './speech';
 import {
   ActorCtx,
@@ -11,6 +11,7 @@ import {
   DataStoreContext,
   DemoContext,
   I18nContext,
+  LanguageContext,
   type DemoApi,
 } from './context';
 
@@ -23,6 +24,7 @@ export const useStore = (): DataStore => need(useContext(DataStoreContext), 'Dat
 export const useClock = (): Clock => need(useContext(ClockContext), 'Clock');
 export const useActor = (): ActorContext => need(useContext(ActorCtx), 'Actor');
 export const useT = (): TFunction => need(useContext(I18nContext), 'I18n');
+export const useLanguage = (): LanguageCode => useContext(LanguageContext);
 export const useSpeech = (): Speech => useContext(SpeechContext);
 export const useDemo = (): DemoApi => need(useContext(DemoContext), 'Demo');
 

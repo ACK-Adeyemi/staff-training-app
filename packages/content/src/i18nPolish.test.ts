@@ -14,7 +14,8 @@ const flatten = (node: unknown, prefix = ''): Map<string, string> => {
   const out = new Map<string, string>();
   if (typeof node === 'string') out.set(prefix, node);
   else if (node && typeof node === 'object')
-    for (const [k, v] of Object.entries(node)) for (const [kk, vv] of flatten(v, prefix ? `${prefix}.${k}` : k)) out.set(kk, vv);
+    for (const [k, v] of Object.entries(node))
+      for (const [kk, vv] of flatten(v, prefix ? `${prefix}.${k}` : k)) out.set(kk, vv);
   return out;
 };
 const placeholders = (s: string): string[] => [...s.matchAll(/\{([A-Za-z][A-Za-z0-9]*)\}/g)].map((m) => m[1]!).sort();
@@ -56,7 +57,7 @@ describe('Polish t with an English fallback', () => {
   const en = { a: 'Hello', b: 'Hi {name}', nested: { c: 'Deep' }, onlyEn: 'Only English' };
   const pl = { a: 'Czesc', nested: {} };
   const make = (strict: boolean) =>
-    createT(pl as never, { strict, fallback: en as never } as never) as unknown as (
+    createT(pl as never, { strict, fallback: en as never }) as unknown as (
       key: string,
       params?: Record<string, string | number>,
     ) => string;
@@ -92,7 +93,9 @@ describe('pl-PL.json', () => {
   });
 
   it('uses exactly the same {placeholders} as en-GB for every key', () => {
-    const wrong = [...pl].filter(([k, v]) => JSON.stringify(placeholders(v)) !== JSON.stringify(placeholders(en.get(k) ?? '')));
+    const wrong = [...pl].filter(
+      ([k, v]) => JSON.stringify(placeholders(v)) !== JSON.stringify(placeholders(en.get(k) ?? '')),
+    );
     expect(wrong.map(([k]) => k)).toEqual([]);
   });
 
@@ -106,7 +109,7 @@ describe('pl-PL.json', () => {
   });
 
   it('creates a working Polish t over en-GB for the whole key set', () => {
-    const t = createT(plPL as never, { strict: true, fallback: enGB } as never) as unknown as (k: string) => string;
+    const t = createT(plPL, { strict: true, fallback: enGB }) as unknown as (k: string) => string;
     expect(t('nav.staff.me')).toBe(pl.get('nav.staff.me'));
     for (const k of en.keys()) if (!pl.has(k)) expect(t(k.includes('{') ? 'me.title' : k)).toBeTruthy();
   });

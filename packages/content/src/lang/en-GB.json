@@ -1472,7 +1472,11 @@
     "loadError": "We could not load your details. Try again.",
     "displayLink": "Display and accessibility",
     "notificationsLink": "Notifications",
-    "hideHelp": "When this is on, your name does not appear on leaderboards."
+    "hideHelp": "When this is on, your name does not appear on leaderboards.",
+    "languageTitle": "Language",
+    "languageHelp": "Choose the language for menus and buttons. Some training content is only in English.",
+    "languageMachineNote": "Machine translated, not yet checked by a person",
+    "languageSaveError": "We could not save your language. Try again."
   },
   "celebration": {
     "levelUp": "You reached level {level}",

@@ -1,0 +1,47 @@
+{
+  "shell": {
+    "skipToContent": "Przejdź do treści",
+    "mainNavigation": "Główne menu",
+    "loading": "Ładowanie",
+    "comingSoon": "Wkrótce",
+    "notifications": "Powiadomienia",
+    "help": "Pomoc",
+    "more": "Więcej",
+    "closeMenu": "Zamknij menu",
+    "notFoundTitle": "Nie możemy znaleźć tej strony",
+    "notFoundBody": "Sprawdź adres albo wróć na początek.",
+    "backToStart": "Wróć na początek",
+    "personaLabel": "Zalogowano jako",
+    "errorTitle": "Wystąpił problem"
+  },
+  "nav": {
+    "staff": {
+      "home": "Start",
+      "learn": "Nauka",
+      "progress": "Postępy",
+      "compete": "Rywalizacja",
+      "me": "Profil"
+    }
+  },
+  "me": {
+    "title": "Mój profil",
+    "nickname": "Pseudonim",
+    "hideFromLeaderboards": "Ukryj mnie w rankingach",
+    "saveNickname": "Zapisz pseudonim",
+    "nicknameHelp": "W rankingach inni widzą Twój pseudonim zamiast imienia i nazwiska.",
+    "nicknameError": "Użyj od 1 do 30 liter, cyfr, spacji, łączników lub apostrofów. Zacznij od litery lub cyfry.",
+    "nicknameSaveError": "Nie udało się zapisać pseudonimu. Spróbuj ponownie.",
+    "nicknameSaved": "Pseudonim zapisany.",
+    "displayNameTitle": "Wyświetlana nazwa",
+    "displayNameHelp": "To jest nazwa, którą widzą inni.",
+    "profileSaveError": "Nie udało się zapisać zmiany. Spróbuj ponownie.",
+    "loadError": "Nie udało się wczytać Twoich danych. Spróbuj ponownie.",
+    "displayLink": "Ekran i dostępność",
+    "notificationsLink": "Powiadomienia",
+    "hideHelp": "Gdy ta opcja jest włączona, Twoje imię i nazwisko nie pojawia się w rankingach.",
+    "languageTitle": "Język",
+    "languageHelp": "Wybierz język menu i przycisków. Część materiałów szkoleniowych jest tylko po angielsku.",
+    "languageMachineNote": "Tłumaczenie maszynowe, jeszcze niesprawdzone przez człowieka",
+    "languageSaveError": "Nie udało się zapisać języka. Spróbuj ponownie."
+  }
+}

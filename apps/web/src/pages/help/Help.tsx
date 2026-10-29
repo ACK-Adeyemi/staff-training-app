@@ -3,6 +3,7 @@ import { useId, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { releaseNotes, type MessageKey } from '@sta/content';
 import { Button, Card, LinkButton, PageHeader } from '@sta/ui';
+import { EnglishOnly } from '../../app/EnglishOnly';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { formatLondonDate } from '../../demo/format';
 import { orEmpty } from '../client/queries';
@@ -20,18 +21,20 @@ function WhatsNew() {
       <h2 id={id} className="m-0 text-xl font-bold">
         {t('help.whatsNew')}
       </h2>
-      {notes.length === 0 ? <p className="m-0">{t('help.whatsNewEmpty')}</p> : null}
-      <ul className="m-0 flex list-none flex-col gap-3 p-0">
-        {notes.map((n) => (
-          <li key={n.id}>
-            <Card>
-              <p className="m-0 font-bold">{t(n.titleKey as MessageKey)}</p>
-              <p className="my-1 text-sm">{formatLondonDate(`${n.date}T12:00:00.000Z`)}</p>
-              <p className="m-0">{t(n.bodyKey as MessageKey)}</p>
-            </Card>
-          </li>
-        ))}
-      </ul>
+      <EnglishOnly className="flex flex-col gap-3">
+        {notes.length === 0 ? <p className="m-0">{t('help.whatsNewEmpty')}</p> : null}
+        <ul className="m-0 flex list-none flex-col gap-3 p-0">
+          {notes.map((n) => (
+            <li key={n.id}>
+              <Card>
+                <p className="m-0 font-bold">{t(n.titleKey as MessageKey)}</p>
+                <p className="my-1 text-sm">{formatLondonDate(`${n.date}T12:00:00.000Z`)}</p>
+                <p className="m-0">{t(n.bodyKey as MessageKey)}</p>
+              </Card>
+            </li>
+          ))}
+        </ul>
+      </EnglishOnly>
     </section>
   );
 }

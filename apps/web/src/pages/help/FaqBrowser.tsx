@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { faqs, type Faq, type MessageKey } from '@sta/content';
 import { Button } from '@sta/ui';
 import { useActor, useStore, useT } from '../../app/hooks';
+import { EnglishOnly } from '../../app/EnglishOnly';
 import { inputClass } from '../client/foundationsErrors';
 import type { HelpSide } from './shared';
 
@@ -75,21 +76,23 @@ export function FaqItem({
   const id = useId();
   return (
     <li className="flex flex-col gap-2">
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls={id}
-        onClick={() => {
-          setOpen(!open);
-        }}
-        className="flex min-h-[var(--target-min)] w-full cursor-pointer items-center justify-between gap-3 rounded-[var(--radius-md)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-start font-semibold text-[var(--color-text)] focus-visible:outline-[length:3px] focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
-      >
-        <span>{t(faq.questionKey as MessageKey)}</span>
-        <span aria-hidden="true">{open ? '−' : '+'}</span>
-      </button>
-      <div id={id} hidden={!open}>
-        {open ? <Answer faq={faq} {...(vote ? { vote } : {})} /> : null}
-      </div>
+      <EnglishOnly className="flex flex-col gap-2">
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={id}
+          onClick={() => {
+            setOpen(!open);
+          }}
+          className="flex min-h-[var(--target-min)] w-full cursor-pointer items-center justify-between gap-3 rounded-[var(--radius-md)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-start font-semibold text-[var(--color-text)] focus-visible:outline-[length:3px] focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+        >
+          <span>{t(faq.questionKey as MessageKey)}</span>
+          <span aria-hidden="true">{open ? '−' : '+'}</span>
+        </button>
+        <div id={id} hidden={!open}>
+          {open ? <Answer faq={faq} {...(vote ? { vote } : {})} /> : null}
+        </div>
+      </EnglishOnly>
     </li>
   );
 }

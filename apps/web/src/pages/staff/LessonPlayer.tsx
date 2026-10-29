@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button, Markdown, PageHeader, Stepper } from '@sta/ui';
 import type { ContentBlock, Lesson, Module } from '@sta/domain';
+import { EnglishOnly } from '../../app/EnglishOnly';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { ExplainThis } from '../ExplainThis';
 import { LessonThumbs } from './FeedbackWidgets';
@@ -116,7 +117,9 @@ function Player({ module, lesson, organisationName }: { module: Module; lesson: 
 
   return (
     <>
-      <PageHeader title={lesson.title} />
+      <EnglishOnly>
+        <PageHeader title={lesson.title} />
+      </EnglishOnly>
       <Stepper
         current={step + 1}
         total={total}
@@ -128,13 +131,15 @@ function Player({ module, lesson, organisationName }: { module: Module; lesson: 
       </div>
       <div className="my-4 min-h-40">
         {block ? (
-          <Block
-            block={block}
-            acknowledged={ticked[step] === true}
-            onAcknowledge={(v) => {
-              setTicked((s) => ({ ...s, [step]: v }));
-            }}
-          />
+          <EnglishOnly>
+            <Block
+              block={block}
+              acknowledged={ticked[step] === true}
+              onAcknowledge={(v) => {
+                setTicked((s) => ({ ...s, [step]: v }));
+              }}
+            />
+          </EnglishOnly>
         ) : null}
         {last && lesson.furtherReading ? (
           <LearnMoreGroups
