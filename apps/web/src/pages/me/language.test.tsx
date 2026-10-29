@@ -85,7 +85,8 @@ describe('S11 language picker', () => {
   it('starts in Polish for a learner whose saved preference is pl-PL (Kasia)', async () => {
     await renderRoute('/staff/me', 'staff', withKasia);
     expect(await screen.findByRole('heading', { level: 1, name: lang(plPL, 'me.title') })).toBeTruthy();
-    expect(((await screen.findByRole('radio', { name: 'Polski' })) as HTMLInputElement).checked).toBe(true);
+    const polski = await screen.findByRole<HTMLInputElement>('radio', { name: 'Polski' });
+    expect(polski.checked).toBe(true);
   });
 });
 
