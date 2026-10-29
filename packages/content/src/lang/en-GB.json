@@ -103,7 +103,8 @@
       "commercial": "Commercial",
       "support": "Support",
       "comms": "Comms",
-      "teamSecurity": "Team and security"
+      "teamSecurity": "Team and security",
+      "recovery": "Account recovery"
     }
   },
   "placeholder": {
@@ -3489,6 +3490,82 @@
         "done": "Done",
         "wontDo": "Won't do"
       }
+    },
+    "comms": {
+      "heading": "Announcements and release notes",
+      "announcements": "Announcements",
+      "releaseNotes": "Release notes",
+      "noAccess": "You do not have access to send announcements.",
+      "none": "No announcements yet.",
+      "noNotes": "No release notes yet.",
+      "audienceGroup": "Audience",
+      "audience": {
+        "all": "All clients",
+        "package": "A package",
+        "pack": "An industry pack",
+        "clients": "Selected clients"
+      },
+      "channelGroup": "How to send it",
+      "channel": {
+        "banner": "Banner",
+        "notification": "Notification",
+        "email": "Email"
+      },
+      "packageField": "Package",
+      "packField": "Industry pack",
+      "clientsField": "Clients",
+      "titleField": "Title",
+      "messageField": "Message",
+      "publishAt": "Show from",
+      "expiresAt": "Show until",
+      "preview": "Preview",
+      "help": "Banners show at the top of the app. Notifications appear in the bell. Emails go to the main contact. Choose when it starts and stops showing.",
+      "send": "Send announcement",
+      "audienceLabel": "Audience: {audience}",
+      "channelsLabel": "Channels: {channels}",
+      "reads": "Read {count} times",
+      "failed": "That could not be sent. Check the title, the audience, at least one channel and the times, then try again.",
+      "noteDate": "Released {date}"
+    },
+    "recovery": {
+      "heading": "Account recovery",
+      "noAccess": "You do not have access to account recovery.",
+      "approvals": "Approved by {count} of 2",
+      "status": {
+        "open": "Open",
+        "approved": "Approved",
+        "done": "Done",
+        "rejected": "Rejected"
+      },
+      "coolingOff": "Cooling off ends in {hours} hours",
+      "coolingOffOne": "Cooling off ends in 1 hour",
+      "coolingOffEnded": "Cooling off has ended",
+      "coolingOffNotSet": "Cooling off starts when the request is approved",
+      "completeWaiting": "Complete is available when the cooling-off period has ended.",
+      "approve": "Approve",
+      "complete": "Complete",
+      "reject": "Reject",
+      "outcomeLabel": "Outcome",
+      "outcomeNone": "Choose an outcome",
+      "outcomeReset2fa": "Reset two-factor",
+      "outcomeTransferOwner": "Transfer Account Owner",
+      "checklist": {
+        "heading": "Identity checks",
+        "callBack": "Call back to the number or email on record",
+        "otherAdmin": "Confirmation from another named client admin",
+        "documented": "Checklist documented"
+      },
+      "new": {
+        "heading": "New request",
+        "client": "Client",
+        "person": "Person",
+        "reason": "Reason",
+        "submit": "Start request",
+        "choose": "Choose"
+      },
+      "requests": "Requests",
+      "none": "There are no recovery requests.",
+      "failed": "That could not be saved. Check the details and try again."
     }
   }
 }

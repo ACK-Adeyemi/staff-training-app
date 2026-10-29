@@ -265,7 +265,14 @@ export const routes: RouteObject[] = [
             path: 'tickets/:id',
             lazy: async () => ({ Component: (await import('../pages/provider/TicketDetail')).TicketDetail }),
           },
-          page('comms', 'nav.provider.comms', 'placeholder.provider.comms'),
+          {
+            path: 'comms',
+            lazy: async () => ({ Component: (await import('../pages/provider/Comms')).Comms }),
+          },
+          {
+            path: 'recovery',
+            lazy: async () => ({ Component: (await import('../pages/provider/Recovery')).Recovery }),
+          },
           page('team', 'nav.provider.teamSecurity', 'placeholder.provider.teamSecurity'),
         ],
       },

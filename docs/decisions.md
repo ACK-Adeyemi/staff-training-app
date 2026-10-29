@@ -933,3 +933,11 @@ Chunk 1 choices:
 ## M4 chunk 14a: incidents and data requests services
 
 `store.incidents` (list, post, update need `incidents.post`; `current` is open to any signed-in actor, including limited accounts) and `store.dataRequests` (`dataRequests.manage`) are in `packages/data/src/providerIncidentsOps.ts`, provider side only. Checks run in the order permission, validation, existence/state (NotFound, then RuleError `notApplicable` for a resolved incident or a non-open request). `dueAt` is `addMonths(receivedAt, 1)`; `dueInDays` is calendar days from the Clock in London time (negative when overdue). Reject appends its reason to `notes`. The overall status is the highest-severity unresolved incident (newest wins a tie), else Normal with no title. Audit holds ids, level, status and kind only. No new language strings were needed.
+
+## M4 chunk 14b: P14 Comms and P15 Recovery
+
+- Added `store.releaseNotes.list(actor)` (any provider actor, newest first). The generic repo for `releaseNotes` stays deny-all.
+- `approveRecovery` now sets `coolingOffEndsAt` to now + 24 hours (RECOVERY_COOLING_OFF_HOURS) when the request has none, so the seeded request can complete after its second approval. One already set is kept.
+- `store.recovery.complete(actor, id, outcome?)` takes the outcome chosen on the page; without it the request's own outcome is used. This makes the P15 "Outcome" control real.
+- Spec correction in the P14 test: language keys cannot be both `provider.comms.audience` (a string) and a parent of `provider.comms.audience.all`, so the radiogroup name is `provider.comms.audienceGroup` (and `channelGroup`). Likewise the recovery outcome keys are `outcomeLabel`, `outcomeReset2fa`, `outcomeTransferOwner`. The P15 test's "48 hours" expectation was left as is: that test sets `coolingOffEndsAt` to 48 hours itself, and the decided 24 hours applies only where none is set.
+- P15 is reachable from the provider "More" navigation (Account recovery).

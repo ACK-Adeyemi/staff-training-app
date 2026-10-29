@@ -31,7 +31,7 @@ import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/re
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { Announcement, ReleaseNote } from '@sta/domain';
-import type { ActorContext, Store } from '@sta/data';
+import type { ActorContext, DataStore } from '@sta/data';
 import type { MessageKey } from '@sta/content';
 import { actorFor, renderRoute, t, TODAY } from '../../test/harness';
 
@@ -40,7 +40,7 @@ afterEach(cleanup);
 const k = (key: string) => t(key as MessageKey);
 type Opts = Parameters<typeof renderRoute>[2];
 const as = (name: string): Opts => ({
-  actor: (keys) => ({ ...actorFor('provider', keys), userId: keys.users[name] }),
+  actor: (keys) => ({ ...actorFor('provider', keys), userId: keys.users[name]! }),
 });
 const sophie = as('sophie');
 const tom = as('tom');
@@ -66,7 +66,7 @@ describe('P14 Announcements and release notes', () => {
     });
     expect(rows().map((r) => r.getAttribute('data-announcement-id'))).toEqual(stored.map((a) => a.id));
     for (const a of stored) {
-      const text = rows().find((r) => r.getAttribute('data-announcement-id') === a.id)!.textContent!;
+      const text = rows().find((r) => r.getAttribute('data-announcement-id') === a.id)!.textContent;
       expect(text).toContain(a.title);
       expect(text).toContain(k('provider.comms.audience.all'));
       for (const c of a.channels) expect(text).toContain(k(`provider.comms.channel.${c}`));
@@ -79,7 +79,7 @@ describe('P14 Announcements and release notes', () => {
     await heading();
     expect(screen.getByRole('textbox', { name: k('provider.comms.titleField') })).toBeTruthy();
     expect(screen.getByRole('textbox', { name: k('provider.comms.messageField') })).toBeTruthy();
-    const audience = screen.getByRole('radiogroup', { name: k('provider.comms.audience') });
+    const audience = screen.getByRole('radiogroup', { name: k('provider.comms.audienceGroup') });
     for (const a of ['all', 'package', 'pack', 'clients'])
       expect(within(audience).getByRole('radio', { name: k(`provider.comms.audience.${a}`) })).toBeTruthy();
     for (const c of ['banner', 'notification', 'email'])
@@ -128,7 +128,7 @@ describe('P14 Announcements and release notes', () => {
     expect(made.audience.packIds).toBeUndefined();
     expect(made.publishAt.startsWith('2026-10-20')).toBe(true);
     expect(made.expiresAt?.startsWith('2026-10-27')).toBe(true);
-    expect(screen.getAllByTestId('announcement').some((r) => r.textContent!.includes('New quiz layout'))).toBe(true);
+    expect(screen.getAllByTestId('announcement').some((r) => r.textContent.includes('New quiz layout'))).toBe(true);
   });
 
   it('sends to selected clients only', async () => {
@@ -151,7 +151,7 @@ describe('P14 Announcements and release notes', () => {
   it('offers All clients only to someone holding comms.sendAll', async () => {
     await openP14(sophie);
     await heading();
-    const audience = screen.getByRole('radiogroup', { name: k('provider.comms.audience') });
+    const audience = screen.getByRole('radiogroup', { name: k('provider.comms.audienceGroup') });
     expect(within(audience).queryByRole('radio', { name: k('provider.comms.audience.all') })).toBeNull();
     expect(within(audience).getByRole('radio', { name: k('provider.comms.audience.package') })).toBeTruthy();
   });
@@ -167,7 +167,7 @@ describe('P14 Announcements and release notes', () => {
   it('keeps the composer help free of billing wording', async () => {
     await openP14();
     await heading();
-    const help = screen.getByTestId('comms-help').textContent!.toLowerCase();
+    const help = screen.getByTestId('comms-help').textContent.toLowerCase();
     expect(help.length).toBeGreaterThan(0);
     for (const word of ['payment', 'invoice']) expect(help).not.toContain(word);
   });
@@ -175,7 +175,7 @@ describe('P14 Announcements and release notes', () => {
   it('lists the seeded release notes newest first', async () => {
     const { view, actor } = await openP14();
     await heading();
-    const notes = await (view.handle.store as unknown as Store & WithNotes).releaseNotes.list(actor);
+    const notes = await (view.handle.store as unknown as DataStore & WithNotes).releaseNotes.list(actor);
     expect(notes).toHaveLength(3);
     const region = screen.getByRole('region', { name: k('provider.comms.releaseNotes') });
     await waitFor(() => {
@@ -183,8 +183,10 @@ describe('P14 Announcements and release notes', () => {
     });
     const shown = within(region)
       .getAllByTestId('release-note')
-      .map((n) => n.textContent!);
-    notes.forEach((n, i) => expect(shown[i]).toContain(n.title));
+      .map((n) => n.textContent);
+    notes.forEach((n, i) => {
+      expect(shown[i]).toContain(n.title);
+    });
     expect(notes.map((n) => n.date)).toEqual([...notes.map((n) => n.date)].sort().reverse());
   });
 });
