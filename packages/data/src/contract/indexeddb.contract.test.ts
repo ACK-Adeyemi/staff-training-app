@@ -15,6 +15,7 @@ import { runProviderTeamContract } from './providerTeam';
 import { runCreateClientContract } from './createClient';
 import { runProviderPublishContract } from './providerPublish';
 import { runProviderCommsContract } from './providerComms';
+import { runProviderIncidentsContract } from './providerIncidents';
 import { runProviderOverviewContract } from './providerOverview';
 import { runProviderRecoveryContract } from './providerRecovery';
 import { runProviderTicketsContract } from './providerTickets';
@@ -101,6 +102,9 @@ runProviderTicketsContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );
 runProviderCommsContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runProviderIncidentsContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );
 runProviderRecoveryContract('indexeddb adapter', (options) =>
