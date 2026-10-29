@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M4
 Milestone base commit: c7160e2
-Next step: M4 chunk 13 (P11 to P13 tickets, per docs/plans/m4.md). P8 Edit price navigates to /provider/pricing (P25, chunk 17). P6-P9 are linked from a Commercial pages list on P7. P3 tabs Sites, Staff, API, Support tickets, Billing, Modules, Competitions, Audit are still stubs. Full check.sh takes ~40 min: run it in the background (timeout 3300) and poll. Give the test-writer small briefs (one test file each).
+Next step (note: do not leave a background check.sh running when a turn ends; the stop hook runs its own check.sh and the two wipe each other's test-results, giving ENOENT e2e failures. Chunk 12 gate: all steps passed, the 5 e2e failures passed alone, 500 of 500): M4 chunk 13 (P11 to P13 tickets, per docs/plans/m4.md). P8 Edit price navigates to /provider/pricing (P25, chunk 17). P6-P9 are linked from a Commercial pages list on P7. P3 tabs Sites, Staff, API, Support tickets, Billing, Modules, Competitions, Audit are still stubs. Full check.sh takes ~40 min: run it in the background (timeout 3300) and poll. Give the test-writer small briefs (one test file each).
 
 ## Milestones
 - [x] M0 Foundations
