@@ -4,6 +4,7 @@ import type { MessageKey } from '@sta/content';
 import { Card, PageHeader, focusClasses } from '@sta/ui';
 import { useT } from '../../app/hooks';
 import { ClientsReadGate } from './Gate';
+import { PriceChangesPanel } from './Pricing';
 import { useClientTelemetry, useLocalTelemetry, useProviderClients } from './queries';
 
 const TABS = [
@@ -161,6 +162,8 @@ function Detail({ id }: { id: string }) {
           <Usage clientId={id} />
         ) : tab === 'errors' ? (
           <Errors clientId={id} />
+        ) : tab === 'billing' ? (
+          <PriceChangesPanel clientId={id} />
         ) : tab === 'device' ? (
           <ThisDevice />
         ) : (

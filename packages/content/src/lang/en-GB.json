@@ -124,7 +124,8 @@
       "status": "Status and incidents",
       "global": "Global content",
       "ai": "AI settings",
-      "profileChanges": "Profile changes"
+      "profileChanges": "Profile changes",
+      "pricing": "Price changes"
     }
   },
   "placeholder": {
@@ -3869,7 +3870,9 @@
       "revert": "Revert display name",
       "loadError": "Could not load profile changes.",
       "failed": "That did not work. Please try again.",
-      "names": { "heading": "Organisation name changes" },
+      "names": {
+        "heading": "Organisation name changes"
+      },
       "status": {
         "pendingReview": "Waiting for review",
         "billingKept": "Billing name kept",
@@ -3885,7 +3888,11 @@
       },
       "billing": {
         "heading": "Billing detail requests",
-        "status": { "pending": "Waiting", "approved": "Approved", "declined": "Declined" },
+        "status": {
+          "pending": "Waiting",
+          "approved": "Approved",
+          "declined": "Declined"
+        },
         "proposed": "Proposed change",
         "reason": "Reason given",
         "approve": "Approve",
@@ -3897,8 +3904,92 @@
         "save": "Save and approve",
         "declineReason": "Reason for declining",
         "confirmDecline": "Send decision",
-        "confirm": { "approved": "Request approved.", "declined": "Request declined." }
+        "confirm": {
+          "approved": "Request approved.",
+          "declined": "Request declined."
+        }
       }
+    },
+    "pricing": {
+      "heading": "Price changes",
+      "noAccess": "You do not have access to price changes.",
+      "loadError": "Could not load price changes.",
+      "failed": "That did not work. Please try again.",
+      "group": {
+        "draft": "Drafts",
+        "submitted": "Awaiting confirmation",
+        "scheduled": "Scheduled",
+        "active": "Active",
+        "ended": "Ended"
+      },
+      "status": {
+        "draft": "Draft",
+        "submitted": "Awaiting confirmation",
+        "scheduled": "Scheduled",
+        "active": "Active",
+        "ended": "Ended",
+        "cancelled": "Cancelled"
+      },
+      "new": "New change",
+      "clientsLegend": "Clients",
+      "clients": {
+        "one": "One client",
+        "several": "Several clients",
+        "all": "All clients"
+      },
+      "client": "Client",
+      "typeLabel": "Type",
+      "type": {
+        "override": "Price override",
+        "discount": "Percentage discount",
+        "increase": "Percentage increase"
+      },
+      "scopeLabel": "Applies to",
+      "addOnLabel": "Add-on",
+      "scope": {
+        "plan": "Plan",
+        "addOn": "One add-on",
+        "invoice": "Whole invoice"
+      },
+      "value": "Value",
+      "reasonLabel": "Reason",
+      "reason": {
+        "loyalty": "Loyalty",
+        "retention": "Retention",
+        "introductory": "Introductory offer",
+        "annualReview": "Annual review",
+        "correction": "Correction",
+        "other": "Other"
+      },
+      "noticeDays": "Notice days",
+      "endsAt": "End date (optional)",
+      "preview": "Preview",
+      "previewCols": {
+        "client": "Client",
+        "current": "Current price",
+        "new": "New price",
+        "effective": "Takes effect",
+        "effect": "Monthly effect"
+      },
+      "saveDraft": "Save draft",
+      "submit": "Submit for confirmation",
+      "confirm": "Confirm",
+      "stepUp": "Step-up code",
+      "confirmNow": "Confirm change",
+      "cancel": "Cancel change",
+      "wrongCode": "That code is not right.",
+      "stepUpRequired": "Enter your step-up code.",
+      "done": {
+        "saved": "Draft saved.",
+        "submitted": "Sent for confirmation.",
+        "confirmed": "Price change confirmed.",
+        "cancelled": "Price change cancelled."
+      },
+      "warning": {
+        "increaseOver20": "This increase is over 20 per cent.",
+        "belowFloor": "The new price is below the minimum price."
+      },
+      "noChanges": "There are no price changes yet."
     }
   }
 }

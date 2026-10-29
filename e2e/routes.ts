@@ -40,6 +40,7 @@ export const providerMore: NavEntry[] = [
   { hash: '#/provider/audit', label: 'Audit log' },
   { hash: '#/provider/global', label: 'Global content' },
   { hash: '#/provider/profile-changes', label: 'Profile changes' },
+  { hash: '#/provider/pricing', label: 'Price changes' },
   { hash: '#/provider/ai', label: 'AI settings', heading: 'AI add-on settings' },
 ];
 

@@ -151,6 +151,7 @@ export function ProviderShell() {
           item('/provider/audit', t('nav.provider.audit'), 'book'),
           item('/provider/global', t('nav.provider.global'), 'book'),
           item('/provider/profile-changes', t('nav.provider.profileChanges'), 'user'),
+          item('/provider/pricing', t('nav.provider.pricing'), 'book'),
           item('/provider/ai', t('nav.provider.ai'), 'help'),
         ],
         headerLinks: [item('/provider/comms', t('provider.shell.notifications'), 'bell')],
