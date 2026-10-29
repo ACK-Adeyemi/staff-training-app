@@ -62,12 +62,14 @@ describe('every shell route renders its title as the page heading', () => {
     ...[...clientBar, ...clientMore].map((p): [Side, Page] => ['client', p]),
     ...[...providerBar, ...providerMore].map((p): [Side, Page] => [
       'provider',
-      // P7 and P11 have their own screen titles; the nav items are the section names.
+      // P7, P11 and P14 have their own screen titles; the nav items are the section names.
       p.path === '/provider/packages'
         ? { ...p, label: t('provider.packages.heading') }
         : p.path === '/provider/tickets'
           ? { ...p, label: t('provider.tickets.heading') }
-          : p,
+          : p.path === '/provider/comms'
+            ? { ...p, label: t('provider.comms.heading') }
+            : p,
     ]),
   ];
   it.each(all)('%s %j', async (side, page) => {
