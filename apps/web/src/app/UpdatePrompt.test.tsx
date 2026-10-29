@@ -17,7 +17,7 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { fixedClock } from '@sta/domain';
 import { AppProviders } from './providers';
 import { UpdatePrompt } from './UpdatePrompt';
@@ -28,7 +28,7 @@ const fake = vi.hoisted(() => {
   const f = {
     state: { needRefresh: false, offlineReady: false } as { needRefresh: boolean; offlineReady: boolean },
     listeners: new Set<() => void>(),
-    update: undefined as unknown as ReturnType<typeof vi.fn>,
+    update: undefined as unknown as Mock<() => Promise<void>>,
   };
   return f;
 });

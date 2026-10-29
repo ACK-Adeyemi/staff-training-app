@@ -115,3 +115,4 @@ Things only the user can check, by milestone.
 - [ ] Records, confidentiality and data protection (nursery Tier 2, Draft content, optional): one lesson, 8 questions (one a scenario) drafted from EYFS 3.95 to 3.99 (`.../records/`). No retention period given (3.98 leaves it to the provider); VERIFY.
 - [ ] New starter induction now has an official Learn more link on each question (EYFS 3.4, 3.5, 3.78, 3.81, 3.100). The question wording is still the demo's own. Check the links fit.
 
+- [ ] Offline and install (M5 chunk 4): after the next deploy, open the live site on a phone, install it to the home screen (it opens the staff app), then redeploy; the already-installed copy shows "A new version is ready" with Update and Later, Update loads the new version, and Later keeps working. The Demo menu shows "Update available" until then. Also check a lesson can be finished with the phone in aeroplane mode after one online visit.

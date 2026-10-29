@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 import { Button, Dialog } from '@sta/ui';
 import { useDemo, useT } from '../app/hooks';
+import { usePwa } from '../app/usePwa';
 
 export function DemoMenu({
   open,
@@ -13,6 +14,7 @@ export function DemoMenu({
 }) {
   const t = useT();
   const demo = useDemo();
+  const pwa = usePwa();
   const navigate = useNavigate();
   // Read at render, and only when open, so tests can stub the build constants.
   const version = open ? __APP_VERSION__ : '';
@@ -22,7 +24,10 @@ export function DemoMenu({
     <Dialog open={open} title={t('demo.menu')} onClose={onClose}>
       {open ? (
         <>
-          <p className="m-0">{t('demo.version', { version })}</p>
+          <p className="m-0">
+            <span>{t('demo.version', { version })}</span>
+            {pwa.needRefresh ? <span> {t('pwa.updateAvailable')}</span> : null}
+          </p>
           <p className="m-0">{t('demo.builtOn', { date: built })}</p>
           <p className="mt-0 mb-4">{t('demo.currentIndustry', { industry })}</p>
           <div className="flex flex-col gap-3">

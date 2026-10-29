@@ -1,4 +1,11 @@
 {
+  "pwa": {
+    "updateReady": "A new version is ready",
+    "update": "Update",
+    "later": "Later",
+    "updateAvailable": "Update available",
+    "offlineReady": "Ready to work offline"
+  },
   "demo": {
     "badge": "Demo",
     "simulatedData": "Simulated data",

@@ -61,6 +61,8 @@ test('a lesson can be completed offline after one online visit and progress is k
 
   await page.goto('./#/staff');
   await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+  // Wait for the home screen to catch up with the lessons just finished, so the snapshot is settled.
+  await expect(page.getByText('Goal met this week').first()).toBeVisible();
   const homeOffline = await page.getByRole('main').innerText();
 
   await context.setOffline(false);

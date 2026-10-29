@@ -1,6 +1,7 @@
 import { createContext, useContext, useLayoutEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Outlet } from 'react-router';
+import { UpdatePrompt } from '../app/UpdatePrompt';
 import { DemoBadge } from './DemoBadge';
 import { DemoMenu } from './DemoMenu';
 import { PresenterPanel } from './PresenterPanel';
@@ -49,6 +50,7 @@ export function RootLayout() {
       <SlotContext value={setSlot}>
         <Outlet />
       </SlotContext>
+      <UpdatePrompt />
       <DemoMenu
         open={open === 'menu'}
         onClose={() => {
