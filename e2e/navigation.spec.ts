@@ -8,7 +8,7 @@ const nav = (page: Page) => page.getByRole('navigation', { name: 'Main navigatio
 
 async function expectAt(page: Page, entry: NavEntry) {
   await expect(page).toHaveURL(new RegExp(`${entry.hash.replace(/[/]/g, '\\/')}$`));
-  await expect(page.getByRole('heading', { level: 1, name: entry.label })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: entry.heading ?? entry.label })).toBeVisible();
 }
 
 test('the empty hash opens the demo landing page, not a shell', async ({ page }) => {

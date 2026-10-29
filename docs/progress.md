@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M4
 Milestone base commit: c7160e2
-Next step: M4 chunk 11b-d (11a P5 links panel done, ebfd2f4; remaining: P6 packs, P7 packages Option A/B, P8 add-ons, one test file each) per docs/plans/m4.md. P3 tabs Sites, Staff, API, Support tickets, Billing, Modules, Competitions, Audit are still stubs: fill them in the chunks that own those screens (P3 Billing in chunk 12/17, tickets in 13) before M4 is done. Give the test-writer small briefs (one test file each); big briefs hit API errors.
+Next step: M4 chunk 12 (P9 Dunning, D2 Simulate failed payment and walk) per docs/plans/m4.md. P8 Edit price navigates to /provider/pricing (P25, chunk 17 builds it). P6 has no nav entry (reachable at #/provider/packs; add a link from the Content or Commercial area). P3 tabs Sites, Staff, API, Support tickets, Billing, Modules, Competitions, Audit are still stubs. Full check.sh takes ~40 min: run it in the background (timeout 3300) and poll. Give the test-writer small briefs (one test file each).
 
 ## Milestones
 - [x] M0 Foundations
@@ -28,7 +28,7 @@ M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list):
 - [x] 8 Data ops E: 8a comms, maintenance, link check, Learn more counts done (tests 8ae4af0, impl c8ee98f); 8b recovery + profile/billing change ops done (tests 91be646, impl 0a6341c); 8c telemetry + overview reads done (tests ea67a8a, impl 10447fa; seed v6, IndexedDB v6)
 - [x] 9 Provider shell and P1-P3 (tests 5bf1716, impl cac7c7f, check.sh green)
 - [x] 10 P4 New client wizard (tests 61ad087, impl 0a421bd, check.sh green)
-- [ ] 11 P5 to P8: 11a P5 Learn more links panel done (tests 0730264, impl ebfd2f4, check.sh green); 11b P6, 11c P7, 11d P8 to do
+- [x] 11 P5 to P8: 11a P5 links (tests 0730264, impl ebfd2f4); 11b P6 packs (e297796, 8adda0a); 11c P7 packages (7b32dcc, 7ca53ff); 11d P8 add-ons (42e1539, 8a5c5c8); routes/e2e heading fixes after full check
 - [ ] 12-18 see the plan
 M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 1 Decisions, schemas, stores and personas

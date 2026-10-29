@@ -1,5 +1,5 @@
 // Shared route and label lists for the M0 e2e specs. Labels mirror packages/content/src/lang/en-GB.json.
-export type NavEntry = { hash: string; label: string };
+export type NavEntry = { hash: string; label: string; heading?: string };
 
 export const staffTabs: NavEntry[] = [
   { hash: '#/staff', label: 'Home' },
@@ -30,7 +30,7 @@ export const providerBar: NavEntry[] = [
   { hash: '#/provider', label: 'Overview' },
   { hash: '#/provider/clients', label: 'Clients' },
   { hash: '#/provider/content', label: 'Content' },
-  { hash: '#/provider/packages', label: 'Commercial' },
+  { hash: '#/provider/packages', label: 'Commercial', heading: 'Packages and entitlements' },
 ];
 export const providerMore: NavEntry[] = [
   { hash: '#/provider/tickets', label: 'Support' },
