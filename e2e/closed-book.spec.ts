@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { readStore } from './helpers/idb';
+import { installSpeechRecorder, readSpeechLog } from './helpers/speech';
 import { answerQuestion, finishLessons, type QuizQuestion } from './helpers/quiz';
 
 type Bank = {
@@ -166,4 +167,60 @@ test('Leave this attempt ends a closed attempt without a score and unlocks the n
   await expect(page.getByRole('alert')).toHaveCount(0);
   const abandoned = (await readStore(page, 'attempts')).filter((a) => a['abandoned'] === true);
   expect(abandoned).toHaveLength(1);
+});
+
+test('read-aloud in a closed-book quiz speaks only the question and its options, never a note', async ({ page }) => {
+  // M5 chunk 8 (BP-4). Contract: apps/web/src/pages/staff/readAloudQuiz.test.tsx ("Pause" appears while reading).
+  test.setTimeout(150_000);
+  const NOTE = 'Zebra crossing memory aid 4471';
+  await installSpeechRecorder(page);
+  await page.goto('./#/staff');
+  await signInAsJade(page);
+  await page.keyboard.press('Shift+Alt+KeyP');
+  await page
+    .getByRole('dialog', { name: 'Presenter panel' })
+    .getByRole('button', { name: /^Fast-forward 7 days?$/ })
+    .click();
+  await page.keyboard.press('Escape');
+  await page.goto('./#/staff/learn');
+  await page.getByRole('link', { name: 'Safer sleep' }).click();
+  await page.getByRole('region', { name: 'Lessons' }).getByRole('link').first().click();
+  await page.getByRole('button', { name: 'Add note' }).click();
+  const sheet = page.getByRole('dialog', { name: 'Add note' });
+  await sheet.getByRole('textbox', { name: 'Note' }).fill(NOTE);
+  await sheet.getByRole('button', { name: 'Save note' }).click();
+  await expect(sheet).toBeHidden();
+  // Read the lesson step too: the note is not part of it either.
+  await page.getByRole('button', { name: 'Read this aloud' }).click();
+  await expect.poll(async () => (await readSpeechLog(page)).spoken.length).toBeGreaterThan(0);
+  await page.getByRole('button', { name: 'Pause' }).click();
+  await page.goto('./#/staff/learn');
+  await page.getByRole('link', { name: 'Safer sleep' }).click();
+  await finishLessons(page);
+
+  await page.getByRole('link', { name: /Start quiz/ }).click();
+  await page
+    .getByRole('radiogroup', { name: 'How do you want to take this quiz?' })
+    .getByRole('radio', { name: /^Closed-book/ })
+    .check();
+  await page.getByRole('button', { name: 'Start quiz' }).click();
+  await expect(page.getByTestId('notes-locked')).toBeVisible();
+
+  for (let n = 1; n <= 2; n++) {
+    const q = await question(page, sleep);
+    const before = (await readSpeechLog(page)).spoken.length;
+    await page.getByRole('button', { name: 'Read this aloud' }).click();
+    await expect.poll(async () => (await readSpeechLog(page)).spoken.length).toBe(before + 1);
+    const said = (await readSpeechLog(page)).spoken[before]?.text ?? '';
+    expect(said).toContain(q.prompt);
+    for (const o of q.options ?? []) expect(said).toContain(o.text);
+    await page.getByRole('button', { name: 'Pause' }).click();
+    await answerQuestion(page, q, true);
+    await expect(page.getByRole('region', { name: 'Feedback' })).toBeVisible();
+    await page.getByRole('button', { name: 'Next question' }).click();
+  }
+
+  const log = await readSpeechLog(page);
+  for (const s of log.spoken) expect(s.text).not.toContain(NOTE);
+  await expect(page.getByText(NOTE)).toHaveCount(0);
 });

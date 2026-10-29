@@ -20,6 +20,12 @@ export interface ReadAloudBarProps {
   rates: number[];
   /** Text for a speed option, for example "1.25x". Defaults to the number. */
   rateLabel?: (rate: number) => string;
+  /** Render only the controls, not the paragraph text (M5 chunk 8; not yet implemented). */
+  controlsOnly?: boolean;
+  /** Called whenever the current paragraph changes (M5 chunk 8; not yet implemented). */
+  onIndexChange?: (index: number) => void;
+  /** The starting speed; one of `rates` (M5 chunk 8; not yet implemented). */
+  defaultRate?: number;
 }
 
 export function ReadAloudBar({ paragraphs, speech, labels, rates, rateLabel = String }: ReadAloudBarProps) {
