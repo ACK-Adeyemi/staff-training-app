@@ -22,6 +22,9 @@ export type DemoApi = {
   setDisplayPrefs?: (prefs: NonNullable<DemoState['displayPrefs']>) => void | Promise<void>;
   setIndustry: (industry: DemoState['industry']) => void | Promise<void>;
   /** Puts the selected client's account into Past due from now (D2). The demo shell knows which client. */
+  /** The demo-wide packaging option (brief 20.4). Every client is evaluated on it. */
+  getPackagingOption: () => Promise<'A' | 'B'>;
+  setPackagingOption: (option: 'A' | 'B') => Promise<void>;
   simulateFailedPayment?: () => void | Promise<void>;
 };
 

@@ -50,6 +50,8 @@ export function makeDemo(side: Side, keys: SeedKeys, handle?: StoreHandle) {
     signInAs: vi.fn(),
     signInAsClient: vi.fn(),
     listPersonas: () => (handle ? handle.admin.listPersonas() : Promise.resolve([])),
+    getPackagingOption: () => (handle ? handle.admin.getPackagingOption() : Promise.resolve('A' as const)),
+    setPackagingOption: (o: 'A' | 'B') => (handle ? handle.admin.setPackagingOption(o) : Promise.resolve()),
     listOutbox: () => (handle ? handle.admin.listOutbox() : Promise.resolve([] as OutboxMessage[])),
   };
 }
@@ -67,6 +69,13 @@ export async function renderRoute(
 ) {
   const { handle, keys } = await seededStore();
   if (opts.prepare) await opts.prepare({ handle, keys });
+  // The app saves the demo state on start; the packaging option lives in it, so make sure it exists here too.
+  if ((await handle.admin.getDemoState()) === undefined)
+    await handle.admin.setDemoState({
+      clockOffsetMs: 0,
+      industry: 'nursery',
+      persona: { side, userId: actorFor(side, keys).userId },
+    });
   const router = createMemoryRouter(routes, { initialEntries: [path] });
   const at = opts.now ?? TODAY;
   const actor = { ...(opts.actor ? opts.actor(keys) : actorFor(side, keys)), now: at };
