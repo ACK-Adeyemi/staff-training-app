@@ -36,6 +36,8 @@ test('the staff shell has no horizontal scroll at 200% text and every tab label 
 
 test('client and provider shells have no horizontal scroll at 200% text', async ({ page }) => {
   for (const hash of ['#/client', '#/provider']) {
+    // A hash-only goto keeps the old page mounted, so its heading could satisfy the wait: load afresh each time.
+    await page.goto('about:blank');
     await page.goto(`./${hash}`);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await scale(page);
@@ -48,6 +50,7 @@ test('client and provider shells have no horizontal scroll at 200% text', async 
 test('provider screens P1 to P25 have no horizontal scroll at 200% text', async ({ page }) => {
   test.setTimeout(180_000);
   for (const r of m4Routes) {
+    await page.goto('about:blank');
     await page.goto(`./${r.hash}`);
     await expect(page.getByRole('heading', { level: 1 }).first(), r.hash).toBeVisible();
     await scale(page);
