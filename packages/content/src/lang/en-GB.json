@@ -3261,6 +3261,24 @@
       "error": "Error",
       "event": "Event"
     },
+    "packs": {
+      "heading": "Industry packs",
+      "intro": "The industry packs available to clients. This page is read only.",
+      "statusFull": "Full pack",
+      "statusStub": "Stub",
+      "roles": "Job roles: {count}",
+      "requirements": "Requirements: {count}",
+      "terminologyHeading": "Terminology",
+      "prizesHeading": "Prize suggestions",
+      "stubNote": "Stub pack: terminology only. Roles, requirements and prize lists arrive with the pack's build.",
+      "noPermission": "You don't have access to this. Ask your manager.",
+      "terms": {
+        "site": "Site",
+        "team": "Team",
+        "auditExport": "Audit export",
+        "inspector": "Inspector"
+      }
+    },
     "links": {
       "region": "Learn more links",
       "check": "Check links",

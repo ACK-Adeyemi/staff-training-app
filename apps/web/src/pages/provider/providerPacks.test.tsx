@@ -47,7 +47,7 @@ describe('P6 Industry packs', () => {
       expect(within(card).getByText(expected)).toBeTruthy();
       if (pack.status === 'full') expect(within(card).queryByText('Stub')).toBeNull();
     });
-    const luxury = cards.find((c) => c.textContent?.includes('Luxury retail'))!;
+    const luxury = cards.find((c) => c.textContent.includes('Luxury retail'))!;
     expect(within(luxury).getByText('Stub')).toBeTruthy();
     const nursery = cards.find((c) => c.getAttribute('data-pack-id') === nurseryPack.id)!;
     expect(within(nursery).getByText('Full pack')).toBeTruthy();
@@ -59,7 +59,7 @@ describe('P6 Industry packs', () => {
     expect(nurseryPack.jobRoles.length).toBeGreaterThan(0);
     expect(nursery.textContent).toContain(`Job roles: ${nurseryPack.jobRoles.length}`);
     expect(nursery.textContent).toContain(`Requirements: ${nurseryPack.requirements.length}`);
-    const schools = cards.find((c) => c.textContent?.includes('Schools'))!;
+    const schools = cards.find((c) => c.textContent.includes('Schools'))!;
     expect(schools.textContent).toContain('Job roles: 0');
     expect(schools.textContent).toContain('Requirements: 0');
   });
@@ -75,7 +75,7 @@ describe('P6 Industry packs', () => {
         expect(row.textContent).toContain(pack.terminology[row.getAttribute('data-term-key')!]!);
       });
     });
-    const schools = cards.find((c) => c.textContent?.includes('Schools'))!;
+    const schools = cards.find((c) => c.textContent.includes('Schools'))!;
     const siteRow = within(schools).getByTestId('pack-terminology').querySelector('[data-term-key="site"]')!;
     expect(siteRow.textContent).toContain('school');
   });
