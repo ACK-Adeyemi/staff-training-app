@@ -32,7 +32,7 @@ M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list):
 - [x] 12 P9 Dunning: 12a dunning service (tests 6b8189d, impl 5010ba5), 12b P9 page (tests in 3 commits, impl c6c393c); D2 Simulate failed payment/Fast-forward/persona jump already existed from M3. The BP-9 e2e walk (client and staff views) goes into the Track B e2e in chunk 18
 - [x] 13 P11 to P13 tickets: 13a P11 inbox (tests b9fc124, impl 100148a), 13b P12 detail (tests f75fe33, impl 5f14f73, adds providerTickets.raiserName, contract bd3eb7e), 13c P13 support settings (tests 0feb2a4, impl efcb64e); gaps under Known issues
 - [x] 14 P14 to P17 and banners: 14a incidents/data requests services (tests 2431a7d, impl 5596566); 14b P14 comms + P15 recovery (tests f958ccf, e48374b, impl 2c5db85..70fb818, adds store.releaseNotes, recovery.complete outcome, approveRecovery sets cooling-off 24h when unset); 14c P16 + P17 (impl 0ed160b); 14d banners and status indicator in three shells (impl b7e3e64). Full check: all steps green except 2 nav e2e headings (P14 title), fixed in routes.ts and rerun green
-- [ ] 15 P18 done (15a tests 14cf3c2/573788d, impl 2f7d7d5); P19, P20, P23 remain (15b)
+- [ ] 15 P18 done (15a tests 14cf3c2/573788d, impl 2f7d7d5, query-key fix after nav e2e); P19, P20, P23 remain (15b)
 - [ ] 16-18 see the plan
 M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 1 Decisions, schemas, stores and personas
@@ -188,3 +188,4 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - 2026-10-28 (session 3): M4 chunk 8c done. Full check.sh: all green except 3 e2e ENOENT artifact failures caused by an overlapping earlier run; the 2 files rerun alone 9/9 green.
 - 2026-10-28 (session 3, cont.): M4 chunk 9 done, check.sh green.
 - 2026-10-29 (session 3): M4 chunk 10 done (P4 wizard). Chunk 11 next.
+- 2026-10-29 (session 5): M4 chunk 15a (P18 team and roles) landed; P19, P20, P23 next.
