@@ -25,6 +25,12 @@ import changedLesson2 from './what-changed-2026/lesson-2.md?raw';
 import inductionJson from './new-starter-induction/module.json';
 import inductionLesson1 from './new-starter-induction/lesson-1.md?raw';
 import inductionLesson2 from './new-starter-induction/lesson-2.md?raw';
+import suitableJson from './suitable-people/module.json';
+import suitableLesson1 from './suitable-people/lesson-1.md?raw';
+import ratiosJson from './ratios/module.json';
+import ratiosLesson1 from './ratios/lesson-1.md?raw';
+import riskJson from './risk-assessment/module.json';
+import riskLesson1 from './risk-assessment/lesson-1.md?raw';
 
 const lessonFiles = [safeguardingLesson1, safeguardingLesson2, safeguardingLesson3, safeguardingLesson4];
 
@@ -54,4 +60,8 @@ export const nurseryModules: Module[] = [
   build(changedJson, [changedLesson1, changedLesson2], moduleIds.whatChangedSeptember2026, [contentId(604)]),
   // New starter induction is contentId(605) and the target of the default induction rule.
   build(inductionJson, [inductionLesson1, inductionLesson2], moduleIds.newStarterInduction, [contentId(605)]),
+  // Tier 2 (M5): optional, no requirement link, so no default rule or matrix cell depends on them.
+  build(suitableJson, [suitableLesson1], moduleIds.suitablePeople, []),
+  build(ratiosJson, [ratiosLesson1], moduleIds.ratios, []),
+  build(riskJson, [riskLesson1], moduleIds.riskAssessment, []),
 ];

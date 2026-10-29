@@ -24,4 +24,7 @@ export const nurseryModuleCategory: Readonly<Record<string, string>> = {
   [moduleIds.paediatricFirstAid]: 'healthAndSafety',
   [moduleIds.safeEatingAllergiesAndChoking]: 'foodAndNutrition',
   [moduleIds.saferSleep]: 'sleepAndWellbeing',
+  [moduleIds.suitablePeople]: 'safeguarding',
+  [moduleIds.ratios]: 'healthAndSafety',
+  [moduleIds.riskAssessment]: 'healthAndSafety',
 };

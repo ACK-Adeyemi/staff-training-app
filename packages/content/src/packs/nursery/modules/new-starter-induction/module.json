@@ -46,7 +46,18 @@
         }
       ],
       "explanation": "Tell the designated safeguarding lead straight away. Do not wait and do not deal with it alone.",
-      "learnMore": [],
+      "learnMore": [
+        {
+          "id": "eyfs-3-4-q-ind-worried",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=23",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.4, page 23",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
       "tags": ["induction"]
     },
     {
@@ -76,7 +87,18 @@
         }
       ],
       "explanation": "Never hand a child to someone you do not know. Ask your manager.",
-      "learnMore": [],
+      "learnMore": [
+        {
+          "id": "eyfs-3-100-q-ind-stranger",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=44",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.100, page 44",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
       "tags": ["induction"]
     },
     {
@@ -96,7 +118,18 @@
         }
       ],
       "explanation": "True. Nobody expects you to know everything at once. Ask your manager or a colleague.",
-      "learnMore": [],
+      "learnMore": [
+        {
+          "id": "eyfs-3-5-q-ind-ask",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=23",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.5, page 23",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
       "tags": ["induction"]
     },
     {
@@ -116,7 +149,18 @@
         }
       ],
       "explanation": "False. The policies tell you what to do and what not to do, so ask to see them early.",
-      "learnMore": [],
+      "learnMore": [
+        {
+          "id": "eyfs-3-5-q-ind-policies",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=23",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.5, page 23",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
       "tags": ["induction"]
     },
     {
@@ -146,7 +190,18 @@
         }
       ],
       "explanation": "Find out where the fire exits and the assembly point are, and what to do when the alarm sounds.",
-      "learnMore": [],
+      "learnMore": [
+        {
+          "id": "eyfs-3-81-q-ind-fire",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=39",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.81, page 39",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
       "tags": ["induction"]
     },
     {
@@ -166,7 +221,18 @@
         }
       ],
       "explanation": "True. Look for the first aid kit and the names of the trained first aiders.",
-      "learnMore": [],
+      "learnMore": [
+        {
+          "id": "eyfs-3-78-q-ind-kit",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=39",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.78, page 39",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
       "tags": ["induction"]
     }
   ],
@@ -185,6 +251,7 @@
   "sourceAttribution": "Written for this demo as plain-English induction guidance. Check it against your own setting's procedures.",
   "draftContent": true,
   "verify": [
-    "Draft content: generic induction wording written for the demo with no source citations. The user should review it and replace it with real induction content."
+    "Draft content: generic induction wording written for the demo with no source citations. The user should review it and replace it with real induction content.",
+    "Learn more links point at the nearest EYFS paragraph for each topic (3.4, 3.5, 3.78, 3.81, 3.100) so the demo has an official link; the question wording is still the demo's own, not the framework's. Check they fit."
   ]
 }

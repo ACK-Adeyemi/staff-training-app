@@ -1,0 +1,359 @@
+{
+  "title": "Risk assessment and outings",
+  "description": "How to keep children safe on outings and manage risks at the nursery. Based on section 3 of the EYFS statutory framework.",
+  "estimatedMinutes": 3,
+  "language": "en-GB",
+  "status": "published",
+  "version": 1,
+  "roleTags": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "Keeping children safe from risks",
+      "minutes": 3
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-ri-outing",
+      "type": "trueFalse",
+      "prompt": "Providers must assess the risks and hazards for children before an outing. True or false?",
+      "options": [
+        {
+          "id": "q-ri-outing-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-ri-outing-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. Children must be kept safe while on outings. Providers must assess potential risks or hazards and identify the steps to remove, minimise and manage them.",
+      "sourceRef": "EYFS 3.91",
+      "learnMore": [
+        {
+          "id": "eyfs-3-91-q-ri-outing",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=42",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.91, page 42",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["risk"]
+    },
+    {
+      "id": "q-ri-ratios",
+      "type": "mcq",
+      "prompt": "What must an outing risk assessment include?",
+      "options": [
+        {
+          "id": "q-ri-ratios-o1",
+          "text": "Consideration of staff to child ratios",
+          "correct": true
+        },
+        {
+          "id": "q-ri-ratios-o2",
+          "text": "Only the cost of the trip",
+          "correct": false
+        },
+        {
+          "id": "q-ri-ratios-o3",
+          "text": "Only the weather forecast",
+          "correct": false
+        },
+        {
+          "id": "q-ri-ratios-o4",
+          "text": "Nothing, as long as a parent signs the form",
+          "correct": false
+        }
+      ],
+      "explanation": "The assessment must include consideration of staff to child ratios. The risk assessment does not necessarily need to be in writing; this is up to providers.",
+      "sourceRef": "EYFS 3.91",
+      "learnMore": [
+        {
+          "id": "eyfs-3-91-q-ri-ratios",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=42",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.91, page 42",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["risk"]
+    },
+    {
+      "id": "q-ri-writing",
+      "type": "trueFalse",
+      "prompt": "An outing risk assessment always has to be written down. True or false?",
+      "options": [
+        {
+          "id": "q-ri-writing-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-ri-writing-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. For outings, the framework says the risk assessment does not necessarily need to be in writing; this is up to providers.",
+      "sourceRef": "EYFS 3.91",
+      "learnMore": [
+        {
+          "id": "eyfs-3-91-q-ri-writing",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=42",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.91, page 42",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["risk"]
+    },
+    {
+      "id": "q-ri-vehicle",
+      "type": "mcq",
+      "prompt": "What does the framework say about vehicles used to transport children?",
+      "options": [
+        {
+          "id": "q-ri-vehicle-o1",
+          "text": "The vehicle and the driver must be adequately insured",
+          "correct": true
+        },
+        {
+          "id": "q-ri-vehicle-o2",
+          "text": "Only the driver must be insured",
+          "correct": false
+        },
+        {
+          "id": "q-ri-vehicle-o3",
+          "text": "Insurance is optional for short journeys",
+          "correct": false
+        },
+        {
+          "id": "q-ri-vehicle-o4",
+          "text": "Only minibuses need insurance",
+          "correct": false
+        }
+      ],
+      "explanation": "Vehicles transporting children, and the driver of those vehicles, must be adequately insured.",
+      "sourceRef": "EYFS 3.92",
+      "learnMore": [
+        {
+          "id": "eyfs-3-92-q-ri-vehicle",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=42",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.92, page 42",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["risk"]
+    },
+    {
+      "id": "q-ri-first-aid",
+      "type": "mcq",
+      "prompt": "What should providers have regard to while on outings with children?",
+      "options": [
+        {
+          "id": "q-ri-first-aid-o1",
+          "text": "The paediatric first aid requirements in sections 3.37 to 3.39",
+          "correct": true
+        },
+        {
+          "id": "q-ri-first-aid-o2",
+          "text": "Nothing extra, as first aid is only for the nursery building",
+          "correct": false
+        },
+        {
+          "id": "q-ri-first-aid-o3",
+          "text": "Only the rules for food",
+          "correct": false
+        },
+        {
+          "id": "q-ri-first-aid-o4",
+          "text": "Only the rules for sleeping children",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers should have regard for the paediatric first aid requirements set out in sections 3.37 to 3.39 while on outings with children.",
+      "sourceRef": "EYFS 3.91",
+      "learnMore": [
+        {
+          "id": "eyfs-3-91-q-ri-first-aid",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=42",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.91, page 42",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["risk"]
+    },
+    {
+      "id": "q-ri-demonstrate",
+      "type": "mcq",
+      "prompt": "What must providers be able to do about risks in the setting?",
+      "options": [
+        {
+          "id": "q-ri-demonstrate-o1",
+          "text": "Show how they are managing risks, and decide where written risk assessments help staff practice",
+          "correct": true
+        },
+        {
+          "id": "q-ri-demonstrate-o2",
+          "text": "Remove every risk, however small",
+          "correct": false
+        },
+        {
+          "id": "q-ri-demonstrate-o3",
+          "text": "Leave risks to inspectors",
+          "correct": false
+        },
+        {
+          "id": "q-ri-demonstrate-o4",
+          "text": "Keep risk assessments secret from parents",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers must take all reasonable steps to ensure staff and children are not exposed to risks, and must be able to demonstrate how they are managing them. They must decide where it is helpful to make written risk assessments, to inform staff practice and to show parents, carers or inspectors how risks are managed.",
+      "sourceRef": "EYFS 3.93",
+      "learnMore": [
+        {
+          "id": "eyfs-3-93-q-ri-demonstrate",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=42",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.93, page 42",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["risk"]
+    },
+    {
+      "id": "q-ri-regular",
+      "type": "mcq",
+      "prompt": "What should a risk assessment say about checks on the environment?",
+      "options": [
+        {
+          "id": "q-ri-regular-o1",
+          "text": "Which aspects need checking regularly, when and by whom, and how the risk will be removed or minimised",
+          "correct": true
+        },
+        {
+          "id": "q-ri-regular-o2",
+          "text": "Only that the building is generally safe",
+          "correct": false
+        },
+        {
+          "id": "q-ri-regular-o3",
+          "text": "Only who signed it",
+          "correct": false
+        },
+        {
+          "id": "q-ri-regular-o4",
+          "text": "Nothing about who checks",
+          "correct": false
+        }
+      ],
+      "explanation": "Risk assessments should identify aspects of the environment that need to be checked on a regular basis, when and by whom those aspects will be checked, and how the risk will be removed or minimised.",
+      "sourceRef": "EYFS 3.93",
+      "learnMore": [
+        {
+          "id": "eyfs-3-93-q-ri-regular",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=42",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.93, page 42",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["risk"]
+    },
+    {
+      "id": "q-sc-ri-outing",
+      "type": "scenario",
+      "prompt": "Your room is going to a local park tomorrow. The minibus is booked and a colleague says, “We have done this trip loads of times, we do not need to think about risks.”",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-ri-outing-s1",
+            "text": "What do you do?",
+            "choices": [
+              {
+                "id": "q-sc-ri-outing-s1-c1",
+                "text": "Make sure the risks and hazards are assessed, including staff to child ratios, and the steps to manage them are agreed",
+                "outcome": "best",
+                "feedback": "Right. Providers must assess the risks and hazards for each outing, including staff to child ratios."
+              },
+              {
+                "id": "q-sc-ri-outing-s1-c2",
+                "text": "Skip it, because it is a trip you have done before",
+                "outcome": "poor",
+                "feedback": "Outings need a risk assessment. Familiar trips can still have new hazards."
+              },
+              {
+                "id": "q-sc-ri-outing-s1-c3",
+                "text": "Only check the minibus is clean",
+                "outcome": "poor",
+                "feedback": "Cleanliness is not the assessment. Risks, hazards and ratios must be considered."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Children must be kept safe on outings. Providers must assess potential risks or hazards and identify the steps to remove, minimise and manage them, and the assessment must include staff to child ratios.",
+      "sourceRef": "EYFS 3.91",
+      "learnMore": [
+        {
+          "id": "eyfs-3-91-q-sc-ri-outing",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=42",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.91, page 42",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["risk"]
+    }
+  ],
+  "quiz": {
+    "mode": "mix",
+    "mixScenarioShare": 0.4,
+    "drawCount": 10,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "passMark": 80,
+    "maxRetakes": null,
+    "feedback": true,
+    "showSourceRef": true,
+    "notesInQuiz": "choice",
+    "learnMoreFor": "all"
+  },
+  "sourceAttribution": "Based on the Early Years Foundation Stage statutory framework for group and school-based providers (Department for Education, September 2026). Contains public sector information licensed under the Open Government Licence v3.0.",
+  "draftContent": true,
+  "verify": [
+    "Draft content: written from the cached September 2026 EYFS PDF; check the wording against the framework, and the page numbers in the Learn more links.",
+    "Open Government Licence attribution wording."
+  ]
+}

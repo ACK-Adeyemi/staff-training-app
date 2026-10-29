@@ -104,3 +104,12 @@ Things only the user can check, by milestone.
 - [ ] The fictional screenshot on the Willow Lane "progress bar" ticket (a plain generated picture, no real content).
 - [ ] Price change reasons and the notice wording shown to clients.
 
+## M5
+
+### Draft content (awaiting review)
+
+- [ ] Suitable people and vetting (nursery Tier 2, Draft content, optional, no requirement link): one lesson, 8 questions (one a scenario) drafted from EYFS 3.15 to 3.21 (`packages/content/src/packs/nursery/modules/suitable-people/`). Check wording, the `verify` list, page numbers in the Learn more links and the Open Government Licence line.
+- [ ] Ratios and qualifications (nursery Tier 2, Draft content, optional): one lesson, 8 questions (one a scenario) drafted from EYFS 3.44 to 3.49 and 3.57 (`.../ratios/`). The lesson does not give the ratios for children aged three and over (3.50 to 3.54 vary by setting type); VERIFY whether to add them.
+- [ ] Risk assessment and outings (nursery Tier 2, Draft content, optional): one lesson, 8 questions (one a scenario) drafted from EYFS 3.91 to 3.93 (`.../risk-assessment/`).
+- [ ] New starter induction now has an official Learn more link on each question (EYFS 3.4, 3.5, 3.78, 3.81, 3.100). The question wording is still the demo's own. Check the links fit.
+

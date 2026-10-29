@@ -1,0 +1,349 @@
+{
+  "title": "Ratios and qualifications",
+  "description": "How many staff you need for the children in the room, and which qualifications count. Based on section 3 of the EYFS statutory framework.",
+  "estimatedMinutes": 3,
+  "language": "en-GB",
+  "status": "published",
+  "version": 1,
+  "roleTags": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "Staff to child ratios",
+      "minutes": 3
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-ra-under-two",
+      "type": "mcq",
+      "prompt": "For children aged under two, what is the minimum staffing ratio?",
+      "options": [
+        {
+          "id": "q-ra-under-two-o1",
+          "text": "At least one member of staff for every three children",
+          "correct": true
+        },
+        {
+          "id": "q-ra-under-two-o2",
+          "text": "One for every four children",
+          "correct": false
+        },
+        {
+          "id": "q-ra-under-two-o3",
+          "text": "One for every five children",
+          "correct": false
+        },
+        {
+          "id": "q-ra-under-two-o4",
+          "text": "One for every eight children",
+          "correct": false
+        }
+      ],
+      "explanation": "For children aged under two there must be at least one member of staff for every three children. At least one member of staff must hold an approved level 3 qualification and be suitably experienced in working with children under two.",
+      "sourceRef": "EYFS 3.48",
+      "learnMore": [
+        {
+          "id": "eyfs-3-48-q-ra-under-two",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=32",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.48, page 32",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["ratios"]
+    },
+    {
+      "id": "q-ra-two",
+      "type": "mcq",
+      "prompt": "For children aged two, what is the minimum staffing ratio?",
+      "options": [
+        {
+          "id": "q-ra-two-o1",
+          "text": "At least one member of staff for every five children",
+          "correct": true
+        },
+        {
+          "id": "q-ra-two-o2",
+          "text": "One for every three children",
+          "correct": false
+        },
+        {
+          "id": "q-ra-two-o3",
+          "text": "One for every eight children",
+          "correct": false
+        },
+        {
+          "id": "q-ra-two-o4",
+          "text": "One for every thirteen children",
+          "correct": false
+        }
+      ],
+      "explanation": "For children aged two there must be at least one member of staff for every five children. At least one member of staff must hold an approved level 3 qualification, and at least half of all other staff must hold an approved level 2 qualification.",
+      "sourceRef": "EYFS 3.49",
+      "learnMore": [
+        {
+          "id": "eyfs-3-49-q-ra-two",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=33",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.49, page 33",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["ratios"]
+    },
+    {
+      "id": "q-ra-under-17",
+      "type": "trueFalse",
+      "prompt": "Anyone aged 16 can be counted in the ratios. True or false?",
+      "options": [
+        {
+          "id": "q-ra-under-17-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-ra-under-17-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. Providers must not include anyone aged under 17 in ratios, except apprentices, who may be included from the age of 16. Nobody aged under 17 may care for children unsupervised at any time.",
+      "sourceRef": "EYFS 3.57",
+      "learnMore": [
+        {
+          "id": "eyfs-3-57-q-ra-under-17",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=35",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.57, page 35",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["ratios"]
+    },
+    {
+      "id": "q-ra-manager",
+      "type": "mcq",
+      "prompt": "What qualification must the manager of a setting on the early years register hold?",
+      "options": [
+        {
+          "id": "q-ra-manager-o1",
+          "text": "An approved qualification at level 3 or above",
+          "correct": true
+        },
+        {
+          "id": "q-ra-manager-o2",
+          "text": "An approved qualification at level 1",
+          "correct": false
+        },
+        {
+          "id": "q-ra-manager-o3",
+          "text": "No qualification, if they have two years’ experience",
+          "correct": false
+        },
+        {
+          "id": "q-ra-manager-o4",
+          "text": "A first aid certificate only",
+          "correct": false
+        }
+      ],
+      "explanation": "In settings on the early years register, the manager must hold an approved qualification at level 3 or above, and at least half of all other staff must hold at least an approved level 2 qualification.",
+      "sourceRef": "EYFS 3.45",
+      "learnMore": [
+        {
+          "id": "eyfs-3-45-q-ra-manager",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=31",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.45, page 31",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["ratios"]
+    },
+    {
+      "id": "q-ra-sight",
+      "type": "mcq",
+      "prompt": "How close must staff be to the children?",
+      "options": [
+        {
+          "id": "q-ra-sight-o1",
+          "text": "Children must usually be within sight and hearing of staff, and always within sight or hearing",
+          "correct": true
+        },
+        {
+          "id": "q-ra-sight-o2",
+          "text": "Children can be out of sight and hearing for short periods",
+          "correct": false
+        },
+        {
+          "id": "q-ra-sight-o3",
+          "text": "Staff only need to be in the building",
+          "correct": false
+        },
+        {
+          "id": "q-ra-sight-o4",
+          "text": "Staff only need to see children during meals",
+          "correct": false
+        }
+      ],
+      "explanation": "Children must usually be within sight and hearing of staff and always within sight or hearing. Paragraph 3.70 applies when children are eating.",
+      "sourceRef": "EYFS 3.44",
+      "learnMore": [
+        {
+          "id": "eyfs-3-44-q-ra-sight",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=31",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.44, page 31",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["ratios"]
+    },
+    {
+      "id": "q-ra-whole-provision",
+      "type": "trueFalse",
+      "prompt": "The ratio requirements apply to the total number of staff available to work directly with children across the whole provision, not just each room. True or false?",
+      "options": [
+        {
+          "id": "q-ra-whole-provision-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-ra-whole-provision-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. The ratio requirements apply to the total number of staff available to work directly with children across the whole provision, not just each room. Ofsted may decide that a higher staff to child ratio is needed to keep children safe.",
+      "sourceRef": "EYFS 3.47",
+      "learnMore": [
+        {
+          "id": "eyfs-3-47-q-ra-whole-provision",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=32",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.47, page 32",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["ratios"]
+    },
+    {
+      "id": "q-ra-english",
+      "type": "trueFalse",
+      "prompt": "Staff with an Early Years Educator qualification must also have a suitable level 2 qualification in English to count in the ratios at level 3. True or false?",
+      "options": [
+        {
+          "id": "q-ra-english-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-ra-english-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. To count within the ratios at level 3, staff holding an Early Years Educator qualification, and those approved at level 3 through the experience-based route, must also have achieved a suitable level 2 qualification in English.",
+      "sourceRef": "EYFS 3.46",
+      "learnMore": [
+        {
+          "id": "eyfs-3-46-q-ra-english",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=32",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.46, page 32",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["ratios"]
+    },
+    {
+      "id": "q-sc-ra-apprentice",
+      "type": "scenario",
+      "prompt": "In the baby room there are nine children under two. Two members of staff are in the room. Kai, aged 15, is on a work experience week and offers to help so the ratio looks fine.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-ra-apprentice-s1",
+            "text": "What do you do?",
+            "choices": [
+              {
+                "id": "q-sc-ra-apprentice-s1-c1",
+                "text": "Do not count Kai in the ratios, and tell your manager that a third member of staff is needed",
+                "outcome": "best",
+                "feedback": "Right. Nine children under two need at least three staff, and nobody aged under 17 can be counted in the ratios (apprentices from 16 are the exception)."
+              },
+              {
+                "id": "q-sc-ra-apprentice-s1-c2",
+                "text": "Count Kai, because they are helping",
+                "outcome": "poor",
+                "feedback": "People aged under 17 cannot be counted in the ratios."
+              },
+              {
+                "id": "q-sc-ra-apprentice-s1-c3",
+                "text": "Count Kai, but only while the manager is out of the room",
+                "outcome": "poor",
+                "feedback": "There is no exception like this. Kai cannot be counted."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Under twos need at least one member of staff for every three children, so nine children need at least three staff. Providers must not include anyone aged under 17 in ratios, except apprentices who may be included from the age of 16.",
+      "sourceRef": "EYFS 3.57",
+      "learnMore": [
+        {
+          "id": "eyfs-3-57-q-sc-ra-apprentice",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=35",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.57, page 35",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["ratios"]
+    }
+  ],
+  "quiz": {
+    "mode": "mix",
+    "mixScenarioShare": 0.4,
+    "drawCount": 10,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "passMark": 80,
+    "maxRetakes": null,
+    "feedback": true,
+    "showSourceRef": true,
+    "notesInQuiz": "choice",
+    "learnMoreFor": "all"
+  },
+  "sourceAttribution": "Based on the Early Years Foundation Stage statutory framework for group and school-based providers (Department for Education, September 2026). Contains public sector information licensed under the Open Government Licence v3.0.",
+  "draftContent": true,
+  "verify": [
+    "Draft content: written from the cached September 2026 EYFS PDF; check the wording against the framework, and the page numbers in the Learn more links.",
+    "Open Government Licence attribution wording."
+  ]
+}

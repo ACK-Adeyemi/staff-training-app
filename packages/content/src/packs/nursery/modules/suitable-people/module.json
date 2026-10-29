@@ -1,0 +1,349 @@
+{
+  "title": "Suitable people and vetting",
+  "description": "How a nursery checks that the people looking after children are suitable: criminal records checks, references and records. Based on section 3 of the EYFS statutory framework.",
+  "estimatedMinutes": 3,
+  "language": "en-GB",
+  "status": "published",
+  "version": 1,
+  "roleTags": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "Checks before anyone works with children",
+      "minutes": 3
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-sp-start-early",
+      "type": "trueFalse",
+      "prompt": "A new member of staff can start work while their enhanced criminal records and barred list check is on its way, as long as the manager is happy with them. True or false?",
+      "options": [
+        {
+          "id": "q-sp-start-early-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-sp-start-early-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. Providers must not allow individuals to begin working or volunteering at the setting until they have received the applicant’s enhanced criminal records and barred list check. There is an exception for supervised volunteers who only help out occasionally.",
+      "sourceRef": "EYFS 3.17",
+      "learnMore": [
+        {
+          "id": "eyfs-3-17-q-sp-start-early",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=26",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.17, page 26",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["suitability"]
+    },
+    {
+      "id": "q-sp-who-checked",
+      "type": "mcq",
+      "prompt": "Who must have an enhanced criminal records check and barred list check?",
+      "options": [
+        {
+          "id": "q-sp-who-checked-o1",
+          "text": "Every person aged 16 and over, including volunteers, who works directly with children, or lives or works on the premises where childcare is provided",
+          "correct": true
+        },
+        {
+          "id": "q-sp-who-checked-o2",
+          "text": "Only staff who are paid",
+          "correct": false
+        },
+        {
+          "id": "q-sp-who-checked-o3",
+          "text": "Only staff who look after children under two",
+          "correct": false
+        },
+        {
+          "id": "q-sp-who-checked-o4",
+          "text": "Only the manager",
+          "correct": false
+        }
+      ],
+      "explanation": "Registered group and school-based providers must obtain these checks for every person aged 16 and over, including volunteers, who works directly with children, lives on the premises or works on the premises. There are limited exceptions, such as people who do not work where children are cared for, or are not there when children are present.",
+      "sourceRef": "EYFS 3.15",
+      "learnMore": [
+        {
+          "id": "eyfs-3-15-q-sp-who-checked",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=26",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.15, page 26",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["suitability"]
+    },
+    {
+      "id": "q-sp-reference",
+      "type": "mcq",
+      "prompt": "Which of these is correct about references for a new member of staff?",
+      "options": [
+        {
+          "id": "q-sp-reference-o1",
+          "text": "Get at least one written reference before they are recruited, and do not rely on the applicant to obtain it",
+          "correct": true
+        },
+        {
+          "id": "q-sp-reference-o2",
+          "text": "A reference “to whom it may concern” is fine",
+          "correct": false
+        },
+        {
+          "id": "q-sp-reference-o3",
+          "text": "A reference from the applicant’s family member is fine",
+          "correct": false
+        },
+        {
+          "id": "q-sp-reference-o4",
+          "text": "The applicant can collect their own reference and hand it in",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers must obtain at least one written reference for any member of staff, including students and volunteers, before they are recruited. Providers should not accept open references (for example, “to whom it may concern”), should not rely on applicants to obtain their reference, and should not accept references from a family member.",
+      "sourceRef": "EYFS 3.20",
+      "learnMore": [
+        {
+          "id": "eyfs-3-20-q-sp-reference",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=27",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.20, page 27",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["suitability"]
+    },
+    {
+      "id": "q-sp-records",
+      "type": "mcq",
+      "prompt": "What must the provider record about a member of staff’s checks?",
+      "options": [
+        {
+          "id": "q-sp-records-o1",
+          "text": "Their qualifications, and the identity checks, vetting processes and references completed, including the criminal records check reference number, the date it was obtained and who at the setting obtained it",
+          "correct": true
+        },
+        {
+          "id": "q-sp-records-o2",
+          "text": "Only that they have a DBS certificate somewhere",
+          "correct": false
+        },
+        {
+          "id": "q-sp-records-o3",
+          "text": "Only their date of birth",
+          "correct": false
+        },
+        {
+          "id": "q-sp-records-o4",
+          "text": "Nothing, as the checks are held by Ofsted",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers must record information about staff qualifications and the identity checks, vetting processes and references that have been completed. This includes the criminal records check reference number, the date a check was obtained and details of who at the setting obtained it.",
+      "sourceRef": "EYFS 3.18",
+      "learnMore": [
+        {
+          "id": "eyfs-3-18-q-sp-records",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=26",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.18, page 26",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["suitability"]
+    },
+    {
+      "id": "q-sp-abroad",
+      "type": "trueFalse",
+      "prompt": "Someone who has lived or worked abroad should have an additional criminal records check (or checks, if more than one country). True or false?",
+      "options": [
+        {
+          "id": "q-sp-abroad-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-sp-abroad-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. An additional criminal records check (or checks if more than one country) should be made for anyone who has lived or worked abroad.",
+      "sourceRef": "EYFS 3.16",
+      "learnMore": [
+        {
+          "id": "eyfs-3-16-q-sp-abroad",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=26",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.16, page 26",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["suitability"]
+    },
+    {
+      "id": "q-sp-disclose",
+      "type": "trueFalse",
+      "prompt": "Staff must tell the provider about anything that may affect their suitability to work with children, even if it happens after they have started. True or false?",
+      "options": [
+        {
+          "id": "q-sp-disclose-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-sp-disclose-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. Providers must tell staff and prospective staff that they must disclose any information which may affect their suitability, such as arrests, charges, convictions, cautions, court orders, reprimands and warnings, whether received before or during their employment. Convictions or cautions that are protected under the Rehabilitation of Offenders Act 1974 are an exception.",
+      "sourceRef": "EYFS 3.17",
+      "learnMore": [
+        {
+          "id": "eyfs-3-17-q-sp-disclose",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=26",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.17, page 26",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["suitability"]
+    },
+    {
+      "id": "q-sp-referral",
+      "type": "mcq",
+      "prompt": "When must a provider make a referral to the Disclosure and Barring Service (DBS)?",
+      "options": [
+        {
+          "id": "q-sp-referral-o1",
+          "text": "When a member of staff is dismissed, or would have been had they not left first, because they have harmed a child or put a child at risk of harm",
+          "correct": true
+        },
+        {
+          "id": "q-sp-referral-o2",
+          "text": "Whenever a member of staff leaves for any reason",
+          "correct": false
+        },
+        {
+          "id": "q-sp-referral-o3",
+          "text": "Only when the police ask",
+          "correct": false
+        },
+        {
+          "id": "q-sp-referral-o4",
+          "text": "Only when a parent complains",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers are required to make a referral to the DBS if a member of staff is dismissed (or would have been, had they not left the setting first) because they have harmed a child or put a child at risk of harm.",
+      "sourceRef": "EYFS 3.19",
+      "learnMore": [
+        {
+          "id": "eyfs-3-19-q-sp-referral",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=27",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.19, page 27",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["suitability"]
+    },
+    {
+      "id": "q-sc-sp-new-starter",
+      "type": "scenario",
+      "prompt": "Sam is a new member of staff. Their enhanced criminal records and barred list check has not come back yet. The room is short-staffed and Sam offers to take two children to the garden on their own.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-sp-new-starter-s1",
+            "text": "What do you do?",
+            "choices": [
+              {
+                "id": "q-sc-sp-new-starter-s1-c1",
+                "text": "Say no. Until the check has been received and looked at, Sam cannot have unsupervised contact with children, and they should not start work yet",
+                "outcome": "best",
+                "feedback": "Right. Providers must not allow anyone whose suitability has not been checked to have unsupervised contact with children."
+              },
+              {
+                "id": "q-sc-sp-new-starter-s1-c2",
+                "text": "Say yes, because Sam seems capable",
+                "outcome": "poor",
+                "feedback": "Not checked means no unsupervised contact with children, however capable someone seems."
+              },
+              {
+                "id": "q-sc-sp-new-starter-s1-c3",
+                "text": "Say yes, but only for ten minutes",
+                "outcome": "poor",
+                "feedback": "There is no short-time exception. Unchecked people must not have unsupervised contact with children."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Providers must not allow individuals to begin working at the setting until they have received the applicant’s enhanced criminal records and barred list check, and must not allow anyone whose suitability has not been checked to have unsupervised contact with children.",
+      "sourceRef": "EYFS 3.17",
+      "learnMore": [
+        {
+          "id": "eyfs-3-17-q-sc-sp-new-starter",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=26",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.17, page 26",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["suitability"]
+    }
+  ],
+  "quiz": {
+    "mode": "mix",
+    "mixScenarioShare": 0.4,
+    "drawCount": 10,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "passMark": 80,
+    "maxRetakes": null,
+    "feedback": true,
+    "showSourceRef": true,
+    "notesInQuiz": "choice",
+    "learnMoreFor": "all"
+  },
+  "sourceAttribution": "Based on the Early Years Foundation Stage statutory framework for group and school-based providers (Department for Education, September 2026). Contains public sector information licensed under the Open Government Licence v3.0.",
+  "draftContent": true,
+  "verify": [
+    "Draft content: written from the cached September 2026 EYFS PDF; check the wording against the framework, and the page numbers in the Learn more links.",
+    "Open Government Licence attribution wording."
+  ]
+}

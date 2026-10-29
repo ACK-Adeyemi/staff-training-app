@@ -50,7 +50,16 @@ const INDUCTION = 'New starter induction'; // published provider module, require
 const REQUIRED = [SAFEGUARDING, PAED, WHAT_CHANGED, INDUCTION];
 // M3 seed version 4 adds Little Acorns' own published module Fire evacuation (optional, 8 minutes).
 const FIRE = 'Fire evacuation at Little Acorns';
-const OPTIONAL = [EATING, SLEEP, FIRE];
+// M5 chunk 2 adds three optional Tier 2 provider modules.
+const SUITABLE = 'Suitable people and vetting';
+const RATIOS = 'Ratios and qualifications';
+const RISK = 'Risk assessment and outings';
+// Ordering (partition in catalogue/learn.ts): unfinished required and due, other unfinished required, unfinished optional,
+// finished required, then finished optional. Jade has not finished Safeguarding, Induction, Paediatric first aid or the
+// three new Tier 2 modules.
+const NEW_TIER2 = [SUITABLE, RATIOS, RISK];
+const UNFINISHED_REQUIRED = [INDUCTION, PAED];
+const FINISHED_OPTIONAL = [EATING, SLEEP, FIRE];
 
 const resultList = () => screen.queryByTestId('learn-path') ?? screen.getByTestId('learn-simple-list');
 const rowsOf = () => Array.from(resultList().children) as HTMLElement[];
@@ -82,13 +91,14 @@ describe('S3 Learn: the default list', () => {
     expect(screen.getByTestId('learn-path')).toBeTruthy();
     expect(screen.queryByTestId('learn-simple-list')).toBeNull();
     expect(rowsOf().every((li) => li.getAttribute('data-testid') === 'path-node')).toBe(true);
-    expect(count()).toBe('7 modules');
+    expect(count()).toBe('10 modules');
     const t = titles();
-    expect(t).toHaveLength(7);
+    expect(t).toHaveLength(10);
     expect(t[0]).toBe(SAFEGUARDING); // required and due soon
-    expect(t.slice(0, 4).sort()).toEqual([...REQUIRED].sort());
-    expect(t.slice(4).sort()).toEqual([...OPTIONAL].sort());
-    const optionalRow = rowsOf()[5] as HTMLElement;
+    expect(t.slice(1, 3).sort()).toEqual([...UNFINISHED_REQUIRED].sort());
+    expect(t.slice(3, 6).sort()).toEqual([...NEW_TIER2].sort());
+    expect(t.slice(6).sort()).toEqual([WHAT_CHANGED, ...FINISHED_OPTIONAL].sort());
+    const optionalRow = rowsOf()[3] as HTMLElement;
     expect(within(optionalRow).getByText('Optional')).toBeTruthy();
     expect(within(rowsOf()[0] as HTMLElement).getByText('Required')).toBeTruthy();
   });
@@ -162,7 +172,7 @@ describe('S3 Learn: search (BP-6)', () => {
     expect(screen.queryByTestId('learn-path')?.children.length ?? 0).toBe(0);
     await userEvent.click(screen.getByRole('button', { name: 'Clear search' }));
     await waitFor(() => {
-      expect(count()).toBe('7 modules');
+      expect(count()).toBe('10 modules');
     });
     expect(screen.getByRole<HTMLInputElement>('searchbox', { name: 'Search' }).value).toBe('');
   });
@@ -184,11 +194,11 @@ describe('S3 Learn: filters (BP-6)', () => {
     await renderRoute('/staff/learn', 'staff');
     await ready();
     const dialog = await openFilters();
-    expect(within(dialog).getByRole('button', { name: 'Show 7 modules' })).toBeTruthy();
+    expect(within(dialog).getByRole('button', { name: 'Show 10 modules' })).toBeTruthy();
     await pick(dialog, 'Requirement', 'Required');
     expect(within(dialog).getByRole('button', { name: 'Show 4 modules' })).toBeTruthy();
     await pick(dialog, 'Requirement', 'Optional');
-    expect(within(dialog).getByRole('button', { name: 'Show 3 modules' })).toBeTruthy();
+    expect(within(dialog).getByRole('button', { name: 'Show 6 modules' })).toBeTruthy();
     await pick(dialog, 'Requirement', 'Required');
     await apply(dialog, 'Show 4 modules');
     await waitFor(() => {
@@ -200,7 +210,7 @@ describe('S3 Learn: filters (BP-6)', () => {
     expect(within(chips).getByText('Required')).toBeTruthy();
     await userEvent.click(within(chips).getByRole('button', { name: 'Remove filter: Required' }));
     await waitFor(() => {
-      expect(count()).toBe('7 modules');
+      expect(count()).toBe('10 modules');
     });
     expect(screen.queryByTestId('learn-active-filters')?.textContent ?? '').not.toContain('Required');
   });
@@ -231,7 +241,7 @@ describe('S3 Learn: filters (BP-6)', () => {
     expect(within(dialog).getByRole('button', { name: 'Show 2 modules' })).toBeTruthy();
     await pick(dialog, 'Group', 'All');
     await pick(dialog, 'Status', 'Not started');
-    expect(within(dialog).getByRole('button', { name: 'Show 0 modules' })).toBeTruthy();
+    expect(within(dialog).getByRole('button', { name: 'Show 3 modules' })).toBeTruthy(); // the three new Tier 2 modules
     await pick(dialog, 'Status', 'Completed');
     expect(within(dialog).getByRole('button', { name: 'Show 7 modules' })).toBeTruthy();
     await pick(dialog, 'Status', 'All');
@@ -239,9 +249,9 @@ describe('S3 Learn: filters (BP-6)', () => {
     expect(within(dialog).getByRole('button', { name: 'Show 1 module' })).toBeTruthy();
     await userEvent.click(within(dialog).getByRole('switch', { name: 'Due soon or overdue' }));
     await userEvent.click(within(dialog).getByRole('switch', { name: 'Under 10 minutes' }));
-    expect(within(dialog).getByRole('button', { name: 'Show 6 modules' })).toBeTruthy(); // Safeguarding is 10 minutes
+    expect(within(dialog).getByRole('button', { name: 'Show 9 modules' })).toBeTruthy(); // Safeguarding is 10 minutes
     await userEvent.click(within(dialog).getByRole('button', { name: 'Reset filters' }));
-    expect(within(dialog).getByRole('button', { name: 'Show 7 modules' })).toBeTruthy();
+    expect(within(dialog).getByRole('button', { name: 'Show 10 modules' })).toBeTruthy();
     expect(within(dialog).getByRole('switch', { name: 'Under 10 minutes' }).getAttribute('aria-checked')).toBe('false');
   });
 
@@ -256,8 +266,10 @@ describe('S3 Learn: filters (BP-6)', () => {
         expect(screen.queryByRole('dialog', { name: 'Filters' })).toBeNull();
       });
       const t = titles();
-      expect(t.slice(0, 4).sort(), `sort ${sort}`).toEqual([...REQUIRED].sort());
-      expect(t.slice(4).sort(), `sort ${sort}`).toEqual([...OPTIONAL].sort());
+      expect(t[0], `sort ${sort}`).toBe(SAFEGUARDING);
+      expect(t.slice(1, 3).sort(), `sort ${sort}`).toEqual([...UNFINISHED_REQUIRED].sort());
+      expect(t.slice(3, 6).sort(), `sort ${sort}`).toEqual([...NEW_TIER2].sort());
+      expect(t.slice(6).sort(), `sort ${sort}`).toEqual([WHAT_CHANGED, ...FINISHED_OPTIONAL].sort());
     }
   });
 
@@ -268,10 +280,10 @@ describe('S3 Learn: filters (BP-6)', () => {
     await pick(dialog, 'Sort by', 'A to Z');
     await apply(dialog, /^Show \d+ modules?$/);
     await waitFor(() => {
-      expect(titles().slice(4)).toEqual([FIRE, EATING, SLEEP]);
+      expect(titles().slice(6)).toEqual([WHAT_CHANGED, FIRE, EATING, SLEEP]);
     });
     // Safeguarding is required and due soon, so it stays first whatever the sort (plan assumption 27); A to Z orders the rest.
-    expect(titles().slice(0, 4)).toEqual([SAFEGUARDING, INDUCTION, PAED, WHAT_CHANGED]);
+    expect(titles().slice(0, 6)).toEqual([SAFEGUARDING, INDUCTION, PAED, RATIOS, RISK, SUITABLE]);
   });
 });
 
@@ -383,9 +395,9 @@ describe('S3 Learn: Simple view', () => {
     expect(screen.queryByTestId('learn-path')).toBeNull();
     expect(screen.queryAllByTestId('path-node')).toHaveLength(0);
     await waitFor(() => {
-      expect(titles()).toHaveLength(7);
+      expect(titles()).toHaveLength(10);
     });
-    expect(count()).toBe('7 modules');
+    expect(count()).toBe('10 modules');
     await search('sleep');
     await waitFor(() => {
       expect(count()).toBe('2 modules');
