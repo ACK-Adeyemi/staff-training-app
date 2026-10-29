@@ -33,7 +33,6 @@ export const requestRecovery = (input: RecoveryInput, clock: Clock): RecoveryReq
   status: 'open',
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- clock kept for a uniform lifecycle signature
 export const approveRecovery = (r: RecoveryRequest, approverUserId: string, clock: Clock): RecoveryResult => {
   if (r.status !== 'open') return fail('This recovery request is no longer open.');
   if (approverUserId === r.subjectUserId) return fail('The person being recovered cannot approve their own recovery.');
@@ -41,7 +40,14 @@ export const approveRecovery = (r: RecoveryRequest, approverUserId: string, cloc
   const approvals = [...r.approvals, approverUserId];
   return {
     ok: true,
-    request: { ...r, approvals, status: approvals.length >= APPROVALS_NEEDED ? 'approved' : 'open' },
+    request: {
+      ...r,
+      approvals,
+      status: approvals.length >= APPROVALS_NEEDED ? 'approved' : 'open',
+      // A request with no waiting period yet (such as the seeded one) starts it now; one already set is kept.
+      coolingOffEndsAt:
+        r.coolingOffEndsAt ?? new Date(clock.now().getTime() + RECOVERY_COOLING_OFF_HOURS * HOUR_MS).toISOString(),
+    },
   };
 };
 

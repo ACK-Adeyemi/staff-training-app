@@ -126,4 +126,15 @@ describe('account recovery', () => {
     if (!done.ok) throw new Error('complete failed');
     expect(rejectRecovery(done.request, A, start).ok).toBe(false);
   });
+
+  it('approving a request that has no cooling-off end sets it to 24 hours from now, and keeps one already set', () => {
+    const bare = { ...requestRecovery(input, start) };
+    Reflect.deleteProperty(bare, 'coolingOffEndsAt');
+    const res = approveRecovery(bare, A, start);
+    if (!res.ok) throw new Error('approval failed');
+    expect(res.request.coolingOffEndsAt).toBe(new Date(start.now().getTime() + 24 * HOUR).toISOString());
+    const kept = approveRecovery(requestRecovery(input, start), A, offsetClock(start, 5 * HOUR));
+    if (!kept.ok) throw new Error('approval failed');
+    expect(kept.request.coolingOffEndsAt).toBe(new Date(start.now().getTime() + 24 * HOUR).toISOString());
+  });
 });
