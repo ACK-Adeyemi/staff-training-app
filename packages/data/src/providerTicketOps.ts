@@ -161,6 +161,13 @@ export function createProviderTicketOperations(backend: RawBackend, options: Sto
       const rows = (await call.all<TicketMessage>('ticketMessages')).filter((m) => m.ticketId === t.id);
       return structuredClone(rows.sort(byCreated));
     },
+
+    async raiserName(ctx, id) {
+      const call = await providerCall(ctx, 'tickets.read');
+      const t = await ticketOf(call, id);
+      const raiser = await call.find<UserAccount>('users', t.raisedBy);
+      return raiser?.displayName ?? '';
+    },
   };
 
   // ------------------------------------------------------------ saved replies

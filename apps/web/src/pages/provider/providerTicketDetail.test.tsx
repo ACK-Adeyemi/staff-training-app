@@ -233,9 +233,7 @@ describe('P12 Ticket detail', () => {
       </AppProviders>,
     );
     expect(await screen.findByText('Please refresh and try again.')).toBeTruthy();
-    expect(
-      screen.getAllByText(t('tickets.status.waitingForCustomer' as Parameters<typeof t>[0])).length,
-    ).toBeGreaterThan(0);
+    expect(screen.getAllByText(t('tickets.status.waitingForCustomer')).length).toBeGreaterThan(0);
     expect(screen.queryByText(/SECRET staff-only remark/)).toBeNull();
     expect(document.body.textContent).not.toContain('SECRET staff-only remark');
   });

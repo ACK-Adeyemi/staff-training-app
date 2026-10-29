@@ -907,6 +907,8 @@ export interface ProviderTicketsService {
   setStatus(ctx: ActorContext, id: string, status: Ticket['status']): Promise<Ticket>;
   /** Replies and internal notes. */
   messages(ctx: ActorContext, id: string): Promise<TicketMessage[]>;
+  /** Display name of the person who raised the ticket. */
+  raiserName(ctx: ActorContext, id: string): Promise<string>;
 }
 
 export interface SavedRepliesService {
