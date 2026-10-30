@@ -439,6 +439,22 @@ export function runAiDraftContract(name: string, makeStore: (options: StoreOptio
         expect(await ruleOf(s.store.authoring.publish(s.priya, m.id, { reassign: false }))).toBe('checklistFailed');
       });
 
+      it('keeps aiDrafted on a stored item when saveDraft sends it without the flag', async () => {
+        const s = await setup();
+        const m = await aiModule(s);
+        await s.store.authoring.saveDraft(
+          s.priya,
+          m.id,
+          s.input({
+            lessons: [
+              { id: 'intro', title: 'Intro', minutes: 3, blocks: [{ kind: 'text', markdown: 'Count heads.' }] },
+            ],
+            questions: [tf('q1'), tf('q2')],
+          }),
+        );
+        expect(await ruleOf(s.store.authoring.publish(s.priya, m.id, { reassign: false }))).toBe('checklistFailed');
+      });
+
       it('keeps a real review when the form saves the same module again', async () => {
         const s = await setup();
         const m = await aiModule(s);

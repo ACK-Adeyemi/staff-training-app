@@ -87,7 +87,7 @@ const REASSIGN_DAYS = 30;
 const FOR_OTHERS = ['evidence.uploadForOthers', 'evidence.approve'];
 const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 /** Fields the data layer owns: whatever the caller sends for them is ignored. */
-const OWNED_FIELDS = ['id', 'owner', 'status', 'version', 'updatedAt', 'duplicatedFrom', 'siteId'] as const;
+const OWNED_FIELDS = ['id', 'owner', 'status', 'version', 'updatedAt', 'duplicatedFrom', 'siteId', 'translatedFrom'] as const;
 
 const byId = (a: { id: string }, b: { id: string }): number => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 const text = (v: unknown): string => (typeof v === 'string' ? v : '');
@@ -231,12 +231,15 @@ export function createAuthoringOperations(backend: RawBackend, options: StoreOpt
    * already holds the same reviewer on the same item; anything else is dropped (no forging the review through a form).
    */
   function withRealReviews(content: object, stored: Module | undefined): void {
-    const kept = (list: unknown, before: { id: string; aiReviewedBy?: string | undefined }[] | undefined): void => {
+    const kept = (list: unknown, before: { id: string; aiDrafted?: boolean | undefined; aiReviewedBy?: string | undefined }[] | undefined): void => {
       if (!Array.isArray(list)) return;
       for (const entry of list as unknown[]) {
-        if (entry === null || typeof entry !== 'object' || !('aiReviewedBy' in entry)) continue;
+        if (entry === null || typeof entry !== 'object') continue;
         const item = entry as Record<string, unknown>;
         const old = before?.find((b) => b.id === item['id']);
+        // S2: once an item is AI drafted it stays so; a form cannot clear the flag.
+        if (old?.aiDrafted === true) item['aiDrafted'] = true;
+        if (!('aiReviewedBy' in item)) continue;
         if (old?.aiReviewedBy === undefined || old.aiReviewedBy !== item['aiReviewedBy']) delete item['aiReviewedBy'];
       }
     };

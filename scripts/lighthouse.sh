@@ -2,6 +2,7 @@
 # BP-5: Lighthouse on the staff home page, phone profile, three cold runs, medians printed.
 # Not part of check.sh. Lighthouse is fetched with pnpm dlx at a pinned version; it is never a dependency.
 set -uo pipefail
+# SECURITY: Chrome runs with --no-sandbox here, so only ever point this at the local preview server, never an outside URL.
 cd "$(dirname "$0")/.." || exit 1
 
 LH_VERSION="13.6.0"

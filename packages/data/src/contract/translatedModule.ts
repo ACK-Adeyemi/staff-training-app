@@ -108,6 +108,26 @@ export function runTranslatedModuleContract(
       expect(without.headline.completed).toBe(withPl.headline.completed); // the done assignment counts either way
     });
 
+    it('ignores translatedFrom sent by a client on create and saveDraft', async () => {
+      const s = await setup();
+      const claim = { moduleId: s.lf.moduleId, machine: true };
+      const base = {
+        title: 'Own',
+        description: 'x',
+        estimatedMinutes: 5,
+        language: 'en-GB',
+        requirementIds: [],
+        roleTags: [],
+        lessons: s.lf.module.lessons,
+        questions: s.lf.module.questions,
+        quiz: s.lf.module.quiz,
+      };
+      const made = await s.store.authoring.create(s.priya, { ...base, translatedFrom: claim } as never);
+      expect(made.translatedFrom).toBeUndefined();
+      const saved = await s.store.authoring.saveDraft(s.priya, made.id, { ...base, translatedFrom: claim } as never);
+      expect(saved.translatedFrom).toBeUndefined();
+    });
+
     it('does not let another client read the Polish attempt or its evidence', async () => {
       const s = await setup();
       const { attempt, result } = await takePolish(s, true);
