@@ -195,7 +195,7 @@ function QuestionView({
         {question.prompt}
       </h2>
       <div className="mb-3">
-        <ReadAloud text={spokenText} {...readAloudLang(module.language)} />
+        <ReadAloud pausable text={spokenText} {...readAloudLang(module.language)} />
       </div>
       {question.type === 'scenario' && step ? <p className="mt-0 text-lg">{step.text}</p> : null}
       {question.type !== 'scenario' && feedback ? (

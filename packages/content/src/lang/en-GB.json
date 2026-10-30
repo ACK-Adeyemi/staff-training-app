@@ -1455,6 +1455,10 @@
     "title": "Read aloud",
     "play": "Read this aloud",
     "stop": "Stop reading",
+    "previous": "Previous paragraph",
+    "next": "Next paragraph",
+    "pause": "Pause",
+    "speed": "Read aloud speed",
     "unavailable": "Read aloud is not available on this device"
   },
   "me": {

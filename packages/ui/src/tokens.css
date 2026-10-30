@@ -252,3 +252,14 @@ html {
   --color-surface: var(--theme-tint);
   --color-on-accent: #ffffff;
 }
+
+/* Read aloud: the unit being read gets a thick start border and bold text, so it never relies on colour alone.
+   The border uses the text colour, so it shows in dark mode and high contrast. */
+[data-read-aloud-paragraph] {
+  border-inline-start: 6px solid transparent;
+  padding-inline-start: 0.5rem;
+}
+[data-read-aloud-paragraph][data-reading='true'] {
+  border-inline-start-color: var(--color-text);
+  font-weight: 700;
+}

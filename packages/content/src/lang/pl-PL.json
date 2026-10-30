@@ -237,6 +237,10 @@
     "title": "Czytanie na głos",
     "play": "Przeczytaj to na głos",
     "stop": "Zatrzymaj czytanie",
+    "previous": "Poprzedni akapit",
+    "next": "Następny akapit",
+    "pause": "Wstrzymaj",
+    "speed": "Szybkość czytania na głos",
     "unavailable": "Czytanie na głos nie jest dostępne na tym urządzeniu"
   },
   "celebration": {
