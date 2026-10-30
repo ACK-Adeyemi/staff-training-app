@@ -114,6 +114,8 @@ Accessibility meets its 95 target. Performance is below the 85 placeholder; caus
 - F4 (CI): ci.yml caches ~/.cache/ms-playwright keyed on the Playwright version, installs Chromium once (check.sh skips its own install when SKIP_PLAYWRIGHT_INSTALL=1), adds install-deps on a cache hit. actions/cache@v5 is unverified (VERIFY). Playwright workers left at the default: more workers raised flakes locally. Awaiting user re-check.
 
 ## Known issues
+- Lighthouse Performance 0.58 on the phone profile (target placeholder 85; Accessibility 0.98 is fine). Cause: first-visit main-thread work, mostly one 844 KB shared chunk (React, Zod, both industry packs, data layer and seed) plus a 634 KB entry chunk, then seeding about 5,700 records into IndexedDB before the first screen. Proposed fix: split by industry pack so only the active pack loads, and seed in slices or a worker; then aim for 70. Not done (docs/decisions.md 'M5 chunk 14').
+- The full e2e step takes about 30 minutes (1272 tests); check.sh step limit is 3600 s. CI's job time limit may need a look.
 - M4 review fixes (docs/decisions.md 'M4 review fixes'): P3 Billing panel does not show the adjusted price or invoice lines; ownership transfer has no receiver 2FA; assignment expiry not audited; Track B is desktop only with no Read-only or Closed steps.
 - M4 security review: per-client scoping of provider users (build pack 8.2 step 5, 'scoped to selected clients') is deferred, not built. The invite form has no client choice and `providerTeam.invite` refuses `clientIds`. See docs/decisions.md 'M4 security review'.
 - M4 chunk 13: P13 archive, merge, reorder and aliases of issue types and features are not built (no data ops); P12 re-tag, merge and link are not built. See docs/decisions.md 'M4 chunk 13'.

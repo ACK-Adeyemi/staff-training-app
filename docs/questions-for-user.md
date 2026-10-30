@@ -8,3 +8,12 @@
 
 ## Polish translation review (M5 chunk 6)
 The Polish staff interface (packages/content/src/lang/pl-PL.json) was written by Claude and has not been checked by a Polish speaker. Can someone who speaks Polish read it before the demo? See "Polish translation review by a speaker" in docs/review-checklist.md. Counts avoid plural agreement because the message system only has one/other forms; say if you want proper few/many forms added.
+
+## Content review (M5, BP-6)
+All nursery modules are Draft. They need a person who knows EYFS practice to read them before real staff see them; the full list with the exact files and `verify` items is in "M1" and "M5" in docs/review-checklist.md. Can you say who will review them, and whether Draft may stay on for the demo? Default used: Draft shown, nothing marked Reviewed.
+
+## Polish review request (M5)
+The machine-translated "Safer sleep" module (`safer-sleep-pl`) and the Polish staff strings both need a Polish speaker. Default used: shown as-is with the review noted in the checklist.
+
+## Lighthouse target (M5 chunk 14)
+Performance on the phone profile is 0.58 against the 85 placeholder. Do you want to accept 55 now and 70 after splitting the content by industry pack, or invest in the split now? See docs/decisions.md "M5 chunk 14". Default used: left as a VERIFY placeholder.
