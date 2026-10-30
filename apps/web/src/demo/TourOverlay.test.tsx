@@ -46,8 +46,9 @@ afterEach(() => {
 });
 
 type Tour = typeof trackA;
-const store = (tour: Tour, index: number, status = 'active') =>
+const store = (tour: Tour, index: number, status = 'active') => {
   localStorage.setItem(KEY, JSON.stringify({ tourId: tour.id, stepCount: tour.steps.length, index, status }));
+};
 const saved = () => JSON.parse(localStorage.getItem(KEY) ?? 'null') as Record<string, unknown> | null;
 const label = (n: number, m: number) => `Tour, step ${String(n)} of ${String(m)}`;
 const overlay = (n: number, m: number) => screen.findByRole('complementary', { name: label(n, m) });
@@ -57,7 +58,11 @@ const pathOf = (r: { state: { location: { pathname: string } } }) => r.state.loc
 async function open(tour: Tour, index: number, status = 'active') {
   store(tour, index, status);
   const step = tour.steps[index]!;
-  const side: Side = step.route.startsWith('/provider') ? 'provider' : step.route.startsWith('/client') ? 'client' : 'staff';
+  const side: Side = step.route.startsWith('/provider')
+    ? 'provider'
+    : step.route.startsWith('/client')
+      ? 'client'
+      : 'staff';
   const view = await renderRoute(step.route.split('?')[0]!, side);
   return view;
 }
@@ -155,7 +160,7 @@ describe('Tour buttons', () => {
   it('Back on the first step does nothing', async () => {
     await open(trackA, 0);
     await overlay(1, 9);
-    const back = screen.getByRole('button', { name: 'Back' }) as HTMLButtonElement;
+    const back = screen.getByRole<HTMLButtonElement>('button', { name: 'Back' });
     expect(back.disabled || back.getAttribute('aria-disabled') === 'true').toBe(true);
     await userEvent.click(back);
     await overlay(1, 9);

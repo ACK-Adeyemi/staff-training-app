@@ -22,7 +22,7 @@ function Body() {
   return (
     <>
       <p className="mt-0">{t('provider.overview.simulatedNote')}</p>
-      <ul className="m-0 mb-4 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-3">
+      <ul data-tour="provider-overview" className="m-0 mb-4 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-3">
         {totals.map(([id, label, n]) => (
           <li key={id}>
             <Card data-testid={id}>

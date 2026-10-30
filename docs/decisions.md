@@ -1074,3 +1074,13 @@ Chunk 7 note (translated sample module): Safer sleep in Polish is `safer-sleep-p
 - **The audit log holds ids only.** Pasted policy text is never stored; drafting returns the draft and counts one usage unit.
 - **Pasted HTML stays plain text** in lessons and questions and is rendered by React as text.
 - **Test fixes (typing only, no assertion changed):** `demoAiDraft.test.ts` indexes `d.lessons[0]!` (noUncheckedIndexedAccess), and `aiDraft.test.tsx` drops `exact: true`, which is not a `getByRole` option (a string name already matches exactly).
+
+## M5 chunk 11: tours A (definitions, overlay, landing)
+
+- **Spec change (demo.test.tsx, D1):** Client tour and Provider tour on the landing page are now buttons, not links to `#/client` and `#/provider`. Each asks "This resets the demo", then runs Reset demo, stores a fresh tour and opens step 1 (F-3, build pack 8.4). The test now asserts they are buttons; Explore freely is unchanged.
+- **Literal ids in tour routes.** The content package cannot read the seed, so the Track B client step uses Little Acorns' seeded id and Track A step 9 uses the seeded Safeguarding module's first lesson. Both are deterministic for seed value 20261019; the route test in `apps/web/src/demo/tours.test.ts` checks routes exist but not ids, so a seed change must update `packages/content/src/tours/trackB.ts`.
+- **Track A step 9** opens the lesson preview (the route the test fixes) with Daniel; the caption covers the optional Demo AI step. Step 10 (Battle Room) joins in M7.
+- **Progress storage:** `sta.tour.v1`, parsed with `tourStateSchema` (Zod, in `packages/domain/src/tour.ts`, so apps/web gains no new dependency). Unreadable or unknown tour ids mean no tour; an id match with a wrong step count or out-of-range index starts again at step 1 (a skipped one stays skipped).
+- **Overlay:** non-modal complementary region, plain buttons without transition classes (the shared Button has `transition-colors`, which the reduced-motion test forbids). Next never navigates; only Show me does. Starting a tour opens the route before saving the tour so the box appears on its page. Shift+Alt+T moves focus to the box (stated in its aria-keyshortcuts and in the box text). The highlight is a dashed 4px outline plus a numbered marker (`data-tour-active`, `tour-marker`).
+- **Demo menu:** Restart tour and Resume tour show while a tour is active or skipped; Resume makes it active at its stored step and does not navigate (Show me does).
+- **Test fixes (typing and style only, no assertion changed):** `TourOverlay.test.tsx` wraps the `store` helper body in braces and uses `getByRole<HTMLButtonElement>` instead of a cast, to satisfy lint.

@@ -14,7 +14,10 @@ describe.each([
       const path = step.route.split('?')[0] as string;
       const found = matchRoutes(routes, path);
       expect(found, `${step.id}: ${path}`).not.toBeNull();
-      expect(found?.some((m) => m.route.path === '*'), `${step.id} is Not found`).toBe(false);
+      expect(
+        found?.some((m) => m.route.path === '*'),
+        `${step.id} is Not found`,
+      ).toBe(false);
     }
   });
 

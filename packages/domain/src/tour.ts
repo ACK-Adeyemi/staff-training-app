@@ -1,6 +1,16 @@
+import { z } from 'zod';
+
 // Pure guided-tour engine (build pack 8.4). Plain JSON state, no timers, no storage. Functions never mutate input.
 export type TourStatus = 'active' | 'complete' | 'skipped';
 export type TourState = { tourId: string; stepCount: number; index: number; status: TourStatus };
+
+/** Shape of a stored tour (the app parses localStorage with this; anything else means "no tour"). */
+export const tourStateSchema = z.object({
+  tourId: z.string().min(1),
+  stepCount: z.number().int().min(1),
+  index: z.number().int().min(0),
+  status: z.enum(['active', 'complete', 'skipped']),
+});
 
 export function start(tourId: string, stepCount: number): TourState {
   if (!Number.isInteger(stepCount) || stepCount < 1) throw new RangeError('A tour needs at least one step');

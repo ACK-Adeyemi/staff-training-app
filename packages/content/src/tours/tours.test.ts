@@ -17,7 +17,8 @@ function flat(node: unknown, prefix = '', out: Record<string, string> = {}): Rec
 }
 const messages = flat(enGB);
 const staffPersonas = new Set(['Jade', 'Maureen']);
-const paymentWords = /\b(pay|paid|payment|payments|invoice|invoices|price|prices|pricing|billing|subscription|card|£)\b|£/i;
+const paymentWords =
+  /\b(pay|paid|payment|payments|invoice|invoices|price|prices|pricing|billing|subscription|card|£)\b|£/i;
 
 const cases = [
   {

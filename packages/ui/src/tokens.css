@@ -263,3 +263,12 @@ html {
   border-inline-start-color: var(--color-text);
   font-weight: 700;
 }
+
+/* Guided tour: the highlighted page element gets a thick outline (plus a numbered marker), so it is not colour alone.
+   The scroll margins keep it clear of the tour box docked at the bottom on a phone. */
+[data-tour-active='true'] {
+  outline: 4px dashed var(--color-accent);
+  outline-offset: 4px;
+  scroll-margin-top: 1rem;
+  scroll-margin-bottom: 18rem;
+}

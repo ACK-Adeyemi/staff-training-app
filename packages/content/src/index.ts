@@ -20,3 +20,5 @@ export { themeBases, themePresets } from './themes/presets';
 export type { ThemePreset } from './themes/presets';
 export { faqs, feedbackTags, issueTypes, releaseNotes, supportFeatures } from './support';
 export type { Faq, FeedbackTag, IssueType, ReleaseNote, SupportFeature } from './support';
+export { tours, trackA, trackB } from './tours';
+export type { Tour, TourStep } from './tours';

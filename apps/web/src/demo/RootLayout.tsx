@@ -5,6 +5,7 @@ import { UpdatePrompt } from '../app/UpdatePrompt';
 import { DemoBadge } from './DemoBadge';
 import { DemoMenu } from './DemoMenu';
 import { PresenterPanel } from './PresenterPanel';
+import { TourOverlay } from './TourOverlay';
 import { takeEarlyShortcut } from './earlyShortcut';
 import { useShortcut } from './useShortcut';
 
@@ -51,6 +52,7 @@ export function RootLayout() {
         <Outlet />
       </SlotContext>
       <UpdatePrompt />
+      <TourOverlay />
       <DemoMenu
         open={open === 'menu'}
         onClose={() => {
