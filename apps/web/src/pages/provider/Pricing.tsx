@@ -471,7 +471,13 @@ function NewChange({ clients, onDone }: { clients: Client[]; onDone: (message: s
       </div>
       {error ? <p role="alert">{t('provider.pricing.failed')}</p> : null}
       {preview ? (
-        <div data-testid="price-preview" className="overflow-x-auto">
+        <div
+          data-testid="price-preview"
+          className="overflow-x-auto"
+          role="region"
+          tabIndex={0}
+          aria-label={t('provider.pricing.preview')}
+        >
           <table className="w-full border-collapse">
             <thead>
               <tr>

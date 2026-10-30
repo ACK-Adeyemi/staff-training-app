@@ -1,7 +1,7 @@
 // M5 chunk 11 (F-3): every tour step points at a real route and a real seed person.
 import { describe, expect, it } from 'vitest';
 import { matchRoutes } from 'react-router';
-import { trackA, trackB } from '@sta/content';
+import { clientNameToken, trackA, trackB } from '@sta/content';
 import { routes } from '../app/routes';
 import { seededStore } from '../test/harness';
 
@@ -43,6 +43,21 @@ describe.each([
       }
       const side = people.find((p) => p.displayName.split(' ')[0] === step.persona)?.side;
       expect(step.route.startsWith(side === 'client' ? '/client' : '/staff'), step.id).toBe(true);
+    }
+  });
+});
+
+describe('client names in tour routes', () => {
+  it('every {client:Name} token matches a client in the seed', async () => {
+    const { handle } = await seededStore();
+    const people = await handle.admin.listPersonas();
+    for (const step of trackB.steps) {
+      const named = clientNameToken.exec(step.route);
+      if (named)
+        expect(
+          people.some((p) => p.clientName.startsWith(named[1] ?? '')),
+          step.id,
+        ).toBe(true);
     }
   });
 });

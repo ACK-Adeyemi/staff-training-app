@@ -1,9 +1,10 @@
+import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router';
 import { back, next, skip, stepNumber, type TourState } from '@sta/domain';
-import type { Tour, TourStep } from '@sta/content';
+import { clientNameToken, type Tour, type TourStep } from '@sta/content';
 import { focusClasses } from '@sta/ui';
 import { useDemo, useT } from '../app/hooks';
 import { saveTour, useStoredTour } from './tourStore';
@@ -61,6 +62,31 @@ function useHighlight(target: string | undefined, enabled: boolean): Spot | null
   return enabled && target ? spot : null;
 }
 
+/** The box is docked over the page, so the page gets room beside or under it while it is open (and under the pill). */
+function useReserveSpace(el: RefObject<HTMLElement | null>, open: boolean) {
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const phone = window.matchMedia('(max-width: 767px)');
+    const apply = () => {
+      const h = open ? (el.current?.getBoundingClientRect().height ?? 0) : 48;
+      // 5rem is the tab bar the box sits above.
+      document.body.style.paddingBottom = phone.matches ? `calc(${Math.ceil(h)}px + 1rem)` : '';
+      // Wide screens: the box is a column at the right (w-80 plus its margin), so the page keeps clear of it.
+      document.body.style.paddingRight = !phone.matches && open ? '21rem' : '';
+    };
+    apply();
+    const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(apply) : null;
+    if (el.current) observer?.observe(el.current);
+    phone.addEventListener('change', apply);
+    return () => {
+      observer?.disconnect();
+      phone.removeEventListener('change', apply);
+      document.body.style.paddingBottom = '';
+      document.body.style.paddingRight = '';
+    };
+  }, [el, open]);
+}
+
 function Panel({ state, tour }: { state: TourState; tour: Tour }) {
   const t = useT();
   const demo = useDemo();
@@ -74,6 +100,7 @@ function Panel({ state, tour }: { state: TourState; tour: Tour }) {
   const step: TourStep | undefined = tour.steps[index];
   const n = stepNumber(state);
   const m = state.stepCount;
+  useReserveSpace(box, !collapsed);
   const spot = useHighlight(step?.target, !done && !collapsed);
 
   const focusIn = useCallback(() => {
@@ -94,7 +121,14 @@ function Panel({ state, tour }: { state: TourState; tour: Tour }) {
         const who = people.find((p) => p.side === side && p.displayName.split(' ')[0] === step.persona);
         if (who) await (side === 'client' ? demo.signInAsClient(who.userId) : demo.signInAs(who.userId));
       }
-      await navigate(step.route);
+      let route = step.route;
+      const named = clientNameToken.exec(route);
+      if (named) {
+        const people = await demo.listPersonas();
+        const found = people.find((p) => p.clientName.startsWith(named[1] ?? ''));
+        route = found ? route.replace(clientNameToken, found.clientId) : '/provider/clients';
+      }
+      await navigate(route);
       // The person may have changed, so anything already loaded belongs to someone else.
       await queryClient.invalidateQueries();
     })();
