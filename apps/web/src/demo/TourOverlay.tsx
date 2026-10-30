@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { back, next, skip, stepNumber, type TourState } from '@sta/domain';
 import type { Tour, TourStep } from '@sta/content';
 import { focusClasses } from '@sta/ui';
@@ -237,6 +237,8 @@ function Panel({ state, tour }: { state: TourState; tour: Tour }) {
 /** The self-guided tour (D4). Not modal, collapsible, never moves on by itself. Mounted once by RootLayout. */
 export function TourOverlay() {
   const stored = useStoredTour();
-  if (!stored || stored.state.status === 'skipped') return null;
+  // The landing page is where a tour is chosen, so the box stays out of its way there.
+  const { pathname } = useLocation();
+  if (pathname === '/' || !stored || stored.state.status === 'skipped') return null;
   return <Panel key={stored.tour.id} state={stored.state} tour={stored.tour} />;
 }
