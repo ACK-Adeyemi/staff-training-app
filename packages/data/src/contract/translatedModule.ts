@@ -99,7 +99,10 @@ export function runTranslatedModuleContract(
       expect(input.attempts.map((a) => a.id)).toContain(attempt.id);
       const without = moduleStats(input);
       const withPl = moduleStats({ ...input, translations: [s.pl] });
-      expect(withPl.headline.started).toBe(without.headline.started + 1);
+      // "started" counts people, and Jade may already have started the original, so compare the answers instead.
+      const answered = (st: typeof without) => st.questions.reduce((n, q) => n + q.answered, 0);
+      expect(answered(withPl)).toBeGreaterThan(answered(without));
+      expect(withPl.headline.started).toBeGreaterThanOrEqual(without.headline.started);
       expect(withPl.headline.completed).toBeGreaterThanOrEqual(1);
       expect(withPl.headline.passRate).not.toBeNull();
       expect(without.headline.completed).toBe(withPl.headline.completed); // the done assignment counts either way

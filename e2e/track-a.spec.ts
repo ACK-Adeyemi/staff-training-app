@@ -229,7 +229,7 @@ test('Track A step 4: Maureen gets Simple view, large text and read-aloud on a l
   await expect(page.getByTestId('path-node')).toHaveCount(0);
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).fontSize)).toBe('24px');
 
-  // Read aloud on a lesson uses the stored rate and a local voice; Stop reading stops it.
+  // Read aloud on a lesson uses the stored rate and a local voice; Pause stops it.
   const maureen = (await readStore(page, 'people')).find((p) => p['firstName'] === 'Maureen');
   const prefs = (maureen?.['prefs'] ?? {}) as { readAloudRate?: number };
   const rate = prefs.readAloudRate ?? 1;
@@ -248,7 +248,7 @@ test('Track A step 4: Maureen gets Simple view, large text and read-aloud on a l
   const norm = (x: string) => x.replace(/\s+/g, ' ').trim();
   expect(norm(await page.getByRole('main').innerText())).toContain(norm(first?.text ?? '').slice(0, 40));
   const cancels = log.cancels;
-  await page.getByRole('button', { name: 'Stop reading' }).click();
+  await page.getByRole('button', { name: 'Pause' }).click();
   await expect.poll(async () => (await readSpeechLog(page)).cancels).toBeGreaterThan(cancels);
   await expect(page.getByRole('button', { name: 'Read this aloud' })).toBeVisible();
 });
