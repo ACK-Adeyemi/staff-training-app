@@ -1,10 +1,10 @@
 // Version 1 schema: one object store per repository, with out-of-line string keys taken from keyOf
 // (id; clientId for subscriptions; clientId:addOnId for addOnSubscriptions; key for settings).
-// Version 2 adds the learning stores. Version 3 adds notes, categories, placements, groups, competitions and board settings. Version 4 adds the M3 admin, billing and support stores. Version 5 adds the M4 provider-story stores. Later upgrades must be additive: add stores or indexes under a higher version, never remove them.
+// Version 2 adds the learning stores. Version 3 adds notes, categories, placements, groups, competitions and board settings. Version 4 adds the M3 admin, billing and support stores. Version 5 adds the M4 provider-story stores. Version 6 adds the provider telemetry stores. Later upgrades must be additive: add stores or indexes under a higher version, never remove them.
 import type { IDBPDatabase } from 'idb';
 import type { StoreName } from '../types';
 
-export const DB_VERSION = 5;
+export const DB_VERSION = 6;
 
 /** Stores whose records carry a clientId get an index on it. */
 const V1_STORES: readonly StoreName[] = [
@@ -63,6 +63,8 @@ const V4_STORES: readonly StoreName[] = [
   'ticketMessages',
   'faqVotes',
 ];
+
+const V6_STORES: readonly StoreName[] = ['usageDaily', 'errorGroups', 'healthScores', 'localTelemetry'];
 
 const V5_STORES: readonly StoreName[] = [
   'priceAdjustments',
@@ -126,6 +128,8 @@ export const clientIndexed: ReadonlySet<StoreName> = new Set<StoreName>([
   'recoveryRequests',
   'profileChangeRequests',
   'moduleNotices',
+  'usageDaily',
+  'healthScores',
 ]);
 
 function createStores(db: IDBPDatabase, names: readonly StoreName[]): void {
@@ -153,4 +157,8 @@ export const upgradeToV4 = (db: IDBPDatabase): void => {
 /** Additive: new object stores only. */
 export const upgradeToV5 = (db: IDBPDatabase): void => {
   createStores(db, V5_STORES);
+};
+/** Additive: new object stores only. */
+export const upgradeToV6 = (db: IDBPDatabase): void => {
+  createStores(db, V6_STORES);
 };

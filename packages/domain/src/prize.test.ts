@@ -1,6 +1,6 @@
 // BP-3 (pure part): the prize suggestion walk (plan M2 assumption 18, brief 13.3).
 import { describe, expect, it } from 'vitest';
-import { nextSuggestion } from './prize';
+import { checkPrizeSuggestion, nextSuggestion } from './prize';
 import { createRng } from './rng';
 
 const list = Array.from({ length: 20 }, (_, i) => `Prize ${i + 1}`);
@@ -75,5 +75,22 @@ describe('nextSuggestion', () => {
 
   it('refuses an empty list', () => {
     expect(() => nextSuggestion([], undefined, createRng(1))).toThrow();
+  });
+});
+
+describe('checkPrizeSuggestion', () => {
+  it('trims and accepts text of 1 to 120 characters', () => {
+    expect(checkPrizeSuggestion('  Gift hamper  ', ['Other'])).toEqual({ ok: true, text: 'Gift hamper' });
+    expect(checkPrizeSuggestion('x'.repeat(120), [])).toMatchObject({ ok: true });
+  });
+
+  it('refuses blank, over-long and non-text input', () => {
+    for (const bad of ['', '   ', 'x'.repeat(121), 5, undefined]) {
+      expect(checkPrizeSuggestion(bad, [])).toEqual({ ok: false, reason: 'invalid' });
+    }
+  });
+
+  it('refuses a repeat, after trimming', () => {
+    expect(checkPrizeSuggestion(' Gift hamper', ['Gift hamper'])).toEqual({ ok: false, reason: 'duplicate' });
   });
 });

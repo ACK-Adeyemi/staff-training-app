@@ -32,3 +32,8 @@
     flex: none;
   }
 }
+
+/* The phone tab bar is fixed to the bottom. Keep scrolled-to controls clear of it (scrollIntoView, focus, find). */
+html {
+  scroll-padding-bottom: 7rem;
+}

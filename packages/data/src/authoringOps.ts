@@ -28,6 +28,7 @@ import {
   type Module,
   type ModuleDraft,
   type ModuleGroup,
+  type ModuleNotice,
   type ModulePlacement,
   type ModuleVersion,
   type Notification,
@@ -89,6 +90,7 @@ const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf
 const OWNED_FIELDS = ['id', 'owner', 'status', 'version', 'updatedAt', 'duplicatedFrom', 'siteId'] as const;
 
 const byId = (a: { id: string }, b: { id: string }): number => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+const text = (v: unknown): string => (typeof v === 'string' ? v : '');
 const isFile = (a: Attachment): a is FileAttachment => a.kind === 'file';
 
 /** Assumption 20: who can read a stored attachment. Everything else is NotFound. */
@@ -410,6 +412,62 @@ export function createAuthoringOperations(backend: RawBackend, options: StoreOpt
       );
       await apply(ops);
       return structuredClone({ module, reassigned });
+    },
+
+    async publishToClients(ctx, moduleId, input) {
+      const call = await beginCall(backend, options, ctx);
+      if (call.side !== 'provider' || !holds(call, ['content.write'])) return forbid('permission');
+      const current = await call.find<Module>('modules', text(moduleId));
+      if (!current || current.owner !== 'provider') throw new RuleError('invalidPublish');
+      const given = (input as Partial<typeof input> | null) ?? {};
+      const summary = text(given.summary).trim();
+      if (summary.length < 1 || summary.length > 500) throw new RuleError('invalidPublish');
+      const ids = Array.isArray(given.clientIds) ? given.clientIds.map(text) : [];
+      if (ids.length < 1 || new Set(ids).size !== ids.length) throw new RuleError('invalidPublish');
+      const clients = await call.all<Client>('clients');
+      if (ids.some((id) => !clients.some((c) => c.id === id))) throw new RuleError('invalidPublish');
+      const stored = (await backend.get('moduleDrafts', current.id)) as ModuleDraft | undefined;
+      if (current.status !== 'published' || !stored) throw new RuleError('invalidPublish');
+      const requirements = (await call.all<Requirement>('requirements')).filter((r) => r.clientId === undefined);
+      if (!publishChecklist(stored.module, requirements).ok) throw new RuleError('checklistFailed');
+
+      const { module, snapshot } = publishVersion({ current, draft: stored, now: new Date(ctx.now) });
+      const ops: WriteOp[] = [put('modules', module)];
+      if (snapshot) ops.push({ type: 'put', store: 'moduleVersions', key: snapshot.key, record: snapshot });
+      ops.push(del('moduleDrafts', current.id));
+      const placed = new Set(
+        (await call.all<ModulePlacement>('modulePlacements'))
+          .filter((p) => p.moduleId === current.id)
+          .map((p) => p.clientId),
+      );
+      const notices: ModuleNotice[] = [];
+      for (const clientId of ids) {
+        if (!placed.has(clientId)) {
+          const placement: ModulePlacement = { clientId, moduleId: current.id, availableToAll: true };
+          ops.push({ type: 'put', store: 'modulePlacements', key: `${clientId}:${current.id}`, record: placement });
+        }
+        const notice: ModuleNotice = {
+          id: call.newId(),
+          clientId,
+          moduleId: current.id,
+          fromVersion: current.version,
+          toVersion: module.version,
+          summary,
+          publishedBy: call.actor.user.id,
+          publishedAt: ctx.now,
+        };
+        notices.push(notice);
+        ops.push(put('moduleNotices', notice));
+      }
+      ops.push(
+        audit(call, undefined, 'authoring.publishToClients', `module:${current.id}`, undefined, {
+          moduleId: current.id,
+          version: module.version,
+          clients: ids.length,
+        }),
+      );
+      await apply(ops);
+      return structuredClone({ module, notices });
     },
 
     async duplicate(ctx, moduleId) {

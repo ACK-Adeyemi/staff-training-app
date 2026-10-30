@@ -2,6 +2,7 @@
 // authorises, applies the domain rules and then writes in ONE batch. Money is integer pence. The payment is a mock: no
 // card number is ever entered or stored. Business rules live in @sta/domain; this file only calls them.
 import {
+  invoiceLinesFor,
   addDays,
   competitionStatus,
   defaultDunningPolicy,
@@ -31,6 +32,7 @@ import {
   type OutboxMessage,
   type Package,
   type PaymentAttempt,
+  type PriceAdjustment,
   type Person,
   type Role,
   type RoleAssignment,
@@ -40,6 +42,7 @@ import {
 } from '@sta/domain';
 import type { RawBackend, WriteOp } from './backend';
 import { moduleFor } from './ops';
+import { killedClientIds } from './providerGlobalAiOps';
 import { audit, beginCall, clientEntitlements, forbid, holds, type Call } from './policy';
 import {
   AccountStateError,
@@ -190,7 +193,18 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
       const { activeStaff, activeSites } = await activeStaffAndSites(call, clientId);
       const price = planPrice(pkg, activeStaff, activeSites);
       const profile = await profileOf(call, clientId);
+      const lines = invoiceLinesFor({
+        listPrice: price.total,
+        adjustments: (await call.all<PriceAdjustment>('priceAdjustments')).filter((a) =>
+          a.clientIds.includes(clientId),
+        ),
+        at: call.actor.ctx.now,
+        label: '',
+      });
+      const change = lines[1];
       const result: BillingOverview = {
+        ...(change?.adjustment ? { adjustment: { ...change.adjustment, amount: change.amount } } : {}),
+        yourPrice: lines.reduce((sum, l) => sum + l.amount, 0),
         packageId: sub.packageId,
         planPrice: { perSite: price.perSite, sites: price.sites, total: price.total },
         period: sub.period,
@@ -227,6 +241,30 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
       const found = (await call.all<Invoice>('invoices')).find((i) => i.id === id && i.clientId === call.clientId);
       if (!found) throw new NotFoundError();
       return structuredClone(found);
+    },
+
+    async priceNotices(ctx) {
+      const call = await clientCall(ctx, 'billing.view');
+      const now = call.actor.ctx.now;
+      return (await call.all<PriceAdjustment>('priceAdjustments'))
+        .filter(
+          (a) =>
+            a.clientIds.includes(call.clientId as string) &&
+            (a.status === 'scheduled' || a.status === 'active') &&
+            a.effectiveAt !== undefined &&
+            (a.endsAt === undefined || a.endsAt > now),
+        )
+        .sort((a, b) => ((a.effectiveAt as string) < (b.effectiveAt as string) ? -1 : a.id < b.id ? -1 : 1))
+        .map((a) =>
+          structuredClone({
+            id: a.id,
+            type: a.type,
+            scope: a.scope,
+            value: a.value,
+            effectiveAt: a.effectiveAt as string,
+            ...(a.endsAt ? { endAt: a.endsAt } : {}),
+          }),
+        );
     },
 
     async plans(ctx) {
@@ -637,6 +675,7 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
   async function features(ctx: ActorContext): Promise<{ aiAssistant: boolean }> {
     const call = await beginCall(backend, options, ctx);
     if (call.side === 'provider') return forbid('permission');
+    if ((await killedClientIds(backend)).includes(call.clientId as string)) return { aiAssistant: false };
     const ents = await clientEntitlements(call, call.clientId as string);
     return { aiAssistant: ents ? entitled(ents, 'aiAssistant') : false };
   }
@@ -647,6 +686,7 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
       if (call.side === 'provider') return forbid('permission');
       const clientId = call.clientId as string;
       requireUsageAddOns(call);
+      if ((await killedClientIds(backend)).includes(clientId)) throw new NotEntitledError('aiAssistant');
       const ents = await clientEntitlements(call, clientId);
       if (!ents || !entitled(ents, 'aiAssistant')) throw new NotEntitledError('aiAssistant');
       const module = await moduleFor(call, text(input.moduleId));

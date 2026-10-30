@@ -73,6 +73,7 @@ export const providerCatalogue: Permission[] = build([
   ['billing.draftPriceChanges', 'Draft price changes', { requires: ['billing.write'] }],
   ['billing.confirmPriceChanges', 'Confirm price changes', { ...S, requires: ['billing.draftPriceChanges'] }],
   ['billing.applyCredits', 'Apply credits', { ...S, requires: ['billing.write'] }],
+  ['billing.manageDunning', 'Extend grace and pause the dunning timeline', { ...S, requires: ['billing.write'] }],
   ['billing.export', 'Export billing data', { ...S, requires: ['billing.read'] }],
   ['ops.read', 'See operations'],
   ['ops.write', 'Change operations settings', { requires: ['ops.read'] }],
@@ -105,7 +106,7 @@ export const providerCatalogue: Permission[] = build([
 const requiresOf = new Map([...clientCatalogue, ...providerCatalogue].map((p) => [p.id, p.requires]));
 
 /** Adds every transitive requirement, so a template never holds a permission without its prerequisites. */
-const closed = (ids: string[]): string[] => {
+export const closePermissions = (ids: string[]): string[] => {
   const out = new Set<string>();
   const add = (id: string): void => {
     if (out.has(id)) return;
@@ -141,7 +142,7 @@ export const providerRoleTemplates: ProviderRoleTemplate[] = [
     systemKey: 'providerAdmin',
     name: 'Admin',
     description: 'Runs client accounts, content and support',
-    permissionIds: closed([
+    permissionIds: closePermissions([
       'clients.write',
       'clients.reviewNameChanges',
       'content.write',
@@ -151,7 +152,8 @@ export const providerRoleTemplates: ProviderRoleTemplate[] = [
       'comms.send',
       'incidents.post',
       'tickets.write',
-      'team.read',
+      'team.manage',
+      'recovery.start',
       'audit.read',
       'billing.read',
     ]),
@@ -161,7 +163,7 @@ export const providerRoleTemplates: ProviderRoleTemplate[] = [
     systemKey: 'providerSupport',
     name: 'Support',
     description: 'Answers tickets and helps clients',
-    permissionIds: closed([
+    permissionIds: closePermissions([
       'clients.read',
       'tickets.write',
       'feedback.write',
@@ -175,7 +177,7 @@ export const providerRoleTemplates: ProviderRoleTemplate[] = [
     systemKey: 'providerBilling',
     name: 'Billing',
     description: 'Looks after billing',
-    permissionIds: closed([
+    permissionIds: closePermissions([
       'clients.read',
       'billing.write',
       'billing.draftPriceChanges',
@@ -188,7 +190,7 @@ export const providerRoleTemplates: ProviderRoleTemplate[] = [
     systemKey: 'providerContentEditor',
     name: 'Content Editor',
     description: 'Writes and edits content and packs',
-    permissionIds: closed(['content.write', 'packs.write', 'feedback.read']),
+    permissionIds: closePermissions(['content.write', 'packs.write', 'feedback.read']),
   },
   {
     key: 'readOnly',

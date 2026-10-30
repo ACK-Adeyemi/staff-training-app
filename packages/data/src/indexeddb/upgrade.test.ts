@@ -101,6 +101,9 @@ async function makeV2(name: string): Promise<void> {
   db.close();
 }
 
+/** Added in version 6 (M4 chunk 8c); see upgradeV6.test.ts. */
+const V6_STORES = ['usageDaily', 'errorGroups', 'healthScores', 'localTelemetry'];
+
 /** Added in version 5 (M4 chunk 1); see upgradeV5.test.ts. */
 const V5_STORES = [
   'priceAdjustments',
@@ -133,8 +136,8 @@ async function makeV1(name: string): Promise<void> {
 }
 
 describe('indexeddb schema upgrade from version 1', () => {
-  it('declares version 5', () => {
-    expect(DB_VERSION).toBe(5);
+  it('declares version 6', () => {
+    expect(DB_VERSION).toBe(6);
   });
 
   it('keeps the version 1 records and adds the new object stores with client indexes', async () => {
@@ -145,8 +148,8 @@ describe('indexeddb schema upgrade from version 1', () => {
     backend.close();
 
     const db = await openDB('upgrade-a');
-    expect(db.version).toBe(5);
-    expect([...db.objectStoreNames].sort()).toEqual([...V1_STORES, ...ALL_NEW, ...V5_STORES].sort());
+    expect(db.version).toBe(6);
+    expect([...db.objectStoreNames].sort()).toEqual([...V1_STORES, ...ALL_NEW, ...V5_STORES, ...V6_STORES].sort());
     for (const s of CLIENT_INDEXED_NEW) {
       expect([...db.transaction(s).store.indexNames], s).toContain('clientId');
     }
@@ -188,8 +191,8 @@ describe('indexeddb schema upgrade from version 2 to 3', () => {
     backend.close();
 
     const db = await openDB('upgrade-v2-a');
-    expect(db.version).toBe(5);
-    expect([...db.objectStoreNames].sort()).toEqual([...V1_STORES, ...ALL_NEW, ...V5_STORES].sort());
+    expect(db.version).toBe(6);
+    expect([...db.objectStoreNames].sort()).toEqual([...V1_STORES, ...ALL_NEW, ...V5_STORES, ...V6_STORES].sort());
     for (const s of V3_STORES) {
       expect([...db.transaction(s).store.indexNames], s).toContain('clientId');
     }
@@ -265,8 +268,8 @@ describe('indexeddb schema upgrade from version 3 to 4', () => {
     backend.close();
 
     const db = await openDB('upgrade-v3-a');
-    expect(db.version).toBe(5);
-    expect([...db.objectStoreNames].sort()).toEqual([...V1_STORES, ...ALL_NEW, ...V5_STORES].sort());
+    expect(db.version).toBe(6);
+    expect([...db.objectStoreNames].sort()).toEqual([...V1_STORES, ...ALL_NEW, ...V5_STORES, ...V6_STORES].sort());
     expect(V4_STORES).toHaveLength(16);
     for (const s of V4_STORES) {
       expect([...db.transaction(s).store.indexNames], s).toContain('clientId');
@@ -305,7 +308,7 @@ describe('indexeddb schema upgrade from version 3 to 4', () => {
     const backend = await createIndexedDbBackend('upgrade-v1-to-v4');
     backend.close();
     const db = await openDB('upgrade-v1-to-v4');
-    expect(db.version).toBe(5);
+    expect(db.version).toBe(6);
     for (const s of V4_STORES) expect(db.objectStoreNames.contains(s), s).toBe(true);
     db.close();
   });

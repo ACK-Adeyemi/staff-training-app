@@ -489,7 +489,7 @@ describe('S15 Raise a ticket', () => {
         alt?: string;
         ownerUserId?: string;
       }>(c.handle, 'attachments')
-    ).filter((a) => a.purpose === 'ticketScreenshot');
+    ).filter((a) => a.purpose === 'ticketScreenshot' && a.ownerUserId === c.keys.users['jade']);
     expect(shots).toHaveLength(2);
     for (const s of shots) {
       expect(s.mime).toBe('image/jpeg');
@@ -519,8 +519,8 @@ describe('S15 Raise a ticket', () => {
     const t = await ticketNumbered(c.handle, 'T-1015');
     const first = need((await dump<TicketMessage>(c.handle, 'ticketMessages')).find((m) => m.ticketId === t.id));
     expect(first.attachmentIds).toHaveLength(1);
-    const shots = (await dump<{ purpose?: string }>(c.handle, 'attachments')).filter(
-      (a) => a.purpose === 'ticketScreenshot',
+    const shots = (await dump<{ purpose?: string; ownerUserId?: string }>(c.handle, 'attachments')).filter(
+      (a) => a.purpose === 'ticketScreenshot' && a.ownerUserId === c.keys.users['jade'],
     );
     expect(shots).toHaveLength(1);
   });

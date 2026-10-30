@@ -18,6 +18,7 @@ export interface TransferInput {
 
 const fail = (reason: string): OwnershipResult => ({ ok: false, reason });
 
+// The end date set here is provisional (the schema needs one); confirming with the 2FA code restarts it.
 export const requestTransfer = (input: TransferInput, clock: Clock): OwnershipTransfer => ({
   id: input.id,
   side: input.side,
@@ -40,7 +41,16 @@ export const confirmTransferTwoFactor = (t: OwnershipTransfer, byUserId: string,
   if (t.status !== 'pending') return fail('This transfer is no longer open.');
   if (byUserId !== t.fromUserId) return fail('Only the current owner can confirm.');
   if (t.acceptedAt === undefined) return fail('The new owner must accept first.');
-  return { ok: true, transfer: { ...t, twoFactorConfirmedAt: clock.now().toISOString() } };
+  // The waiting period runs from this confirmation, so a late accept or confirm still leaves the full period.
+  const now = clock.now();
+  return {
+    ok: true,
+    transfer: {
+      ...t,
+      twoFactorConfirmedAt: now.toISOString(),
+      coolingOffEndsAt: new Date(now.getTime() + OWNERSHIP_COOLING_OFF_DAYS * DAY_MS).toISOString(),
+    },
+  };
 };
 
 export const completeTransfer = (t: OwnershipTransfer, clock: Clock): OwnershipResult => {

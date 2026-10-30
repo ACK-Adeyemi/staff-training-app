@@ -152,6 +152,14 @@ export function accountStateAt(
   ) {
     return 'pastDue';
   }
+  if (
+    stage === 'readOnly' &&
+    subscription.state === 'limited' &&
+    subscription.graceExtendedUntil &&
+    now.getTime() < new Date(subscription.graceExtendedUntil).getTime()
+  ) {
+    return 'limited';
+  }
   return stage;
 }
 
@@ -190,6 +198,18 @@ export function nextTransition(
   if (next === 'limited' && subscription.graceExtendedUntil) {
     const ext = new Date(subscription.graceExtendedUntil);
     if (ext.getTime() > at.getTime()) return { state: 'limited', at: ext };
+  }
+  if (
+    current === 'limited' &&
+    stage === 'readOnly' &&
+    subscription.state === 'limited' &&
+    subscription.graceExtendedUntil
+  ) {
+    return { state: 'readOnly', at: new Date(subscription.graceExtendedUntil) };
+  }
+  if (next === 'readOnly' && subscription.state === 'limited' && subscription.graceExtendedUntil) {
+    const ext = new Date(subscription.graceExtendedUntil);
+    if (ext.getTime() > at.getTime()) return { state: 'readOnly', at: ext };
   }
   return { state: next, at };
 }

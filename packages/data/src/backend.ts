@@ -13,6 +13,10 @@ import {
   profileChangeRequestSchema,
   linkCheckResultSchema,
   moduleNoticeSchema,
+  usageDailySchema,
+  errorGroupSchema,
+  healthScoreSchema,
+  localTelemetrySchema,
   addOnRequestSchema,
   addOnSchema,
   appFeedbackSchema,
@@ -156,6 +160,10 @@ const parsers: Record<StoreName, Parser> = {
   profileChangeRequests: profileChangeRequestSchema,
   linkCheckResults: linkCheckResultSchema,
   moduleNotices: moduleNoticeSchema,
+  usageDaily: usageDailySchema,
+  errorGroups: errorGroupSchema,
+  healthScores: healthScoreSchema,
+  localTelemetry: localTelemetrySchema,
 };
 
 /** Parses with the domain schema; throws ValidationError listing every issue. Returns the cleaned record. */
@@ -188,6 +196,10 @@ export function keyOf(store: StoreName, record: unknown): string {
       return r['key'] as string;
     case 'addOnSubscriptions':
       return `${r['clientId'] as string}:${r['addOnId'] as string}`;
+    case 'usageDaily':
+      return `${r['clientId'] as string}:${r['date'] as string}:${r['feature'] as string}`;
+    case 'healthScores':
+      return `${r['clientId'] as string}:${r['date'] as string}`;
     case 'modulePlacements':
       return `${r['clientId'] as string}:${r['moduleId'] as string}`;
     case 'settings':

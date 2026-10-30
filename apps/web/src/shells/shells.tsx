@@ -143,9 +143,18 @@ export function ProviderShell() {
         more: [
           item('/provider/tickets', t('nav.provider.support'), 'help'),
           item('/provider/comms', t('nav.provider.comms'), 'bell'),
+          item('/provider/recovery', t('nav.provider.recovery'), 'user'),
+          item('/provider/data-requests', t('nav.provider.dataRequests'), 'book'),
+          item('/provider/status', t('nav.provider.status'), 'bell'),
           item('/provider/team', t('nav.provider.teamSecurity'), 'user'),
+          item('/provider/security', t('nav.provider.security'), 'user'),
+          item('/provider/audit', t('nav.provider.audit'), 'book'),
+          item('/provider/global', t('nav.provider.global'), 'book'),
+          item('/provider/profile-changes', t('nav.provider.profileChanges'), 'user'),
+          item('/provider/pricing', t('nav.provider.pricing'), 'book'),
+          item('/provider/ai', t('nav.provider.ai'), 'help'),
         ],
-        headerLinks: [],
+        headerLinks: [item('/provider/comms', t('provider.shell.notifications'), 'bell')],
       }}
     />
   );

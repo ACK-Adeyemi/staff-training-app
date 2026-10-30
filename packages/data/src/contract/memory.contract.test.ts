@@ -9,7 +9,19 @@ import { runEvidenceFlowContract } from './evidenceFlow';
 import { runFeedbackTicketsContract } from './feedbackTickets';
 import { runIdentityOrgContract } from './identityOrg';
 import { runPricingContract } from './pricing';
+import { runPriceNoticesContract } from './priceNotices';
+import { runOwnershipTransferContract } from './ownershipTransfer';
+import { runProviderTeamContract } from './providerTeam';
+import { runCreateClientContract } from './createClient';
+import { runProviderPublishContract } from './providerPublish';
+import { runProviderCommsContract } from './providerComms';
+import { runProviderIncidentsContract } from './providerIncidents';
+import { runProviderGlobalAiContract } from './providerGlobalAi';
+import { runProviderOverviewContract } from './providerOverview';
+import { runProviderRecoveryContract } from './providerRecovery';
+import { runProviderTicketsContract } from './providerTickets';
 import { runPackagingOptionContract } from './packagingOption';
+import { runDunningContract } from './dunning';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
 import { runExportsRetentionContract } from './exportsRetention';
@@ -49,4 +61,19 @@ runExportsRetentionContract('memory adapter', (options) => Promise.resolve(creat
 runRemindersLeftoversContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 
 runPricingContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runPriceNoticesContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runOwnershipTransferContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runProviderTeamContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 runPackagingOptionContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runDunningContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runCreateClientContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runProviderPublishContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runProviderTicketsContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runProviderCommsContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runProviderIncidentsContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runProviderRecoveryContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+
+runProviderOverviewContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runProviderGlobalAiContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));

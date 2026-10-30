@@ -86,11 +86,12 @@ export function useClientCalendar() {
 
       async function readBilling(): Promise<Billing | undefined> {
         try {
-          const [overview, invoices, addOns, account] = await Promise.all([
+          const [overview, invoices, addOns, account, notices] = await Promise.all([
             store.billing.overview(actor),
             store.billing.invoices(actor),
             store.addOns.list(actor),
             store.account.status(actor),
+            store.billing.priceNotices(actor),
           ]);
           return {
             renewalAt: overview.renewalAt,
@@ -100,6 +101,7 @@ export function useClientCalendar() {
             addOnTrials: addOns
               .filter((a) => a.status === 'trial' && a.endsAt !== undefined)
               .map((a) => ({ addOnId: a.addOnId, endsAt: a.endsAt ?? '' })),
+            priceChanges: notices.map((n) => ({ id: n.id, effectiveAt: n.effectiveAt })),
             ...(account.nextChange
               ? { nextStateChange: { at: account.nextChange.at, state: account.nextChange.state } }
               : {}),

@@ -61,6 +61,19 @@
     "personaClientAdmins": "Client admins",
     "personaStaff": "Staff"
   },
+  "systemNotices": {
+    "statusLabel": "System status",
+    "level": {
+      "normal": "Normal",
+      "degraded": "Degraded",
+      "maintenance": "Maintenance",
+      "incident": "Incident"
+    },
+    "maintenanceBanner": "Maintenance: we are making improvements. Some things may be slow or unavailable for a short time. Your progress is safe.",
+    "incidentBanner": "{level}: {title}",
+    "announcementDismiss": "Dismiss",
+    "announcementDismissFor": "Dismiss: {title}"
+  },
   "shell": {
     "skipToContent": "Skip to main content",
     "mainNavigation": "Main navigation",
@@ -103,7 +116,16 @@
       "commercial": "Commercial",
       "support": "Support",
       "comms": "Comms",
-      "teamSecurity": "Team and security"
+      "teamSecurity": "Team and security",
+      "security": "Security",
+      "audit": "Audit log",
+      "recovery": "Account recovery",
+      "dataRequests": "Data requests",
+      "status": "Status and incidents",
+      "global": "Global content",
+      "ai": "AI settings",
+      "profileChanges": "Profile changes",
+      "pricing": "Price changes"
     }
   },
   "placeholder": {
@@ -229,7 +251,10 @@
       "notAwaitingCheck": "This certificate is not waiting for a check any more.",
       "invalidFeedback": "Check your feedback and try again.",
       "invalidTicket": "Check the details of your request and try again.",
-      "invalidReply": "Write a reply of up to 2,000 characters."
+      "invalidReply": "Write a reply of up to 2,000 characters.",
+      "invalidClient": "Check the organisation name, sites, industry pack, package and first admin's email, then try again.",
+      "invalidPublish": "Choose at least one client, write what changed, and make sure the module has a saved draft to publish.",
+      "duplicate": "That is already in the list."
     },
     "notEntitled": {
       "liveCompetitions": "You have reached the number of live competitions in your package. End or cancel one first.",
@@ -239,6 +264,18 @@
     "twoFactorRequired": "Set up two-step sign-in to carry on."
   },
   "client": {
+    "priceNotice": {
+      "title": "Price change",
+      "plan": "Your plan price",
+      "addOn": "The price of an add-on",
+      "invoice": "Your next invoice",
+      "percent": "{what} changes by {amount} from {date}.",
+      "amount": "{what} changes to {amount} from {date}.",
+      "until": "This lasts until {date}.",
+      "emailSubject": "A change to your price",
+      "emailBody": "Your price will change from {oldPrice} to {newPrice} from {date}. Invoices already issued are not changed.",
+      "emailAsk": "To ask about this change, reply to this email or raise a ticket from Help."
+    },
     "status": {
       "overdue": "Overdue",
       "expiringSoon": "Expiring soon",
@@ -1983,6 +2020,7 @@
       "received": "Received",
       "inProgress": "In progress",
       "waitingForYou": "Waiting for your reply",
+      "waitingForCustomer": "Waiting for your reply",
       "resolved": "Resolved",
       "closed": "Closed",
       "reopened": "Reopened"
@@ -2443,6 +2481,23 @@
     "title": "Plan and billing",
     "plan": "Your plan",
     "price": "{amount} a month",
+    "listPrice": "List price: {amount} a month",
+    "yourPrice": "Your price: {amount} a month",
+    "adjustment": {
+      "discount": "{reason} discount, {detail}: {amount}",
+      "increase": "{reason} increase, {detail}: {amount}",
+      "minus": "minus {size} per cent",
+      "plus": "plus {size} per cent",
+      "fixed": "fixed price",
+      "reason": {
+        "loyalty": "Loyalty",
+        "retention": "Retention",
+        "introductory": "Introductory offer",
+        "annualReview": "Annual review",
+        "correction": "Correction",
+        "other": "Price change"
+      }
+    },
     "nextInvoice": "Next invoice on {date}",
     "invoices": "Invoices",
     "invoice": "Invoice {number}",
@@ -3142,6 +3197,327 @@
     "stepLabel": "Step {number}"
   },
   "provider": {
+    "shell": {
+      "status": "System status",
+      "statusOk": "All systems working",
+      "statusNote": "Simulated",
+      "notifications": "Notifications"
+    },
+    "loadError": "We could not load this page. Please try again.",
+    "noPermission": "You don't have access to this. Ask your manager.",
+    "accountState": {
+      "trial": "Trial",
+      "active": "Active",
+      "pastDue": "Payment overdue",
+      "limited": "Limited",
+      "readOnly": "Read only",
+      "closed": "Closed",
+      "deleted": "Deleted",
+      "paused": "Paused"
+    },
+    "overview": {
+      "title": "Overview",
+      "clientsTotal": "Clients",
+      "sitesTotal": "Sites",
+      "peopleTotal": "People",
+      "byState": "Clients by account state",
+      "attention": "Needs attention",
+      "attentionNone": "No clients need attention.",
+      "viewClient": "Open {name}",
+      "simulatedNote": "Health scores are simulated for this demo."
+    },
+    "clients": {
+      "title": "Clients",
+      "stateFilter": "Account state",
+      "allStates": "All states",
+      "none": "No clients match.",
+      "name": "Client",
+      "sites": "Sites: {count}",
+      "people": "People: {count}",
+      "health": "Health score: {score} (simulated)",
+      "noHealth": "No health score yet",
+      "new": "New client"
+    },
+    "newClient": {
+      "title": "New client",
+      "intro": "Set up a new client account. We email the first admin an invitation.",
+      "noPermission": "You don't have permission to add clients.",
+      "name": "Organisation name",
+      "pack": "Industry pack",
+      "stubFlag": "(preview only)",
+      "package": "Package",
+      "billing": "Trial or paid",
+      "trial": "Trial",
+      "paid": "Paid",
+      "trialDays": "Trial length in days",
+      "billingContact": "Billing contact",
+      "billingContactHint": "An email address. Leave blank to use the first admin's email.",
+      "sitesHeading": "Sites",
+      "site": "Site name",
+      "addSite": "Add site",
+      "adminHeading": "First admin",
+      "adminName": "First admin name",
+      "adminEmail": "First admin email",
+      "adminRole": "Account Owner",
+      "twoFactor": "They must set up two-step sign-in before they can use the account.",
+      "submit": "Create client",
+      "saving": "Creating the client...",
+      "created": "Client created",
+      "createdBody": "{name} is ready.",
+      "viewClient": "Open client",
+      "invitationSent": "Invitation email",
+      "invitationTo": "To: {to}",
+      "invitationSubject": "Subject: {subject}",
+      "saveError": "We could not create the client. Please try again.",
+      "error": {
+        "name": "Enter the organisation name.",
+        "site": "Enter a name for this site.",
+        "email": "Enter a valid email address.",
+        "adminName": "Enter the first admin's name.",
+        "billingContact": "Enter a valid email address, or leave this blank.",
+        "trialDays": "Enter a whole number of days from 1 to 90."
+      }
+    },
+    "client": {
+      "notFound": "We could not find that client.",
+      "back": "Back to clients",
+      "tabsLabel": "Client sections",
+      "tabs": {
+        "overview": "Overview",
+        "sites": "Sites",
+        "staff": "Staff",
+        "usage": "Usage",
+        "api": "API",
+        "errors": "Errors and logs",
+        "tickets": "Support tickets",
+        "billing": "Billing",
+        "modules": "Modules",
+        "competitions": "Competitions",
+        "audit": "Audit",
+        "device": "This device"
+      },
+      "laterStep": "This section is not part of the demo yet.",
+      "auditIntro": "What people did for this client, newest first.",
+      "auditEmpty": "Nothing has been recorded for this client yet.",
+      "auditLine": "{who} at {when}",
+      "usageNone": "No usage recorded yet.",
+      "usageLine": "{feature}: {count} uses, {users} active people",
+      "errorsNone": "No errors recorded for this client.",
+      "errorLine": "{message}: seen {count} times, {users} people affected",
+      "errorStatus": "Status: {status}"
+    },
+    "errorStatus": {
+      "open": "Open",
+      "acknowledged": "Acknowledged",
+      "resolved": "Resolved"
+    },
+    "thisDevice": {
+      "intro": "Errors and events this browser has recorded. They stay on this device and are never sent anywhere.",
+      "empty": "Nothing has been recorded on this device.",
+      "error": "Error",
+      "event": "Event"
+    },
+    "addOns": {
+      "heading": "Add-on catalogue",
+      "priceFlat": "{price} per month",
+      "priceUsage": "{price} per {unit}, {included} included each month",
+      "appliesTo": "Every add-on applies to: {options}",
+      "optionA": "Option A",
+      "optionB": "Option B",
+      "demoAi": "Demo AI",
+      "editPrice": "Edit price",
+      "editPriceHint": "Price changes are confirmed with a code on the Price changes page.",
+      "noPermission": "You don't have permission to see add-ons."
+    },
+    "dunning": {
+      "heading": "Dunning",
+      "outstanding": "Total outstanding: {amount}",
+      "recoveryRate": "Recovery rate: {percent}%",
+      "noFailures": "No payment failures yet",
+      "amount": "Outstanding: {amount}",
+      "nextState": "Next: {state} in {count} days",
+      "nextStateOne": "Next: {state} in 1 day",
+      "deletion": "Deleted in {count} days",
+      "deletionOne": "Deleted in 1 day",
+      "extendGrace": "Extend grace",
+      "pause": "Pause timeline",
+      "resume": "Resume timeline",
+      "sensitive": "Sensitive",
+      "daysLabel": "Days to add (1 to 30)",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "dialogTitle": "Extend grace for {client}",
+      "empty": "No accounts need attention.",
+      "paused": "Timeline paused",
+      "noPermission": "You don't have permission to see dunning.",
+      "failed": "That change could not be saved. Check the number of days and try again."
+    },
+    "supportSettings": {
+      "heading": "Support settings",
+      "link": "Support settings",
+      "noPermission": "You don't have permission to see support settings.",
+      "features": "Features",
+      "issueTypes": "Issue types",
+      "otherEntries": "Other entries review",
+      "fieldLabel": "Review field",
+      "fieldFeature": "Feature",
+      "fieldIssueType": "Issue type",
+      "usedBy": "Used by {count} clients",
+      "usedByOne": "Used by 1 client",
+      "tickets": "{count} tickets",
+      "ticketsOne": "1 ticket",
+      "trending": "Trending",
+      "empty": "Nothing to review.",
+      "createIssueType": "Create issue type",
+      "name": "Name",
+      "create": "Create",
+      "cancel": "Cancel",
+      "ticketsToRetag": "Tickets to re-tag",
+      "retagged": "Re-tagged {count} tickets",
+      "retaggedOne": "Re-tagged 1 ticket",
+      "failed": "That could not be saved. Check the details and try again.",
+      "savedReplies": "Saved replies",
+      "replyTitle": "Title",
+      "replyBody": "Body",
+      "addReply": "Add saved reply"
+    },
+    "tickets": {
+      "heading": "Ticket inbox",
+      "filters": {
+        "status": "Status",
+        "client": "Client",
+        "assignee": "Assignee",
+        "impact": "Impact",
+        "all": "All"
+      },
+      "unassigned": "Unassigned",
+      "assignToMe": "Assign to me",
+      "dueIn": "Response due in {count} hours",
+      "dueInOne": "Response due in 1 hour",
+      "overdueBy": "Response overdue by {count} hours",
+      "overdueByOne": "Response overdue by 1 hour",
+      "responded": "Resolved",
+      "status": {
+        "received": "Received",
+        "inProgress": "In progress",
+        "waitingForCustomer": "Waiting for customer",
+        "resolved": "Resolved",
+        "closed": "Closed"
+      },
+      "impact": {
+        "blocked": "Blocked",
+        "workaround": "Workaround available",
+        "question": "Question"
+      },
+      "savedViews": "Saved views",
+      "views": {
+        "needsReply": "Needs reply",
+        "breached": "Breached"
+      },
+      "empty": "No tickets match these filters",
+      "noPermission": "You don't have permission to see tickets.",
+      "assignFailed": "That ticket could not be assigned. Try again."
+    },
+    "ticket": {
+      "back": "Back to Ticket inbox",
+      "screenshots": "Screenshots",
+      "conversation": "Conversation",
+      "internalNote": "Internal note",
+      "context": "Ticket details",
+      "client": "Client",
+      "raisedBy": "Raised by",
+      "feature": "Feature",
+      "issueType": "Issue type",
+      "impact": "Impact",
+      "status": "Status",
+      "replyLabel": "Reply to customer",
+      "send": "Send reply",
+      "addNoteToggle": "Add internal note",
+      "noteLabel": "Internal note",
+      "addNote": "Add note",
+      "savedReplies": "Insert saved reply",
+      "statusLabel": "Status",
+      "assignLabel": "Assign to",
+      "unassigned": "Unassigned",
+      "notFound": "That ticket could not be found.",
+      "noPermission": "You don't have permission to see tickets.",
+      "failed": "That change could not be saved. Try again.",
+      "from": "{name}, {time}",
+      "customerSide": "Customer",
+      "providerSide": "Support team"
+    },
+    "commercial": {
+      "heading": "Commercial pages",
+      "packs": "Industry packs",
+      "packages": "Packages and entitlements",
+      "addOns": "Add-on catalogue",
+      "dunning": "Dunning"
+    },
+    "packages": {
+      "heading": "Packages and entitlements",
+      "optionRegion": "Packaging option",
+      "optionLegend": "Packaging option",
+      "optionA": "Option A: three tiers",
+      "optionB": "Option B: one plan",
+      "demoNote": "This switch applies to the whole demo. Every client is evaluated on the chosen option.",
+      "readOnlyNote": "You can see the option but not change it.",
+      "limit": "{label}: {value}",
+      "unlimited": "Unlimited",
+      "yes": "Yes",
+      "no": "No",
+      "limitLabels": {
+        "ownModules": "Own modules",
+        "savedThemes": "Saved themes",
+        "admins": "Admins",
+        "autoAssignRules": "Auto-assign rules",
+        "liveCompetitions": "Live competitions",
+        "customClientRoles": "Custom client roles",
+        "closedBookCompetitions": "Closed-book competitions",
+        "multiSite": "Multi-site",
+        "logoBranding": "Logo and branding",
+        "perSiteThemes": "Per-site themes",
+        "integrations": "Integrations",
+        "responseTargetHours": "Support response target (hours)",
+        "battlesPerMonth": "Battles per month",
+        "maxBattlePlayers": "Most players in a battle",
+        "crossSiteBattles": "Battles across sites"
+      },
+      "recordsKeeperHeading": "Records Keeper",
+      "recordsKeeperBody": "Available under both options.",
+      "loadError": "We could not load the packaging option. Please try again.",
+      "noPermission": "You don't have permission to see packages."
+    },
+    "packs": {
+      "heading": "Industry packs",
+      "intro": "The industry packs available to clients. This page is read only.",
+      "statusFull": "Full pack",
+      "statusStub": "Stub",
+      "roles": "Job roles: {count}",
+      "requirements": "Requirements: {count}",
+      "terminologyHeading": "Terminology",
+      "prizesHeading": "Prize suggestions",
+      "stubNote": "Stub pack: terminology only. Roles, requirements and prize lists arrive with the pack's build.",
+      "noPermission": "You don't have access to this. Ask your manager.",
+      "terms": {
+        "site": "Site",
+        "team": "Team",
+        "auditExport": "Audit export",
+        "inspector": "Inspector"
+      }
+    },
+    "links": {
+      "region": "Learn more links",
+      "check": "Check links",
+      "checking": "Checking links",
+      "simulated": "This check is simulated in the demo. No web requests are made.",
+      "result": "Checked {checked} links. {broken} broken.",
+      "noneBroken": "No broken links found.",
+      "brokenHeading": "Broken links",
+      "opensHeading": "Opens across all clients",
+      "opens": "{count} opens",
+      "loadError": "Could not load link information.",
+      "noPermission": "You don't have access to this. Ask your manager."
+    },
     "feedback": {
       "moduleRegion": "Module feedback",
       "ownRegion": "Our clients' own modules",
@@ -3169,6 +3545,496 @@
         "done": "Done",
         "wontDo": "Won't do"
       }
+    },
+    "comms": {
+      "heading": "Announcements and release notes",
+      "announcements": "Announcements",
+      "releaseNotes": "Release notes",
+      "noAccess": "You do not have access to send announcements.",
+      "none": "No announcements yet.",
+      "noNotes": "No release notes yet.",
+      "audienceGroup": "Audience",
+      "audience": {
+        "all": "All clients",
+        "package": "A package",
+        "pack": "An industry pack",
+        "clients": "Selected clients"
+      },
+      "channelGroup": "How to send it",
+      "channel": {
+        "banner": "Banner",
+        "notification": "Notification",
+        "email": "Email"
+      },
+      "packageField": "Package",
+      "packField": "Industry pack",
+      "clientsField": "Clients",
+      "titleField": "Title",
+      "messageField": "Message",
+      "publishAt": "Show from",
+      "expiresAt": "Show until",
+      "preview": "Preview",
+      "help": "Banners show at the top of the app. Notifications appear in the bell. Emails go to the main contact. Choose when it starts and stops showing.",
+      "send": "Send announcement",
+      "audienceLabel": "Audience: {audience}",
+      "channelsLabel": "Channels: {channels}",
+      "reads": "Read {count} times",
+      "failed": "That could not be sent. Check the title, the audience, at least one channel and the times, then try again.",
+      "noteDate": "Released {date}"
+    },
+    "audit": {
+      "heading": "Audit log",
+      "noAccess": "You do not have access to the audit log.",
+      "action": "Action",
+      "allActions": "All actions",
+      "client": "Client",
+      "allClients": "All clients",
+      "empty": "No events match.",
+      "actor": "Who",
+      "when": "When",
+      "unknownActor": "Unknown person"
+    },
+    "security": {
+      "heading": "Security",
+      "demoOnly": "Demo only",
+      "policy": "Two-step sign-in is required for all provider team members, with a few days grace to set it up.",
+      "yourStatus": "Your two-step sign-in",
+      "status": {
+        "enrolled": "On",
+        "notYet": "Not set up yet"
+      },
+      "sessions": "Sessions",
+      "thisDevice": "This device",
+      "signOutAll": "Sign out everywhere",
+      "signedOut": "Signed out everywhere on this demo.",
+      "trustTitle": "Trusted device",
+      "trust": "Trust this device for 30 days",
+      "on": "On",
+      "off": "Off",
+      "commitments": {
+        "heading": "Our security and data commitments",
+        "twoStep": "Everyone on the provider team signs in with two steps, and client administrators can be asked to as well.",
+        "auditLog": "Every sensitive change is written to an audit log that cannot be edited. It shows who, when and what, never the personal details.",
+        "stagedStates": "If a payment fails, the account moves through clear stages (Past due, Limited, then Read-only). Staff keep training through the early stages and nothing is deleted.",
+        "exports": "Exports of compliance records are never held back. Clients can download their records in every account state, up to and before deletion.",
+        "retention": "Each client sets a retention schedule for their records, and the data page shows what will be removed and when.",
+        "simulated": "This demo simulates authentication, payments and messaging. No real sign-in, card payment, email or text message is ever sent.",
+        "auditLink": "Open the audit log"
+      }
+    },
+    "signin": {
+      "title": "Provider sign in",
+      "demoOnly": "Demo only: any email and password work.",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "intro": "Enter the code from your authenticator app.",
+      "code": "Sign-in code",
+      "confirm": "Confirm",
+      "useRecovery": "Use a recovery code",
+      "useAppCode": "Use the app code",
+      "recoveryLabel": "Recovery code",
+      "wrong": "That code is not right. Try again.",
+      "locked": "Too many tries. Wait a little and try again."
+    },
+    "team": {
+      "heading": "Team and roles",
+      "noAccess": "You do not have access to the team.",
+      "readOnly": "You can look at the team but not change anything here.",
+      "loadError": "We could not load the team. Please try again.",
+      "members": "Members",
+      "status": {
+        "active": "Active",
+        "invited": "Invited",
+        "suspended": "Suspended"
+      },
+      "invite": {
+        "heading": "Invite someone",
+        "email": "Email",
+        "name": "Name",
+        "role": "Role",
+        "submit": "Send invite",
+        "error": "Check the email address and name, then try again."
+      },
+      "changeRole": "Change role",
+      "suspend": "Suspend",
+      "reactivate": "Reactivate",
+      "lastOwner": "There must always be at least one Account Owner.",
+      "changeError": "That change could not be made. You may not have the right to do it.",
+      "roles": "Roles",
+      "system": "System role",
+      "custom": "Custom role",
+      "new": "New role",
+      "edit": "Edit role",
+      "editor": "Role editor",
+      "roleName": "Role name",
+      "roleDescription": "Description",
+      "save": "Save role",
+      "cancelEdit": "Close editor",
+      "saveError": "Check the role name, then try again. You can only give permissions you hold yourself.",
+      "sensitive": "Sensitive",
+      "addedDeps": "Also added because it needs them: {names}",
+      "blockedRemove": "Cannot remove this yet. Needed by: {names}",
+      "area": {
+        "ai": "AI tools",
+        "audit": "Audit log",
+        "billing": "Billing",
+        "clients": "Clients",
+        "comms": "Messages to clients",
+        "content": "Content",
+        "dataRequests": "Data requests",
+        "feedback": "Feedback",
+        "incidents": "Incidents",
+        "ops": "Operations",
+        "owner": "Owner-only actions",
+        "packs": "Industry packs",
+        "recovery": "Account recovery",
+        "roles": "Roles",
+        "security": "Security",
+        "system": "System",
+        "team": "Team",
+        "tickets": "Support tickets"
+      },
+      "compare": "Compare roles",
+      "from": "From role",
+      "to": "To role",
+      "chooseRole": "Choose a role",
+      "added": "Added",
+      "removed": "Removed",
+      "none": "None",
+      "effective": "Effective permissions",
+      "effectiveFor": "Effective permissions for {name}",
+      "grantedBy": "Granted by {role}",
+      "grantedDirectly": "Granted directly",
+      "transfer": {
+        "heading": "Ownership transfer",
+        "newOwner": "New owner",
+        "afterwards": "Role for you afterwards",
+        "start": "Start transfer",
+        "cancel": "Cancel transfer",
+        "accept": "Accept ownership",
+        "code": "Confirmation code",
+        "confirm": "Confirm",
+        "complete": "Complete transfer",
+        "completeWaiting": "Complete is available when the cooling-off period has ended.",
+        "error": "That did not work. Check the details and try again.",
+        "status": {
+          "requested": "Waiting for {name} to accept",
+          "accepted": "{name} has accepted. Enter your confirmation code.",
+          "confirmed": "Confirmed. Cooling off ends in {days} days",
+          "confirmedOne": "Confirmed. Cooling off ends in 1 day",
+          "ready": "Confirmed. The cooling-off period has ended.",
+          "done": "Done",
+          "cancelled": "Cancelled"
+        }
+      }
+    },
+    "recovery": {
+      "heading": "Account recovery",
+      "noAccess": "You do not have access to account recovery.",
+      "approvals": "Approved by {count} of 2",
+      "status": {
+        "open": "Open",
+        "approved": "Approved",
+        "done": "Done",
+        "rejected": "Rejected"
+      },
+      "coolingOff": "Cooling off ends in {hours} hours",
+      "coolingOffOne": "Cooling off ends in 1 hour",
+      "coolingOffEnded": "Cooling off has ended",
+      "coolingOffNotSet": "Cooling off starts when the request is approved",
+      "completeWaiting": "Complete is available when the cooling-off period has ended.",
+      "approve": "Approve",
+      "complete": "Complete",
+      "reject": "Reject",
+      "outcomeLabel": "Outcome",
+      "outcomeNone": "Choose an outcome",
+      "outcomeReset2fa": "Reset two-factor",
+      "outcomeTransferOwner": "Transfer Account Owner",
+      "checklist": {
+        "heading": "Identity checks",
+        "callBack": "Call back to the number or email on record",
+        "otherAdmin": "Confirmation from another named client admin",
+        "documented": "Checklist documented"
+      },
+      "new": {
+        "heading": "New request",
+        "client": "Client",
+        "person": "Person",
+        "reason": "Reason",
+        "submit": "Start request",
+        "choose": "Choose"
+      },
+      "requests": "Requests",
+      "none": "There are no recovery requests.",
+      "failed": "That could not be saved. Check the details and try again."
+    },
+    "dataRequests": {
+      "heading": "Data requests",
+      "noAccess": "You do not have access to data requests.",
+      "note": "The client is the controller of its staff's personal data. The provider helps the client answer each request and keeps this log.",
+      "list": "Requests",
+      "kind": {
+        "access": "Access",
+        "correction": "Correction",
+        "erasure": "Erasure",
+        "other": "Other"
+      },
+      "status": {
+        "open": "Open",
+        "done": "Done",
+        "rejected": "Rejected"
+      },
+      "received": "Received {date}",
+      "due": "Due {date}",
+      "dueIn": "Due in {count} days",
+      "dueInOne": "Due in 1 day",
+      "dueToday": "Due today",
+      "overdue": "Overdue by {count} days",
+      "dueSoon": "Due soon",
+      "evidenceShown": "Evidence: {text}",
+      "new": "Log request",
+      "newKind": "Kind",
+      "newRequester": "Requester",
+      "newClient": "Client (optional)",
+      "noClient": "No client",
+      "newNotes": "Notes",
+      "submit": "Log request",
+      "requesterError": "Enter who made the request.",
+      "done": "Mark done",
+      "evidence": "Evidence of completion",
+      "reject": "Reject",
+      "reason": "Reason",
+      "confirm": "Save",
+      "failed": "That could not be saved. Check the details and try again."
+    },
+    "status": {
+      "heading": "Status and incidents",
+      "noAccess": "You do not have access to status and incidents.",
+      "current": "Current status",
+      "incidents": "Incidents",
+      "none": "There are no incidents.",
+      "level": {
+        "normal": "Normal",
+        "degraded": "Degraded",
+        "maintenance": "Maintenance",
+        "incident": "Incident"
+      },
+      "levelMessage": {
+        "normal": "Everything is working as expected.",
+        "degraded": "Some things are slower than usual.",
+        "maintenance": "Planned maintenance is under way.",
+        "incident": "There is a problem we are working on."
+      },
+      "update": {
+        "investigating": "Investigating",
+        "identified": "Identified",
+        "monitoring": "Monitoring",
+        "resolved": "Resolved"
+      },
+      "updateStatus": "Status",
+      "message": "Message",
+      "addUpdate": "Add update",
+      "updateFailed": "Enter a message for the update.",
+      "post": {
+        "heading": "Post incident",
+        "level": "Level",
+        "title": "Title",
+        "submit": "Post incident",
+        "titleError": "Enter a title for the incident.",
+        "failed": "That could not be posted. Check the details and try again."
+      },
+      "maintenance": "Maintenance",
+      "maintenanceHelp": "Turn an app on to show the maintenance banner to its users. The banner will say that the app is being updated and to try again soon.",
+      "app": {
+        "staff": "Staff",
+        "client": "Client",
+        "provider": "Provider"
+      },
+      "on": "On",
+      "off": "Off"
+    },
+    "global": {
+      "heading": "Global content",
+      "noAccess": "You do not have access to global content.",
+      "readOnly": "You can look at global content but not change it.",
+      "themes": "Seasonal themes",
+      "prizes": "Prize suggestions",
+      "faqs": "Global FAQs",
+      "badges": "Badges",
+      "levels": "Levels",
+      "level": "Level {level}",
+      "levelFrom": "{xp} XP",
+      "prizeDisclaimer": "The client provides and pays for the prize and is responsible for any tax, payroll or legal implications.",
+      "newPrize": "New prize suggestion",
+      "addPrize": "Add prize suggestion",
+      "removePrize": "Remove {text}",
+      "prizeAdded": "Added to the prize suggestions.",
+      "prizeRemoved": "Removed from the prize suggestions.",
+      "prizeDuplicate": "That suggestion is already in the list.",
+      "prizeInvalid": "Type a suggestion of up to 120 characters.",
+      "loadError": "Could not load global content."
+    },
+    "ai": {
+      "heading": "AI add-on settings",
+      "noAccess": "You do not have access to AI settings.",
+      "demo": "Demo AI",
+      "demoNote": "This is Demo AI: scripted answers, no real model and no network requests.",
+      "guardrails": "Guardrails",
+      "guardrail": {
+        "grounded": "Answers use only the client's approved modules and policies, and cite them.",
+        "noAdvice": "No legal advice and no predictions about inspection outcomes.",
+        "personalData": "Staff are warned not to paste personal data. Children's data is never included.",
+        "draft": "AI output is always a draft that a person must review before it is published."
+      },
+      "usage": "Usage by client",
+      "used": "{used} of {included} questions used",
+      "status": {
+        "off": "Off",
+        "on": "On",
+        "trial": "Trial"
+      },
+      "killSwitchOn": "AI switched off by the provider",
+      "switchOff": "Switch off AI for {name}",
+      "switchBackOn": "Switch AI back on for {name}",
+      "switchedOff": "AI switched off for {name}.",
+      "switchedOn": "AI switched back on for {name}.",
+      "loadError": "Could not load AI settings."
+    },
+    "profileChanges": {
+      "heading": "Profile changes",
+      "noAccess": "You do not have access to profile changes.",
+      "oldName": "Old name",
+      "newName": "New name",
+      "billingName": "Billing name",
+      "keep": "Keep billing name",
+      "update": "Update billing name to match",
+      "ask": "Ask the client",
+      "revert": "Revert display name",
+      "loadError": "Could not load profile changes.",
+      "failed": "That did not work. Please try again.",
+      "names": {
+        "heading": "Organisation name changes"
+      },
+      "status": {
+        "pendingReview": "Waiting for review",
+        "billingKept": "Billing name kept",
+        "billingUpdated": "Billing name updated",
+        "clientAsked": "Client asked",
+        "reverted": "Display name reverted"
+      },
+      "confirm": {
+        "kept": "Billing name kept.",
+        "updated": "Billing name updated for future invoices.",
+        "asked": "We have asked the client to confirm their billing details.",
+        "reverted": "Display name reverted."
+      },
+      "billing": {
+        "heading": "Billing detail requests",
+        "status": {
+          "pending": "Waiting",
+          "approved": "Approved",
+          "declined": "Declined"
+        },
+        "proposed": "Proposed change",
+        "reason": "Reason given",
+        "approve": "Approve",
+        "edit": "Edit before approving",
+        "decline": "Decline",
+        "fieldName": "Billing name",
+        "fieldAddress": "Address",
+        "fieldVat": "VAT number",
+        "save": "Save and approve",
+        "declineReason": "Reason for declining",
+        "confirmDecline": "Send decision",
+        "confirm": {
+          "approved": "Request approved.",
+          "declined": "Request declined."
+        }
+      }
+    },
+    "pricing": {
+      "heading": "Price changes",
+      "noticeInvalid": "Enter the notice as a whole number of days, 0 or more.",
+      "noAccess": "You do not have access to price changes.",
+      "loadError": "Could not load price changes.",
+      "failed": "That did not work. Please try again.",
+      "group": {
+        "draft": "Drafts",
+        "submitted": "Awaiting confirmation",
+        "scheduled": "Scheduled",
+        "active": "Active",
+        "ended": "Ended"
+      },
+      "status": {
+        "draft": "Draft",
+        "submitted": "Awaiting confirmation",
+        "scheduled": "Scheduled",
+        "active": "Active",
+        "ended": "Ended",
+        "cancelled": "Cancelled"
+      },
+      "new": "New change",
+      "clientsLegend": "Clients",
+      "clients": {
+        "one": "One client",
+        "several": "Several clients",
+        "all": "All clients"
+      },
+      "client": "Client",
+      "typeLabel": "Type",
+      "type": {
+        "override": "Price override",
+        "discount": "Percentage discount",
+        "increase": "Percentage increase"
+      },
+      "scopeLabel": "Applies to",
+      "addOnLabel": "Add-on",
+      "scope": {
+        "plan": "Plan",
+        "addOn": "One add-on",
+        "invoice": "Whole invoice"
+      },
+      "value": "Value",
+      "reasonLabel": "Reason",
+      "reason": {
+        "loyalty": "Loyalty",
+        "retention": "Retention",
+        "introductory": "Introductory offer",
+        "annualReview": "Annual review",
+        "correction": "Correction",
+        "other": "Other"
+      },
+      "noticeDays": "Notice days",
+      "endsAt": "End date (optional)",
+      "endsOn": "Ends {date}",
+      "preview": "Preview",
+      "previewCols": {
+        "client": "Client",
+        "current": "Current price",
+        "new": "New price",
+        "effective": "Takes effect",
+        "effect": "Monthly effect"
+      },
+      "saveDraft": "Save draft",
+      "submit": "Submit for confirmation",
+      "confirm": "Confirm",
+      "stepUp": "Step-up code",
+      "confirmNow": "Confirm change",
+      "cancel": "Cancel change",
+      "wrongCode": "That code is not right.",
+      "stepUpRequired": "Enter your step-up code.",
+      "done": {
+        "saved": "Draft saved.",
+        "submitted": "Sent for confirmation.",
+        "confirmed": "Price change confirmed.",
+        "cancelled": "Price change cancelled."
+      },
+      "warning": {
+        "increaseOver20": "This increase is over 20 per cent.",
+        "belowFloor": "The new price is below the minimum price."
+      },
+      "noChanges": "There are no price changes yet."
     }
   }
 }

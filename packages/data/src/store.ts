@@ -19,7 +19,17 @@ import { createSupportOperations } from './supportOps';
 import { createThemesOperations } from './themesOps';
 import { createDataRightsOperations } from './dataRightsOps';
 import { createRulesOperations, newPersonPrefs } from './rulesOps';
+import { createOwnershipOperations } from './ownershipOps';
+import { createProviderTeamOperations } from './providerTeamOps';
+import { createProviderTicketOperations } from './providerTicketOps';
+import { createProviderCommsOperations } from './providerCommsOps';
+import { createProviderIncidentsOperations } from './providerIncidentsOps';
+import { createProviderRecoveryOperations } from './providerRecoveryOps';
 import { createPricingOperations } from './pricingOps';
+import { createDunningOperations } from './dunningOps';
+import { createProviderGlobalAiOperations } from './providerGlobalAiOps';
+import { createProviderOverviewOperations } from './providerOverviewOps';
+import { createProviderOperations } from './providerOps';
 import { createBillingOperations, simulateFailedPayment } from './billingOps';
 import { keyOf, validate, type RawBackend, type SettingsRecord, type WriteOp } from './backend';
 import {
@@ -293,6 +303,16 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
   const identity = createIdentityOperations(backend, options);
   const billingOps = createBillingOperations(backend, options);
   const pricing = createPricingOperations(backend, options);
+  const providerOps = createProviderOperations(backend, options);
+  const ownership = createOwnershipOperations(backend, options);
+  const providerTeam = createProviderTeamOperations(backend, options);
+  const providerTicketOps = createProviderTicketOperations(backend, options);
+  const commsOps = createProviderCommsOperations(backend, options);
+  const incidentOps = createProviderIncidentsOperations(backend, options);
+  const recoveryOps = createProviderRecoveryOperations(backend, options);
+  const dunningOps = createDunningOperations(backend, options);
+  const globalAiOps = createProviderGlobalAiOperations(backend, options);
+  const overviewOps = createProviderOverviewOperations(backend, options);
   const authoringOps = createAuthoringOperations(backend, options);
   const evidenceFlow = createEvidenceOperations(backend, options);
   const support = createSupportOperations(backend, options);
@@ -328,6 +348,27 @@ export function createStore(rawBackend: RawBackend, options: StoreOptions): Stor
     addOns: { ...withoutRemove('addOns'), ...billingOps.addOnOps },
     billing: billingOps.billing,
     pricing,
+    providerOps,
+    ownership,
+    providerTeam,
+    providerTickets: providerTicketOps.providerTickets,
+    savedReplies: providerTicketOps.savedReplies,
+    otherEntries: providerTicketOps.otherEntries,
+    providerComms: commsOps.providerComms,
+    releaseNotes: commsOps.releaseNotes,
+    incidents: incidentOps.incidents,
+    dataRequests: incidentOps.dataRequests,
+    maintenance: commsOps.maintenance,
+    linkCheck: commsOps.linkCheck,
+    learnMore: commsOps.learnMore,
+    recovery: recoveryOps.recovery,
+    providerOverview: overviewOps.providerOverview,
+    globalContent: globalAiOps.globalContent,
+    aiSettings: globalAiOps.aiSettings,
+    dunning: dunningOps.dunning,
+    telemetry: overviewOps.telemetry,
+    profileChanges: recoveryOps.profileChanges,
+    billingChanges: recoveryOps.billingChanges,
     addOnRequests: billingOps.addOnRequests,
     account: billingOps.account,
     ai: billingOps.ai,

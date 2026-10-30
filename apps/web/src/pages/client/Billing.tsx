@@ -4,12 +4,12 @@ import { useState, type SyntheticEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Badge, Button, DescriptionList, Dialog, LinkButton, PageHeader } from '@sta/ui';
 import { holdsAnywhere } from '@sta/domain';
-import type { PlanPreview } from '@sta/data';
+import type { BillingOverview, PlanPreview } from '@sta/data';
 import type { MessageKey } from '@sta/content';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { formatLondonDate, formatPounds } from '../../demo/format';
 import { foundationsErrorKey, inputClass } from './foundationsErrors';
-import { useAddOns, useBillingOverview, useInvoices, usePlanOptions } from './billingQueries';
+import { useAddOns, useBillingOverview, useInvoices, usePlanOptions, usePriceNotices } from './billingQueries';
 import { Section } from './billingShared';
 import { PermissionGate } from './PermissionGate';
 import { usePermissions } from './queries';
@@ -336,6 +336,74 @@ function DetailsSection({ canManage }: { canManage: boolean }) {
   );
 }
 
+/** The list price, the separate discount or increase line, and what is paid (brief 23.11). */
+export function AdjustedPrice({ overview: o }: { overview: BillingOverview }) {
+  const t = useT();
+  const a = o.adjustment;
+  if (!a) return null;
+  const size = String(Math.abs(a.value));
+  const detail =
+    a.type === 'override'
+      ? t('billing.adjustment.fixed')
+      : t(a.value < 0 ? 'billing.adjustment.minus' : 'billing.adjustment.plus', { size });
+  const signed = `${a.amount < 0 ? '-' : '+'}${formatPounds(Math.abs(a.amount))}`;
+  return (
+    <div data-testid="adjusted-price">
+      <p className="m-0">{t('billing.listPrice', { amount: formatPounds(o.planPrice.total) })}</p>
+      <p className="m-0" data-testid="adjustment-line">
+        {t(a.direction === 'discount' ? 'billing.adjustment.discount' : 'billing.adjustment.increase', {
+          reason: t(`billing.adjustment.reason.${a.reason}` as MessageKey),
+          detail,
+          amount: signed,
+        })}
+      </p>
+      <p className="m-0 text-xl font-bold">{t('billing.yourPrice', { amount: formatPounds(o.yourPrice) })}</p>
+    </div>
+  );
+}
+
+function PriceNotices() {
+  const t = useT();
+  const notices = usePriceNotices();
+  if (!notices.data || notices.data.length === 0) return null;
+  return (
+    <>
+      {notices.data.map((n) => {
+        const amount = n.type === 'percent' ? `${String(n.value)}%` : formatPounds(n.value);
+        const what =
+          n.scope.kind === 'addOn'
+            ? t('client.priceNotice.addOn')
+            : n.scope.kind === 'invoice'
+              ? t('client.priceNotice.invoice')
+              : t('client.priceNotice.plan');
+        const headingId = `price-notice-${n.id}`;
+        return (
+          <section
+            key={n.id}
+            data-testid="price-notice"
+            aria-labelledby={headingId}
+            className="mt-3 rounded-md border border-current p-3"
+          >
+            <h3 id={headingId} className="mt-0 mb-1 text-base font-bold">
+              {t('client.priceNotice.title')}
+            </h3>
+            <p className="m-0">
+              {t(n.type === 'percent' ? 'client.priceNotice.percent' : 'client.priceNotice.amount', {
+                what,
+                amount,
+                date: formatLondonDate(n.effectiveAt),
+              })}
+            </p>
+            {n.endAt ? (
+              <p className="mt-1 mb-0">{t('client.priceNotice.until', { date: formatLondonDate(n.endAt) })}</p>
+            ) : null}
+          </section>
+        );
+      })}
+    </>
+  );
+}
+
 function BillingBody() {
   const t = useT();
   const perms = usePermissions();
@@ -352,13 +420,17 @@ function BillingBody() {
       <PageHeader title={t('billing.title')} />
       <Section id="c19-plan" title={t('billing.plan')}>
         {currentName ? <p className="mt-0 mb-1 font-semibold">{t('billing.planName', { name: currentName })}</p> : null}
-        <p className="m-0 text-xl font-bold">{t('billing.price', { amount: formatPounds(o.planPrice.total) })}</p>
+        {o.adjustment ? <AdjustedPrice overview={o} /> : null}
+        {o.adjustment ? null : (
+          <p className="m-0 text-xl font-bold">{t('billing.price', { amount: formatPounds(o.planPrice.total) })}</p>
+        )}
         <p className="mt-1 mb-0">{t('billing.renews', { date: formatLondonDate(o.renewalAt) })}</p>
         {pendingName ? (
           <p className="mt-1 mb-0">
             {t('billing.pending', { name: pendingName, date: formatLondonDate(o.renewalAt) })}
           </p>
         ) : null}
+        <PriceNotices />
         <div className="mt-3" data-testid="payment-method">
           <span className="font-semibold">{t('billing.paymentMethod')}: </span>
           {o.paymentMethod

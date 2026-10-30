@@ -32,6 +32,8 @@ async function enrol(page: Page): Promise<string[]> {
   const shown = await codes.getByRole('listitem').allInnerTexts();
   await page.getByRole('button', { name: 'I have saved my codes' }).click();
   await expect(page).toHaveURL(/#\/client$/);
+  // The address changes before the router renders the dashboard; wait for the screen so a later goto starts clean.
+  await expect(page.getByRole('heading', { level: 1, name: 'Two-step sign-in' })).toBeHidden();
   return shown.map((c) => c.trim());
 }
 

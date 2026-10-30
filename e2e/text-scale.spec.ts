@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { readStore } from './helpers/idb';
 import { expectNoClipOrOverlap } from './helpers/layout';
 import { answerQuestion, finishLessons, type QuizQuestion } from './helpers/quiz';
-import { need, staffTabs } from './routes';
+import { m4Routes, need, staffTabs } from './routes';
 
 test.use({ viewport: { width: 390, height: 844 } });
 
@@ -36,11 +36,25 @@ test('the staff shell has no horizontal scroll at 200% text and every tab label 
 
 test('client and provider shells have no horizontal scroll at 200% text', async ({ page }) => {
   for (const hash of ['#/client', '#/provider']) {
+    // A hash-only goto keeps the old page mounted, so its heading could satisfy the wait: load afresh each time.
+    await page.goto('about:blank');
     await page.goto(`./${hash}`);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await scale(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
     await expect(page.getByRole('button', { name: 'More' })).toBeVisible();
+  }
+});
+
+// M4 chunk 18b: every provider screen P1 to P25 (without ids) has no sideways scroll at 200% text on a phone.
+test('provider screens P1 to P25 have no horizontal scroll at 200% text', async ({ page }) => {
+  test.setTimeout(180_000);
+  for (const r of m4Routes) {
+    await page.goto('about:blank');
+    await page.goto(`./${r.hash}`);
+    await expect(page.getByRole('heading', { level: 1 }).first(), r.hash).toBeVisible();
+    await scale(page);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), r.hash).toBeLessThanOrEqual(390);
   }
 });
 

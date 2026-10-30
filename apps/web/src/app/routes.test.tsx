@@ -54,13 +54,37 @@ const providerMore: Page[] = [
   { path: '/provider/tickets', label: t('nav.provider.support') },
   { path: '/provider/comms', label: t('nav.provider.comms') },
   { path: '/provider/team', label: t('nav.provider.teamSecurity') },
+  { path: '/provider/security', label: t('nav.provider.security') },
+  { path: '/provider/audit', label: t('nav.provider.audit') },
+  { path: '/provider/global', label: t('nav.provider.global') },
+  { path: '/provider/profile-changes', label: t('nav.provider.profileChanges') },
+  { path: '/provider/pricing', label: t('nav.provider.pricing') },
+  { path: '/provider/ai', label: t('nav.provider.ai') },
 ];
 
 describe('every shell route renders its title as the page heading', () => {
   const all: [Side, Page][] = [
     ...[...staffTabs, ...staffExtra].map((p): [Side, Page] => ['staff', p]),
     ...[...clientBar, ...clientMore].map((p): [Side, Page] => ['client', p]),
-    ...[...providerBar, ...providerMore].map((p): [Side, Page] => ['provider', p]),
+    ...[...providerBar, ...providerMore].map((p): [Side, Page] => [
+      'provider',
+      // P7, P11, P14, P18, P19 and P20 have their own screen titles; the nav items are the section names.
+      p.path === '/provider/packages'
+        ? { ...p, label: t('provider.packages.heading') }
+        : p.path === '/provider/tickets'
+          ? { ...p, label: t('provider.tickets.heading') }
+          : p.path === '/provider/comms'
+            ? { ...p, label: t('provider.comms.heading') }
+            : p.path === '/provider/team'
+              ? { ...p, label: t('provider.team.heading') }
+              : p.path === '/provider/security'
+                ? { ...p, label: t('provider.security.heading') }
+                : p.path === '/provider/audit'
+                  ? { ...p, label: t('provider.audit.heading') }
+                  : p.path === '/provider/ai'
+                    ? { ...p, label: t('provider.ai.heading') }
+                    : p,
+    ]),
   ];
   it.each(all)('%s %j', async (side, page) => {
     await renderRoute(page.path, side);
@@ -168,7 +192,9 @@ describe.each([
     for (const item of more) expect(within(sheet).getByRole('link', { name: item.label })).toBeTruthy();
     const target = more[0] ?? { path: '', label: '' };
     await userEvent.click(within(sheet).getByRole('link', { name: target.label }));
-    expect(await screen.findByRole('heading', { level: 1, name: target.label })).toBeTruthy();
+    // P11 has its own screen title; the nav item is the section name "Support".
+    const heading = target.path === '/provider/tickets' ? t('provider.tickets.heading') : target.label;
+    expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeTruthy();
     expect(router.state.location.pathname).toBe(target.path);
   });
 });

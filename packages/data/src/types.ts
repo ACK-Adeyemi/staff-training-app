@@ -1,9 +1,24 @@
 // Public types of the data layer (build pack 4.3). The UI talks to a DataStore and nothing else.
 import type {
   AccountState,
+  Announcement,
+  DataRequest,
+  Incident,
+  ErrorGroup,
+  HealthScore,
+  LocalTelemetryEntry,
+  UsageDaily,
+  ProfileChangeRequest,
+  RecoveryRequest,
+  ReleaseNote,
+  LinkCheckResult,
+  MaintenanceApp,
+  OtherEntryGroup,
+  SavedReply,
   AddOn,
   AddOnSubscription,
   PriceAdjustment,
+  OwnershipTransfer,
   previewAdjustment,
   EffectiveEntitlements,
   Assignment,
@@ -72,6 +87,8 @@ import type {
   Invoice,
   AutoAssignRule,
   ClientSettings,
+  ModuleNotice,
+  OnboardingChecklist,
 } from '@sta/domain';
 
 export type Id = string;
@@ -137,6 +154,10 @@ export const storeNames = [
   'profileChangeRequests',
   'linkCheckResults',
   'moduleNotices',
+  'usageDaily',
+  'errorGroups',
+  'healthScores',
+  'localTelemetry',
 ] as const;
 export type StoreName = (typeof storeNames)[number];
 
@@ -266,7 +287,10 @@ export type RuleName =
   | 'notAwaitingCheck'
   | 'invalidFeedback'
   | 'invalidTicket'
-  | 'invalidReply';
+  | 'invalidReply'
+  | 'invalidClient'
+  | 'invalidPublish'
+  | 'duplicate';
 
 /** A business rule said no (for example "finish every lesson first"). The web app maps `rule` to `errors.rule.<rule>`. */
 export class RuleError extends DataError {
@@ -567,6 +591,16 @@ export type BillingOverview = {
   packageId: Id;
   /** Package band price per site for the active staff count, times active sites (assumption 41). Pence. */
   planPrice: { perSite: number; sites: number; total: number };
+  /** What the organisation pays after any price change in force now (pence). Equals planPrice.total when none applies. */
+  yourPrice: number;
+  /** The separate discount or increase line, as codes the screen words from the language file. amount is signed pence. */
+  adjustment?: {
+    reason: PriceAdjustment['reason'];
+    direction: 'discount' | 'increase';
+    type: PriceAdjustment['type'];
+    value: number;
+    amount: number;
+  };
   period: 'monthly' | 'annual';
   state: AccountState;
   renewalAt: string;
@@ -598,7 +632,18 @@ export interface BillingService {
   changePlan(ctx: ActorContext, packageId: Id, code: string): Promise<void>;
   /** Mock payment: pays everything owed and returns the account to Active. */
   payNow(ctx: ActorContext): Promise<void>;
+  /** Your organisation's scheduled or active price changes, with no other client's details. Needs `billing.view`. */
+  priceNotices(ctx: ActorContext): Promise<PriceNotice[]>;
 }
+
+export type PriceNotice = {
+  id: Id;
+  type: PriceAdjustment['type'];
+  scope: PriceAdjustment['scope'];
+  value: number;
+  effectiveAt: string;
+  endAt?: string;
+};
 
 export type AddOnListing = {
   addOnId: Id;
@@ -686,6 +731,16 @@ export interface AuthoringService {
   /** Snapshots of earlier published versions, oldest first. */
   versions(ctx: ActorContext, moduleId: Id): Promise<ModuleVersion[]>;
   getVersion(ctx: ActorContext, moduleId: Id, version: number): Promise<Module>;
+  /**
+   * Provider only, content.write. Publishes the pending draft of a published provider module as the next version and
+   * tells the chosen clients: a placement if they have none and a ModuleNotice each, in one batch.
+   * RuleError('invalidPublish') for a bad client list, a blank summary or no pending draft.
+   */
+  publishToClients(
+    ctx: ActorContext,
+    moduleId: Id,
+    input: { summary: string; clientIds: string[] },
+  ): Promise<{ module: Module; notices: ModuleNotice[] }>;
   drafts: { get(ctx: ActorContext, moduleId: Id): Promise<ModuleDraft | null> };
 }
 
@@ -825,8 +880,340 @@ export interface PricingService {
   ): Promise<number>;
 }
 
+export type OwnershipRequestInput = {
+  side: 'client' | 'provider';
+  clientId?: string;
+  toUserId: string;
+  demoteFromTo: string;
+};
+
+/** Ownership transfer (M4 chunk 5). The owner of one side hands the owner role to another user there; the sides never cross. */
+export interface OwnershipService {
+  request(ctx: ActorContext, input: OwnershipRequestInput): Promise<OwnershipTransfer>;
+  accept(ctx: ActorContext, id: string): Promise<OwnershipTransfer>;
+  confirmWithCode(ctx: ActorContext, id: string, code: string): Promise<OwnershipTransfer>;
+  complete(ctx: ActorContext, id: string): Promise<OwnershipTransfer>;
+  cancel(ctx: ActorContext, id: string): Promise<OwnershipTransfer>;
+  /** Only transfers the actor is part of, on their own side. */
+  list(ctx: ActorContext): Promise<OwnershipTransfer[]>;
+}
+
+export type ProviderTeamMember = {
+  userId: string;
+  name: string;
+  email: string;
+  status: string;
+  roleIds: string[];
+  roleNames: string[];
+};
+export type ProviderRoleInput = { name: string; description: string; permissionIds: string[] };
+
+/** Provider team and roles (M4 chunk 5b). Provider side only; Owner and Co-Owner roles need owner.manageOwnerRoles. */
+export interface ProviderTeamService {
+  list(ctx: ActorContext): Promise<ProviderTeamMember[]>;
+  /** Always for all clients: a `clientIds` key is refused (per-client scoping of provider users is not built). */
+  invite(ctx: ActorContext, input: { email: string; displayName: string; roleKey: string }): Promise<UserAccount>;
+  setRole(ctx: ActorContext, userId: string, roleKey: string): Promise<void>;
+  suspend(ctx: ActorContext, userId: string): Promise<void>;
+  reactivate(ctx: ActorContext, userId: string): Promise<void>;
+  createRole(ctx: ActorContext, input: ProviderRoleInput): Promise<Role>;
+  updateRole(ctx: ActorContext, roleId: string, input: Partial<ProviderRoleInput>): Promise<Role>;
+  deleteRole(ctx: ActorContext, roleId: string): Promise<void>;
+}
+
+export type ProviderTicketRow = { ticket: Ticket; responseDueAt?: string; breached: boolean };
+export type ProviderTicketFilter = {
+  status?: Ticket['status'];
+  clientId?: string;
+  assigneeId?: string;
+  impact?: Ticket['impact'];
+};
+
+/** Provider ticket inbox (M4 chunk 7). Provider side only; reading needs tickets.read, changing needs tickets.write. */
+export interface ProviderTicketsService {
+  list(ctx: ActorContext, filter?: ProviderTicketFilter): Promise<ProviderTicketRow[]>;
+  assign(ctx: ActorContext, id: string, assigneeId: string | null): Promise<Ticket>;
+  /** A reply the customer sees; sets firstResponseAt the first time. */
+  reply(ctx: ActorContext, id: string, input: { body: string }): Promise<TicketMessage>;
+  /** An internal note: provider eyes only. */
+  addNote(ctx: ActorContext, id: string, input: { body: string }): Promise<TicketMessage>;
+  setStatus(ctx: ActorContext, id: string, status: Ticket['status']): Promise<Ticket>;
+  /** Replies and internal notes. */
+  messages(ctx: ActorContext, id: string): Promise<TicketMessage[]>;
+  /** Display name of the person who raised the ticket. */
+  raiserName(ctx: ActorContext, id: string): Promise<string>;
+  /** The screenshots attached to the ticket's customer messages (tickets.read). Never other file types. */
+  screenshots(ctx: ActorContext, id: string): Promise<ProviderTicketScreenshot[]>;
+}
+
+export type ProviderTicketScreenshot = {
+  id: string;
+  title: string;
+  alt: string;
+  mime: 'image/jpeg' | 'image/png' | 'image/webp';
+  data: Uint8Array;
+};
+
+export interface SavedRepliesService {
+  list(ctx: ActorContext): Promise<SavedReply[]>;
+  create(ctx: ActorContext, input: { title: string; body: string }): Promise<SavedReply>;
+  /** The reply text with {{firstName}} replaced by the ticket raiser's first name. */
+  insertText(ctx: ActorContext, replyId: string, ticketId: string): Promise<string>;
+}
+
+export type OtherEntryGroupRow = OtherEntryGroup & { clientCount: number; trending: boolean };
+
+export interface OtherEntriesService {
+  review(ctx: ActorContext, field: 'feature' | 'issueType'): Promise<OtherEntryGroupRow[]>;
+  /** Re-tags only the chosen tickets, which must all belong to the group. */
+  createIssueType(
+    ctx: ActorContext,
+    input: { groupId: string; name: string; ticketIds: string[] },
+  ): Promise<{ issueTypeId: string; retagged: number; group: OtherEntryGroup }>;
+}
+
+export type CreateClientInput = {
+  displayName: string;
+  industryPackId: string;
+  packageId: string;
+  sites: { name: string; countryCode?: string; timezone?: string }[];
+  billingContact: string;
+  trialDays?: number;
+  firstAdmin: { email: string; displayName: string; roleKey: 'accountOwner' };
+};
+export type CreateClientResult = {
+  client: Client;
+  sites: Site[];
+  subscription: Subscription;
+  placements: ModulePlacement[];
+  checklist: OnboardingChecklist;
+  invitation: Invitation;
+};
+
+/** Provider-only client management (M4 chunk 6a). */
+export interface ProviderOpsService {
+  /** Needs clients.write. RuleError('invalidClient') for a bad name, sites, pack, package or admin email. */
+  createClient(ctx: ActorContext, input: CreateClientInput): Promise<CreateClientResult>;
+}
+
+/** One row of the provider client list (P2). Counts: all sites, and people with status 'active'. */
+export type ProviderClientRow = {
+  clientId: string;
+  displayName: string;
+  accountState: AccountState;
+  packageId: string;
+  siteCount: number;
+  peopleCount: number;
+  /** The latest seeded health score, where one exists. Simulated. */
+  healthScore?: number;
+};
+
+/** The provider overview (P1). Counts are real records; `attention` comes from the simulated health scores. */
+export type ProviderOverview = {
+  simulated: true;
+  clientCount: number;
+  byAccountState: Partial<Record<AccountState, number>>;
+  siteCount: number;
+  peopleCount: number;
+  /** Clients needing attention. A reason is plain English from the health score, or a code starting `accountState.`. */
+  attention: { clientId: string; reasons: string[] }[];
+};
+
+/** Provider overview and client list (M4 chunk 8c). Provider side only, needs clients.read. */
+export interface ProviderOverviewService {
+  overview(ctx: ActorContext): Promise<ProviderOverview>;
+  clients(ctx: ActorContext, filter?: { accountState?: AccountState }): Promise<ProviderClientRow[]>;
+}
+
+/** One client in the provider dunning view (M4 chunk 12a). */
+export type DunningRow = {
+  clientId: Id;
+  clientName: string;
+  state: AccountState;
+  amountOutstandingPence: number;
+  nextState?: { state: AccountState; at: string };
+  daysToNextState?: number;
+  daysToDeletion?: number;
+  /** True while the provider has paused this client's timeline. */
+  paused?: boolean;
+};
+export type DunningOverview = { rows: DunningRow[]; recoveryRatePercent: number | null; outstandingPence: number };
+
+/** Provider dunning (M4 chunk 12a). overview needs billing.read; the two changes need billing.manageDunning. */
+export interface DunningService {
+  overview(ctx: ActorContext): Promise<DunningOverview>;
+  /** Pushes the next state change back by `days` (1 to 30). Only while the account is Past due or Limited. */
+  extendGrace(ctx: ActorContext, clientId: Id, days: number): Promise<void>;
+  setPaused(ctx: ActorContext, clientId: Id, paused: boolean): Promise<void>;
+}
+
+/** Telemetry (M4 chunk 8c). Local records are real and stay on this device; the rest is seeded and simulated. */
+export interface TelemetryService {
+  /** No actor: an error handler has none. The time comes from the injected Clock. */
+  recordLocalEvent(input: { name: string }): Promise<LocalTelemetryEntry>;
+  recordLocalError(input: { name: string; message: string }): Promise<LocalTelemetryEntry>;
+  /** Provider only (clients.read). Newest first. */
+  listLocal(ctx: ActorContext): Promise<LocalTelemetryEntry[]>;
+  /** Provider only (clients.read). Seeded usage, error groups and latest health score of one client. */
+  simulated(
+    ctx: ActorContext,
+    clientId: string,
+  ): Promise<{
+    simulated: true;
+    clientId: string;
+    usageDaily: UsageDaily[];
+    errorGroups: ErrorGroup[];
+    healthScore: HealthScore | undefined;
+  }>;
+}
+
+/** Provider announcements (M4 chunk 8a). Listing and creating need comms.send; banners are for any client or staff actor. */
+export interface ProviderCommsService {
+  listAnnouncements(ctx: ActorContext): Promise<Announcement[]>;
+  createAnnouncement(
+    ctx: ActorContext,
+    input: {
+      title: string;
+      body: string;
+      audience: Announcement['audience'];
+      channels: Announcement['channels'];
+      publishAt: string;
+      expiresAt?: string;
+    },
+  ): Promise<Announcement>;
+  /** Live banner announcements for the actor's own client, package, pack and side. */
+  banners(ctx: ActorContext): Promise<Announcement[]>;
+}
+
+/** Release notes (M4 chunk 14b). Readable by any provider actor, newest first. */
+export interface ReleaseNotesService {
+  list(ctx: ActorContext): Promise<ReleaseNote[]>;
+}
+
+/** Maintenance flags per app. Setting needs ops.write; reading is open to every actor. */
+export interface MaintenanceService {
+  set(ctx: ActorContext, input: { app: MaintenanceApp; on: boolean }): Promise<Record<MaintenanceApp, boolean>>;
+  flags(ctx: ActorContext): Promise<Record<MaintenanceApp, boolean>>;
+}
+
+/** The simulated Learn more link check (no network request). Needs content.write to run. */
+export interface LinkCheckService {
+  run(ctx: ActorContext): Promise<{ checkedAt: string; results: LinkCheckResult[]; broken: LinkCheckResult[] }>;
+  last(ctx: ActorContext): Promise<LinkCheckResult[]>;
+}
+
+/** Learn more open counts per link, with no learner identity. Needs content.write. */
+export interface LearnMoreService {
+  counts(ctx: ActorContext): Promise<{ linkId: string; opens: number }[]>;
+}
+
+/** Account recovery (M4 chunk 8b). Provider side only: list, request and reject need recovery.start; approve and complete need recovery.approve. */
+export interface RecoveryService {
+  list(ctx: ActorContext): Promise<RecoveryRequest[]>;
+  request(
+    ctx: ActorContext,
+    input: { clientId: string; subjectUserId: string; reason: string; outcome?: 'reset2fa' | 'transferOwner' },
+  ): Promise<RecoveryRequest>;
+  approve(ctx: ActorContext, id: string): Promise<RecoveryRequest>;
+  /** `outcome`, when given, is the outcome chosen at completion; otherwise the one on the request is used. */
+  complete(ctx: ActorContext, id: string, outcome?: 'reset2fa' | 'transferOwner'): Promise<RecoveryRequest>;
+  reject(ctx: ActorContext, id: string): Promise<RecoveryRequest>;
+}
+
+/** Organisation name changes waiting for review. Needs clients.reviewNameChanges (revert needs clients.revertDisplayName). */
+export interface ProfileChangesService {
+  list(ctx: ActorContext): Promise<(ProfileChangeRequest & { billingName: string })[]>;
+  keepBillingName(ctx: ActorContext, id: string): Promise<ProfileChangeRequest>;
+  updateBillingName(ctx: ActorContext, id: string): Promise<ProfileChangeRequest>;
+  askClient(ctx: ActorContext, id: string): Promise<ProfileChangeRequest>;
+  revertDisplayName(ctx: ActorContext, id: string): Promise<ProfileChangeRequest>;
+}
+
+/** Client billing detail change requests, decided by the provider. Needs clients.editBilling. */
+export interface BillingChangesService {
+  list(ctx: ActorContext): Promise<BillingChangeRequest[]>;
+  approve(ctx: ActorContext, id: string): Promise<BillingChangeRequest>;
+  editThenApprove(
+    ctx: ActorContext,
+    id: string,
+    proposed: BillingChangeRequest['proposed'],
+  ): Promise<BillingChangeRequest>;
+  decline(ctx: ActorContext, id: string, reason: string): Promise<BillingChangeRequest>;
+}
+
+/** Provider incident notices (M4 chunk 14a). list, post and update need incidents.post; current is open to any signed-in actor. */
+export interface IncidentsService {
+  list(ctx: ActorContext): Promise<Incident[]>;
+  post(
+    ctx: ActorContext,
+    input: { level: Incident['level']; title: string; message: string; status?: Incident['updates'][number]['status'] },
+  ): Promise<Incident>;
+  update(
+    ctx: ActorContext,
+    id: string,
+    input: { status: Incident['updates'][number]['status']; message: string },
+  ): Promise<Incident>;
+  current(ctx: ActorContext): Promise<{ level: Incident['level']; title?: string; message?: string }>;
+}
+
+/** The data request log (M4 chunk 14a). Provider side only; needs dataRequests.manage. */
+export interface DataRequestsService {
+  list(ctx: ActorContext): Promise<(DataRequest & { dueInDays: number })[]>;
+  create(
+    ctx: ActorContext,
+    input: { kind: DataRequest['kind']; requester: string; clientId?: string; notes: string; receivedAt?: string },
+  ): Promise<DataRequest>;
+  complete(ctx: ActorContext, id: string, input: { evidence: string }): Promise<DataRequest>;
+  reject(ctx: ActorContext, id: string, input: { notes: string }): Promise<DataRequest>;
+}
+
+/** Provider global content (M4 chunk 16). content.read to look, content.write to change the prize suggestion list. */
+export interface GlobalContentService {
+  get(ctx: ActorContext): Promise<{ prizeSuggestions: string[] }>;
+  /** Trims; blank or over 120 characters is a ValidationError; a repeat is RuleError 'duplicate'. */
+  addPrizeSuggestion(ctx: ActorContext, text: string): Promise<{ prizeSuggestions: string[] }>;
+  /** A text not in the list is NotFoundError. */
+  removePrizeSuggestion(ctx: ActorContext, text: string): Promise<{ prizeSuggestions: string[] }>;
+}
+
+export type AiSettingsRow = {
+  clientId: Id;
+  clientName: string;
+  status: 'off' | 'on' | 'trial';
+  usageThisPeriod: number;
+  includedUnits: number;
+  killSwitch: boolean;
+};
+
+/** Provider AI add-on settings (M4 chunk 16). ai.manage. While a client's kill switch is on, its AI is unavailable. */
+export interface AiSettingsService {
+  overview(ctx: ActorContext): Promise<AiSettingsRow[]>;
+  setKillSwitch(ctx: ActorContext, clientId: Id, on: boolean): Promise<AiSettingsRow>;
+}
+
 export interface DataStore {
+  globalContent: GlobalContentService;
+  aiSettings: AiSettingsService;
+  recovery: RecoveryService;
+  profileChanges: ProfileChangesService;
+  billingChanges: BillingChangesService;
+  providerComms: ProviderCommsService;
+  releaseNotes: ReleaseNotesService;
+  incidents: IncidentsService;
+  dataRequests: DataRequestsService;
+  maintenance: MaintenanceService;
+  linkCheck: LinkCheckService;
+  learnMore: LearnMoreService;
+  providerOps: ProviderOpsService;
+  providerOverview: ProviderOverviewService;
+  dunning: DunningService;
+  telemetry: TelemetryService;
+  providerTeam: ProviderTeamService;
+  providerTickets: ProviderTicketsService;
+  savedReplies: SavedRepliesService;
+  otherEntries: OtherEntriesService;
   pricing: PricingService;
+  ownership: OwnershipService;
   clients: WriteRepo<Client>;
   sites: RemovableRepo<Site>;
   teams: RemovableRepo<Team>;

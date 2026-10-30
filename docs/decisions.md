@@ -892,3 +892,125 @@ Chunk 1 choices:
 - The packaging option (A or B) is demo-wide `DemoState.packagingOption`. It reads as A when absent, so A is the default.
 - Under B, any Option A package maps to the Option B package (Core), add-ons are kept, and the floor package stays the cheapest. Switching goes only from A to B in the demo; B back to A is just setting the option again.
 - Reset demo drops the option, so it returns to A. `setPackagingOption` needs a stored demo state.
+
+### M4 chunk 5
+- Ownership transfer and provider team are services (`store.ownership`, `store.providerTeam`) built like pricing: provider or client side checked first, one batch with its audit event, time from `ctx.now`. Domain refusals surface as `RuleError`. A wrong step-up code writes `ownership.confirmFailed` before throwing.
+- The provider Admin role template gains `team.manage` and `recovery.start` (needed so an Admin can manage the team under `canGrant`'s rule that you can only grant what you hold). Owner and Co-Owner roles still need `owner.manageOwnerRoles`. Placeholder, for the user to review with the P20 matrix.
+- Custom provider roles are stored with their permissions closed over `requires` (`closePermissions` in domain).
+
+## M4 chunk 6
+
+- **Two new rule names.** `invalidClient` (create client: blank name, no or blank sites, unknown pack or package, bad admin email or name, trial length outside 0 to 90 days) and `invalidPublish` (publish to clients: empty or repeated client list, unknown client or module, client-owned or unpublished module, blank summary, no pending draft). Both have `errors.rule` strings in en-GB.json. A pending draft that fails the publish checklist still gives `checklistFailed`, as `publish` does.
+- **`providerOps.createClient`.** Needs `clients.write`, provider side only; anything else is Forbidden before any validation. Package ids are checked against the content catalogue (`@sta/content` packages), as the seed does.
+- **Starter content = module placements.** One placement (`availableToAll: true`) for each published module of the chosen pack. Only the nursery pack has modules, so stub packs and luxury retail get none.
+- **Trial handling.** `trialDays` above 0 makes the client and subscription `trial`, ending exactly `trialDays * 24h` after `ctx.now` (not London calendar days, so the trial end does not shift an hour across a clock change); the subscription renews at the trial end. No `trialDays` (or 0) makes them `active` and renewing one month on. Billing contact defaults to the first admin's email when blank.
+- **First admin.** Besides the invitation and the one Outbox email, the batch writes an `invited` user and an active role assignment (Account Owner, scope = the new client), mirroring `team.invite`, so accepting the invitation has an account to activate. The invitation expires after 14 days.
+- **Audit.** One `client.create` event (target and clientId = the new client) holding pack, package, site count and trial days only; no personal data.
+- **`authoring.publishToClients`.** Reuses `publishVersion`, so the old version is snapshotted in `moduleVersions` and the draft is removed. A placement is added only for chosen clients that have none (an existing category is kept). One `ModuleNotice` per client; `fromVersion` is the previous version.
+
+### M4 chunk 8b
+
+- **Services.** `store.recovery`, `store.profileChanges` and `store.billingChanges` (providerRecoveryOps.ts), provider side only, built like providerCommsOps: permission checked first (Forbidden before validation), one batch with its audit event, domain refusals as `RuleError('notApplicable')` (no new rule names). The stores stay in the direct-access deny list in policy.ts, so the generic repos remain deny-all and only these services reach them.
+- **Time.** Reviewed-at, cooling off and billing profile `updatedAt` come from the injected Clock (`options.clock`), not `ctx.now`.
+- **Permissions.** Recovery: list, request and reject need `recovery.start`; approve and complete need `recovery.approve`. Name changes: `clients.reviewNameChanges` (revert needs `clients.revertDisplayName`). Billing changes: `clients.editBilling`.
+- **Recovery request checks.** The subject must be a client-side user of the named client; the reason is required. `complete` with outcome `reset2fa` removes the subject's `twoFactor` in the same batch; `transferOwner` (or no outcome) only marks the request done, the transfer itself goes through `store.ownership`.
+- **Audit content.** Ids, statuses, approval counts, field names only. Never the recovery reason, names or addresses.
+- **Name changes.** A review of a request that is not `pendingReview` is a rule error. Keep and ask work even when the client has no billing profile (the request is decided; nothing else changes); update-to-match without a profile is refused. Revert puts the client's `displayName` back to `oldName` and leaves billing alone. Issued invoices are never written.
+- **Billing changes.** Approve and edit-then-approve write the profile (`updatedBy` = reviewer); a decline needs a non-blank reason (ValidationError) and leaves the profile alone. A request with no billing profile to apply to is refused.
+
+## M4 chunk 11d (P8 Add-on catalogue)
+
+- **Edit price never writes.** Brief 23.11: price changes apply only after a step-up code on P25 Price changes. So the P8 "Edit price" button (shown with `billing.write`) only navigates to `#/provider/pricing`; it does not call `store.addOns.put`. P25 is not built yet, so that route shows not-found until it is.
+- P8 reads the catalogue from `@sta/content` (`addOns`, `addOnCopy`) and needs `billing.read`.
+
+## M4 chunk 13 (P11 to P13 gaps)
+
+- **P13 built read-and-create only.** Archive, merge, reorder and aliases of issue types and features are not built: there are no data ops for them and BP-10/BP-11 do not need them. P13 shows the catalogue lists, Other entries review with Create issue type, and saved replies.
+- **P12 gaps.** Re-tag, merge and link on the ticket detail are not built either.
+- Both are carried to docs/progress.md Known issues.
+- The P13 page shows nothing but a loading line until its first data arrives, so the heading never appears over an empty page.
+
+## M4 chunk 14a: incidents and data requests services
+
+`store.incidents` (list, post, update need `incidents.post`; `current` is open to any signed-in actor, including limited accounts) and `store.dataRequests` (`dataRequests.manage`) are in `packages/data/src/providerIncidentsOps.ts`, provider side only. Checks run in the order permission, validation, existence/state (NotFound, then RuleError `notApplicable` for a resolved incident or a non-open request). `dueAt` is `addMonths(receivedAt, 1)`; `dueInDays` is calendar days from the Clock in London time (negative when overdue). Reject appends its reason to `notes`. The overall status is the highest-severity unresolved incident (newest wins a tie), else Normal with no title. Audit holds ids, level, status and kind only. No new language strings were needed.
+
+## M4 chunk 14b: P14 Comms and P15 Recovery
+
+- Added `store.releaseNotes.list(actor)` (any provider actor, newest first). The generic repo for `releaseNotes` stays deny-all.
+- `approveRecovery` now sets `coolingOffEndsAt` to now + 24 hours (RECOVERY_COOLING_OFF_HOURS) when the request has none, so the seeded request can complete after its second approval. One already set is kept.
+- `store.recovery.complete(actor, id, outcome?)` takes the outcome chosen on the page; without it the request's own outcome is used. This makes the P15 "Outcome" control real.
+- Spec correction in the P14 test: language keys cannot be both `provider.comms.audience` (a string) and a parent of `provider.comms.audience.all`, so the radiogroup name is `provider.comms.audienceGroup` (and `channelGroup`). Likewise the recovery outcome keys are `outcomeLabel`, `outcomeReset2fa`, `outcomeTransferOwner`. The P15 test's "48 hours" expectation was left as is: that test sets `coolingOffEndsAt` to 48 hours itself, and the decided 24 hours applies only where none is set.
+- P15 is reachable from the provider "More" navigation (Account recovery).
+
+## M4 chunk 14c: P16 Data requests and P17 Status
+
+- Routes `#/provider/data-requests` and `#/provider/status`, both in the provider "More" navigation. P16 needs `dataRequests.manage`; P17 needs `incidents.post` for the page and `ops.write` to use the maintenance switches (disabled otherwise).
+- Language keys follow the test headers, with two shape changes: `provider.status.post` is an object (heading, level, title, submit, titleError, failed) so the post form keys do not clash with a string key, and the "Due soon" badge shows for open requests due within 7 days, including overdue ones.
+- The "link to the client's exports" on P16 is not built (no client exports route yet). The persona choices in the tests (`raj`, `tom`) were correct; no test was changed.
+
+## M4 chunk 14d: banners in three apps
+
+- New `apps/web/src/shells/systemNotices.tsx`, used by the shared `Shell`: a header status indicator (all three shells), system banners (this app's maintenance flag, or an open incident; `role="status"`, no dismiss, rendered outside `<main>`) and announcement banners (staff and client only; Dismiss hides until reload; session state lives in the shell, so it survives navigation). It reads `maintenance.flags`, `incidents.current` and `providerComms.banners` in one query, which the existing live-update invalidation refreshes. Text is under `systemNotices.*` in en-GB.json; the staff maintenance wording has no billing or payment words.
+- Only the provider indicator carries `role="status"` and the name "System status" (the P1 test needs it). Staff and client show the same text without a live-region role, and announcement banners use a labelled `section` rather than `role="status"`, because extra status regions broke many existing `findByRole('status')` toast checks.
+- The old `ProviderStatus` ("All systems working (Simulated)") is replaced by the shared indicator. `providerChrome.tsx` is deleted.
+- The seeded live announcement "Fire evacuation template" now shows in the staff shell, so the three S13 notification tests that searched the whole page for /Fire evacuation/ now search inside `<main>`. Their expectations are unchanged.
+- `systemBanners.test.tsx`: only its 7 lint errors were fixed (braces on arrow functions, unnecessary `?.` and `as string`). No expectation was changed.
+- `routes.test.tsx` provider `/provider/comms` ("Comms" heading) already failed before this chunk (P14 heading is not "Comms"); not touched here.
+
+## M4 chunk 15a: P18 Team and roles
+
+- The page is `Team` in apps/web/src/pages/provider/ProviderTeam.tsx at /provider/team. The nav label stays "Team and security" (`nav.provider.teamSecurity`) and the page h1 is "Team and roles", so routes.test.tsx and e2e/routes.ts now expect that heading for this route (as for P7, P11 and P14). The unused `page()` placeholder helper in routes.tsx was removed.
+- Fix to a test (not a weakening): the seeded transfer in providerTeam.test.tsx used id 'transfer-ready', which the schema refuses (ids are 26-character ULIDs). It now uses a valid id; assertions are unchanged.
+- The Start transfer form stays on screen while a transfer is open (the tests look for its fields afterwards); its button is disabled until the open transfer is done or cancelled.
+- Extra keys beyond the test contract: area names, `changeError`, `saveError`, `cancelEdit`, `chooseRole`, `none`, `grantedDirectly`, `transfer.accept`, `transfer.error`, `transfer.status.confirmedOne` and `.ready` (shown once cooling-off has ended). The transfer region also shows for someone with an open transfer but no owner.transfer, so the receiver can accept it.
+- Owner and Co-Owner are left out of the invite and change-role lists (not just disabled) for people without owner.manageOwnerRoles; the data layer still refuses them independently.
+
+## M4 chunk 15b: P19 Security, P20 Audit log, P23 Provider sign in
+
+- Pages: `Security` (ProviderSecurity.tsx, /provider/security), `Audit` (ProviderAudit.tsx, /provider/audit, needs `audit.read` held anywhere) and `ProviderSignIn` (ProviderSignIn.tsx, standalone at /provider/signin, outside the provider shell). Nav: "Security" and "Audit log" join "Team and security" in the More menu. routes.test.tsx and e2e/routes.ts expect the h1 "Security" and "Audit log" (nav labels equal the headings).
+- **P23 reuses C26.** `TwoFactorSignIn` in pages/client/SignIn.tsx now holds the whole flow and takes the destination and a `SignInCopy` (the language keys that differ); the client `SignIn` and `ProviderSignIn` are thin wrappers. Set-up and recovery-code steps still use the shared `twoFactor.*` words.
+- **Data layer change (small).** `twoFactor.startEnrolment`, `confirmEnrolment` and the code check behind `verify` and `useRecoveryCode` refused every non-client actor, so a provider team member could not sign in with a code (the P23 tests need it, brief 22.6 requires two-step for the provider team). They now refuse only staff. Everything else (lockout after five wrong codes, hashes, audit) is unchanged.
+- **Test corrections (not weakenings).**
+  1. providerAudit.test.tsx: seeded ids used the prefix `...AU..`, and `U` is not a ULID character, so `bulkPut` refused them. Prefix is now `AD` (the test's own regex follows).
+  2. providerSecurity.test.tsx: the sign-out confirmation was found with `screen.findByRole('status')`, but the provider header's System status indicator is also `role="status"` (required by providerOverview.test.tsx), so the lookup always found two. It is now scoped to the Sessions region; the assertion text is the same.
+- Audit rows show action, target, actor name and time only (never before, after or reason). Actor names come from `users.list`; an actor the reader cannot see shows "Unknown person". Sessions and Trust this device are simulated and live in component state only.
+
+## M4 chunk 16: global prize list and AI kill switch stored as settings records
+The provider's global prize suggestion list and the set of clients whose AI is switched off are two records in the existing
+`settings` store (`provider.prizeSuggestions`, `provider.aiKillSwitches`), so no new object store and no IndexedDB version bump
+were needed. The prize list starts as the nursery pack's list until first edited. Reset and Load restore the defaults. The
+kill switch is read by `access.features` and `ai.explain`. Added rule name `duplicate`. The P22 test looked for a single
+`role=status` on the whole page, but the shell header always has one (system status), so the test now looks inside the
+"Usage by client" region.
+
+## M4 chunk 17a: P24 Profile changes
+- Route `/provider/profile-changes`, in the provider "More" navigation. Reviewed name changes stay on screen for the visit (the service lists only pending ones).
+- **Test correction (not a weakening).** The first P24 test expected `tom` (clients.read only) to see rows with disabled buttons. The data layer (and its contract tests) refuse both lists without `clients.reviewNameChanges` and `clients.editBilling`, so the page shows the no-access message to anyone lacking either; the test now says so. The status-message lookups in that test are scoped to `<main>` because the provider header indicator is also `role="status"`; the header role was left as it was.
+
+## M4 chunk 18b: Track B gaps closed
+- **P3 Audit tab (2b).** Now a read-only list of the audit events for that client (action, target, who, when), newest first, from `store.audit.list`. It shows no before/after values or reasons, as on P20.
+- **Ticket screenshot (3b).** The Willow Lane "progress bar is hard to see at night" ticket now carries one fictional generated PNG (ticketScreenshot file, alt text). `SEED_VERSION` is 7, so a browser holding a v6 world reloads it once (Reset semantics). New `providerTickets.screenshots(ctx, id)` (tickets.read, provider side) returns only the ticket's customer-message screenshots (never PDFs, never another client's files); P12 shows them in a Screenshots section. Provider access to attachments through `attachments.*` stays closed (canSeeAttachment refuses the provider side). The m1 seed test "no other client has an attachment" now ignores ticketScreenshot files.
+- **Derived account state on P1/P2/P3 (4c).** `providerOverview.clients` and `overview` now use `derivedAccountState` (subscription plus the demo clock), the same as the client banner and Dunning, so Fast-forward shows Limited on the provider side. This was a real bug.
+- **Scope on invitations (5b).** Build pack 8.2 step 5 says "an Account manager role scoped to selected clients". In the permission model scope sits on the role assignment, not on the role, so the control is on the P18 invite form (All clients, or Selected clients with a list). `providerTeam.invite` takes `clientIds`; it stores `{type:'clients', ids}` on the invitation and the role assignment (unknown ids are refused) and the member list shows "Selected clients only: N". **Known limit:** the provider screens and data operations check `holds()` for a permission and do not yet filter other clients out for a client-scoped provider user, so the scope is stored and shown but not enforced on reads. Logged under Known issues. The role editor has no scope control by design.
+- **Price end date (6b).** P25 rows (and so the P3 Billing panel) show "Ends {date}" when the change has an end date.
+- **Closing commitments (7b).** P19 Security gets an "Our security and data commitments" list: two-step sign-in, audit log, staged account states, exports never held back, retention schedule, and the note that the demo simulates authentication, payments and messaging. No separate closing route was added.
+- **200% text fixes found by the new provider route check.** Selects no longer exceed their container (`max-w-full` on `fieldClass`, Tickets filter wrapper), and the Send announcement button wraps.
+- Test change (not a weakening): step 5b in e2e/track-b.spec.ts asserted a scope control inside the role editor; it now asserts the invite-form control and the stored result, per the decision above.
+
+## M4 security review
+- **Per-client scoping of provider users is deferred, not built (High).** Chunk 18b stored and showed a client scope on provider invitations, but no provider read filtered by it, so it looked like a limit and was not one. The 'Selected clients' option and the "Selected clients only" row text are removed from P18, and `providerTeam.invite` now refuses a `clientIds` key with a validation error. Every provider user has access to all clients. This supersedes the 'Scope on invitations (5b)' item under 'M4 chunk 18b'. Build pack 8.2 step 5 ("scoped to selected clients") is therefore not met; listed under Known issues in docs/progress.md. Test change (not a weakening): the contract test and e2e step 5b covered the removed option; they now assert it is refused or absent. The demo script and review checklist no longer mention it.
+- **Recovery self-approval (Medium).** The person who requested a recovery can no longer approve it (domain `approveRecovery`, plain-words refusal), in addition to the person being recovered. Contract and domain tests added.
+- **Suspending an invited person (Low).** `providerTeam.suspend` refuses a user who is still invited, so Reactivate cannot make them active without accepting.
+- **Payment brand (Low).** Seeded payment methods use the fictional brand 'Testcard' instead of a real card network name. `SEED_VERSION` is 8.
+- **Accepted for the PoC (Medium).** Audit events for provider reads of client data are not recorded; step-up has no attempt limit (the demo simulates authentication); the error telemetry store is not capped (small, seeded and local); GitHub Actions are pinned by tag, not commit SHA. All four are acceptable for a static demo with fictional data and would be fixed before a real deployment.
+
+## M4 review fixes
+- **Replacing a price change keeps the old price during notice.** Confirming a replacement used to end the old change at once for every client, so a client paid list price until the new one started. Now `supersede` (packages/domain/src/pricing) sets the old change's `endsAt` to the new change's `effectiveAt`; a change that would only have started later is marked ended. Where the old change also covers clients the new one does not, the old record keeps those clients and a copy (new id) with the overlapping clients carries them up to the switch. Contract tests on both adapters cover no gap and partial overlap. Confirming also refuses an `endsAt` that is not after the effective date (draft and preview refuse it too).
+- **Plan card price adjustment (brief 23.11).** `invoiceLinesFor` now returns reason codes, not English. `billing.overview` returns `yourPrice` and an `adjustment` (codes plus signed pence); the C19 plan card shows the list price, a separate discount or increase line and "Your price", worded from `billing.adjustment.*` in en-GB.json. **Gap:** the P3 Billing panel still lists the price changes only and does not show the adjusted price or invoice lines. Known issue.
+- **Ownership cooling-off starts at the owner's 2FA confirmation**, not at the request (`confirmTransferTwoFactor` sets `coolingOffEndsAt` to confirmation plus 7 days; the date set at request is provisional because the schema needs one). **Deviation:** the receiver only accepts; they do not also confirm with 2FA, though brief 22.2 says both confirm. Not built, logged.
+- **`ownership.request` also needs `owner.transfer` on the provider side.** The client permission catalogue has no such permission, so the client side is gated by holding the Account Owner role only.
+- **Recovery cooling-off is 48 hours, from the second approval.** The brief (26.3) gives a 48 hour placeholder; the code used 24 hours from the request. `RECOVERY_COOLING_OFF_HOURS` is now 48 and `approveRecovery` sets `coolingOffEndsAt` when the status becomes approved. The date set at request is provisional. Tests updated for 48 hours (not a weakening: the expected value follows the brief).
+- **Price warnings.** `increaseOver20` also fires for a fixed price that raises the price by more than 20 per cent over the current price. `belowFloor` can now fire: the preview passes a placeholder floor of £10.00 a month (`PLACEHOLDER_FLOOR_PENCE`) until the real floor is decided. The `invoice` scope is computed as the plan plus active flat-price add-ons.
+- **Price notice email** now names the old price, the new price, the effective date and how to ask (words from `client.priceNotice.*`). Blank or invalid notice days show a plain-words error on P25 and block Preview and Save draft. Notice default uses `DEFAULT_NOTICE_DAYS`.
+- **Smaller fixes.** Local telemetry lists the newest 200 entries only (storage is not pruned). `ProviderTeamMember` has `roleIds` and P18 matches the current role by id, not by name.
+- **Left as known issues:** expiry of role assignments is not audited; Track B runs at desktop width only and has no Read-only or Closed account steps; price change reason codes are lost once a change is replaced into a notice email; the owner-role check (`OWNERISH`) is duplicated across data ops; the P3 Billing panel gap above; receiver 2FA for ownership transfer.

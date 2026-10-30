@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M4
 Milestone base commit: c7160e2
-Next step: M4 chunk 5 (data ops B: ownership and team) per docs/plans/m4.md. Give the test-writer small briefs (one test file each); big briefs hit API errors.
+Next step: M4 chunk 18 (Track B e2e `e2e/track-b.spec.ts` from build pack 8.2, flow specs for P24, wizard, price change, team/transfer, tickets, banners; axe/200% text/dark/no-network additions; docs/demo-script.md Track B; review-checklist M4 entries), then security-reviewer and code-reviewer on `git diff c7160e2...HEAD`. Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn. Test-writer briefs: one test file each.
 
 ## Milestones
 - [x] M0 Foundations
@@ -22,7 +22,20 @@ M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list):
 - [x] 2 Domain: price engine (tests 1ee83ad, 002b093, impl ceba2fd)
 - [x] 3 Domain: transfer, recovery, comms, other entries, billing names, permission matrix (ownership d1e3557, recovery 371052b, comms, otherEntries 4477ef5, billingNames b34b0c8, matrix ee8d588)
 - [x] 4 Data ops A: pricing (4a tests 1bc6c1a, 70e3332, impl 142412c; 4b packaging option tests b87e2ef, impl aebb303)
-- [ ] 5-18 see the plan (5 next)
+- [x] 5 Data ops B (5a ownership tests 3 commits ago, impl baf4f7a; 5b provider team tests 3c10b5f, impl a5f851c)
+- [x] 6 Data ops C (tests dca84ed, f9e6d35, impl ec3b521)
+- [x] 7 Data ops D (tests cb51eea, impl e4e99a3)
+- [x] 8 Data ops E: 8a comms, maintenance, link check, Learn more counts done (tests 8ae4af0, impl c8ee98f); 8b recovery + profile/billing change ops done (tests 91be646, impl 0a6341c); 8c telemetry + overview reads done (tests ea67a8a, impl 10447fa; seed v6, IndexedDB v6)
+- [x] 9 Provider shell and P1-P3 (tests 5bf1716, impl cac7c7f, check.sh green)
+- [x] 10 P4 New client wizard (tests 61ad087, impl 0a421bd, check.sh green)
+- [x] 11 P5 to P8: 11a P5 links (tests 0730264, impl ebfd2f4); 11b P6 packs (e297796, 8adda0a); 11c P7 packages (7b32dcc, 7ca53ff); 11d P8 add-ons (42e1539, 8a5c5c8); routes/e2e heading fixes after full check
+- [x] 12 P9 Dunning: 12a dunning service (tests 6b8189d, impl 5010ba5), 12b P9 page (tests in 3 commits, impl c6c393c); D2 Simulate failed payment/Fast-forward/persona jump already existed from M3. The BP-9 e2e walk (client and staff views) goes into the Track B e2e in chunk 18
+- [x] 13 P11 to P13 tickets: 13a P11 inbox (tests b9fc124, impl 100148a), 13b P12 detail (tests f75fe33, impl 5f14f73, adds providerTickets.raiserName, contract bd3eb7e), 13c P13 support settings (tests 0feb2a4, impl efcb64e); gaps under Known issues
+- [x] 14 P14 to P17 and banners: 14a incidents/data requests services (tests 2431a7d, impl 5596566); 14b P14 comms + P15 recovery (tests f958ccf, e48374b, impl 2c5db85..70fb818, adds store.releaseNotes, recovery.complete outcome, approveRecovery sets cooling-off 24h when unset); 14c P16 + P17 (impl 0ed160b); 14d banners and status indicator in three shells (impl b7e3e64). Full check: all steps green except 2 nav e2e headings (P14 title), fixed in routes.ts and rerun green
+- [x] 15 P18 (15a tests 14cf3c2/573788d, impl 2f7d7d5); P19, P20, P23 (15b tests 55c481f, impl 06c0376, check.sh green)
+- [x] 16 P21 Global content, P22 AI settings (tests 8e1e806, impl 8b9234c, check.sh green)
+- [x] 17 P24 (tests bde9b9f, impl 8cf2905, fix after), P25 + P3 panel (tests 99b7fc7, impl f9b31bb), client price notice (tests 3b335dd, impl 8816023); check.sh green except lint (prettier, fixed)
+- [x] 18 Track B e2e, a11y and docs: 18a tests (80449a3, 1cdf28d), 18b gaps fixed and provider routes in smoke/high-contrast/200% text, demo script Track B, review checklist (see docs/decisions.md 'M4 chunk 18b'); coordinator runs the full check.sh
 M3 (plan docs/plans/m3.md, 21 chunks):
 - [x] 1 Decisions, schemas, stores and personas
 - [x] 2 Domain: sites, leaderboards, calendar, rules, reminders
@@ -73,18 +86,30 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - F1 (M0, ?reset=1): fixed; awaiting user re-check. Cause: editing only the hash (`#/staff?reset=1`) never reloads the page and the hash form was not read. Both forms now work (resetParam.ts, hashchange reload), with e2e for both against the base-path build. Fix commit: see git log "fix: ?reset=1 works before the hash".
 - F2 (M3, calendar at 200% text with wider fonts): the MonthGrid fix (earlier this session) holds with DejaVu Sans forced on every screen in text-scale.spec.ts (24 of 24 pass); added a permanent wide-font calendar test. Awaiting user re-check on GitHub.
 - F3 (M3, two-factor.spec.ts:67): reproduced (14 of 40 runs under load). Cause was the test: the address changes before the router renders the dashboard, so the next goto hit a still-mounted sign-in screen. The test now waits for the screen. 150 of 150 pass under load. Awaiting user re-check.
+- F3 follow-up: same race recurred in enrol() (the first sign-in after enrolment); enrol() now waits for the sign-in screen to go. 50 of 50 pass repeated.
 - F4 (CI): ci.yml caches ~/.cache/ms-playwright keyed on the Playwright version, installs Chromium once (check.sh skips its own install when SKIP_PLAYWRIGHT_INSTALL=1), adds install-deps on a cache hit. actions/cache@v5 is unverified (VERIFY). Playwright workers left at the default: more workers raised flakes locally. Awaiting user re-check.
 
 ## Known issues
+- M4 review fixes (docs/decisions.md 'M4 review fixes'): P3 Billing panel does not show the adjusted price or invoice lines; ownership transfer has no receiver 2FA; assignment expiry not audited; Track B is desktop only with no Read-only or Closed steps.
+- M4 security review: per-client scoping of provider users (build pack 8.2 step 5, 'scoped to selected clients') is deferred, not built. The invite form has no client choice and `providerTeam.invite` refuses `clientIds`. See docs/decisions.md 'M4 security review'.
+- M4 chunk 13: P13 archive, merge, reorder and aliases of issue types and features are not built (no data ops); P12 re-tag, merge and link are not built. See docs/decisions.md 'M4 chunk 13'.
 - Chunk 14: C19 usage omits Battle Rooms limit (data layer has no count); C6 preview is minimal until chunk 15.
 - e2e 'C1 updates in one tab when Jade passes the refresher in another tab' (client-dashboard.spec.ts) failed once, passed on rerun: possible flake, watch it.
 - Action versions in deploy.yml unconfirmed (VERIFY, in review checklist). Commit b6146c5 touched protected files (docs/questions-for-user.md).
 
-- e2e flakes seen once each and passing on rerun: client-dashboard.spec.ts (C1 two tabs), track-a.spec.ts desktop. (FIXED in chunk 14: stale module progress after lesson finish; watch only) client-dashboard C1 two-tab flake had recurred in 3 full runs (chunks 11, 13): investigate its cause (cross-tab update timing) at the start of chunk 14 or in M2 review.
+- e2e flakes seen once each and passing on rerun: text-scale.spec.ts:37 desktop (scrollWidth 701, 8 of 8 pass alone, session 5), client-dashboard.spec.ts (C1 two tabs), track-a.spec.ts desktop. (FIXED in chunk 14: stale module progress after lesson finish; watch only) client-dashboard C1 two-tab flake had recurred in 3 full runs (chunks 11, 13): investigate its cause (cross-tab update timing) at the start of chunk 14 or in M2 review.
 
 - M3 code review leftovers (not fixed, by decision): placeholders not all in adminConfig; ModuleLibrary stats computed in the UI; duplicate London-day helpers; .ics DTSTAMP hour rounding; reminders e2e cap check is loose; affected-now preview ignores the actor's scope; reports.test privacy check is narrow; ContrastCheck formula duplicated in the UI.
 
 ## Session log
+- 2026-10-29 (session 7): F1-F4 already handled. M4 chunk 17 (P24, P25, client price notice) landed. Chunk 18 next.
+- 2026-10-29 (session 6): F1-F4 already handled. M4 chunk 16 (P21, P22) landed (8b9234c), check.sh green. Chunk 17 next.
+- 2026-10-29 (session 5): F2-F4 already handled. M4 chunk 15b (P19, P20, P23) landed (06c0376), check.sh green. Chunk 16 next.
+- 2026-10-29 (session 4): M4 chunk 14 landed (14a-14d). Chunk 15 next.
+- 2026-10-29: M4 chunk 11a (P5 links panel) landed (ebfd2f4), check.sh green (full run takes ~30 min on this VM). Stopping at a clean point; 11b next.
+- 2026-10-28: M4 chunk 8b landed (0a6341c), check.sh green. Stopping at a clean point; 8c next.
+- 2026-10-28: M4 chunk 8a landed (c8ee98f), check.sh green. Stopping at a clean point; 8b next.
+- 2026-10-28: M4 chunk 7 (provider tickets, saved replies, other entries) landed (e4e99a3), check.sh green. Stopping at a clean point; chunk 8 next.
 - 2026-10-25: session started, created progress.md, M0 planning.
 - 2026-10-25: M0 plan committed (250adaa); starting chunk 1.
 - 2026-10-25: M0 chunk 8 seed generator landed (cf69643).
@@ -163,3 +188,11 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 - 2026-10-28: M4 chunk 3 landed (ee8d588), check.sh green. Small one-file briefs to test-writer/implementer worked (first big brief hit an API error). Chunk 4 next.
 - 2026-10-28: M4 chunk 4 landed (4a pricing ops 142412c, 4b packaging option aebb303), check.sh green. Known: a confirmed price change replaces a whole earlier multi-client adjustment, even for clients that do not overlap (follows domain replacedBy). Test-writer briefs of ~150 lines work; the 400-line brief hit an API error. Chunk 5 next.
 - 2026-10-28 (session 2): merged origin/main; fixed user feedback F2, F3, F4 (see User feedback). M4 chunk 5 next.
+- 2026-10-28 (session 2): M4 chunk 5 landed (baf4f7a, a5f851c), full check.sh green. Chunk 6 next.
+- 2026-10-28: merged origin/main; M4 chunk 6 data ops C landed (ec3b521); two-factor e2e race fixed in enrol().
+- 2026-10-28: e2e flake feedback.spec.ts:46 (phone) fixed. Cause: the forced radio click scrolled the control under the fixed bottom tab bar and hit the Progress tab. app.css now sets html scroll-padding-bottom. 16 of 16 pass repeated.
+
+- 2026-10-28 (session 3): M4 chunk 8c done. Full check.sh: all green except 3 e2e ENOENT artifact failures caused by an overlapping earlier run; the 2 files rerun alone 9/9 green.
+- 2026-10-28 (session 3, cont.): M4 chunk 9 done, check.sh green.
+- 2026-10-29 (session 3): M4 chunk 10 done (P4 wizard). Chunk 11 next.
+- 2026-10-29 (session 5): M4 chunk 15a (P18 team and roles) landed; P19, P20, P23 next.

@@ -32,7 +32,8 @@ export type CalendarKind =
   | 'planRenewal'
   | 'invoiceDue'
   | 'addOnTrialEnd'
-  | 'accountStateChange';
+  | 'accountStateChange'
+  | 'priceChange';
 
 export type CalendarItem = {
   id: string;
@@ -75,6 +76,8 @@ export type Billing = {
   invoices: { id: string; dueAt: string; status: 'open' | 'paid' }[];
   addOnTrials: { addOnId: string; endsAt: string }[];
   nextStateChange?: { at: string; state: string };
+  /** Confirmed price changes, by the date they take effect. */
+  priceChanges?: { id: string; effectiveAt: string }[];
 };
 export type AdminCalendarView = Shared & {
   audience: 'admin';
@@ -256,6 +259,13 @@ export function calendarItems(view: CalendarView, range: CalendarRange, filters:
           kind: 'addOnTrialEnd',
           date: day(t.endsAt),
           titleKey: 'calendar.addOnTrialEnd',
+        });
+      for (const pc of b.priceChanges ?? [])
+        add({
+          id: `priceChange:${pc.id}`,
+          kind: 'priceChange',
+          date: day(pc.effectiveAt),
+          titleKey: 'client.priceNotice.title',
         });
       if (b.nextStateChange)
         add({

@@ -91,6 +91,10 @@ const ALL_STORES: StoreName[] = [
   'profileChangeRequests',
   'linkCheckResults',
   'moduleNotices',
+  'usageDaily',
+  'errorGroups',
+  'healthScores',
+  'localTelemetry',
 ];
 
 type Setup = { store: DataStore; admin: StoreHandle['admin']; fx: Fixture; options: StoreOptions };

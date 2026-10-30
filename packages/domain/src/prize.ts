@@ -26,3 +26,15 @@ export function nextSuggestion(
   }
   return { text: walk.order[walk.next] as string, state: { order: walk.order, next: walk.next + 1 } };
 }
+
+export const PRIZE_SUGGESTION_MAX = 120;
+
+export type PrizeSuggestionCheck = { ok: true; text: string } | { ok: false; reason: 'invalid' | 'duplicate' };
+
+/** A new prize suggestion for the global list: trimmed, 1 to 120 characters, and not already in the list. */
+export function checkPrizeSuggestion(input: unknown, existing: readonly string[]): PrizeSuggestionCheck {
+  const text = typeof input === 'string' ? input.trim() : '';
+  if (text.length < 1 || text.length > PRIZE_SUGGESTION_MAX) return { ok: false, reason: 'invalid' };
+  if (existing.includes(text)) return { ok: false, reason: 'duplicate' };
+  return { ok: true, text };
+}

@@ -80,6 +80,11 @@ function Inner({ booted }: { booted: Booted }) {
       signInAs: (userId) => save({ ...state, persona: { side: 'staff', userId } }),
       setDisplayPrefs: (displayPrefs) => save({ ...state, displayPrefs }),
       setIndustry: (industry) => save({ ...state, industry }),
+      getPackagingOption: () => handle.admin.getPackagingOption(),
+      setPackagingOption: async (option) => {
+        await handle.admin.setPackagingOption(option);
+        setState({ ...state, packagingOption: option });
+      },
       simulateFailedPayment: async () => {
         const chosen = state.clientPersona?.userId ?? keys.users['priya'];
         const clientId = personas.find((p) => p.userId === chosen && p.side === 'client')?.clientId;

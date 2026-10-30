@@ -95,7 +95,7 @@ export function buildM4({ data, keys, today, clock, rng }: Input): void {
       billingName: name,
       address,
       billingContactEmail: sub.billingContact,
-      paymentMethod: { brand: 'Visa', last4: String(rng.int(1000, 9999)), expMonth: rng.int(1, 12), expYear: 2028 },
+      paymentMethod: { brand: 'Testcard', last4: String(rng.int(1000, 9999)), expMonth: rng.int(1, 12), expYear: 2028 },
       updatedBy,
       updatedAt: ago(150),
     };
@@ -230,6 +230,15 @@ export function buildM4({ data, keys, today, clock, rng }: Input): void {
   data.learningEvents.push(...opens);
 
   // --- Tickets with "Other" phrases, and the groups the provider review builds from them.
+  /** A small fictional screenshot (a plain PNG, no real content). */
+  const screenshotBytes = (): Uint8Array<ArrayBuffer> => {
+    const raw = atob(
+      'iVBORw0KGgoAAAANSUhEUgAAAGAAAAAwCAIAAABhdOiYAAAAcklEQVR42u3YMQ0AIAwEQJSgBE0YxwETBmhnQq/58aebPm19TEnSEAACBAgQIECAAMkVaAW3g6vWBwQIECBALwOByPuAAAECBAgQoH+BQFjSgAABAgQIkH+QoWhJAwIECBAgQP5BhqIlDQgQIECAABXoH4DIb2aup77rAAAAAElFTkSuQmCC',
+    );
+    const out = new Uint8Array(new ArrayBuffer(raw.length));
+    for (let i = 0; i < raw.length; i += 1) out[i] = raw.charCodeAt(i);
+    return out;
+  };
   const userOf = (key: string) => need(data.users.find((u) => u.id === user(key)));
   let sequence = Math.max(0, ...data.tickets.map((t) => Number(t.number.replace('T-', '')) - 1000));
   type Spec = {
@@ -242,6 +251,8 @@ export function buildM4({ data, keys, today, clock, rng }: Input): void {
     issueType?: string;
     issueTypeOther?: string;
     status: Ticket['status'];
+    /** Adds a fictional screenshot to the first message (alt text). */
+    screenshot?: string;
   };
   const makeTickets = (specs: Spec[]): Ticket[] =>
     specs.map((s) => {
@@ -274,6 +285,26 @@ export function buildM4({ data, keys, today, clock, rng }: Input): void {
         updatedAt: created,
       };
       data.tickets.push(ticket);
+      const screenshotIds: string[] = [];
+      if (s.screenshot) {
+        const bytes = screenshotBytes();
+        const fileId = newId();
+        screenshotIds.push(fileId);
+        data.attachments.push({
+          id: fileId,
+          clientId: ticket.clientId,
+          kind: 'file',
+          purpose: 'ticketScreenshot',
+          title: 'Screenshot of the progress bar',
+          mime: 'image/png',
+          bytes: bytes.length,
+          data: bytes,
+          ownerUserId: u.id,
+          redacted: false,
+          alt: s.screenshot,
+          createdAt: created,
+        });
+      }
       data.ticketMessages.push({
         id: newId(),
         ticketId: id,
@@ -281,7 +312,7 @@ export function buildM4({ data, keys, today, clock, rng }: Input): void {
         side: 'customer',
         body: s.description,
         internal: false,
-        attachmentIds: [],
+        attachmentIds: screenshotIds,
         createdAt: created,
       });
       return ticket;
@@ -359,6 +390,7 @@ export function buildM4({ data, keys, today, clock, rng }: Input): void {
       feature: 'notes',
       issueTypeOther: 'Progress bar too faint',
       status: 'received',
+      screenshot: 'Screenshot of a training progress bar that is hard to see against a dark background',
     },
   ]);
   data.otherEntryGroups.push(

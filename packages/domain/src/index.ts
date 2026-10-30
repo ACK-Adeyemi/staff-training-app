@@ -6,6 +6,7 @@ export * from './schemas/index';
 export * from './permissions/index';
 export * from './entitlements';
 export * from './accountState';
+export * from './dunning';
 export * from './packs';
 export * from './requirements';
 export * from './quiz/draw';
@@ -67,6 +68,9 @@ export * from './ownership';
 export * from './recovery';
 export * from './comms';
 // normaliseOtherText stays exported from './support' (a looser version for ticket validation).
+export { responseStatus } from './responseTarget';
+export type { ResponseStatus } from './responseTarget';
 export { groupOtherEntries, retagEntries, trendingPhrase } from './otherEntries';
+export { normaliseOtherText as normaliseOtherEntry } from './otherEntries';
 export type { OtherField, OtherGroupView } from './otherEntries';
 export * from './billingNames';

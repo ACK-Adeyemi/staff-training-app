@@ -1,5 +1,5 @@
 // Shared route and label lists for the M0 e2e specs. Labels mirror packages/content/src/lang/en-GB.json.
-export type NavEntry = { hash: string; label: string };
+export type NavEntry = { hash: string; label: string; heading?: string };
 
 export const staffTabs: NavEntry[] = [
   { hash: '#/staff', label: 'Home' },
@@ -30,12 +30,18 @@ export const providerBar: NavEntry[] = [
   { hash: '#/provider', label: 'Overview' },
   { hash: '#/provider/clients', label: 'Clients' },
   { hash: '#/provider/content', label: 'Content' },
-  { hash: '#/provider/packages', label: 'Commercial' },
+  { hash: '#/provider/packages', label: 'Commercial', heading: 'Packages and entitlements' },
 ];
 export const providerMore: NavEntry[] = [
-  { hash: '#/provider/tickets', label: 'Support' },
-  { hash: '#/provider/comms', label: 'Comms' },
-  { hash: '#/provider/team', label: 'Team and security' },
+  { hash: '#/provider/tickets', label: 'Support', heading: 'Ticket inbox' },
+  { hash: '#/provider/comms', label: 'Comms', heading: 'Announcements and release notes' },
+  { hash: '#/provider/team', label: 'Team and security', heading: 'Team and roles' },
+  { hash: '#/provider/security', label: 'Security' },
+  { hash: '#/provider/audit', label: 'Audit log' },
+  { hash: '#/provider/global', label: 'Global content' },
+  { hash: '#/provider/profile-changes', label: 'Profile changes' },
+  { hash: '#/provider/pricing', label: 'Price changes' },
+  { hash: '#/provider/ai', label: 'AI settings', heading: 'AI add-on settings' },
 ];
 
 /** The 21 shell routes. */
@@ -158,3 +164,30 @@ export const m3AllRoutes: NavEntry[] = [
     ...m3AuthoringRoutes,
   ],
 ].filter((r, i, all) => all.findIndex((x) => x.hash === r.hash) === i);
+
+/** M4 provider routes P1 to P25 without an id in them (P3 and P12 are resolved in smoke.spec.ts). Sign in sits outside the provider shell. */
+export const m4Routes: NavEntry[] = [
+  { hash: '#/provider', label: 'Overview' },
+  { hash: '#/provider/clients', label: 'Clients' },
+  { hash: '#/provider/clients/new', label: 'New client' },
+  { hash: '#/provider/content', label: 'Content' },
+  { hash: '#/provider/feedback', label: 'App feedback' },
+  { hash: '#/provider/packs', label: 'Industry packs' },
+  { hash: '#/provider/packages', label: 'Packages' },
+  { hash: '#/provider/add-ons', label: 'Add-ons' },
+  { hash: '#/provider/dunning', label: 'Dunning' },
+  { hash: '#/provider/tickets', label: 'Ticket inbox' },
+  { hash: '#/provider/support-settings', label: 'Support settings' },
+  { hash: '#/provider/comms', label: 'Announcements' },
+  { hash: '#/provider/recovery', label: 'Account recovery' },
+  { hash: '#/provider/data-requests', label: 'Data requests' },
+  { hash: '#/provider/status', label: 'Status and incidents' },
+  { hash: '#/provider/team', label: 'Team and roles' },
+  { hash: '#/provider/security', label: 'Security' },
+  { hash: '#/provider/audit', label: 'Audit log' },
+  { hash: '#/provider/global', label: 'Global content' },
+  { hash: '#/provider/profile-changes', label: 'Profile changes' },
+  { hash: '#/provider/pricing', label: 'Price changes' },
+  { hash: '#/provider/ai', label: 'AI settings' },
+  { hash: '#/provider/signin', label: 'Provider sign in' },
+];

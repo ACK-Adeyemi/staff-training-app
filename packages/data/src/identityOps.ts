@@ -145,10 +145,10 @@ export function createIdentityOperations(backend: RawBackend, options: StoreOpti
 
   // ------------------------------------------------------------ two-factor
 
-  /** Code entry for an enrolled client admin: checks the lock first, counts wrong codes, locks after five. */
+  /** Code entry for an enrolled client admin or provider team member: checks the lock first, counts wrong codes, locks after five. */
   async function codeEntry(ctx: ActorContext, matches: (user: UserAccount) => Promise<UserAccount | undefined>) {
     const call = await beginCall(backend, options, ctx, { allowLimited: true });
-    if (call.side !== 'client') return forbid('permission');
+    if (call.side === 'staff') return forbid('permission');
     const user = call.actor.user;
     const tf = user.twoFactor;
     if (!tf) throw new RuleError('wrongCode');
@@ -182,7 +182,7 @@ export function createIdentityOperations(backend: RawBackend, options: StoreOpti
 
     async startEnrolment(ctx) {
       const call = await beginCall(backend, options, ctx, { allowLimited: true });
-      if (call.side !== 'client') return forbid('permission');
+      if (call.side === 'staff') return forbid('permission');
       const rng = options.rng.fork(`twoFactor:${call.actor.user.id}`);
       const secret = Array.from({ length: 16 }, () => rng.pick(SECRET_CHARS)).join('');
       return { secret, uri: otpauthUri(secret, call.actor.user.email ?? call.actor.user.displayName) };
@@ -190,7 +190,7 @@ export function createIdentityOperations(backend: RawBackend, options: StoreOpti
 
     async confirmEnrolment(ctx, code) {
       const call = await beginCall(backend, options, ctx, { allowLimited: true });
-      if (call.side !== 'client') return forbid('permission');
+      if (call.side === 'staff') return forbid('permission');
       const user = call.actor.user;
       if (user.twoFactor) throw new ValidationError(['code: two-step sign-in is already set up']);
       if (text(code).trim() !== demoTwoFactorCode) throw new RuleError('wrongCode');

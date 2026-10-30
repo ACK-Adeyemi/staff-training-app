@@ -66,12 +66,14 @@ export function confirmAdjustment(
 ): PriceAdjustment {
   need(a.status === 'submitted', 'Only a submitted change can be confirmed');
   need(input.confirmerId.trim() !== '', 'A confirmer is needed');
+  const effectiveAt = effectiveDateFor(input.confirmedAt, a.noticeDays);
+  need(a.endsAt === undefined || ms(a.endsAt) > ms(effectiveAt), 'The end date must be after the effective date');
   return {
     ...a,
     status: a.noticeDays === 0 ? 'active' : 'scheduled',
     confirmedBy: input.confirmerId,
     confirmedAt: input.confirmedAt,
-    effectiveAt: effectiveDateFor(input.confirmedAt, a.noticeDays),
+    effectiveAt,
   };
 }
 
@@ -90,6 +92,39 @@ export function replacedBy(existing: PriceAdjustment[], incoming: PriceAdjustmen
       sameScope(e.scope, incoming.scope) &&
       e.clientIds.some((c) => incoming.clientIds.includes(c)),
   );
+}
+
+/**
+ * What confirming `incoming` (already given its effective date) does to the changes it replaces. The old change keeps
+ * applying until the new one starts, so there is no gap during the notice period: it is ended at that moment (or
+ * never applies, if it would have started later). Where it also covers clients the new change does not, those
+ * clients stay on it and a copy (with a new id) carries the overlapping clients up to the switch.
+ */
+export function supersede(
+  existing: PriceAdjustment[],
+  incoming: PriceAdjustment,
+  newId: () => string,
+): { updates: PriceAdjustment[]; replacedIds: string[] } {
+  const start = incoming.effectiveAt;
+  const updates: PriceAdjustment[] = [];
+  const replacedIds: string[] = [];
+  if (start === undefined) return { updates, replacedIds };
+  for (const e of replacedBy(existing, incoming)) {
+    // Already ending on or before the switch: nothing to change.
+    if (e.endsAt !== undefined && ms(e.endsAt) <= ms(start)) continue;
+    replacedIds.push(e.id);
+    const never = e.effectiveAt === undefined || ms(e.effectiveAt) >= ms(start);
+    const cut = (x: PriceAdjustment): PriceAdjustment => (never ? { ...x, status: 'ended' } : { ...x, endsAt: start });
+    const overlap = e.clientIds.filter((c) => incoming.clientIds.includes(c));
+    const rest = e.clientIds.filter((c) => !incoming.clientIds.includes(c));
+    if (rest.length === 0) {
+      updates.push(cut(e));
+    } else {
+      updates.push({ ...e, clientIds: rest });
+      updates.push(cut({ ...e, id: newId(), clientIds: overlap }));
+    }
+  }
+  return { updates, replacedIds };
 }
 
 export type PreviewWarning = 'increaseOver20' | 'belowFloor';
@@ -126,23 +161,25 @@ export function previewAdjustment(input: {
     return { clientId: c.clientId, currentPrice, newPrice, monthlyEffect: newPrice - currentPrice, effectiveAt };
   });
   const warnings: PreviewWarning[] = [];
-  if (adjustment.type === 'percent' && adjustment.value > INCREASE_WARNING_PERCENT) warnings.push('increaseOver20');
+  const jump = (r: PreviewRow): boolean =>
+    r.currentPrice > 0 && ((r.newPrice - r.currentPrice) * 100) / r.currentPrice > INCREASE_WARNING_PERCENT;
+  if ((adjustment.type === 'percent' && adjustment.value > INCREASE_WARNING_PERCENT) || rows.some(jump))
+    warnings.push('increaseOver20');
   if (floorPence !== undefined && rows.some((r) => r.newPrice < floorPence)) warnings.push('belowFloor');
   return { rows, warnings };
 }
 
-const REASON_LABELS: Record<PriceAdjustment['reason'], string> = {
-  loyalty: 'Loyalty',
-  retention: 'Retention',
-  introductory: 'Introductory offer',
-  annualReview: 'Annual review',
-  correction: 'Correction',
-  other: 'Price change',
-};
-
 export interface InvoiceLine {
-  label: string;
   amount: number;
+  /** Set on the list price line. */
+  label?: string;
+  /** Set on the separate adjustment line. Codes only: the screen words them from the language file. */
+  adjustment?: {
+    reason: PriceAdjustment['reason'];
+    direction: 'discount' | 'increase';
+    type: PriceAdjustment['type'];
+    value: number;
+  };
 }
 
 /** The list price line, plus one separate adjustment line when a change applies. */
@@ -156,19 +193,17 @@ export function invoiceLinesFor(input: {
   const scope: Scope = input.scope ?? { kind: 'plan' };
   const lines: InvoiceLine[] = [{ label: input.label, amount: input.listPrice }];
   const net = priceFor({ listPrice: input.listPrice, scope, adjustments: input.adjustments, at: input.at });
-  const percent = pick(input.adjustments, 'percent', scope, input.at);
-  const override = pick(input.adjustments, 'override', scope, input.at);
-  const main = percent ?? override;
+  const main =
+    pick(input.adjustments, 'percent', scope, input.at) ?? pick(input.adjustments, 'override', scope, input.at);
   if (!main || net === input.listPrice) return lines;
-  const reason = REASON_LABELS[main.reason];
-  let detail: string;
-  if (percent) {
-    const size = Math.abs(percent.value);
-    detail = `${percent.value < 0 ? 'minus' : 'plus'} ${size} per cent`;
-  } else {
-    detail = 'fixed price';
-  }
-  const word = net < input.listPrice ? 'discount' : 'increase';
-  lines.push({ label: `${reason} ${word}, ${detail}`, amount: net - input.listPrice });
+  lines.push({
+    amount: net - input.listPrice,
+    adjustment: {
+      reason: main.reason,
+      direction: net < input.listPrice ? 'discount' : 'increase',
+      type: main.type,
+      value: main.value,
+    },
+  });
   return lines;
 }

@@ -10,7 +10,19 @@ import { runEvidenceFlowContract } from './evidenceFlow';
 import { runFeedbackTicketsContract } from './feedbackTickets';
 import { runIdentityOrgContract } from './identityOrg';
 import { runPricingContract } from './pricing';
+import { runPriceNoticesContract } from './priceNotices';
+import { runOwnershipTransferContract } from './ownershipTransfer';
+import { runProviderTeamContract } from './providerTeam';
+import { runCreateClientContract } from './createClient';
+import { runProviderPublishContract } from './providerPublish';
+import { runProviderCommsContract } from './providerComms';
+import { runProviderIncidentsContract } from './providerIncidents';
+import { runProviderGlobalAiContract } from './providerGlobalAi';
+import { runProviderOverviewContract } from './providerOverview';
+import { runProviderRecoveryContract } from './providerRecovery';
+import { runProviderTicketsContract } from './providerTickets';
 import { runPackagingOptionContract } from './packagingOption';
+import { runDunningContract } from './dunning';
 import { runLearningContract } from './learning';
 import { runM3FoundationContract } from './m3Foundation';
 import { runExportsRetentionContract } from './exportsRetention';
@@ -72,6 +84,40 @@ runRemindersLeftoversContract('indexeddb adapter', (options) =>
 );
 
 runPricingContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
+runPriceNoticesContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runOwnershipTransferContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runProviderTeamContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
 runPackagingOptionContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runDunningContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
+runCreateClientContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runProviderPublishContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runProviderTicketsContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runProviderCommsContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runProviderIncidentsContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runProviderRecoveryContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runProviderOverviewContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
+runProviderGlobalAiContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),
 );

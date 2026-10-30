@@ -21,6 +21,9 @@ import {
   type DataRequest,
   type Incident,
   type LinkCheckResult,
+  type UsageDaily,
+  type ErrorGroup,
+  type HealthScore,
   type OtherEntryGroup,
   type OutboxMessage,
   type PriceAdjustment,
@@ -75,6 +78,7 @@ import {
 import { buildHistory } from './history';
 import { buildBilling, buildFeedback, buildM3History, buildSupport } from './m3';
 import { buildM4 } from './m4';
+import { buildTelemetry } from './telemetry';
 
 /** Well-known keys are declared properties, so reading one gives a string; any other key is looked up by index. */
 type KeyMap<K extends string> = Record<K, string> & Record<string, string>;
@@ -194,6 +198,9 @@ export type SeedData = {
   savedReplies: SavedReply[];
   profileChangeRequests: ProfileChangeRequest[];
   linkCheckResults: LinkCheckResult[];
+  usageDaily: UsageDaily[];
+  errorGroups: ErrorGroup[];
+  healthScores: HealthScore[];
 };
 
 const POLICY_BODY = `## Little Acorns Safeguarding policy
@@ -673,6 +680,8 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     support: root.fork('support'),
     // Added in M4, drawn last.
     m4: root.fork('m4'),
+    // Added in M4 chunk 8c; its own stream so the m4 records do not move.
+    telemetry: root.fork('telemetry'),
   };
   const newId = (rng: Rng) => (): string => ulid(clock, rng);
   const ago = (days: number): Date => addDays(today, -days);
@@ -741,6 +750,9 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     savedReplies: [],
     profileChangeRequests: [],
     linkCheckResults: [],
+    usageDaily: [],
+    errorGroups: [],
+    healthScores: [],
   };
 
   keys.requirements = {
@@ -1220,6 +1232,7 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
 
   // M4: provider story (price changes, profile changes, link check, Other entries, comms).
   buildM4({ data, keys, today, clock, rng: streams.m4 });
+  buildTelemetry({ data, keys, today, clock, rng: streams.telemetry });
 
   return { data, keys };
 }

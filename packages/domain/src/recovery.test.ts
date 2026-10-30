@@ -1,10 +1,10 @@
 // M4 chunk 3: account recovery two-approver rule, written before the implementation.
 //
 // API under test (recovery.ts):
-//   RECOVERY_COOLING_OFF_HOURS = 24
+//   RECOVERY_COOLING_OFF_HOURS = 48
 //   type RecoveryResult = { ok: true; request: RecoveryRequest } | { ok: false; reason: string }
 //   requestRecovery(input: { id; clientId; subjectUserId; requester; reason; outcome? ; checks? }, clock): RecoveryRequest
-//     -> status 'open', approvals [], coolingOffEndsAt = now + 24h
+//     -> status 'open', approvals [], coolingOffEndsAt = now + 48h
 //   approveRecovery(r, approverUserId, clock): RecoveryResult   // distinct, not the subject, open only; 2nd approval -> 'approved'
 //   completeRecovery(r, clock): RecoveryResult                   // needs 'approved' and cooling-off over -> 'done'
 //   rejectRecovery(r, byUserId, clock): RecoveryResult           // open or approved only -> 'rejected'
@@ -42,13 +42,13 @@ const approvedRequest = (): RecoveryRequest => {
 };
 
 describe('account recovery', () => {
-  it('requesting creates an open record that is valid under the schema with a 24 hour cooling-off', () => {
+  it('requesting creates an open record that is valid under the schema with a 48 hour cooling-off', () => {
     const r = requestRecovery(input, start);
-    expect(RECOVERY_COOLING_OFF_HOURS).toBe(24);
+    expect(RECOVERY_COOLING_OFF_HOURS).toBe(48);
     expect(recoveryRequestSchema.safeParse(r).success).toBe(true);
     expect(r.status).toBe('open');
     expect(r.approvals).toEqual([]);
-    expect(r.coolingOffEndsAt).toBe(new Date(start.now().getTime() + 24 * HOUR).toISOString());
+    expect(r.coolingOffEndsAt).toBe(new Date(start.now().getTime() + 48 * HOUR).toISOString());
   });
 
   it('the first approval is recorded and the request stays open', () => {
@@ -74,6 +74,12 @@ describe('account recovery', () => {
     expect(res.ok).toBe(false);
   });
 
+  it('the person who asked for the recovery cannot approve it', () => {
+    const res = approveRecovery(requestRecovery({ ...input, requester: A }, start), A, start);
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.reason).toBe('The person who asked for this recovery cannot approve it.');
+  });
+
   it('two different approvers move the request to approved and it stays schema valid', () => {
     const r = approvedRequest();
     expect(r.status).toBe('approved');
@@ -88,13 +94,13 @@ describe('account recovery', () => {
     expect(res.ok).toBe(false);
   });
 
-  it('cannot complete before the 24 hour cooling-off is over', () => {
-    const res = completeRecovery(approvedRequest(), offsetClock(start, 24 * HOUR - 1));
+  it('cannot complete before the 48 hour cooling-off is over', () => {
+    const res = completeRecovery(approvedRequest(), offsetClock(start, 48 * HOUR - 1));
     expect(res.ok).toBe(false);
   });
 
   it('can complete once the cooling-off is over, and the request becomes done', () => {
-    const res = completeRecovery(approvedRequest(), offsetClock(start, 24 * HOUR));
+    const res = completeRecovery(approvedRequest(), offsetClock(start, 48 * HOUR));
     expect(res.ok).toBe(true);
     if (res.ok) {
       expect(res.request.status).toBe('done');
@@ -103,7 +109,7 @@ describe('account recovery', () => {
   });
 
   it('fast-forwarding the demo clock past the cooling-off allows completion', () => {
-    const fastForwarded = offsetClock(start, 3 * 24 * HOUR);
+    const fastForwarded = offsetClock(start, 4 * 24 * HOUR);
     expect(completeRecovery(approvedRequest(), start).ok).toBe(false);
     expect(completeRecovery(approvedRequest(), fastForwarded).ok).toBe(true);
   });
@@ -122,8 +128,30 @@ describe('account recovery', () => {
   });
 
   it('a finished request cannot be declined', () => {
-    const done = completeRecovery(approvedRequest(), offsetClock(start, 25 * HOUR));
+    const done = completeRecovery(approvedRequest(), offsetClock(start, 49 * HOUR));
     if (!done.ok) throw new Error('complete failed');
     expect(rejectRecovery(done.request, A, start).ok).toBe(false);
+  });
+
+  it('the waiting period starts at the second approval, so a late approval still leaves the full 48 hours', () => {
+    const one = approveRecovery(requestRecovery(input, start), A, start);
+    if (!one.ok) throw new Error('first approval failed');
+    const later = offsetClock(start, 30 * HOUR);
+    const two = approveRecovery(one.request, B, later);
+    if (!two.ok) throw new Error('second approval failed');
+    expect(two.request.coolingOffEndsAt).toBe(new Date(start.now().getTime() + 78 * HOUR).toISOString());
+    expect(completeRecovery(two.request, offsetClock(start, 77 * HOUR)).ok).toBe(false);
+    expect(completeRecovery(two.request, offsetClock(start, 78 * HOUR)).ok).toBe(true);
+  });
+
+  it('approving a request that has no cooling-off end sets it to 48 hours from now, and keeps one already set before approval', () => {
+    const bare = { ...requestRecovery(input, start) };
+    Reflect.deleteProperty(bare, 'coolingOffEndsAt');
+    const res = approveRecovery(bare, A, start);
+    if (!res.ok) throw new Error('approval failed');
+    expect(res.request.coolingOffEndsAt).toBe(new Date(start.now().getTime() + 48 * HOUR).toISOString());
+    const kept = approveRecovery(requestRecovery(input, start), A, offsetClock(start, 5 * HOUR));
+    if (!kept.ok) throw new Error('approval failed');
+    expect(kept.request.coolingOffEndsAt).toBe(new Date(start.now().getTime() + 48 * HOUR).toISOString());
   });
 });

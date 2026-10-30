@@ -71,3 +71,9 @@ export function useFeatures() {
   const actor = useActor();
   return useQuery({ queryKey: useScopeKey('features'), queryFn: () => store.access.features(actor) });
 }
+
+export function usePriceNotices() {
+  const store = useStore();
+  const actor = useActor();
+  return useQuery({ queryKey: useScopeKey('billingPriceNotices'), queryFn: () => store.billing.priceNotices(actor) });
+}

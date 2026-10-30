@@ -1,6 +1,5 @@
 import type { RouteObject } from 'react-router';
-import type { MessageKey } from '@sta/content';
-import { NotFound, Placeholder } from '../pages/pages';
+import { NotFound } from '../pages/pages';
 import { Landing } from '../demo/pages/Landing';
 import { Outbox } from '../demo/pages/Outbox';
 import { RootLayout } from '../demo/RootLayout';
@@ -18,6 +17,7 @@ import { Onboarding } from '../pages/client/Onboarding';
 import { DataRetention } from '../pages/client/DataRetention';
 import { Settings } from '../pages/client/Settings';
 import { SignIn as ClientSignIn } from '../pages/client/SignIn';
+import { ProviderSignIn } from '../pages/provider/ProviderSignIn';
 import { Team } from '../pages/client/Team';
 import { Display } from '../pages/me/Display';
 import { Me } from '../pages/me/Me';
@@ -37,12 +37,10 @@ import { SignIn } from '../pages/staff/SignIn';
 import { Help } from '../pages/help/Help';
 import { TicketThread } from '../pages/help/TicketThread';
 import { TicketWizard } from '../pages/help/TicketWizard';
+import { Overview } from '../pages/provider/Overview';
+import { Clients } from '../pages/provider/Clients';
+import { ClientDetail } from '../pages/provider/ClientDetail';
 import { RouteError } from './RouteError';
-
-const page = (path: string, title: MessageKey, body: MessageKey): RouteObject => ({
-  path,
-  element: <Placeholder titleKey={title} bodyKey={body} />,
-});
 
 // S14 to S16 for staff and C23 for admins: the same components, told apart by the signed-in side.
 const helpRoutes: RouteObject[] = [
@@ -61,6 +59,7 @@ export const routes: RouteObject[] = [
       { path: '/staff/signin', element: <SignIn /> },
       // Outside the client shell, so an admin who must set up two-step sign-in can still reach it.
       { path: '/client/signin', element: <ClientSignIn /> },
+      { path: '/provider/signin', element: <ProviderSignIn /> },
       // Outside the staff chrome: a certificate prints cleanly and an organisation document opens in its own tab.
       { path: '/staff/module/:moduleId/certificate', element: <Certificate /> },
       { path: '/staff/progress/record', element: <TrainingRecord /> },
@@ -219,11 +218,13 @@ export const routes: RouteObject[] = [
         path: '/provider',
         lazy: async () => ({ Component: (await import('../shells/shells')).ProviderShell }),
         children: [
+          { index: true, element: <Overview /> },
+          { path: 'clients', element: <Clients /> },
           {
-            index: true,
-            element: <Placeholder titleKey="nav.provider.overview" bodyKey="placeholder.provider.overview" />,
+            path: 'clients/new',
+            lazy: async () => ({ Component: (await import('../pages/provider/NewClient')).NewClient }),
           },
-          page('clients', 'nav.provider.clients', 'placeholder.provider.clients'),
+          { path: 'clients/:id', element: <ClientDetail /> },
           {
             path: 'content',
             lazy: async () => ({ Component: (await import('../pages/provider/ProviderContent')).ProviderContent }),
@@ -232,10 +233,78 @@ export const routes: RouteObject[] = [
             path: 'feedback',
             lazy: async () => ({ Component: (await import('../pages/provider/AppFeedback')).AppFeedback }),
           },
-          page('packages', 'nav.provider.commercial', 'placeholder.provider.commercial'),
-          page('tickets', 'nav.provider.support', 'placeholder.provider.support'),
-          page('comms', 'nav.provider.comms', 'placeholder.provider.comms'),
-          page('team', 'nav.provider.teamSecurity', 'placeholder.provider.teamSecurity'),
+          {
+            path: 'packs',
+            lazy: async () => ({ Component: (await import('../pages/provider/Packs')).Packs }),
+          },
+          {
+            path: 'packages',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProviderPackages')).ProviderPackages }),
+          },
+          {
+            path: 'add-ons',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProviderAddOns')).ProviderAddOns }),
+          },
+          {
+            path: 'dunning',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProviderDunning')).ProviderDunning }),
+          },
+          {
+            path: 'tickets',
+            lazy: async () => ({ Component: (await import('../pages/provider/Tickets')).Tickets }),
+          },
+          {
+            path: 'support-settings',
+            lazy: async () => ({ Component: (await import('../pages/provider/SupportSettings')).SupportSettings }),
+          },
+          {
+            path: 'tickets/:id',
+            lazy: async () => ({ Component: (await import('../pages/provider/TicketDetail')).TicketDetail }),
+          },
+          {
+            path: 'comms',
+            lazy: async () => ({ Component: (await import('../pages/provider/Comms')).Comms }),
+          },
+          {
+            path: 'recovery',
+            lazy: async () => ({ Component: (await import('../pages/provider/Recovery')).Recovery }),
+          },
+          {
+            path: 'data-requests',
+            lazy: async () => ({ Component: (await import('../pages/provider/DataRequests')).DataRequests }),
+          },
+          {
+            path: 'status',
+            lazy: async () => ({ Component: (await import('../pages/provider/Status')).Status }),
+          },
+          {
+            path: 'team',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProviderTeam')).Team }),
+          },
+          {
+            path: 'security',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProviderSecurity')).Security }),
+          },
+          {
+            path: 'audit',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProviderAudit')).Audit }),
+          },
+          {
+            path: 'global',
+            lazy: async () => ({ Component: (await import('../pages/provider/GlobalContent')).GlobalContent }),
+          },
+          {
+            path: 'profile-changes',
+            lazy: async () => ({ Component: (await import('../pages/provider/ProfileChanges')).ProfileChanges }),
+          },
+          {
+            path: 'pricing',
+            lazy: async () => ({ Component: (await import('../pages/provider/Pricing')).Pricing }),
+          },
+          {
+            path: 'ai',
+            lazy: async () => ({ Component: (await import('../pages/provider/AiSettings')).AiSettings }),
+          },
         ],
       },
       { path: '*', element: <NotFound /> },

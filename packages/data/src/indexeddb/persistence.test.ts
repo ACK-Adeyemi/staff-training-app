@@ -53,7 +53,7 @@ describe('indexeddb adapter persistence', () => {
     const after = await second.admin.dumpAll();
     expect(hashStores(after)).toEqual(hashStores(before));
     expect(after['people'].length).toBeGreaterThan(0);
-    expect(await second.admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 5 });
+    expect(await second.admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 8 });
     second.close();
   });
 
@@ -209,7 +209,7 @@ describe('indexeddb adapter reset and determinism (BP-4)', () => {
     await load(handle.admin, SEED);
     const expected = hashStores(await handle.admin.dumpAll());
     await reset(handle.admin);
-    expect(await handle.admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 5 });
+    expect(await handle.admin.getSeedMeta()).toEqual({ ...SEED, seedVersion: 8 });
     expect(hashStores(await handle.admin.dumpAll())).toEqual(expected);
     handle.close();
   });

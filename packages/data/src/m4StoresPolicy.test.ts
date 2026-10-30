@@ -21,6 +21,11 @@ export const M4_STORES = [
   'profileChangeRequests',
   'linkCheckResults',
   'moduleNotices',
+  // Chunk 8c: provider telemetry, read only through the providerOverview and telemetry services.
+  'usageDaily',
+  'errorGroups',
+  'healthScores',
+  'localTelemetry',
 ] as const;
 
 async function world() {

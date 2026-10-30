@@ -4,6 +4,7 @@ import { createT, languages } from '@sta/content';
 import type { ActorContext, DataStore, StoreHandle } from '@sta/data';
 import type { Clock } from '@sta/domain';
 import { DisplayPrefsProvider } from './display/DisplayPrefsProvider';
+import { listenForLocalErrors } from './errorRecorder';
 import { connectLiveUpdates } from './liveUpdates';
 import { ActorCtx, ClockContext, DataStoreContext, DemoContext, I18nContext, type DemoApi } from './context';
 
@@ -35,6 +36,7 @@ export function AppProviders({
       },
     });
   }, [subscribe, queryClient]);
+  useEffect(() => listenForLocalErrors(store), [store]);
   return (
     <DataStoreContext value={store}>
       <ClockContext value={clock}>
