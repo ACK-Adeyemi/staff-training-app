@@ -117,7 +117,8 @@ describe('C6 Module Library', () => {
     const c = await renderRoute('/client/modules', 'client');
     expect((await screen.findByRole('heading', { level: 1 })).textContent).toBe('Training');
     const shown = await items();
-    const stored = await c.handle.store.modules.list(priya(c.keys));
+    // Machine translations are versions of a module, not rows of their own (M5 chunk 7).
+    const stored = (await c.handle.store.modules.list(priya(c.keys))).filter((m) => !m.translatedFrom);
     expect(shown.map((el) => el.getAttribute('data-module-id')).sort()).toEqual(stored.map((m) => m.id).sort());
     const fire = await fireOf(c);
     expect(within(await itemFor(fire.id)).getByText('Own')).toBeTruthy();
@@ -238,7 +239,7 @@ describe('C6 Module Library', () => {
     const c = await renderRoute('/client/modules', 'client');
     const user = userEvent.setup();
     await items();
-    const stored = await c.handle.store.modules.list(priya(c.keys));
+    const stored = (await c.handle.store.modules.list(priya(c.keys))).filter((m) => !m.translatedFrom);
     await user.selectOptions(screen.getByRole('combobox', { name: 'Sort by' }), 'Title');
     const byTitle = [...stored].sort((a, b) => a.title.localeCompare(b.title)).map((m) => m.id);
     await waitFor(async () => {
