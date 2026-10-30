@@ -236,6 +236,18 @@ describe('Show me', () => {
     expect(demo.signInAsClient).not.toHaveBeenCalled();
   });
 
+  it('says so and does not navigate when the persona is missing', async () => {
+    const { demo, router } = await open(trackA, 5);
+    await overlay(6, 9);
+    demo.listPersonas = () => Promise.resolve([]);
+    await router.navigate('/client');
+    await userEvent.click(screen.getByRole('button', { name: 'Show me' }));
+    const alert = await screen.findByRole('alert');
+    expect(alert.textContent).toBe(t('tour.personaMissing'));
+    expect(pathOf(router)).toBe('/client');
+    expect(demo.signInAsClient).not.toHaveBeenCalled();
+  });
+
   it('keeps the tour on the same step after Show me', async () => {
     await open(trackA, 1);
     await overlay(2, 9);

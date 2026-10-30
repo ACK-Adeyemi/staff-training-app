@@ -129,6 +129,17 @@ describe('Quiz me for practice buttons', () => {
 });
 
 describe('Practice page', () => {
+  it('shows the try-again message, not the not-available one, when the call fails for another reason', async () => {
+    await renderRoute(PRACTICE, 'staff', {
+      prepare: async (ctx) => {
+        await withAi(ctx);
+        ctx.handle.store.ai.practice = () => Promise.reject(new Error('boom'));
+      },
+    });
+    const alert = await screen.findByRole('alert');
+    expect(alert.textContent).toBe('We could not make a practice quiz right now. Please try again.');
+  });
+
   it('labels the quiz Demo AI and says it is practice only', async () => {
     await renderRoute(PRACTICE, 'staff', { prepare: withAi });
     expect(await screen.findByText(NOTICE)).toBeTruthy();

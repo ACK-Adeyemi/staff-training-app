@@ -60,7 +60,7 @@ export function DemoMenu({
                   {t('tour.restartTour')}
                 </Button>
               ) : null}
-              {tourOn ? (
+              {tourOn && stored.state.status === 'skipped' ? (
                 <Button
                   variant="secondary"
                   onClick={() => {

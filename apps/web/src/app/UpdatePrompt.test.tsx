@@ -91,6 +91,14 @@ describe('language keys', () => {
 });
 
 describe('UpdatePrompt', () => {
+  it('sits above the phone bottom navigation', async () => {
+    fake.state = { needRefresh: true, offlineReady: false };
+    await mount();
+    const cls = screen.getByRole('status').className;
+    expect(cls).toMatch(/\bbottom-20\b/);
+    expect(cls).toMatch(/\bmd:bottom-0\b/);
+  });
+
   it('shows nothing when no update is waiting', async () => {
     await mount();
     expect(screen.queryByText('A new version is ready')).toBeNull();

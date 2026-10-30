@@ -4117,6 +4117,7 @@
     "cancel": "Cancel",
     "restartTour": "Restart tour",
     "resumeTour": "Resume tour",
+    "personaMissing": "We could not find that person in the demo. Try Restart, or carry on with Next.",
     "doneTitle": "That is the tour",
     "tryNextTitle": "Try this next",
     "a": {

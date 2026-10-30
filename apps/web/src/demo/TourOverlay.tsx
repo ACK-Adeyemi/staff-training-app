@@ -98,6 +98,7 @@ function Panel({ state, tour }: { state: TourState; tour: Tour }) {
   // Set when a press removes the control that had focus; the next render puts focus somewhere sensible.
   const refocus = useRef<'pill' | 'box' | null>(null);
   const starter = useTourStart();
+  const [problem, setProblem] = useState(false);
   const done = state.status === 'complete';
   const index = Math.min(state.index, tour.steps.length - 1);
   const step: TourStep | undefined = tour.steps[index];
@@ -122,23 +123,32 @@ function Panel({ state, tour }: { state: TourState; tour: Tour }) {
 
   if (!step) return null;
   const showMe = () => {
+    setProblem(false);
     void (async () => {
-      if (step.persona !== 'Provider') {
-        const side = step.route.startsWith('/client') ? 'client' : 'staff';
-        const people = await demo.listPersonas();
-        const who = people.find((p) => p.side === side && p.displayName.split(' ')[0] === step.persona);
-        if (who) await (side === 'client' ? demo.signInAsClient(who.userId) : demo.signInAs(who.userId));
+      try {
+        if (step.persona !== 'Provider') {
+          const side = step.route.startsWith('/client') ? 'client' : 'staff';
+          const people = await demo.listPersonas();
+          const who = people.find((p) => p.side === side && p.displayName.split(' ')[0] === step.persona);
+          if (!who) {
+            setProblem(true);
+            return;
+          }
+          await (side === 'client' ? demo.signInAsClient(who.userId) : demo.signInAs(who.userId));
+        }
+        let route = step.route;
+        const named = clientNameToken.exec(route);
+        if (named) {
+          const people = await demo.listPersonas();
+          const found = people.find((p) => p.clientName.startsWith(named[1] ?? ''));
+          route = found ? route.replace(clientNameToken, found.clientId) : '/provider/clients';
+        }
+        await navigate(route);
+        // The person may have changed, so anything already loaded belongs to someone else.
+        await queryClient.invalidateQueries();
+      } catch {
+        setProblem(true);
       }
-      let route = step.route;
-      const named = clientNameToken.exec(route);
-      if (named) {
-        const people = await demo.listPersonas();
-        const found = people.find((p) => p.clientName.startsWith(named[1] ?? ''));
-        route = found ? route.replace(clientNameToken, found.clientId) : '/provider/clients';
-      }
-      await navigate(route);
-      // The person may have changed, so anything already loaded belongs to someone else.
-      await queryClient.invalidateQueries();
     })();
   };
   const set = (s: TourState) => {
@@ -187,6 +197,11 @@ function Panel({ state, tour }: { state: TourState; tour: Tour }) {
           <>
             <p className="m-0 mb-1 text-sm font-bold">{t('tour.stepOf', { n, m })}</p>
             <p className="mt-0 mb-3">{t(step.captionKey)}</p>
+            {problem ? (
+              <p role="alert" className="mt-0 mb-3 font-bold">
+                {t('tour.personaMissing')}
+              </p>
+            ) : null}
           </>
         )}
         <div className="flex flex-wrap gap-2">

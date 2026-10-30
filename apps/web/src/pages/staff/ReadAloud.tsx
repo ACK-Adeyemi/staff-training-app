@@ -44,15 +44,17 @@ export function ReadAloud({ text, lang, pausable = false }: { text: string; lang
           {t('readAloud.pause')}
         </Button>
       ) : null}
-      <Button
-        variant="secondary"
-        onClick={() => {
-          speech.stop();
-          setReadingText(null);
-        }}
-      >
-        {t('readAloud.stop')}
-      </Button>
+      {pausable ? null : (
+        <Button
+          variant="secondary"
+          onClick={() => {
+            speech.stop();
+            setReadingText(null);
+          }}
+        >
+          {t('readAloud.stop')}
+        </Button>
+      )}
     </div>
   ) : (
     <Button

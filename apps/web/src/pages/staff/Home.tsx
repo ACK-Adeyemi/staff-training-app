@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Badge, Banner as InfoBanner, Button, Card, GoalRing, LinkButton, PageHeader, ProgressRing } from '@sta/ui';
 import {
@@ -15,6 +15,8 @@ import type { MessageKey } from '@sta/content';
 import { useActor, useClock, useStore, useT } from '../../app/hooks';
 import { formatLondonDate } from '../../demo/format';
 import { CompetitionSheet } from '../compete/CompetitionSheet';
+import { offlineNoticeTold, markOfflineNoticeTold } from './offlineNotice';
+import { usePwa } from '../../app/usePwa';
 import { useSystemNotices } from '../../shells/systemNotices';
 import { useStaffData } from './queries';
 import { badgeDefinitionFor, latestBadge, useRewards, type RewardsData } from './rewardsQueries';
@@ -199,6 +201,34 @@ function AccountNotice() {
   );
 }
 
+/** F-2: tells the learner once that the app now works offline. */
+function OfflineReady() {
+  const t = useT();
+  const { offlineReady } = usePwa();
+  // Taken at mount: a page opened after the notice was given never shows it again.
+  const [eligible] = useState(() => !offlineNoticeTold());
+  const [closed, setClosed] = useState(false);
+  const show = offlineReady && eligible && !closed;
+  useEffect(() => {
+    if (show) markOfflineNoticeTold();
+  }, [show]);
+  if (!show) return null;
+  return (
+    <div role="status" className="mb-3 flex flex-wrap items-center gap-3">
+      <span className="flex-1">{t('pwa.offlineReady')}</span>
+      <Button
+        className="min-h-11"
+        variant="secondary"
+        onClick={() => {
+          setClosed(true);
+        }}
+      >
+        {t('common.close')}
+      </Button>
+    </div>
+  );
+}
+
 export function Home() {
   const t = useT();
   const q = useStaffData();
@@ -212,6 +242,7 @@ export function Home() {
     <>
       <PageHeader title={t('nav.staff.home')} />
       <AccountNotice />
+      <OfflineReady />
       <p className="m-0 text-lg">{t('staff.home.greeting', { name: personName })}</p>
       <div className="mb-4 flex flex-col items-center gap-2">
         <ProgressRing

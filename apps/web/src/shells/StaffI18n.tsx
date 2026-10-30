@@ -23,7 +23,7 @@ export function StaffI18n({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (code === 'en-GB') return undefined;
-    const entry = languages['pl-PL'];
+    const entry = languages[code];
     let live = true;
     void entry
       .load()

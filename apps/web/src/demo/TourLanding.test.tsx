@@ -98,12 +98,12 @@ describe('Demo menu tour items', () => {
     expect(within(menu).queryByRole('button', { name: 'Resume tour' })).toBeNull();
   });
 
-  it('offers both while a tour is in progress', async () => {
+  it('offers Restart tour but not Resume tour while a tour is active (review: Resume only after a skip)', async () => {
     localStorage.setItem(KEY, JSON.stringify({ tourId: trackA.id, stepCount: 9, index: 2, status: 'active' }));
     await renderRoute('/client', 'client');
     const menu = await openMenu();
     expect(within(menu).getByRole('button', { name: 'Restart tour' })).toBeTruthy();
-    expect(within(menu).getByRole('button', { name: 'Resume tour' })).toBeTruthy();
+    expect(within(menu).queryByRole('button', { name: 'Resume tour' })).toBeNull();
   });
 
   it('Resume tour brings back a skipped tour at the step it was on', async () => {

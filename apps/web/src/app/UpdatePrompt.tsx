@@ -12,7 +12,7 @@ export function UpdatePrompt() {
   return (
     <div
       role="status"
-      className="fixed inset-x-0 bottom-0 z-50 m-3 flex flex-wrap items-center gap-3 rounded-lg border-2 border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-[var(--color-text)] shadow-lg"
+      className="fixed inset-x-0 bottom-20 z-50 md:bottom-0 m-3 flex flex-wrap items-center gap-3 rounded-lg border-2 border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-[var(--color-text)] shadow-lg"
     >
       <span className="flex-1">{t('pwa.updateReady')}</span>
       <Button

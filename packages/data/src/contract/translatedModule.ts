@@ -122,9 +122,9 @@ export function runTranslatedModuleContract(
         questions: s.lf.module.questions,
         quiz: s.lf.module.quiz,
       };
-      const made = await s.store.authoring.create(s.priya, { ...base, translatedFrom: claim } as never);
+      const made = await s.store.authoring.create(s.priya, { ...base, translatedFrom: claim });
       expect(made.translatedFrom).toBeUndefined();
-      const saved = await s.store.authoring.saveDraft(s.priya, made.id, { ...base, translatedFrom: claim } as never);
+      const saved = await s.store.authoring.saveDraft(s.priya, made.id, { ...base, translatedFrom: claim });
       expect(saved.translatedFrom).toBeUndefined();
     });
 

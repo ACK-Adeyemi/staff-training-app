@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Card, LinkButton, PageHeader } from '@sta/ui';
 import { checkAnswer, type Question } from '@sta/domain';
+import { AccountStateError, NotEntitledError } from '@sta/data';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { useFeatures } from '../client/billingQueries';
 import { LearningFrame } from './LearningFrame';
@@ -75,13 +76,16 @@ function PracticeRun({ moduleId }: { moduleId: string }) {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
-  if (q.isError) return <p role="alert">{t('aiPractice.off')}</p>;
+  if (q.isError) {
+    const unavailable = q.error instanceof NotEntitledError || q.error instanceof AccountStateError;
+    return <p role="alert">{t(unavailable ? 'aiPractice.off' : 'aiPractice.error')}</p>;
+  }
   if (!q.data) return <p>{t('aiPractice.loading')}</p>;
-  const { label, questions } = q.data;
+  const { questions } = q.data;
   const right = results.filter(Boolean).length;
   return (
     <>
-      <p className="mt-0 mb-1 font-bold">{label}</p>
+      <p className="mt-0 mb-1 font-bold">{t('aiPractice.label')}</p>
       <p className="mt-0">{t('aiPractice.notice')}</p>
       {questions.length === 0 ? (
         <p>{t('aiPractice.empty')}</p>

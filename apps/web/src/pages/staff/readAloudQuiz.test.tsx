@@ -64,6 +64,7 @@ describe('S6 read-aloud Pause', () => {
     expect(screen.queryByRole('button', { name: 'Pause' })).toBeNull();
     await user.click(await screen.findByRole('button', { name: 'Read this aloud' }));
     expect(spoken).toHaveLength(1);
+    expect(screen.queryByRole('button', { name: 'Stop reading' })).toBeNull();
     const cancelsBefore = state.cancels;
     await user.click(screen.getByRole('button', { name: 'Pause' }));
     expect(state.cancels).toBeGreaterThan(cancelsBefore);
