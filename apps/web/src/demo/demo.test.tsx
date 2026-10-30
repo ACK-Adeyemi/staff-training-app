@@ -265,10 +265,13 @@ describe('D1 landing', () => {
     expect(demo.setIndustry).not.toHaveBeenCalledWith('luxuryRetail');
   });
 
-  it('Client tour, Provider tour and Explore freely lead to the three surfaces', async () => {
+  // SPEC CHANGE (M5 chunk 11, F-3): Client tour and Provider tour are buttons that ask to reset first, then start the
+  // tour (see TourLanding.test.tsx). Explore freely still links straight to the three surfaces.
+  it('Client tour and Provider tour are buttons, and Explore freely leads to the three surfaces', async () => {
     await renderRoute('/', 'staff');
-    expect((await screen.findByRole('link', { name: 'Client tour' })).getAttribute('href')).toBe('#/client');
-    expect(screen.getByRole('link', { name: 'Provider tour' }).getAttribute('href')).toBe('#/provider');
+    expect((await screen.findByRole('button', { name: 'Client tour' })).tagName).toBe('BUTTON');
+    expect(screen.getByRole('button', { name: 'Provider tour' }).tagName).toBe('BUTTON');
+    expect(screen.queryByRole('link', { name: 'Client tour' })).toBeNull();
     const explore = screen.getByRole('region', { name: 'Explore freely' });
     expect(
       within(explore)
