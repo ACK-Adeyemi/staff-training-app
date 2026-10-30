@@ -3,6 +3,7 @@ import 'fake-indexeddb/auto';
 import { createIndexedDbStore } from '../indexeddb/index';
 import { runAuthoringFilesContract } from './authoringFiles';
 import { runAiPracticeContract } from './aiPractice';
+import { runAiDraftContract } from './aiDraft';
 import { runBillingContract } from './billing';
 import { runAdminCountContract } from './adminCount';
 import { runCompetitionsContract } from './competitions';
@@ -60,6 +61,7 @@ runIdentityOrgContract('indexeddb adapter', (options) =>
 
 runBillingContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
 runAiPracticeContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
+runAiDraftContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
 
 runAuthoringFilesContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),

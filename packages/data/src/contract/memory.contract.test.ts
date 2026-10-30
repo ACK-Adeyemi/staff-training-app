@@ -2,6 +2,7 @@
 import { createMemoryStore } from '../memory/index';
 import { runAuthoringFilesContract } from './authoringFiles';
 import { runAiPracticeContract } from './aiPractice';
+import { runAiDraftContract } from './aiDraft';
 import { runBillingContract } from './billing';
 import { runAdminCountContract } from './adminCount';
 import { runCompetitionsContract } from './competitions';
@@ -81,3 +82,4 @@ runProviderRecoveryContract('memory adapter', (options) => Promise.resolve(creat
 
 runProviderOverviewContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
 runProviderGlobalAiContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
+runAiDraftContract('memory adapter', (options) => Promise.resolve(createMemoryStore(options)));
