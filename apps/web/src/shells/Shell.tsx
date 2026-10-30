@@ -5,6 +5,7 @@ import { useCurrentUser, useT } from '../app/hooks';
 import { useDesktop } from '../app/useDesktop';
 import { useUnreadCount } from '../pages/staff/queries';
 import { DemoBadgeSlot } from '../demo/RootLayout';
+import { SkipLink } from './SkipLink';
 import { SystemBanners, SystemStatus } from './systemNotices';
 
 export type ShellConfig = {
@@ -63,6 +64,7 @@ export function Shell({ config }: { config: ShellConfig }) {
 
   return (
     <div onClick={onClick} className="min-h-screen md:flex">
+      <SkipLink />
       {sidebar ? (
         <aside
           className={`border-[var(--color-border)] p-3 print:hidden md:w-60 md:shrink-0 md:border-r-2 ${staff ? '' : 'hidden md:block'}`}

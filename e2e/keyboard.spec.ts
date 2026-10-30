@@ -242,7 +242,8 @@ test.describe('Flow 4: tour overlay', () => {
     await page.keyboard.press('Shift+Alt+KeyT');
     await tabTo(page, overlay(page, 1, 9).getByRole('button', { name: 'Skip tour' }), { max: 14 });
     await page.keyboard.press('Enter');
-    await expect(page.getByRole('complementary', { name: 'Tour, finished' })).toBeVisible();
+    // Skip closes the overlay and leaves the app where it is (plan M5 chunk 10), so no "finished" box appears.
+    await expect(anyOverlay(page)).toHaveCount(0);
     const lost = await page.evaluate(() => document.activeElement === document.body);
     expect(lost, 'focus is not dropped to the page body after Skip tour').toBe(false);
   });

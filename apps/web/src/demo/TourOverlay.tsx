@@ -94,6 +94,9 @@ function Panel({ state, tour }: { state: TourState; tour: Tour }) {
   const queryClient = useQueryClient();
   const [collapsed, setCollapsed] = useState(false);
   const box = useRef<HTMLElement>(null);
+  const pill = useRef<HTMLButtonElement>(null);
+  // Set when a press removes the control that had focus; the next render puts focus somewhere sensible.
+  const refocus = useRef<'pill' | 'box' | null>(null);
   const starter = useTourStart();
   const done = state.status === 'complete';
   const index = Math.min(state.index, tour.steps.length - 1);
@@ -101,6 +104,11 @@ function Panel({ state, tour }: { state: TourState; tour: Tour }) {
   const n = stepNumber(state);
   const m = state.stepCount;
   useReserveSpace(box, !collapsed);
+  useEffect(() => {
+    if (refocus.current === 'pill') pill.current?.focus();
+    else if (refocus.current === 'box') box.current?.focus();
+    refocus.current = null;
+  });
   const spot = useHighlight(step?.target, !done && !collapsed);
 
   const focusIn = useCallback(() => {
@@ -141,9 +149,11 @@ function Panel({ state, tour }: { state: TourState; tour: Tour }) {
     return (
       <>
         <button
+          ref={pill}
           type="button"
           className={`${primary} fixed right-2 bottom-20 z-30 md:right-4 md:bottom-4`}
           onClick={() => {
+            refocus.current = 'box';
             setCollapsed(false);
           }}
         >
@@ -224,6 +234,13 @@ function Panel({ state, tour }: { state: TourState; tour: Tour }) {
               className={quiet}
               onClick={() => {
                 set(skip(state));
+                // The box goes away with its button, so focus goes to the page content instead of the body.
+                window.setTimeout(() => {
+                  const main = document.querySelector<HTMLElement>('main');
+                  if (!main) return;
+                  main.tabIndex = -1;
+                  main.focus();
+                }, 0);
               }}
             >
               {t('tour.skip')}
@@ -242,6 +259,7 @@ function Panel({ state, tour }: { state: TourState; tour: Tour }) {
             type="button"
             className={quiet}
             onClick={() => {
+              refocus.current = 'pill';
               setCollapsed(true);
             }}
           >

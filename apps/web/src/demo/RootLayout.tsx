@@ -1,6 +1,7 @@
 import { createContext, useContext, useLayoutEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Outlet } from 'react-router';
+import { SkipLink } from '../shells/SkipLink';
 import { UpdatePrompt } from '../app/UpdatePrompt';
 import { DemoBadge } from './DemoBadge';
 import { DemoMenu } from './DemoMenu';
@@ -46,6 +47,7 @@ export function RootLayout() {
   );
   return (
     <>
+      {slot ? null : <SkipLink />}
       {slot ? null : <div ref={setTop} className="flex justify-end px-4 pt-2" />}
       {createPortal(badge, host)}
       <SlotContext value={setSlot}>
