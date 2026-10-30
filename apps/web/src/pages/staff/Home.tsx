@@ -15,6 +15,7 @@ import type { MessageKey } from '@sta/content';
 import { useActor, useClock, useStore, useT } from '../../app/hooks';
 import { formatLondonDate } from '../../demo/format';
 import { CompetitionSheet } from '../compete/CompetitionSheet';
+import { useSystemNotices } from '../../shells/systemNotices';
 import { useStaffData } from './queries';
 import { badgeDefinitionFor, latestBadge, useRewards, type RewardsData } from './rewardsQueries';
 import { focusLink } from './styles';
@@ -202,8 +203,10 @@ export function Home() {
   const t = useT();
   const q = useStaffData();
   const rewards = useRewards();
+  const notices = useSystemNotices('staff');
   if (q.isError) return <p role="alert">{t('staff.home.loadError')}</p>;
-  if (!q.data) return <p>{t('shell.loading')}</p>;
+  // Wait for the rewards and the shell banners too, so nothing is inserted above the page after first paint.
+  if (!q.data || rewards.isPending || notices.isPending) return <p>{t('shell.loading')}</p>;
   const { summary, modules, assignments, personName } = q.data;
   return (
     <>

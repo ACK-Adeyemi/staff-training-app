@@ -90,6 +90,22 @@ M3 (final commit 39b00b3; full check.sh green except one e2e timing test fixed i
 
 M4 (final commit 76ca260; last full check.sh: lint, typecheck, unit, build, audit and all e2e green except two text-scale e2e checks that failed intermittently under load; their cause was a hash-only goto reading the old page, fixed in 76ca260 and 48 of 48 pass repeated): every acceptance criterion in docs/plans/m4.md is proven by domain, contract (both adapters), seed, component and Playwright tests (Track B in e2e/track-b.spec.ts, desktop only; axe, dark, high contrast, 200% text and no-network on provider routes). Pass, with gaps under Known issues. Live and phone checks deferred to user in docs/review-checklist.md. Security review: FAIL first pass (1 High: provider client scope not enforced, fixed by removing the option, deferred in decisions.md; 1 Medium requester-can-approve fixed; Lows fixed or accepted), fixes e7c0a31. Code review: CHANGES REQUESTED, 5 Must fixes and most Shoulds done in 1ef8cf7; leftovers in docs/decisions.md 'M4 review fixes'. The last fixes (1ef8cf7) were verified by the full check except the two text-scale checks above.
 
+M5 BP-5 (chunk 14, Lighthouse 13.6.0 via `scripts/lighthouse.sh`, Chromium Google Chrome for Testing 156.0.8078.4 at /ms-playwright/chromium-1248/chrome-linux64/chrome, 2026-10-30, staff home `#/staff`, mobile profile with simulated throttling, median of 3 cold runs so first-visit seeding is included). Measured, not gated.
+
+| Metric | Before | After |
+|---|---|---|
+| Performance | 0.55 | 0.58 |
+| Accessibility | 0.98 | 0.98 |
+| Best Practices | 0.92 | 0.92 |
+| FCP | 756 ms | 757 ms |
+| LCP | 4230 ms | 4236 ms |
+| TBT | 1517 ms | 1464 ms |
+| CLS | 0.128 | 0.083 |
+| Speed Index | 1679 ms | 1641 ms |
+| Transfer (preview server, no compression) | 456 KB | 456 KB |
+
+Accessibility meets its 95 target. Performance is below the 85 placeholder; cause and proposed target in docs/decisions.md.
+
 ## User feedback
 - F1 (M0, ?reset=1): fixed; awaiting user re-check. Cause: editing only the hash (`#/staff?reset=1`) never reloads the page and the hash form was not read. Both forms now work (resetParam.ts, hashchange reload), with e2e for both against the base-path build. Fix commit: see git log "fix: ?reset=1 works before the hash".
 - F2 (M3, calendar at 200% text with wider fonts): the MonthGrid fix (earlier this session) holds with DejaVu Sans forced on every screen in text-scale.spec.ts (24 of 24 pass); added a permanent wide-font calendar test. Awaiting user re-check on GitHub.

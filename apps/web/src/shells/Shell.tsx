@@ -74,7 +74,7 @@ export function Shell({ config }: { config: ShellConfig }) {
       ) : null}
       <div className="min-w-0 flex-1">
         <header className="flex flex-wrap items-center justify-between gap-2 print:hidden border-b-2 border-[var(--color-border)] px-4 py-2">
-          <span className="font-semibold">{user.data?.displayName ?? t('shell.loading')}</span>
+          <span className="font-semibold max-md:basis-full">{user.data?.displayName ?? t('shell.loading')}</span>
           <div className="flex flex-wrap items-center gap-2">
             {config.headerExtra}
             <SystemStatus side={config.side} />

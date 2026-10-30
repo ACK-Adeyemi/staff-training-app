@@ -118,6 +118,10 @@ Things only the user can check, by milestone.
 
 - [ ] Offline and install (M5 chunk 4): after the next deploy, open the live site on a phone, install it to the home screen (it opens the staff app), then redeploy; the already-installed copy shows "A new version is ready" with Update and Later, Update loads the new version, and Later keeps working. The Demo menu shows "Update available" until then. Also check a lesson can be finished with the phone in aeroplane mode after one online visit.
 
+### M5 Lighthouse (BP-5)
+- Run `scripts/lighthouse.sh` for the numbers on this VM (last run 2026-10-30, Lighthouse 13.6.0, Chromium 156.0.8078.4): Performance 0.58, Accessibility 0.98, Best Practices 0.92, FCP 757 ms, LCP 4236 ms, TBT 1464 ms, CLS 0.083, Speed Index 1641 ms, 456 KB. Performance is under the 85 placeholder; see docs/decisions.md 'M5 chunk 14' and decide the target.
+- Run Lighthouse on a real phone against the deployed site (remote debugging or PageSpeed Insights); the VM numbers use simulated throttling.
+
 ## Polish translation review by a speaker
 - [ ] A Polish speaker reads pl-PL.json (staff screens) for natural wording, consistent terms and gender-neutral phrasing (forms like "ukończył(a)" and "gotowy lub gotowa").
 - [ ] Check the number wording that avoids plural agreement ("Moduły: 3", "Zostało dni: 5") and the abbreviated renewal periods ("2 l.", "6 mies.").
