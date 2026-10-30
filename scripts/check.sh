@@ -8,7 +8,7 @@
 # Output is kept short on purpose: each step's full output goes to .agent-logs/check/<step>.log,
 # and only failures print their last lines here. Open the log when you need more detail.
 # In CI (CI=true) the full output is printed, because CI logs are read by humans.
-# Every step has a time limit (CHECK_STEP_TIMEOUT seconds, default 1800), so a hung test run fails
+# Every step has a time limit (CHECK_STEP_TIMEOUT seconds, default 3600), so a hung test run fails
 # instead of blocking forever. The limit stops the step and everything it started.
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
@@ -19,7 +19,7 @@ failed=0
 ran=0
 LOG_DIR=".agent-logs/check"
 TAIL_LINES="${CHECK_TAIL_LINES:-60}"
-STEP_TIMEOUT="${CHECK_STEP_TIMEOUT:-1800}"
+STEP_TIMEOUT="${CHECK_STEP_TIMEOUT:-3600}"
 mkdir -p "$LOG_DIR"
 
 timed_out() { case "$1" in 124|137) echo " - stopped after the ${STEP_TIMEOUT}s time limit (CHECK_STEP_TIMEOUT)" ;; esac; }

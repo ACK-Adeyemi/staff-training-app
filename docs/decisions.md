@@ -1088,3 +1088,6 @@ Chunk 7 note (translated sample module): Safer sleep in Polish is `safer-sleep-p
 - **Tour client by name (M5 chunk 12).** Client ids follow the seed date, so Track B step 2 uses the route token `{client:Little Acorns}`; Show me finds the client whose name starts with that text (via `listPersonas`) and falls back to the client list. `tours.test.ts` gained a check that the name exists in the seed. Track A's module id is a fixed content id.
 - **Tour box leaves room.** While open, the overlay pads the page (bottom on phones by its measured height, right on wide screens by 21rem) so it never covers links and tabs.
 - **Fast-forward race fixed.** A fetch in flight from a write made during the jobs carried the old date, and a page that remounted joined it. The presenter panel now cancels running queries before invalidating, and the state commit is flushed before that.
+
+### M5 chunk 13: check.sh step limit
+The e2e suite grew to 1272 tests and takes about 30 minutes on this VM, past the 1800 s step limit in scripts/check.sh. The default `CHECK_STEP_TIMEOUT` is now 3600 s (hang protection kept). All 1246 e2e tests passed, 26 skipped. CI's job time limit may need a look (user review of .github).

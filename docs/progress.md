@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M5
 Milestone base commit: 431ae38
-Next step: M5 chunk 13 (Accessibility pass) per docs/plans/m5.md, then 14 (Lighthouse), 15 (docs). Full check.sh after chunk 12 running/pending. 9-10, 11-12, 13-15. Full check.sh not yet run since chunk 3 (do after chunk 8). Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn.
+Next step: M5 chunk 14 (Performance pass and Lighthouse) per docs/plans/m5.md, then 15 (docs), then security and code reviews. Full check.sh after chunk 12 running/pending. 9-10, 11-12, 13-15. Full check.sh not yet run since chunk 3 (do after chunk 8). Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn.
 
 ## Milestones
 - [x] M0 Foundations
@@ -21,6 +21,8 @@ M5 (plan docs/plans/m5.md, 15 chunks; base 431ae38):
 - [x] 1 Decisions and groundwork (tests 00190bf, impl + print-route fix; full check.sh green except e2e count fixes, see below)
 - [x] 2 Content A: suitable-people, ratios, risk-assessment (tests 855ff2c, impl be8775b)
 - [x] 3 Content B: medicines, records, Coming soon, Mobile phone policy draft, seed v9 (tests e8f061a, impl 2618019; e2e count fixes after full check; track-b step 4c failed once in the full run, passed alone: watch)
+- [x] 4 PWA (3c3d3e1, 416fe0c); 5 language infrastructure (5341c71, bb9f922); 6 Polish strings (b2723e2, 29029d8); 7 translated module (0586763, 0e97c4d); 8 read-aloud (aaa9023, 47a3b09); 9 Demo AI practice (a41f2ef, 60b8426); 10 Demo AI draft (cf1b634, fe7737b); 11 tours (eacc38d, 9d97367); 12 tour specs and tracks at both viewports (91ea1b0, 92e93a6)
+- [x] 13 Accessibility pass (tests 5f3fca3, impl 135e07b: skip links, tour focus); full check green (e2e 1246 passed, 26 skipped, 29.9 min; check.sh step limit raised 1800 to 3600 s because the e2e step outgrew it)
 M4 (plan docs/plans/m4.md, 18 chunks; see the plan's Chunks list): 
 - [x] 1 Decisions, schemas and seed additions (tests 8bd8188, impl 125c3aa)
 - [x] 2 Domain: price engine (tests 1ee83ad, 002b093, impl ceba2fd)
