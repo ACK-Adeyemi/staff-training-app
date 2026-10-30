@@ -18,3 +18,9 @@ export type OwnLinks = {
   add: (kind: 'lesson' | 'question', targetId: string, link: NewLink) => void;
   remove: (kind: 'lesson' | 'question', targetId: string, linkId: string) => void;
 };
+
+export type AiCheck = {
+  /** Marks one AI-drafted item as checked by this person (saves the draft first). */
+  mark: (kind: 'lesson' | 'question', id: string) => void;
+  busy: boolean;
+};

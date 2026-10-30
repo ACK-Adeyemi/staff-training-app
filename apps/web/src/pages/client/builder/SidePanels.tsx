@@ -57,7 +57,13 @@ export function PhonePreview({
   );
 }
 
-export function Checklist({ items }: { items: { id: ChecklistItemId; passed: boolean }[] }) {
+export function Checklist({
+  items,
+  aiUnchecked,
+}: {
+  items: { id: ChecklistItemId; passed: boolean }[];
+  aiUnchecked: number;
+}) {
   const t = useT();
   return (
     <section aria-labelledby="builder-checklist" className={cardClass}>
@@ -84,6 +90,11 @@ export function Checklist({ items }: { items: { id: ChecklistItemId; passed: boo
           </li>
         ))}
       </ul>
+      {aiUnchecked > 0 ? (
+        <p data-testid="ai-unchecked-message" className="m-0 mt-3 font-semibold">
+          {t('aiDraft.uncheckedMessage', { count: aiUnchecked })}
+        </p>
+      ) : null}
     </section>
   );
 }

@@ -11,6 +11,9 @@ import {
   entitled,
   explainLesson,
   practiceQuestions,
+  draftFromPolicy,
+  suggestQuestions,
+  lessonSchema,
   featureAvailability,
   invoiceTotals,
   nextTransition,
@@ -685,14 +688,19 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
    * The checks both Demo AI calls share, in order: provider side, account state, kill switch and entitlement, the
    * module (published), then the usage cap. `find` runs after the module is known. Returns what is needed to count one use.
    */
-  async function beginAi(ctx: ActorContext, moduleId: string) {
-    const call = await beginCall(backend, options, ctx);
-    if (call.side === 'provider') return forbid('permission');
+  async function checkAiEntitled(call: Call) {
     const clientId = call.clientId as string;
     requireUsageAddOns(call);
     if ((await killedClientIds(backend)).includes(clientId)) throw new NotEntitledError('aiAssistant');
     const ents = await clientEntitlements(call, clientId);
     if (!ents || !entitled(ents, 'aiAssistant')) throw new NotEntitledError('aiAssistant');
+    return clientId;
+  }
+
+  async function beginAi(ctx: ActorContext, moduleId: string) {
+    const call = await beginCall(backend, options, ctx);
+    if (call.side === 'provider') return forbid('permission');
+    const clientId = await checkAiEntitled(call);
     const module = await moduleFor(call, text(moduleId));
     if (module.status !== 'published') throw new NotFoundError();
     return { call, clientId, module };
@@ -720,6 +728,13 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
     ]);
   }
 
+  /** Drafting for the module builder: a client actor with modules.manage, then the shared checks. */
+  async function beginAiDraft(ctx: ActorContext) {
+    const call = await clientCall(ctx, 'modules.manage');
+    const clientId = await checkAiEntitled(call);
+    return { call, clientId };
+  }
+
   const ai: AiService = {
     async explain(ctx, input) {
       const { call, clientId, module } = await beginAi(ctx, input.moduleId);
@@ -735,6 +750,29 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
       const questions = practiceQuestions(module, options.rng, 3);
       await countAiUse(call, clientId);
       return { label: 'Demo AI', questions: structuredClone(questions) };
+    },
+
+    async draftFromPolicy(ctx, input) {
+      const { call, clientId } = await beginAiDraft(ctx);
+      const draft = draftFromPolicy(text(input.text));
+      if (!draft.ok) throw new RuleError(draft.reason === 'empty' ? 'policyEmpty' : 'policyTooLong');
+      await countAiUse(call, clientId);
+      return structuredClone({
+        label: 'Demo AI' as const,
+        title: draft.title,
+        lessons: draft.lessons,
+        questions: draft.questions,
+      });
+    },
+
+    async suggestQuestions(ctx, input) {
+      const { call, clientId } = await beginAiDraft(ctx);
+      const parsed = lessonSchema.safeParse(input.lesson);
+      if (!parsed.success) throw new ValidationError(['lesson: not a valid lesson']);
+      const questions = suggestQuestions(parsed.data, options.rng);
+      if (questions.length === 0) throw new ValidationError(['lesson: add some lesson text first']);
+      await countAiUse(call, clientId);
+      return structuredClone({ label: 'Demo AI' as const, questions });
     },
   };
 

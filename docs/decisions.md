@@ -1065,3 +1065,12 @@ Chunk 7 note (translated sample module): Safer sleep in Polish is `safer-sleep-p
 ## M5 chunk 9: Quiz me for practice draws single-answer questions only
 
 `practiceQuestions` draws only multiple choice and true or false questions from the module's own bank. Scenario questions are multi-step and the real quiz renders them tied to an attempt, so they stay out of practice. The practice page checks answers on screen with the domain `checkAnswer` and records nothing; the only write is one AI usage unit.
+
+## M5 chunk 10: Draft from a policy and Suggest questions
+
+- **No `sourceRef` on questions drafted from a pasted policy.** The question schema demands a Learn more link with any sourceRef, and a pasted policy has no https address. The explanation ends "Source: Your policy, part N" instead, and no EYFS paragraph is ever invented. The statements are the policy's own sentences, so each drafted true or false question has True as the correct answer; the admin edits them.
+- **aiReviewedBy is set only by `authoring.markAiChecked`.** `create` drops every aiReviewedBy; `saveDraft` keeps one only where the stored working copy (the module row, or the pending draft of a published module) already holds the same reviewer on the same item. The publish checklist keeps its six items and adds `aiUnchecked`; `ok` is false while it is above 0, which also blocks publishing in the data layer.
+- **Mark as checked saves the draft first** (the checker is stored on the saved copy), so it also works on a brand new, unsaved module.
+- **The audit log holds ids only.** Pasted policy text is never stored; drafting returns the draft and counts one usage unit.
+- **Pasted HTML stays plain text** in lessons and questions and is rendered by React as text.
+- **Test fixes (typing only, no assertion changed):** `demoAiDraft.test.ts` indexes `d.lessons[0]!` (noUncheckedIndexedAccess), and `aiDraft.test.tsx` drops `exact: true`, which is not a `getByRole` option (a string name already matches exactly).

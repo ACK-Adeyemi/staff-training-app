@@ -247,6 +247,8 @@
       "stepUpRequired": "Enter a fresh code from your authenticator app to do this.",
       "revokeAccessFirst": "Remove this person’s admin access first, then try again.",
       "usageCapReached": "The spending limit for this add-on has been reached.",
+      "policyEmpty": "Paste your policy first.",
+      "policyTooLong": "The policy is too long. Keep it to 20,000 characters or fewer.",
       "invalidTemplate": "The message can only use {firstName}, {training} and {date}, and must be 1 to 300 characters.",
       "invalidTheme": "Some colours don't have enough contrast. Fix the pairs listed.",
       "invalidScope": "That view is not available to you.",
@@ -4076,5 +4078,22 @@
     "off": "Quiz me for practice is not available right now.",
     "loading": "Getting your questions",
     "locked": "Quiz me for practice is an extra feature. Ask someone with billing access to turn it on."
+  },
+  "aiDraft": {
+    "heading": "Draft from a policy",
+    "intro": "Paste a policy and we will turn it into a draft with lessons and questions. You check every item before it can be published.",
+    "pasteLabel": "Paste your policy",
+    "warning": "Do not paste personal data, such as names of children, parents or staff.",
+    "draftButton": "Make a draft",
+    "added": "Draft added. Check each item before publishing.",
+    "tooLong": "The policy is too long. Keep it to 20,000 characters or fewer.",
+    "empty": "Paste your policy first.",
+    "suggestButton": "Suggest questions",
+    "noText": "Add some lesson text first.",
+    "label": "AI-drafted: check before publishing",
+    "checked": "AI-drafted and checked",
+    "markChecked": "Mark as checked",
+    "uncheckedMessage": "Check every AI-drafted lesson and question before publishing. {count} still to check.",
+    "locked": "Draft from a policy and Suggest questions are extra features. Ask someone with billing access to turn them on."
   }
 }

@@ -226,6 +226,25 @@ export function createAuthoringOperations(backend: RawBackend, options: StoreOpt
     }
   }
 
+  /**
+   * F-7: aiReviewedBy is only ever set by markAiChecked. A value in the input counts only where the stored working copy
+   * already holds the same reviewer on the same item; anything else is dropped (no forging the review through a form).
+   */
+  function withRealReviews(content: object, stored: Module | undefined): void {
+    const kept = (list: unknown, before: { id: string; aiReviewedBy?: string | undefined }[] | undefined): void => {
+      if (!Array.isArray(list)) return;
+      for (const entry of list as unknown[]) {
+        if (entry === null || typeof entry !== 'object' || !('aiReviewedBy' in entry)) continue;
+        const item = entry as Record<string, unknown>;
+        const old = before?.find((b) => b.id === item['id']);
+        if (old?.aiReviewedBy === undefined || old.aiReviewedBy !== item['aiReviewedBy']) delete item['aiReviewedBy'];
+      }
+    };
+    const fields = content as Record<string, unknown>;
+    kept(fields['lessons'], stored?.lessons);
+    kept(fields['questions'], stored?.questions);
+  }
+
   const clientIdOf = (m: Module): string | undefined => (m.owner === 'provider' ? undefined : m.owner.clientId);
 
   /** A new open assignment and, for a staff user, the matching notification. */
@@ -289,7 +308,8 @@ export function createAuthoringOperations(backend: RawBackend, options: StoreOpt
         authoringState(call);
         await ownModuleLimit(call, clientId);
       }
-      const content = contentOf(input);
+      const content = structuredClone(contentOf(input));
+      withRealReviews(content, undefined);
       await checkModuleLinks(call, content, call.clientId);
       const module = validate('modules', {
         ...content,
@@ -315,7 +335,12 @@ export function createAuthoringOperations(backend: RawBackend, options: StoreOpt
       const current = await writableModule(call, moduleId);
       if (current.status === 'archived') throw new RuleError('moduleNotPublished');
       authoringState(call);
-      const content = contentOf(input);
+      const content = structuredClone(contentOf(input));
+      const pending =
+        current.status === 'draft'
+          ? undefined
+          : ((await backend.get('moduleDrafts', current.id)) as ModuleDraft | undefined)?.module;
+      withRealReviews(content, pending ?? current);
       await checkModuleLinks(call, content, call.clientId);
       const next = validate('modules', {
         ...content,
@@ -346,6 +371,44 @@ export function createAuthoringOperations(backend: RawBackend, options: StoreOpt
         { type: 'put', store: 'moduleDrafts', key: draft.moduleId, record: draft },
         audit(call, call.clientId, 'authoring.saveDraft', `module:${current.id}`, undefined, slim),
       ]);
+      return structuredClone(draft.module);
+    },
+
+    async markAiChecked(ctx, moduleId, item) {
+      const call = await authorCall(ctx, 'content.write');
+      const current = await writableModule(call, text(moduleId));
+      authoringState(call);
+      const stored = (await backend.get('moduleDrafts', current.id)) as ModuleDraft | undefined;
+      const working = current.status === 'draft' ? current : stored?.module;
+      if (!working) throw new NotFoundError();
+      const kind: string = item.kind;
+      if (kind !== 'lesson' && kind !== 'question') throw new ValidationError(['kind: lesson or question']);
+      const list = item.kind === 'lesson' ? working.lessons : working.questions;
+      const found = (list as { id: string; aiDrafted?: boolean; aiReviewedBy?: string }[]).find(
+        (x) => x.id === item.id,
+      );
+      if (!found || found.aiDrafted !== true) throw new NotFoundError();
+      const next = structuredClone(working);
+      const target = (item.kind === 'lesson' ? next.lessons : next.questions).find((x) => x.id === item.id);
+      if (!target) throw new NotFoundError();
+      target.aiReviewedBy = found.aiReviewedBy ?? call.actor.user.id;
+      next.updatedAt = ctx.now;
+      const event = audit(call, call.clientId, 'authoring.markAiChecked', `module:${current.id}`, undefined, {
+        moduleId: current.id,
+        kind: item.kind,
+        itemId: item.id,
+      });
+      if (current.status === 'draft') {
+        await apply([put('modules', validate('modules', next) as Module), event]);
+        return structuredClone(next);
+      }
+      const draft = validate('moduleDrafts', {
+        ...(stored as ModuleDraft),
+        module: next,
+        updatedBy: call.actor.user.id,
+        updatedAt: ctx.now,
+      }) as ModuleDraft;
+      await apply([{ type: 'put', store: 'moduleDrafts', key: draft.moduleId, record: draft }, event]);
       return structuredClone(draft.module);
     },
 

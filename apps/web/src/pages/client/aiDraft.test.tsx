@@ -183,7 +183,7 @@ describe('C7 Draft from a policy', () => {
       expect(lessons()).toHaveLength(2);
     });
     expect(questions()).toHaveLength(5);
-    expect(screen.getByRole<HTMLInputElement>('textbox', { name: 'Title', exact: true }).value).toBe('Outings policy');
+    expect(screen.getByRole<HTMLInputElement>('textbox', { name: 'Title' }).value).toBe('Outings policy');
     for (const card of [...lessons(), ...questions()]) {
       expect(within(card).getByTestId('ai-label').textContent).toContain(LABEL);
       expect(within(card).getByRole('button', { name: 'Mark as checked' })).toBeTruthy();

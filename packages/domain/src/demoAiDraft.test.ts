@@ -63,8 +63,8 @@ describe('draftFromPolicy', () => {
     const d = ok(BLANK_GROUPS);
     expect(d.title).toBe('Mobile phone policy');
     expect(d.lessons).toHaveLength(2);
-    expect(textOf(d.lessons[0])).toContain('locked cupboard');
-    expect(textOf(d.lessons[1])).toContain('office phone');
+    expect(textOf(d.lessons[0]!)).toContain('locked cupboard');
+    expect(textOf(d.lessons[1]!)).toContain('office phone');
     for (const l of d.lessons) expect(l.title.trim().length).toBeGreaterThan(0);
   });
 

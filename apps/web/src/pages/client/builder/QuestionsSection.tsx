@@ -14,18 +14,21 @@ import {
   type Form,
 } from './builderForm';
 import { LinkPanel } from './LinkPanel';
-import { cardClass, checkBox, checkLabel, labelClass, type OwnLinks, type Update } from './shared';
+import { AiLabel } from './AiLabel';
+import { cardClass, checkBox, checkLabel, labelClass, type AiCheck, type OwnLinks, type Update } from './shared';
 
 function QuestionCard({
   question,
   index,
   update,
   links,
+  check,
 }: {
   question: Question;
   index: number;
   update: Update;
   links: OwnLinks;
+  check: AiCheck;
 }) {
   const t = useT();
   const options = question.options ?? [];
@@ -49,6 +52,7 @@ function QuestionCard({
   return (
     <div data-testid="builder-question" data-question-id={question.id} className={`${cardClass} flex flex-col gap-3`}>
       <h3 className="m-0 font-bold">{t('client.builder.questionNumber', { number: index + 1 })}</h3>
+      <AiLabel item={question} kind="question" check={check} />
       {area(t('client.builder.question'), question.prompt, false, (prompt) => ({ prompt }))}
       {question.type === 'scenario' ? <p className="m-0">{t('client.builder.scenarioNote')}</p> : null}
       {question.type === 'mcq'
@@ -153,7 +157,17 @@ function QuestionCard({
   );
 }
 
-export function QuestionsSection({ form, update, links }: { form: Form; update: Update; links: OwnLinks }) {
+export function QuestionsSection({
+  form,
+  update,
+  links,
+  check,
+}: {
+  form: Form;
+  update: Update;
+  links: OwnLinks;
+  check: AiCheck;
+}) {
   const t = useT();
   return (
     <section aria-labelledby="builder-questions" className="flex flex-col gap-3">
@@ -162,7 +176,7 @@ export function QuestionsSection({ form, update, links }: { form: Form; update: 
       </h2>
       {form.questions.length === 0 ? <p className="m-0">{t('client.builder.noQuestions')}</p> : null}
       {form.questions.map((q, i) => (
-        <QuestionCard key={q.id} question={q} index={i} update={update} links={links} />
+        <QuestionCard key={q.id} question={q} index={i} update={update} links={links} check={check} />
       ))}
       <div className="flex flex-wrap gap-3">
         <Button

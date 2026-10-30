@@ -8,7 +8,7 @@ export type ChecklistItemId = 'title' | 'lesson' | 'question' | 'quiz' | 'requir
 export const publishChecklist = (
   module: Module,
   requirements: readonly Requirement[],
-): { ok: boolean; items: { id: ChecklistItemId; passed: boolean }[] } => {
+): { ok: boolean; items: { id: ChecklistItemId; passed: boolean }[]; aiUnchecked: number } => {
   const title = module.title.trim().length;
   const bank = module.questions.length;
   const scenarios = module.questions.filter((q) => q.type === 'scenario').length;
@@ -46,5 +46,9 @@ export const publishChecklist = (
         module.lessons.every((l) => (l.furtherReading ?? []).every(linkOk)),
     },
   ];
-  return { ok: items.every((i) => i.passed), items };
+  // F-7: AI-drafted lessons and questions must each be marked as checked by a person before publishing.
+  const unchecked = (x: { aiDrafted?: boolean | undefined; aiReviewedBy?: string | undefined }): boolean =>
+    x.aiDrafted === true && x.aiReviewedBy === undefined;
+  const aiUnchecked = module.lessons.filter(unchecked).length + module.questions.filter(unchecked).length;
+  return { ok: items.every((i) => i.passed) && aiUnchecked === 0, items, aiUnchecked };
 };

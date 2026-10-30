@@ -1,6 +1,7 @@
 // Public types of the data layer (build pack 4.3). The UI talks to a DataStore and nothing else.
 import type {
   AccountState,
+  Lesson,
   Announcement,
   DataRequest,
   Incident,
@@ -291,6 +292,8 @@ export type RuleName =
   | 'invalidReply'
   | 'invalidClient'
   | 'invalidPublish'
+  | 'policyEmpty'
+  | 'policyTooLong'
   | 'duplicate';
 
 /** A business rule said no (for example "finish every lesson first"). The web app maps `rule` to `errors.rule.<rule>`. */
@@ -695,6 +698,16 @@ export interface AiService {
   explain(ctx: ActorContext, input: { moduleId: Id; lessonId: string }): Promise<{ label: string; text: string }>;
   /** Up to 3 practice questions from the module's own bank, labelled Demo AI. Counts one use; writes nothing else. */
   practice(ctx: ActorContext, input: { moduleId: Id }): Promise<{ label: 'Demo AI'; questions: Question[] }>;
+  /**
+   * Client admin with modules.manage. A draft module from pasted policy text (RuleError policyEmpty / policyTooLong).
+   * Counts one use and only returns the draft: nothing is stored and the text is never audited.
+   */
+  draftFromPolicy(
+    ctx: ActorContext,
+    input: { text: string },
+  ): Promise<{ label: 'Demo AI'; title: string; lessons: Lesson[]; questions: Question[] }>;
+  /** Client admin with modules.manage. Up to 3 questions from the given (possibly unsaved) lesson. Counts one use. */
+  suggestQuestions(ctx: ActorContext, input: { lesson: Lesson }): Promise<{ label: 'Demo AI'; questions: Question[] }>;
 }
 
 /** A Module without the fields the data layer owns. `siteId` makes an own module belong to one site. */
@@ -718,6 +731,11 @@ export type FileUpload = {
 export interface AuthoringService {
   /** A never-published own module (provider actors: a provider module): status draft, version 1. */
   create(ctx: ActorContext, input: ModuleInput): Promise<Module>;
+  /**
+   * Needs content.write. Marks one AI-drafted lesson or question of the working copy as checked by the caller
+   * (aiReviewedBy). NotFoundError for an unknown item or one that is not AI-drafted.
+   */
+  markAiChecked(ctx: ActorContext, moduleId: Id, item: { kind: 'lesson' | 'question'; id: string }): Promise<Module>;
   /** Never runs the publish checklist. A published module keeps its edits in a ModuleDraft. */
   saveDraft(ctx: ActorContext, moduleId: Id, input: ModuleInput): Promise<Module>;
   /** Refused with RuleError('checklistFailed') until the checklist passes. `reassign` asks earlier completers again. */
