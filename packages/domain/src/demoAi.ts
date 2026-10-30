@@ -1,5 +1,6 @@
 // The canned "Demo AI" answer and the usage-cap rule (M3 assumption 42 and 44). Pure: no network, no real AI.
-import type { Lesson } from './schemas/learning';
+import type { Rng } from './rng';
+import type { Lesson, Module, Question } from './schemas/learning';
 
 /** First sentence of a markdown paragraph, with heading and emphasis marks removed. */
 function firstSentence(markdown: string): string {
@@ -38,4 +39,14 @@ export function usageCapReached(
   if (capPence === undefined) return false;
   const over = usageThisPeriod + 1 - pricing.includedUnits;
   return over > 0 && over * pricing.pricePerUnit > capPence;
+}
+
+/**
+ * Practice questions for "Quiz me for practice": up to `count` different questions drawn from the module's own bank
+ * (so a translated module keeps its own wording). Only single-answer questions (multiple choice and true or false) are
+ * drawn; scenarios are multi-step and stay in the real quiz. The module is not changed.
+ */
+export function practiceQuestions(module: Pick<Module, 'questions'>, rng: Rng, count: number): Question[] {
+  const pool = module.questions.filter((q) => q.type !== 'scenario');
+  return rng.shuffle(pool).slice(0, Math.max(0, count));
 }

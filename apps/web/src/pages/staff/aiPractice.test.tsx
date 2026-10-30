@@ -229,9 +229,9 @@ describe('Language files', () => {
     expect(msg(en, 'aiPractice.label')).toBe('Demo AI');
     expect(msg(en, 'aiPractice.notice')).toBe(NOTICE);
   });
-  it('holds Polish values for every aiPractice key', () => {
+  it('holds Polish values for every aiPractice key', async () => {
     const en = (languages['en-GB'].messages as { aiPractice?: Record<string, string> }).aiPractice ?? {};
-    const pl = languages['pl-PL'].messages as { aiPractice?: Record<string, string> };
+    const pl = (await languages['pl-PL'].load()) as { aiPractice?: Record<string, string> };
     expect(Object.keys(en).length).toBeGreaterThanOrEqual(3);
     for (const key of Object.keys(en)) expect(pl.aiPractice?.[key], key).toBeTruthy();
   });

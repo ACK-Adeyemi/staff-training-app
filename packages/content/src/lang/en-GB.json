@@ -4060,5 +4060,21 @@
     "openEnglish": "Read the English version",
     "languageEn": "English",
     "languagePl": "Polski"
+  },
+  "aiPractice": {
+    "button": "Quiz me for practice",
+    "label": "Demo AI",
+    "notice": "Practice only: no XP, and it does not count towards your training record or competitions",
+    "intro": "Three questions from this module. Pick an answer to see if it is right.",
+    "correct": "Correct",
+    "notQuite": "Not quite",
+    "summary": "You got {right} of {total} right",
+    "again": "Try three more",
+    "back": "Back to the module",
+    "empty": "This module has no questions to practise yet.",
+    "error": "We could not make a practice quiz right now. Please try again.",
+    "off": "Quiz me for practice is not available right now.",
+    "loading": "Getting your questions",
+    "locked": "Quiz me for practice is an extra feature. Ask someone with billing access to turn it on."
   }
 }

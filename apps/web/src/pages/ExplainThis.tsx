@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button, Card } from '@sta/ui';
 import { holdsAnywhere } from '@sta/domain';
-import { addOnIds } from '@sta/content';
+import { addOnIds, type MessageKey } from '@sta/content';
 import { useActor, useStore, useT } from '../app/hooks';
 import { foundationsErrorKey } from './client/foundationsErrors';
 import { useFeatures } from './client/billingQueries';
@@ -57,7 +57,13 @@ function Explain({ moduleId, lessonId, admin }: { moduleId: string; lessonId: st
   );
 }
 
-function Locked() {
+export function Locked({
+  testId = 'explain-locked',
+  messageKey = 'preview.explainLocked',
+}: {
+  testId?: string;
+  messageKey?: MessageKey;
+}) {
   const t = useT();
   const perms = usePermissions();
   const [asking, setAsking] = useState(false);
@@ -65,9 +71,9 @@ function Locked() {
   const canTurnOn = perms.data ? holdsAnywhere(perms.data, 'billing.manageAddOns') : false;
   return (
     <>
-      <div data-testid="explain-locked" className="my-4">
+      <div data-testid={testId} className="my-4">
         <Card>
-          <p className="m-0">{t('preview.explainLocked')}</p>
+          <p className="m-0">{t(messageKey)}</p>
           {perms.data && canTurnOn ? (
             <p className="mt-2 mb-0">
               {t('preview.explainLockedManage')}{' '}

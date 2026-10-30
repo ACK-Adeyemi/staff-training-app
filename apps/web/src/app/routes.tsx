@@ -28,6 +28,7 @@ import { LessonPlayer } from '../pages/staff/LessonPlayer';
 import { ModuleOverview } from '../pages/staff/ModuleOverview';
 import { Quiz } from '../pages/staff/Quiz';
 import { Results } from '../pages/staff/Results';
+import { Practice } from '../pages/staff/Practice';
 import { Learn } from '../pages/staff/Learn';
 import { MyNotes } from '../pages/staff/MyNotes';
 import { Notifications } from '../pages/staff/Notifications';
@@ -82,6 +83,7 @@ export const routes: RouteObject[] = [
           { path: 'module/:moduleId/lesson/:lessonId', element: <LessonPlayer /> },
           { path: 'module/:moduleId/quiz', element: <Quiz /> },
           { path: 'module/:moduleId/done', element: <Results /> },
+          { path: 'module/:moduleId/practice', element: <Practice /> },
           { path: 'notes', element: <MyNotes /> },
           { path: 'progress', element: <Progress /> },
           {

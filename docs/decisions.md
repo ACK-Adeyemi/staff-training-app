@@ -1061,3 +1061,7 @@ Chunk 7 note (translated sample module): Safer sleep in Polish is `safer-sleep-p
 ### M5 chunk 8
 
 - **Read-aloud Pause is stop-and-resume at the start of the current paragraph** (plan assumption 16). The speech adapter still has only speak and stop; Pause calls stop and Play speaks the current paragraph again from its start. On a lesson text step the bar (Previous paragraph, Read this aloud or Pause, Next paragraph, speed) reads one unit per heading, paragraph and bullet, and the lesson marks the unit being read with aria-current, a thick start border and bold (data-reading). Other step types keep the single button. On the quiz the single-question control shows Pause next to Stop reading; only the prompt, scenario text and options are spoken, never notes.
+
+## M5 chunk 9: Quiz me for practice draws single-answer questions only
+
+`practiceQuestions` draws only multiple choice and true or false questions from the module's own bank. Scenario questions are multi-step and the real quiz renders them tied to an attempt, so they stay out of practice. The practice page checks answers on screen with the domain `checkAnswer` and records nothing; the only write is one AI usage unit.

@@ -1267,5 +1267,21 @@
     "openEnglish": "Przeczytaj wersję angielską",
     "languageEn": "angielski",
     "languagePl": "polski"
+  },
+  "aiPractice": {
+    "button": "Przećwicz pytania",
+    "label": "Demo AI",
+    "notice": "Tylko ćwiczenie: bez XP, nie wlicza się do Twojego szkolenia ani do konkursów",
+    "intro": "Trzy pytania z tego modułu. Wybierz odpowiedź, żeby zobaczyć, czy jest dobra.",
+    "correct": "Dobrze",
+    "notQuite": "Nie do końca",
+    "summary": "Masz {right} z {total} dobrych odpowiedzi",
+    "again": "Spróbuj jeszcze trzy",
+    "back": "Wróć do modułu",
+    "empty": "W tym module nie ma jeszcze pytań do ćwiczenia.",
+    "error": "Nie możemy teraz przygotować ćwiczenia. Spróbuj ponownie.",
+    "off": "Ćwiczenie pytań nie jest teraz dostępne.",
+    "loading": "Przygotowujemy pytania",
+    "locked": "Ćwiczenie pytań to dodatkowa funkcja. Poproś osobę z dostępem do rozliczeń, żeby ją włączyła."
   }
 }

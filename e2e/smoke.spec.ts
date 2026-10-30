@@ -29,6 +29,7 @@ const m1Routes: Route[] = [
   { hash: `#/staff/module/${moduleId}/lesson/${String(lessonId)}`, name: 'S5 lesson' },
   { hash: `#/staff/module/${moduleId}/quiz`, name: 'S6 quiz' },
   { hash: `#/staff/module/${moduleId}/done`, name: 'S7 results' },
+  { hash: `#/staff/module/${moduleId}/practice`, name: 'practice quiz' },
   { hash: `#/staff/module/${moduleId}/certificate`, name: 'certificate' },
   {
     hash: '',

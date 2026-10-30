@@ -51,6 +51,7 @@ import type {
   LeaderboardRow,
   LearningEvent,
   Module,
+  Question,
   ModuleGroup,
   ModulePlacement,
   Note,
@@ -692,6 +693,8 @@ export interface AccountService {
 export interface AiService {
   /** Canned "simpler words" text from the lesson itself, labelled Demo AI. Counts one use. */
   explain(ctx: ActorContext, input: { moduleId: Id; lessonId: string }): Promise<{ label: string; text: string }>;
+  /** Up to 3 practice questions from the module's own bank, labelled Demo AI. Counts one use; writes nothing else. */
+  practice(ctx: ActorContext, input: { moduleId: Id }): Promise<{ label: 'Demo AI'; questions: Question[] }>;
 }
 
 /** A Module without the fields the data layer owns. `siteId` makes an own module belong to one site. */

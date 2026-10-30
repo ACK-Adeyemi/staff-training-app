@@ -6,7 +6,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Button, PageHeader, PhoneFrame } from '@sta/ui';
 import type { Module, Question } from '@sta/domain';
 import { useActor, useStore, useT } from '../../app/hooks';
-import { ExplainThis } from '../ExplainThis';
+import { ExplainThis, Locked } from '../ExplainThis';
+import { useFeatures } from './billingQueries';
 import { Block } from '../staff/LessonPlayer';
 import { focusLink } from '../staff/styles';
 import { foundationsErrorKey } from './foundationsErrors';
@@ -94,6 +95,13 @@ function QuestionView({ question }: { question: Question }) {
   );
 }
 
+/** Without the AI Assistant, admins see where "Quiz me for practice" would be, as a calm locked card. */
+function PracticeLocked() {
+  const features = useFeatures();
+  if (!features.data || features.data.aiAssistant) return null;
+  return <Locked testId="practice-locked" messageKey="aiPractice.locked" />;
+}
+
 function ModuleWalk({ module }: { module: Module }) {
   const t = useT();
   const [tab, setTab] = useState<'lessons' | 'quiz'>('lessons');
@@ -101,70 +109,73 @@ function ModuleWalk({ module }: { module: Module }) {
   const tabClass = (on: boolean) =>
     `inline-flex min-h-[var(--target-min)] min-w-[var(--target-min)] cursor-pointer items-center justify-center rounded-[var(--radius-md)] border-2 px-4 py-2 font-semibold ${focusLink} ${on ? 'border-[var(--color-accent)] bg-[var(--color-accent)] text-[var(--color-on-accent)] underline underline-offset-4' : 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)]'}`;
   return (
-    <PhoneFrame title={t('preview.lessonTitle', { title: module.title })}>
-      <div role="tablist" aria-label={t('preview.tabsLabel')} className="mb-3 flex gap-2">
-        {(['lessons', 'quiz'] as const).map((id) => (
-          <button
-            key={id}
-            type="button"
-            role="tab"
-            id={`preview-tab-${id}`}
-            aria-selected={tab === id}
-            aria-controls="preview-panel"
-            onClick={() => {
-              setTab(id);
-            }}
-            className={tabClass(tab === id)}
-          >
-            {t(id === 'lessons' ? 'preview.lessonsTab' : 'preview.quizTab')}
-          </button>
-        ))}
-      </div>
-      <div role="tabpanel" id="preview-panel" aria-labelledby={`preview-tab-${tab}`}>
-        {tab === 'lessons' ? (
-          module.lessons.length === 0 ? (
-            <p>{t('preview.noLessons')}</p>
+    <>
+      <PhoneFrame title={t('preview.lessonTitle', { title: module.title })}>
+        <div role="tablist" aria-label={t('preview.tabsLabel')} className="mb-3 flex gap-2">
+          {(['lessons', 'quiz'] as const).map((id) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              id={`preview-tab-${id}`}
+              aria-selected={tab === id}
+              aria-controls="preview-panel"
+              onClick={() => {
+                setTab(id);
+              }}
+              className={tabClass(tab === id)}
+            >
+              {t(id === 'lessons' ? 'preview.lessonsTab' : 'preview.quizTab')}
+            </button>
+          ))}
+        </div>
+        <div role="tabpanel" id="preview-panel" aria-labelledby={`preview-tab-${tab}`}>
+          {tab === 'lessons' ? (
+            module.lessons.length === 0 ? (
+              <p>{t('preview.noLessons')}</p>
+            ) : (
+              <>
+                <p className="mt-0 mb-2 font-semibold">
+                  {t('preview.lessonCount', { number: index + 1, total: module.lessons.length })}
+                </p>
+                <LessonView module={module} index={index} />
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {index > 0 ? (
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        setIndex(index - 1);
+                      }}
+                    >
+                      {t('preview.previousLesson')}
+                    </Button>
+                  ) : null}
+                  {index < module.lessons.length - 1 ? (
+                    <Button
+                      onClick={() => {
+                        setIndex(index + 1);
+                      }}
+                    >
+                      {t('preview.nextLesson')}
+                    </Button>
+                  ) : null}
+                </div>
+              </>
+            )
+          ) : module.questions.length === 0 ? (
+            <p>{t('preview.noQuestions')}</p>
           ) : (
             <>
-              <p className="mt-0 mb-2 font-semibold">
-                {t('preview.lessonCount', { number: index + 1, total: module.lessons.length })}
-              </p>
-              <LessonView module={module} index={index} />
-              <div className="mt-3 flex flex-wrap gap-2">
-                {index > 0 ? (
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      setIndex(index - 1);
-                    }}
-                  >
-                    {t('preview.previousLesson')}
-                  </Button>
-                ) : null}
-                {index < module.lessons.length - 1 ? (
-                  <Button
-                    onClick={() => {
-                      setIndex(index + 1);
-                    }}
-                  >
-                    {t('preview.nextLesson')}
-                  </Button>
-                ) : null}
-              </div>
+              <p className="mt-0">{t('preview.quizNote')}</p>
+              {module.questions.map((q) => (
+                <QuestionView key={q.id} question={q} />
+              ))}
             </>
-          )
-        ) : module.questions.length === 0 ? (
-          <p>{t('preview.noQuestions')}</p>
-        ) : (
-          <>
-            <p className="mt-0">{t('preview.quizNote')}</p>
-            {module.questions.map((q) => (
-              <QuestionView key={q.id} question={q} />
-            ))}
-          </>
-        )}
-      </div>
-    </PhoneFrame>
+          )}
+        </div>
+      </PhoneFrame>
+      <PracticeLocked />
+    </>
   );
 }
 

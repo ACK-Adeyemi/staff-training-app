@@ -86,13 +86,13 @@ describe('practiceQuestions', () => {
   });
   it('returns only questions from the module itself, whole and unchanged', () => {
     const own = bank(6);
-    const drawn = practiceQuestions(moduleWith(own) as Module, createRng(9), 3);
+    const drawn = practiceQuestions(moduleWith(own), createRng(9), 3);
     for (const q of drawn) expect(own).toContainEqual(q);
   });
   it('uses the translated module own wording when two modules share question ids', () => {
     const en = moduleWith(bank(6));
     const pl = moduleWith(bank(6).map((q) => ({ ...q, prompt: `PL ${q.prompt}`, explanation: `PL ${q.explanation}` })));
-    const drawn = practiceQuestions(pl as Module, createRng(3), 3);
+    const drawn = practiceQuestions(pl, createRng(3), 3);
     expect(drawn.length).toBe(3);
     for (const q of drawn) {
       expect(q.prompt.startsWith('PL ')).toBe(true);
@@ -103,7 +103,7 @@ describe('practiceQuestions', () => {
   it('does not change the module bank', () => {
     const m = moduleWith(bank(8));
     const before = m.questions.map((q) => q.id);
-    practiceQuestions(m as Module, createRng(5), 3);
+    practiceQuestions(m, createRng(5), 3);
     expect(m.questions.map((q) => q.id)).toEqual(before);
   });
 });
