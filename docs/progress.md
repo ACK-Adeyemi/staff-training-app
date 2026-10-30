@@ -4,7 +4,7 @@ Mode: unattended
 Branch: agent/poc-build
 Current milestone: M5
 Milestone base commit: 431ae38
-Next step: M5 chunk 9 (Demo AI A: Quiz me for practice) per docs/plans/m5.md. Then 9-10, 11-12, 13-15. Full check.sh not yet run since chunk 3 (do after chunk 8). Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn.
+Next step: M5 chunk 11 (Tours A: definitions, overlay, landing) per docs/plans/m5.md. Then 12, 13-15. (Old list:) 9-10, 11-12, 13-15. Full check.sh not yet run since chunk 3 (do after chunk 8). Full check.sh takes ~40 min: run in background (timeout 3300) and poll inside the turn.
 
 ## Milestones
 - [x] M0 Foundations
