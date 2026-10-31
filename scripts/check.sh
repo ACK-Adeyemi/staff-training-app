@@ -105,3 +105,7 @@ fi
 
 if [ "$failed" -ne 0 ]; then echo "CHECKS FAILED"; exit 1; fi
 echo "All checks passed."
+# Record what passed (commit plus uncommitted state), so the stop hook can skip an identical re-run.
+if [ "${CI:-}" != "true" ] && git rev-parse --git-dir >/dev/null 2>&1; then
+  { git rev-parse HEAD; git status --porcelain | sha256sum; } > "$LOG_DIR/last-pass" 2>/dev/null || true
+fi
