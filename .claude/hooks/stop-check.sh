@@ -13,6 +13,16 @@ attempts="$(cat "$counter" 2>/dev/null || echo 0)"
 [ "$attempts" -ge 3 ] && exit 0
 
 root="${CLAUDE_PROJECT_DIR:-$PWD}"
+
+# scripts/check.sh records the commit and uncommitted state it last passed on. If nothing has
+# changed since, the full run (about 35 minutes) would only repeat the same result, so skip it.
+# CI runs everything again before anything can merge.
+stamp="$root/.agent-logs/check/last-pass"
+state="$(cd "$root" && { git rev-parse HEAD; git status --porcelain | sha256sum; } 2>/dev/null)"
+if [ -s "$stamp" ] && [ -n "$state" ] && [ "$state" = "$(cat "$stamp")" ]; then
+  exit 0
+fi
+
 if output="$("$root/scripts/check.sh" 2>&1)"; then
   exit 0
 fi
