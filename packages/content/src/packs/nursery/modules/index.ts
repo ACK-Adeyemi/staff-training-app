@@ -19,12 +19,25 @@ import eatingLesson3 from './safer-eating/lesson-3.md?raw';
 import sleepJson from './safer-sleep/module.json';
 import sleepLesson1 from './safer-sleep/lesson-1.md?raw';
 import sleepLesson2 from './safer-sleep/lesson-2.md?raw';
+import sleepPlJson from './safer-sleep-pl/module.json';
+import sleepPlLesson1 from './safer-sleep-pl/lesson-1.md?raw';
+import sleepPlLesson2 from './safer-sleep-pl/lesson-2.md?raw';
 import changedJson from './what-changed-2026/module.json';
 import changedLesson1 from './what-changed-2026/lesson-1.md?raw';
 import changedLesson2 from './what-changed-2026/lesson-2.md?raw';
 import inductionJson from './new-starter-induction/module.json';
 import inductionLesson1 from './new-starter-induction/lesson-1.md?raw';
 import inductionLesson2 from './new-starter-induction/lesson-2.md?raw';
+import suitableJson from './suitable-people/module.json';
+import suitableLesson1 from './suitable-people/lesson-1.md?raw';
+import ratiosJson from './ratios/module.json';
+import ratiosLesson1 from './ratios/lesson-1.md?raw';
+import riskJson from './risk-assessment/module.json';
+import riskLesson1 from './risk-assessment/lesson-1.md?raw';
+import medicinesJson from './medicines/module.json';
+import medicinesLesson1 from './medicines/lesson-1.md?raw';
+import recordsJson from './records/module.json';
+import recordsLesson1 from './records/lesson-1.md?raw';
 
 const lessonFiles = [safeguardingLesson1, safeguardingLesson2, safeguardingLesson3, safeguardingLesson4];
 
@@ -32,13 +45,14 @@ interface ModuleJson {
   lessons: { id: string; title: string; minutes: number }[];
 }
 
-const build = (json: ModuleJson, files: string[], id: string, requirementIds: string[]): Module => {
+const build = (json: ModuleJson, files: string[], id: string, requirementIds: string[], extra = {}): Module => {
   const { lessons, ...rest } = json; // moduleSchema drops the unknown `verify` note
   return moduleSchema.parse({
     ...rest,
     id,
     owner: 'provider',
     requirementIds,
+    ...extra,
     lessons: lessons.map((l, i) => ({ ...l, blocks: parseLesson(files[i] ?? '') })),
   });
 };
@@ -51,7 +65,17 @@ export const nurseryModules: Module[] = [
   build(eatingJson, [eatingLesson1, eatingLesson2, eatingLesson3], moduleIds.safeEatingAllergiesAndChoking, []),
   // Safer sleep is optional (no requirement link). What changed in September 2026 is contentId(604).
   build(sleepJson, [sleepLesson1, sleepLesson2], moduleIds.saferSleep, []),
+  // The Polish machine translation of Safer sleep (plan M5, F-5): same requirements, ids and links as the original.
+  build(sleepPlJson, [sleepPlLesson1, sleepPlLesson2], moduleIds.saferSleepPl, [], {
+    translatedFrom: { moduleId: moduleIds.saferSleep, machine: true },
+  }),
   build(changedJson, [changedLesson1, changedLesson2], moduleIds.whatChangedSeptember2026, [contentId(604)]),
   // New starter induction is contentId(605) and the target of the default induction rule.
   build(inductionJson, [inductionLesson1, inductionLesson2], moduleIds.newStarterInduction, [contentId(605)]),
+  // Tier 2 (M5): optional, no requirement link, so no default rule or matrix cell depends on them.
+  build(suitableJson, [suitableLesson1], moduleIds.suitablePeople, []),
+  build(ratiosJson, [ratiosLesson1], moduleIds.ratios, []),
+  build(riskJson, [riskLesson1], moduleIds.riskAssessment, []),
+  build(medicinesJson, [medicinesLesson1], moduleIds.medicines, []),
+  build(recordsJson, [recordsLesson1], moduleIds.records, []),
 ];

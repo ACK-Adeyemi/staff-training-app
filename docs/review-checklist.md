@@ -27,6 +27,7 @@ Things only the user can check, by milestone.
 - [ ] Paediatric first aid and accidents module (nursery, Draft content): two lessons, 8 questions and 2 scenarios drafted from EYFS 3.37 to 3.40, 3.78 and 3.79. Check wording, the `verify` list in `packages/content/src/packs/nursery/modules/paediatric-first-aid/module.json`, the HSE link and the Open Government Licence line.
 - [ ] Safer eating, allergies and choking module (nursery, Draft content, optional, no requirement link): three lessons, 11 questions and 2 scenarios drafted from EYFS 3.64 to 3.73. Check wording, the `verify` list in `packages/content/src/packs/nursery/modules/safer-eating/module.json`, the GOV.UK food safety link (from memory) and the Open Government Licence line.
 - [ ] Safer sleep module (nursery, Draft content, optional, no requirement link): two lessons, 9 questions and 2 scenarios drafted from EYFS 3.86. Check wording, the `verify` list in `packages/content/src/packs/nursery/modules/safer-sleep/module.json`, the page number (3.86 runs over pages 40 and 41), whether to add NHS or Lullaby Trust links, and the Open Government Licence line.
+- [ ] Safer sleep in Polish (`packages/content/src/packs/nursery/modules/safer-sleep-pl/`, Draft content, machine translated from Safer sleep, same ids and Learn more links). A Polish speaker must review the wording before real Polish-speaking staff see it. Learn shows one Safer sleep row and opens the version in the learner's language.
 - [ ] What changed in September 2026 module (nursery, Draft content, requirement contentId(604)): two lessons, 9 questions and 2 scenarios drafted from EYFS 3.15, 3.17, 3.82, 3.86 and 3.94 and footnote 20. Check wording, the `verify` list in `packages/content/src/packs/nursery/modules/what-changed-2026/module.json`, the GOV.UK banned dogs link (from memory), the missing screen use guidance link, whether these are the right headline changes, and the trip helper exception.
 - [ ] Open the NSPCC whistleblowing advice line link used in the question bank; it could not be fetched from the build environment.
 - [ ] Lesson 2 "Noticing" is general guidance rather than EYFS text; confirm it suits you.
@@ -104,3 +105,27 @@ Things only the user can check, by milestone.
 - [ ] The fictional screenshot on the Willow Lane "progress bar" ticket (a plain generated picture, no real content).
 - [ ] Price change reasons and the notice wording shown to clients.
 
+## M5
+
+### Draft content (awaiting review)
+
+- [ ] Suitable people and vetting (nursery Tier 2, Draft content, optional, no requirement link): one lesson, 8 questions (one a scenario) drafted from EYFS 3.15 to 3.21 (`packages/content/src/packs/nursery/modules/suitable-people/`). Check wording, the `verify` list, page numbers in the Learn more links and the Open Government Licence line.
+- [ ] Ratios and qualifications (nursery Tier 2, Draft content, optional): one lesson, 8 questions (one a scenario) drafted from EYFS 3.44 to 3.49 and 3.57 (`.../ratios/`). The lesson does not give the ratios for children aged three and over (3.50 to 3.54 vary by setting type); VERIFY whether to add them.
+- [ ] Risk assessment and outings (nursery Tier 2, Draft content, optional): one lesson, 8 questions (one a scenario) drafted from EYFS 3.91 to 3.93 (`.../risk-assessment/`).
+- [ ] Medicines (nursery Tier 2, Draft content, optional): one lesson, 8 questions (one a scenario) drafted from EYFS 3.60 to 3.62 (`.../medicines/`). National rule only; check against a setting's own policy.
+- [ ] Records, confidentiality and data protection (nursery Tier 2, Draft content, optional): one lesson, 8 questions (one a scenario) drafted from EYFS 3.95 to 3.99 (`.../records/`). No retention period given (3.98 leaves it to the provider); VERIFY.
+- [ ] New starter induction now has an official Learn more link on each question (EYFS 3.4, 3.5, 3.78, 3.81, 3.100). The question wording is still the demo's own. Check the links fit.
+
+- [ ] Offline and install (M5 chunk 4): after the next deploy, open the live site on a phone, install it to the home screen (it opens the staff app), then redeploy; the already-installed copy shows "A new version is ready" with Update and Later, Update loads the new version, and Later keeps working. The Demo menu shows "Update available" until then. Also check a lesson can be finished with the phone in aeroplane mode after one online visit.
+
+- [ ] Content review for BP-6: the Draft modules listed above (M1 and M5 sections: Safeguarding, Paediatric first aid, Safer eating, Safer sleep and its Polish version, What changed in September 2026, and the five Tier 2 modules) stay marked Draft content until you review them. Nothing is marked Reviewed.
+- [ ] Installing on a real phone: open the live site, use Add to home screen (Android Chrome) or Share, then Add to Home Screen (iPhone), and confirm it opens the staff app with the right icon and name.
+
+### M5 Lighthouse (BP-5)
+- Run `scripts/lighthouse.sh` for the numbers on this VM (last run 2026-10-30, Lighthouse 13.6.0, Chromium 156.0.8078.4): Performance 0.58, Accessibility 0.98, Best Practices 0.92, FCP 757 ms, LCP 4236 ms, TBT 1464 ms, CLS 0.083, Speed Index 1641 ms, 456 KB. Performance is under the 85 placeholder; see docs/decisions.md 'M5 chunk 14' and decide the target.
+- Run Lighthouse on a real phone against the deployed site (remote debugging or PageSpeed Insights); the VM numbers use simulated throttling.
+
+## Polish translation review by a speaker
+- [ ] A Polish speaker reads pl-PL.json (staff screens) for natural wording, consistent terms and gender-neutral phrasing (forms like "ukończył(a)" and "gotowy lub gotowa").
+- [ ] Check the number wording that avoids plural agreement ("Moduły: 3", "Zostało dni: 5") and the abbreviated renewal periods ("2 l.", "6 mies.").
+- [ ] Check the terms: "Pokój bitwy" (Battle Room), "Punkty XP", "Rywalizacja", "Zgłoś sprawę" (raise a ticket), "bez zaglądania do materiałów" (closed-book).

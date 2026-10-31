@@ -20,12 +20,44 @@ export interface ReadAloudBarProps {
   rates: number[];
   /** Text for a speed option, for example "1.25x". Defaults to the number. */
   rateLabel?: (rate: number) => string;
+  /** Render only the controls, not the paragraph text. */
+  controlsOnly?: boolean;
+  /** Called whenever the current paragraph changes. */
+  onIndexChange?: (index: number) => void;
+  /** The starting speed; one of `rates`. */
+  defaultRate?: number;
+  /** Called with true each time speech starts. */
+  onPlayingChange?: (playing: boolean) => void;
 }
 
-export function ReadAloudBar({ paragraphs, speech, labels, rates, rateLabel = String }: ReadAloudBarProps) {
-  const [index, setIndex] = useState(0);
+export function ReadAloudBar({
+  paragraphs,
+  speech,
+  labels,
+  rates,
+  rateLabel = String,
+  controlsOnly = false,
+  onIndexChange,
+  defaultRate,
+  onPlayingChange,
+}: ReadAloudBarProps) {
+  const [index, setIndexState] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [rate, setRate] = useState(rates.includes(1) ? 1 : (rates[0] ?? 1));
+  const [rate, setRate] = useState(
+    defaultRate !== undefined && rates.includes(defaultRate) ? defaultRate : rates.includes(1) ? 1 : (rates[0] ?? 1),
+  );
+  const onIndexRef = useRef(onIndexChange);
+  useEffect(() => {
+    onIndexRef.current = onIndexChange;
+  }, [onIndexChange]);
+  const onPlayingRef = useRef(onPlayingChange);
+  useEffect(() => {
+    onPlayingRef.current = onPlayingChange;
+  }, [onPlayingChange]);
+  const setIndex = (i: number) => {
+    setIndexState(i);
+    onIndexRef.current?.(i);
+  };
   const speechRef = useRef(speech);
   const token = useRef(0);
 
@@ -43,6 +75,7 @@ export function ReadAloudBar({ paragraphs, speech, labels, rates, rateLabel = St
     const mine = ++token.current;
     setIndex(i);
     setPlaying(true);
+    onPlayingRef.current?.(true);
     speechRef.current.speak(paragraphs[i] ?? '', {
       rate: r,
       onEnd: () => {
@@ -120,17 +153,19 @@ export function ReadAloudBar({ paragraphs, speech, labels, rates, rateLabel = St
           </select>
         </label>
       </div>
-      <div className="flex flex-col gap-2">
-        {paragraphs.map((p, i) => (
-          <p
-            key={i}
-            aria-current={i === index ? 'true' : undefined}
-            className={`m-0 rounded-[var(--radius-sm)] p-2 ${i === index ? 'border-s-4 border-[var(--color-accent)] bg-[var(--color-surface)] font-semibold' : 'border-s-4 border-transparent'}`}
-          >
-            {p}
-          </p>
-        ))}
-      </div>
+      {controlsOnly ? null : (
+        <div className="flex flex-col gap-2">
+          {paragraphs.map((p, i) => (
+            <p
+              key={i}
+              aria-current={i === index ? 'true' : undefined}
+              className={`m-0 rounded-[var(--radius-sm)] p-2 ${i === index ? 'border-s-4 border-[var(--color-accent)] bg-[var(--color-surface)] font-semibold' : 'border-s-4 border-transparent'}`}
+            >
+              {p}
+            </p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

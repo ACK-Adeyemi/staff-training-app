@@ -14,7 +14,12 @@ export type TFunction = (key: MessageKey, params?: Params) => string;
 export interface CreateTOptions {
   /** Throw on an unknown key or a missing parameter. Defaults to true except in a production build. */
   strict?: boolean;
+  /** Messages used when a key is missing from `messages` (the en-GB set, for a partial translation). */
+  fallback?: Messages;
 }
+
+/** A translation may cover only some keys. */
+export type PartialMessages<T = Messages> = { [K in keyof T]?: T[K] extends string ? string : PartialMessages<T[K]> };
 
 const defaultStrict = (): boolean => (import.meta as { env?: { MODE?: string } }).env?.MODE !== 'production';
 
@@ -27,10 +32,13 @@ const lookup = (messages: unknown, key: string): string | undefined => {
   return typeof node === 'string' ? node : undefined;
 };
 
-export function createT(messages: Messages, options: CreateTOptions = {}): TFunction {
+export function createT(messages: Messages | PartialMessages, options: CreateTOptions = {}): TFunction {
   const strict = options.strict ?? defaultStrict();
   return (key, params) => {
-    const template = lookup(messages, key);
+    const own = lookup(messages, key);
+    const template = own ?? (options.fallback ? lookup(options.fallback, key) : undefined);
+    // A missing parameter in an English fallback message must not break a Polish screen, so only the main set is strict.
+    const strictParams = strict && own !== undefined;
     if (template === undefined) {
       if (strict) throw new Error(`Unknown message key: ${key}`);
       return key;
@@ -38,14 +46,20 @@ export function createT(messages: Messages, options: CreateTOptions = {}): TFunc
     // One pass, so inserted values are literal and never re-interpolated.
     return template.replace(/\{([A-Za-z][A-Za-z0-9]*)\}/g, (placeholder, name: string) => {
       if (params && Object.hasOwn(params, name)) return String(params[name]);
-      if (strict) throw new Error(`Missing parameter "${name}" for message key: ${key}`);
+      if (strictParams) throw new Error(`Missing parameter "${name}" for message key: ${key}`);
       return placeholder;
     });
   };
 }
 
+/** Registry order is the order of the picker. Polish loads on demand so English users never download it. */
 export const languages = {
-  'en-GB': { label: 'English (UK)', messages: enGB },
+  'en-GB': { label: 'English (UK)', machineTranslated: false, messages: enGB },
+  'pl-PL': {
+    label: 'Polski',
+    machineTranslated: true,
+    load: async (): Promise<PartialMessages> => (await import('./lang/pl-PL.json')).default,
+  },
 } as const;
 
 export type LanguageCode = keyof typeof languages;

@@ -8,6 +8,7 @@ import { useActor, useStore, useT } from '../../app/hooks';
 import { useDisplayPrefs } from '../../app/display/context';
 import { celebrate } from '../../app/feedback';
 import { ModuleFeedbackCard } from './FeedbackWidgets';
+import { PracticeButton } from './Practice';
 import { RewardsPanel } from './RewardsPanel';
 import { LearnMoreGroups } from './LearnMoreList';
 import { LearningFrame } from './LearningFrame';
@@ -122,6 +123,7 @@ export function Results() {
                 </p>
               )}
               {back}
+              <PracticeButton moduleId={module.id} />
             </div>
             {error ? <p role="alert">{t(error)}</p> : null}
             <ModuleFeedbackCard moduleId={module.id} />

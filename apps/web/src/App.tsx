@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState, useSyncExternalStore } from 'react';
+import { flushSync } from 'react-dom';
 import { createHashRouter, RouterProvider } from 'react-router';
 import type { PersonaListing, StoreHandle } from '@sta/data';
 import { offsetClock, systemClock, type DemoState } from '@sta/domain';
@@ -51,7 +52,11 @@ function Inner({ booted }: { booted: Booted }) {
     const save = async (next: DemoState) => {
       await handle.admin.setDemoState(next);
       setOffset(next.clockOffsetMs);
-      setState(next);
+      // Commit now. Queries read "now" from the actor of the latest render, so a refetch started before the render
+      // would compute everything from the old date (Fast-forward to Limited showed Past due for seconds).
+      flushSync(() => {
+        setState(next);
+      });
     };
     return {
       state,

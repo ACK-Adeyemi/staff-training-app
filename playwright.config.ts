@@ -11,6 +11,7 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:4173/staff-training-app/',
     trace: 'retain-on-failure',
+    serviceWorkers: 'block',
   },
   webServer: {
     command: 'pnpm --filter @sta/web preview --port 4173 --strictPort',

@@ -49,6 +49,8 @@ export const lessonSchema = z.object({
   minutes: z.number().positive(),
   blocks: z.array(contentBlockSchema),
   furtherReading: z.array(learnMoreLinkSchema).optional(),
+  aiDrafted: z.boolean().optional(),
+  aiReviewedBy: idSchema.optional(),
 });
 export type Lesson = z.infer<typeof lessonSchema>;
 
@@ -92,6 +94,8 @@ export const questionSchema = z
     sourceRef: z.string().optional(),
     learnMore: z.array(learnMoreLinkSchema),
     tags: z.array(z.string()),
+    aiDrafted: z.boolean().optional(),
+    aiReviewedBy: idSchema.optional(),
   })
   .superRefine((q, ctx) => {
     const fail = (message: string): void => {

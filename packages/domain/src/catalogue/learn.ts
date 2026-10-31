@@ -7,6 +7,7 @@ import type { Assignment, LearningEvent, Module } from '../schemas/learning';
 import type { Requirement } from '../schemas/packs';
 import type { Person, Site } from '../schemas/tenancy';
 import { addDays } from '../dates';
+import { translationsFor } from '../translations';
 import { findRanges, fold, searchTerms } from './text';
 
 export type ModuleStatus = 'notStarted' | 'inProgress' | 'completed';
@@ -24,6 +25,8 @@ export type CatalogueRow = {
   dueAt?: string;
   dueState: DueState;
   lastActiveAt?: string;
+  /** Published language versions of the module. They are not rows of their own; the link goes to the learner's language. */
+  translations?: Module[];
 };
 
 export type CatalogueInput = {
@@ -54,7 +57,9 @@ export function learnCatalogue(input: CatalogueInput): CatalogueRow[] {
 
   const rows: CatalogueRow[] = [];
   for (const module of input.modules) {
-    if (module.status !== 'published') continue;
+    if (module.status !== 'published' || module.translatedFrom !== undefined) continue;
+    const translations = translationsFor(module.id, input.modules as Module[]);
+    const versionIds = new Set([module.id, ...translations.map((m) => m.id)]);
     const groups = input.groups.filter((g) => g.moduleIds.includes(module.id));
     const groupIds = new Set(groups.map((g) => g.id));
 
@@ -79,7 +84,7 @@ export function learnCatalogue(input: CatalogueInput): CatalogueRow[] {
     const placement = input.placements.find((p) => p.moduleId === module.id);
     if (placement && !required && !placement.availableToAll) continue;
 
-    const moduleEvents = mineEvents.filter((e) => e.moduleId === module.id);
+    const moduleEvents = mineEvents.filter((e) => versionIds.has(e.moduleId ?? ''));
     let lastActiveAt: string | undefined;
     for (const e of moduleEvents)
       if (lastActiveAt === undefined || time(e.at) > time(lastActiveAt)) lastActiveAt = e.at;
@@ -100,6 +105,7 @@ export function learnCatalogue(input: CatalogueInput): CatalogueRow[] {
       required,
       ...(category ? { category } : {}),
       groups,
+      ...(translations.length > 0 ? { translations } : {}),
       minutes: module.estimatedMinutes,
       status,
       finished,

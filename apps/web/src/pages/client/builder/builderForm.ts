@@ -213,6 +213,46 @@ export function removeOption(f: Form, qid: string, oid: string): Form {
   return setQuestion(f, qid, { options: options.filter((o) => o.id !== oid) });
 }
 
+// ----------------------------------------------------------------- Demo AI drafts
+
+/** Adds drafted questions with keys that are free in the form (the Demo AI numbers its own from 1). */
+export function addDraftedQuestions(f: Form, drafted: Question[], lessonIds: Map<string, string>): Form {
+  const used = keysOf(f);
+  const added = drafted.map((q): Question => {
+    const id = freshKey('ai-question', used);
+    used.add(id);
+    const options = (q.options ?? []).map((o) => {
+      const key = freshKey(`${id}-${o.correct ? 'right' : 'other'}`, used);
+      used.add(key);
+      return { ...o, id: key };
+    });
+    return { ...q, id, options, tags: q.tags.map((tag) => lessonIds.get(tag) ?? tag) };
+  });
+  return { ...f, questions: [...f.questions, ...added] };
+}
+
+/** A pasted-policy draft added to the form: its lessons and questions are appended and the Title filled if blank. */
+export function addPolicyDraft(f: Form, draft: { title: string; lessons: Lesson[]; questions: Question[] }): Form {
+  const used = keysOf(f);
+  const ids = new Map<string, string>();
+  const lessons = draft.lessons.map((l): Lesson => {
+    const id = freshKey('ai-lesson', used);
+    used.add(id);
+    ids.set(l.id, id);
+    return { ...l, id };
+  });
+  const withLessons: Form = {
+    ...f,
+    title: f.title.trim() === '' ? draft.title : f.title,
+    lessons: [...f.lessons, ...lessons],
+  };
+  return addDraftedQuestions(withLessons, draft.questions, ids);
+}
+
+/** True when the item is AI-drafted and nobody has marked it as checked. */
+export const aiUnchecked = (x: { aiDrafted?: boolean | undefined; aiReviewedBy?: string | undefined }): boolean =>
+  x.aiDrafted === true && x.aiReviewedBy === undefined;
+
 // ----------------------------------------------------------------- links
 
 export function setLessonLinks(f: Form, lessonId: string, links: LearnMoreLink[]): Form {

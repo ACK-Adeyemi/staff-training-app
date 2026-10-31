@@ -9,7 +9,7 @@ import { useActor, useStore, useT } from '../app/hooks';
 type Side = 'staff' | 'client' | 'provider';
 
 /** Flags, the open incident and live banner announcements. Refreshed with the other shell queries. */
-function useSystemNotices(side: Side) {
+export function useSystemNotices(side: Side) {
   const store = useStore();
   const actor = useActor();
   return useQuery({

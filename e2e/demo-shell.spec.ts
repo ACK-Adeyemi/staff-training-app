@@ -35,8 +35,8 @@ test.describe('D1 landing', () => {
     await expect(page.getByRole('radio', { name: 'Nursery' })).toBeChecked();
     await expect(page.getByRole('radio', { name: /Luxury retail/ })).toBeDisabled();
     await expect(page.getByText('Arrives in a later build')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Client tour' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Provider tour' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Client tour' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Provider tour' })).toBeVisible();
     const explore = page.getByRole('region', { name: 'Explore freely' });
     for (const name of [/Staff app/, /Client admin/, /Provider admin/]) {
       await expect(explore.getByRole('link', { name })).toBeVisible();
@@ -45,11 +45,14 @@ test.describe('D1 landing', () => {
 
   test('Client tour opens the client admin as Priya and Provider tour opens the provider admin', async ({ page }) => {
     await page.goto('./');
-    await page.getByRole('link', { name: 'Client tour' }).click();
+    // SPEC CHANGE (M5 chunk 11): the tour buttons ask "This resets the demo" first.
+    await page.getByRole('button', { name: 'Client tour' }).click();
+    await page.getByRole('button', { name: 'Confirm' }).click();
     await expect(page).toHaveURL(/#\/client$/);
     await expect(page.getByRole('banner')).toContainText('Priya');
     await page.goto('./');
-    await page.getByRole('link', { name: 'Provider tour' }).click();
+    await page.getByRole('button', { name: 'Provider tour' }).click();
+    await page.getByRole('button', { name: 'Confirm' }).click();
     await expect(page).toHaveURL(/#\/provider$/);
   });
 

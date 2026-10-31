@@ -67,6 +67,9 @@ export function PresenterPanel({ open, onClose }: { open: boolean; onClose: () =
     void (async () => {
       try {
         await demo.fastForward(days);
+        // A fetch already running was started with the old date and a page that remounts would join it, so stop
+        // those before marking everything out of date.
+        await queryClient.cancelQueries();
         await queryClient.invalidateQueries();
       } finally {
         setRunning((n) => n - 1);

@@ -1,6 +1,7 @@
 // M1 chunk 12 (BP-7, F-9): demo-script Track A steps 1, 3 and the matrix part of 5 as one automated test.
 // M3 chunk 21 adds steps 2, 5 (upload), 6, 8 and 9 at the end of this file.
-// Desktop project only. Priya (client admin) uses the desktop page; Jade (staff) uses a second page sized 390 by 844.
+// M5 chunk 12 (BP-1): runs on the phone and desktop projects, each test from a fresh context and a Reset demo.
+// Priya (client admin) uses the project's own viewport; Jade (staff) uses a second page sized 390 by 844.
 // Both pages share one browser context, so they share IndexedDB and talk over BroadcastChannel like two tabs.
 // Needs poppler-utils (pdftotext, pdfinfo) on the machine to read the matrix PDF.
 // The clock is fixed at PINNED before the first load, so the store RNG and the quiz draw are reproducible.
@@ -42,8 +43,6 @@ const overlayIds = new Set(
   ].flatMap((q) => (q ? [q.id] : [])),
 );
 
-test.skip(({ isMobile }) => isMobile, 'desktop project only');
-
 test('Track A: Priya sees the dashboard, Jade completes her refresher on a phone, Priya prints the matrix', async ({
   page: priya,
   context,
@@ -62,12 +61,17 @@ test('Track A: Priya sees the dashboard, Jade completes her refresher on a phone
   const all: string[] = [];
   context.on('request', (r) => all.push(r.url()));
 
-  // Step 1: Priya's dashboard.
-  await priya.goto('./#/client');
+  // Step 1: Priya's dashboard. Every test starts from Reset demo.
+  await priya.goto('./?reset=1#/client');
   const needs = priya.getByRole('region', { name: 'Needs attention' });
   await expect(needs.getByRole('listitem')).toHaveCount(6);
   await expect(priya.getByRole('region', { name: 'Compliance' })).toContainText('11 of 14');
   await expect(priya.getByRole('region', { name: 'Assigned training' })).toContainText('Jade Mills');
+  // The onboarding checklist (8.1 step 1) is one tap away from the dashboard.
+  await priya.goto('./#/client/onboarding');
+  await expect(priya.getByRole('heading', { level: 1, name: 'Getting started' })).toBeVisible();
+  await expect(priya.getByText(/^\d+ of \d+ done$/)).toBeVisible();
+  await priya.goto('./#/client');
 
   // Step 3: Jade on a phone.
   const jade = await context.newPage();
@@ -188,7 +192,9 @@ test('Track A: Priya sees the dashboard, Jade completes her refresher on a phone
     timeout: 5_000,
   });
 
-  // Step 5 (matrix part): Priya opens the matrix and prints it.
+  // Step 5 (matrix part): Priya opens the matrix and prints it. The training matrix (P18) is a wide table designed for
+  // desktop and printed on A4 landscape, so this part uses a desktop-sized window on the phone project too.
+  await priya.setViewportSize({ width: 1440, height: 900 });
   await priya.goto('./#/client/reports');
   await priya.getByRole('link', { name: /training matrix/i }).click();
   const table = priya.getByRole('table', { name: /training matrix/i });
@@ -217,7 +223,7 @@ test('Track A step 4: Maureen gets Simple view, large text and read-aloud on a l
   await context.clock.setFixedTime(PINNED);
   await installSpeechRecorder(page);
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('./#/staff/signin');
+  await page.goto('./?reset=1#/staff/signin');
   await page.getByRole('radio', { name: /Maureen/ }).check();
   await page.getByLabel('PIN').fill('1234');
   await page.getByRole('button', { name: 'Sign in' }).click();
@@ -229,7 +235,7 @@ test('Track A step 4: Maureen gets Simple view, large text and read-aloud on a l
   await expect(page.getByTestId('path-node')).toHaveCount(0);
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).fontSize)).toBe('24px');
 
-  // Read aloud on a lesson uses the stored rate and a local voice; Stop reading stops it.
+  // Read aloud on a lesson uses the stored rate and a local voice; Pause stops it.
   const maureen = (await readStore(page, 'people')).find((p) => p['firstName'] === 'Maureen');
   const prefs = (maureen?.['prefs'] ?? {}) as { readAloudRate?: number };
   const rate = prefs.readAloudRate ?? 1;
@@ -248,7 +254,7 @@ test('Track A step 4: Maureen gets Simple view, large text and read-aloud on a l
   const norm = (x: string) => x.replace(/\s+/g, ' ').trim();
   expect(norm(await page.getByRole('main').innerText())).toContain(norm(first?.text ?? '').slice(0, 40));
   const cancels = log.cancels;
-  await page.getByRole('button', { name: 'Stop reading' }).click();
+  await page.getByRole('button', { name: 'Pause' }).click();
   await expect.poll(async () => (await readSpeechLog(page)).cancels).toBeGreaterThan(cancels);
   await expect(page.getByRole('button', { name: 'Read this aloud' })).toBeVisible();
 });
@@ -259,7 +265,7 @@ test('Track A step 7: Priya publishes Mastery Month with Suggest a prize; Jade s
 }) => {
   test.setTimeout(120_000);
   await context.clock.setFixedTime(PINNED);
-  await priya.goto('./#/client/competitions');
+  await priya.goto('./?reset=1#/client/competitions');
   await priya.getByRole('link', { name: 'New competition' }).click();
   await priya.getByRole('radio', { name: 'Mastery Month' }).check();
   await expect(priya.getByTestId('template-why')).not.toBeEmpty();
@@ -324,7 +330,7 @@ const panel = (page: Page) => page.getByRole('dialog', { name: 'Presenter panel'
 
 async function startTour(page: Page, context: BrowserContext) {
   await context.clock.setFixedTime(PINNED);
-  await page.goto('./');
+  await page.goto('./?reset=1');
 }
 async function jumpTo(page: Page, name: RegExp) {
   await page.keyboard.press('Shift+Alt+KeyP');

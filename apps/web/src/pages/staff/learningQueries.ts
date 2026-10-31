@@ -12,6 +12,7 @@ import {
   type LearningEvent,
   type Module,
   type Person,
+  translationsFor,
 } from '@sta/domain';
 import { useActor, useStore } from '../../app/hooks';
 
@@ -26,6 +27,8 @@ export type LearningData = {
   doneLessons: Set<string>;
   allLessonsDone: boolean;
   renewMonths: number | undefined;
+  /** The other published language versions of this module. */
+  translations: Module[];
 };
 
 export const useModuleId = (): string => useParams()['moduleId'] ?? '';
@@ -39,7 +42,7 @@ export function useLearning(moduleId: string) {
     queryFn: async (): Promise<LearningData> => {
       const user = await store.users.get(actor, actor.userId);
       if (!user.personId || !actor.clientId) throw new Error('This account has no person record.');
-      const [module, person, client, requirements, allEvents, allAttempts, allEvidence, allOverlays] =
+      const [module, person, client, requirements, allEvents, allAttempts, allEvidence, allOverlays, allModules] =
         await Promise.all([
           store.modules.get(actor, moduleId),
           store.people.get(actor, user.personId),
@@ -49,6 +52,7 @@ export function useLearning(moduleId: string) {
           store.attempts.list(actor),
           store.evidence.list(actor),
           store.clientLinkOverlays.list(actor),
+          store.modules.list(actor),
         ]);
       const events = allEvents.filter((e) => e.personId === person.id && e.moduleId === module.id);
       const doneLessons = completedLessonIds(module, events, person.id);
@@ -69,6 +73,7 @@ export function useLearning(moduleId: string) {
         doneLessons,
         allLessonsDone: module.lessons.every((l) => doneLessons.has(l.id)),
         renewMonths: renewalMonths(module, requirements),
+        translations: translationsFor(module.id, allModules),
       };
     },
   });

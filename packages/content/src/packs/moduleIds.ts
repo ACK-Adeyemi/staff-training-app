@@ -9,4 +9,10 @@ export const moduleIds = {
   newStarterInduction: contentId(205),
   foodHygiene: contentId(206),
   saferSleep: contentId(207),
+  suitablePeople: contentId(208),
+  ratios: contentId(209),
+  riskAssessment: contentId(210),
+  medicines: contentId(211),
+  records: contentId(212),
+  saferSleepPl: contentId(213),
 } as const;

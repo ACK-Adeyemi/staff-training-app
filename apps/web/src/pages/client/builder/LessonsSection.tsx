@@ -1,11 +1,15 @@
 // The lessons list of the Module Builder: Markdown paste, one card per lesson, warnings for what was left out.
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@sta/ui';
-import { useT } from '../../../app/hooks';
-import { inputClass } from '../foundationsErrors';
-import { pasteLessons, setLesson } from './builderForm';
+import { suggestQuestions, type Lesson } from '@sta/domain';
+import { useActor, useStore, useT } from '../../../app/hooks';
+import { foundationsErrorKey, inputClass } from '../foundationsErrors';
+import { useFeatures } from '../billingQueries';
+import { AiLabel } from './AiLabel';
+import { addDraftedQuestions, pasteLessons, setLesson } from './builderForm';
 import { LinkPanel } from './LinkPanel';
-import { cardClass, labelClass, type OwnLinks, type Update } from './shared';
+import { cardClass, labelClass, type AiCheck, type OwnLinks, type Update } from './shared';
 import type { Form } from './builderForm';
 import type { MarkdownWarning } from '@sta/domain';
 
@@ -14,13 +18,21 @@ export function LessonsSection({
   update,
   links,
   onShow,
+  check,
 }: {
   form: Form;
   update: Update;
   links: OwnLinks;
   onShow: (index: number) => void;
+  check: AiCheck;
 }) {
   const t = useT();
+  const store = useStore();
+  const actor = useActor();
+  const queryClient = useQueryClient();
+  const aiOn = useFeatures().data?.aiAssistant === true;
+  const [suggesting, setSuggesting] = useState(false);
+  const [suggestError, setSuggestError] = useState<{ lessonId: string; text: string } | null>(null);
   const [text, setText] = useState('');
   const [warnings, setWarnings] = useState<MarkdownWarning[]>([]);
 
@@ -30,6 +42,25 @@ export function LessonsSection({
     setWarnings(result.warnings);
     setText('');
     onShow(0);
+  };
+
+  const suggest = async (lesson: Lesson) => {
+    setSuggestError(null);
+    // Checked here first so an empty lesson uses nothing.
+    if (suggestQuestions(lesson).length === 0) {
+      setSuggestError({ lessonId: lesson.id, text: t('aiDraft.noText') });
+      return;
+    }
+    setSuggesting(true);
+    try {
+      const result = await store.ai.suggestQuestions(actor, { lesson });
+      update((f) => addDraftedQuestions(f, result.questions, new Map()));
+      await queryClient.invalidateQueries({ queryKey: ['addOns'] });
+    } catch (e) {
+      setSuggestError({ lessonId: lesson.id, text: t(foundationsErrorKey(e)) });
+    } finally {
+      setSuggesting(false);
+    }
   };
 
   return (
@@ -86,14 +117,35 @@ export function LessonsSection({
             />
           </label>
           <p className="mt-2 mb-2">{t('client.builder.lessonMinutes', { minutes: lesson.minutes })}</p>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              onShow(index);
-            }}
-          >
-            {t('client.builder.showInPreview')}
-          </Button>
+          <div className="mb-2">
+            <AiLabel item={lesson} kind="lesson" check={check} />
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                onShow(index);
+              }}
+            >
+              {t('client.builder.showInPreview')}
+            </Button>
+            {aiOn ? (
+              <Button
+                variant="secondary"
+                disabled={suggesting}
+                onClick={() => {
+                  void suggest(lesson);
+                }}
+              >
+                {t('aiDraft.suggestButton')}
+              </Button>
+            ) : null}
+          </div>
+          {suggestError?.lessonId === lesson.id ? (
+            <p role="alert" className="mt-2 mb-0 font-semibold">
+              {suggestError.text}
+            </p>
+          ) : null}
           <LinkPanel
             kind="lesson"
             targetId={lesson.id}

@@ -1,0 +1,477 @@
+{
+  "title": "Bezpieczny sen",
+  "description": "Jak bezpiecznie układać niemowlęta i małe dzieci do snu i jak je sprawdzać. Na podstawie sekcji 3 ram prawnych EYFS.",
+  "estimatedMinutes": 6,
+  "language": "pl-PL",
+  "status": "published",
+  "version": 1,
+  "roleTags": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "Bezpieczne miejsce do spania",
+      "minutes": 3
+    },
+    {
+      "id": "lesson-2",
+      "title": "Sprawdzanie dzieci podczas snu",
+      "minutes": 3
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-sleep-baby-cot",
+      "type": "mcq",
+      "prompt": "Gdzie można układać do snu niemowlę w wieku 12 miesięcy lub młodsze?",
+      "options": [
+        {
+          "id": "q-sleep-baby-cot-o1",
+          "text": "Tylko w łóżeczku",
+          "correct": true
+        },
+        {
+          "id": "q-sleep-baby-cot-o2",
+          "text": "W łóżeczku lub na materacu na podłodze",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-baby-cot-o3",
+          "text": "W łóżku lub w łóżeczku",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-baby-cot-o4",
+          "text": "W foteliku samochodowym lub w łóżeczku",
+          "correct": false
+        }
+      ],
+      "explanation": "Dzieci należy układać na plecach, w ich własnym, oddzielnym miejscu do spania. Niemowlęta w wieku 12 miesięcy i młodsze wolno układać do snu tylko w łóżeczku. Do łóżeczek zaliczają się też kosze do przenoszenia, kosze Mojżesza i łóżeczka turystyczne.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-baby-cot",
+          "title": "EYFS statutory framework for group and school-based providers (po angielsku)",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-position",
+      "type": "mcq",
+      "prompt": "Jak należy układać dziecko do snu?",
+      "options": [
+        {
+          "id": "q-sleep-position-o1",
+          "text": "Na plecach",
+          "correct": true
+        },
+        {
+          "id": "q-sleep-position-o2",
+          "text": "Na brzuchu",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-position-o3",
+          "text": "Na boku",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-position-o4",
+          "text": "Tak, jak najszybciej się uspokoi",
+          "correct": false
+        }
+      ],
+      "explanation": "Dzieci należy układać na plecach, w ich własnym, oddzielnym miejscu do spania, na twardej, płaskiej powierzchni.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-position",
+          "title": "EYFS statutory framework for group and school-based providers (po angielsku)",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-bumpers",
+      "type": "trueFalse",
+      "prompt": "W łóżeczku może być kilka miękkich zabawek i ochraniacz, jeśli dziecko jest zadowolone. Prawda czy fałsz?",
+      "options": [
+        {
+          "id": "q-sleep-bumpers-o1",
+          "text": "Prawda",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-bumpers-o2",
+          "text": "Fałsz",
+          "correct": true
+        }
+      ],
+      "explanation": "Fałsz. W łóżeczku nie wolno trzymać dodatkowych rzeczy, takich jak zabawki, poduszki, dodatkowe koce, ochraniacze, kliny czy pasy.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-bumpers",
+          "title": "EYFS statutory framework for group and school-based providers (po angielsku)",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-blankets",
+      "type": "mcq",
+      "prompt": "Jeśli używasz kocyka, jak ułożyć dziecko w łóżeczku?",
+      "options": [
+        {
+          "id": "q-sleep-blankets-o1",
+          "text": "Stopami przy nogach łóżeczka, z kocykiem dobrze podwiniętym",
+          "correct": true
+        },
+        {
+          "id": "q-sleep-blankets-o2",
+          "text": "Głową u góry i z luźnym kocykiem",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-blankets-o3",
+          "text": "Ciasno owinięte, z kocykiem na głowie",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-blankets-o4",
+          "text": "Gdziekolwiek, byle kocyk był ciepły",
+          "correct": false
+        }
+      ],
+      "explanation": "Gdy używa się kocyków, dziecko należy ułożyć stopami przy nogach łóżeczka, a kocyk dobrze podwinąć. Pościel musi być lekka i mocno podwinięta poniżej ramion.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-blankets",
+          "title": "EYFS statutory framework for group and school-based providers (po angielsku)",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-temp",
+      "type": "mcq",
+      "prompt": "Jaka jest zalecana temperatura w pokoju dla niemowląt?",
+      "options": [
+        {
+          "id": "q-sleep-temp-o1",
+          "text": "Od 16 do 20 stopni C",
+          "correct": true
+        },
+        {
+          "id": "q-sleep-temp-o2",
+          "text": "Od 10 do 14 stopni C",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-temp-o3",
+          "text": "Od 22 do 26 stopni C",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-temp-o4",
+          "text": "Taka, jaka jest wygodna dla personelu",
+          "correct": false
+        }
+      ],
+      "explanation": "Dzieci nie powinny być zbyt rozgrzane ani zbyt zmarznięte. Zalecana temperatura w pokoju dla niemowląt to od 16 do 20 stopni C. Nie wolno zakrywać dzieciom głów.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-temp",
+          "title": "EYFS statutory framework for group and school-based providers (po angielsku)",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-under-six",
+      "type": "trueFalse",
+      "prompt": "Przy niemowlęciu poniżej sześciu miesięcy podczas każdego snu musi zawsze być dorosły w tym samym pomieszczeniu. Prawda czy fałsz?",
+      "options": [
+        {
+          "id": "q-sleep-under-six-o1",
+          "text": "Prawda",
+          "correct": true
+        },
+        {
+          "id": "q-sleep-under-six-o2",
+          "text": "Fałsz",
+          "correct": false
+        }
+      ],
+      "explanation": "Prawda. Przy niemowlętach poniżej sześciu miesięcy podczas każdego snu musi zawsze być dorosły w tym samym pomieszczeniu.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-under-six",
+          "title": "EYFS statutory framework for group and school-based providers (po angielsku)",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-sight-hearing",
+      "type": "trueFalse",
+      "prompt": "Dziecko może spać samo w pokoju, jeśli personel zagląda do niego co godzinę. Prawda czy fałsz?",
+      "options": [
+        {
+          "id": "q-sleep-sight-hearing-o1",
+          "text": "Prawda",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-sight-hearing-o2",
+          "text": "Fałsz",
+          "correct": true
+        }
+      ],
+      "explanation": "Fałsz. Śpiące dzieci muszą być zawsze w zasięgu wzroku i słuchu personelu oraz często sprawdzane.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-sight-hearing",
+          "title": "EYFS statutory framework for group and school-based providers (po angielsku)",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sleep-bedding",
+      "type": "mcq",
+      "prompt": "Jaka pościel jest dozwolona w miejscu do spania?",
+      "options": [
+        {
+          "id": "q-sleep-bedding-o1",
+          "text": "Twardy, płaski, wodoodporny materac i lekka pościel podwinięta poniżej ramion",
+          "correct": true
+        },
+        {
+          "id": "q-sleep-bedding-o2",
+          "text": "Gruba kołdra i poduszka",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-bedding-o3",
+          "text": "Miękka narzuta włożona luźno",
+          "correct": false
+        },
+        {
+          "id": "q-sleep-bedding-o4",
+          "text": "Klin podpierający dziecko",
+          "correct": false
+        }
+      ],
+      "explanation": "W miejscu do spania może być tylko twardy, płaski, wodoodporny materac i lekka pościel mocno podwinięta poniżej ramion dziecka albo dobrze dopasowany śpiworek dla niemowląt.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sleep-bedding",
+          "title": "EYFS statutory framework for group and school-based providers (po angielsku)",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sc-sleep-cot",
+      "type": "scenario",
+      "prompt": "Noor, lat 8 miesięcy, idzie na drzemkę. W jej łóżeczku jest nowy miękki ochraniacz i mała pluszowa zabawka od rodziców.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-sleep-cot-s1",
+            "text": "Co robisz?",
+            "choices": [
+              {
+                "id": "q-sc-sleep-cot-s1-c1",
+                "text": "Wyjmuję ochraniacz i zabawkę i układam Noor na plecach",
+                "outcome": "best",
+                "feedback": "Tak. W łóżeczku nie wolno trzymać dodatkowych rzeczy, takich jak zabawki czy ochraniacze.",
+                "next": "q-sc-sleep-cot-s2"
+              },
+              {
+                "id": "q-sc-sleep-cot-s1-c2",
+                "text": "Zostawiam je, bo przynieśli je rodzice",
+                "outcome": "poor",
+                "feedback": "Ochraniaczy i zabawek nie może być w łóżeczku, nawet jeśli dostarczyli je rodzice.",
+                "next": "q-sc-sleep-cot-s2"
+              },
+              {
+                "id": "q-sc-sleep-cot-s1-c3",
+                "text": "Wyjmuję zabawkę, ale zostawiam ochraniacz",
+                "outcome": "poor",
+                "feedback": "Ochraniacze też są niedozwolone.",
+                "next": "q-sc-sleep-cot-s2"
+              }
+            ]
+          },
+          {
+            "id": "q-sc-sleep-cot-s2",
+            "text": "Noor śpi. W pokoju jest cicho, a Ty musisz przygotować obiad w kuchni. Co robisz?",
+            "choices": [
+              {
+                "id": "q-sc-sleep-cot-s2-c1",
+                "text": "Proszę koleżankę, żeby została w pokoju, tak by Noor była zawsze w zasięgu wzroku i słuchu",
+                "outcome": "best",
+                "feedback": "Dobrze. Dzieci muszą być w zasięgu wzroku i słuchu personelu i często sprawdzane."
+              },
+              {
+                "id": "q-sc-sleep-cot-s2-c2",
+                "text": "Idę do kuchni i sprawdzę ją po powrocie",
+                "outcome": "poor",
+                "feedback": "Noor musi być zawsze w zasięgu wzroku i słuchu personelu, gdy śpi."
+              },
+              {
+                "id": "q-sc-sleep-cot-s2-c3",
+                "text": "Zamykam drzwi, żeby jej nie przeszkadzać",
+                "outcome": "poor",
+                "feedback": "Zamknięte drzwi oznaczają brak wzroku i słuchu. Zadbaj, by personel mógł ją widzieć i słyszeć."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Zadbaj o to, by łóżeczko było puste, układaj niemowlęta na plecach i pilnuj, by śpiące dzieci były zawsze w zasięgu wzroku i słuchu personelu.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sc-sleep-cot",
+          "title": "EYFS statutory framework for group and school-based providers (po angielsku)",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    },
+    {
+      "id": "q-sc-sleep-warm",
+      "type": "scenario",
+      "prompt": "Jest zimny dzień. Niemowlę pod Twoją opieką śpi w łóżeczku, a w pokoju jest bardzo ciepło.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-sleep-warm-s1",
+            "text": "Co należy sprawdzić?",
+            "choices": [
+              {
+                "id": "q-sc-sleep-warm-s1-c1",
+                "text": "Temperaturę w pokoju (zalecane od 16 do 20 stopni C) i to, czy głowa niemowlęcia nie jest zakryta",
+                "outcome": "best",
+                "feedback": "Tak. Niemowlęta nie powinny być zbyt rozgrzane ani zbyt zmarznięte, a głów nie wolno zakrywać."
+              },
+              {
+                "id": "q-sc-sleep-warm-s1-c2",
+                "text": "Nic, ciepło jest lepsze dla niemowląt",
+                "outcome": "poor",
+                "feedback": "Niemowlęta nie powinny się przegrzewać. Zalecana temperatura w pokoju to od 16 do 20 stopni C."
+              },
+              {
+                "id": "q-sc-sleep-warm-s1-c3",
+                "text": "Dokładam jeszcze jeden koc dla pewności",
+                "outcome": "poor",
+                "feedback": "Dodatkowe koce w łóżeczku są niedozwolone, a niemowlę może się przegrzać."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Niemowlęta nie powinny być zbyt rozgrzane ani zbyt zmarznięte. Zalecana temperatura w pokoju to od 16 do 20 stopni C.",
+      "sourceRef": "EYFS 3.86",
+      "learnMore": [
+        {
+          "id": "eyfs-3-86-q-sc-sleep-warm",
+          "title": "EYFS statutory framework for group and school-based providers (po angielsku)",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=40",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.86, page 40",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["sleep"]
+    }
+  ],
+  "quiz": {
+    "mode": "mix",
+    "mixScenarioShare": 0.4,
+    "drawCount": 10,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "passMark": 80,
+    "maxRetakes": null,
+    "feedback": true,
+    "showSourceRef": true,
+    "notesInQuiz": "choice",
+    "learnMoreFor": "all"
+  },
+  "sourceAttribution": "Based on the Early Years Foundation Stage statutory framework for group and school-based providers (Department for Education, September 2026). Contains public sector information licensed under the Open Government Licence v3.0.",
+  "draftContent": true,
+  "verify": [
+    "Machine translation of the English Safer sleep module. A Polish speaker must review the wording before it is shown to real staff.",
+    "Draft content: wording checked against the cached September 2026 EYFS PDF (paragraph 3.86 and footnote 68); page 40 is where 3.86 starts; its bullets carry on at the top of page 41 (the page footer 40 comes before them), so check the page link in the PDF.",
+    "The framework also tells practitioners to read NHS advice on sudden infant death syndrome and guidance from The Lullaby Trust. Neither is linked here because they are not on the official-source list; decide whether to add them.",
+    "Open Government Licence attribution wording."
+  ],
+  "translatedFrom": {
+    "moduleId": "__EN__",
+    "machine": true
+  }
+}

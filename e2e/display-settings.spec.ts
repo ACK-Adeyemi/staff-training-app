@@ -165,10 +165,73 @@ test('Read aloud: the button shows or hides with the setting and the chosen spee
   const log = await readSpeechLog(page);
   expect(log.spoken[0]?.rate).toBe(1.5);
   expect(log.spoken[0]?.localService).toBe(true);
-  await page.getByRole('button', { name: 'Stop reading' }).click();
+  await page.getByRole('button', { name: 'Pause' }).click();
   await page.goto('./#/staff/me/display');
   await flip(page, 'Read aloud');
   await page.goBack();
+  await expect(page.getByRole('button', { name: 'Read this aloud' })).toHaveCount(0);
+});
+
+test('Read aloud bar on a lesson: play, pause, next paragraph and speed change reach speech, and the paragraph is highlighted', async ({
+  page,
+}) => {
+  // M5 chunk 8 (F-6). Contract: apps/web/src/pages/staff/readAloudLesson.test.tsx (buttons "Previous paragraph",
+  // "Read this aloud", "Pause", "Next paragraph"; select "Read aloud speed" with options such as "1.25x";
+  // the paragraph being read has aria-current="true" and data-reading="true").
+  await installSpeechRecorder(page);
+  await signInAsJade(page);
+  await page.goto('./#/staff/learn');
+  await page
+    .getByRole('link', { name: new RegExp(bank.title) })
+    .first()
+    .click();
+  await page.getByRole('link', { name: /^Start|^Resume/ }).click();
+  const texts = async () => (await readSpeechLog(page)).spoken.map((s) => s.text);
+
+  await page.getByRole('button', { name: 'Read this aloud' }).click();
+  await expect.poll(async () => (await texts()).length).toBe(1);
+  const firstText = (await texts())[0] ?? '';
+  await expect(page.locator('[aria-current="true"][data-reading="true"]')).toHaveCount(1);
+
+  await page.getByRole('button', { name: 'Next paragraph' }).click();
+  await expect.poll(async () => (await texts()).length).toBe(2);
+  const secondText = (await texts())[1] ?? '';
+  expect(secondText).not.toBe(firstText);
+  await expect(page.locator('[aria-current="true"][data-reading="true"]')).toHaveCount(1);
+  const cancelsBeforePause = (await readSpeechLog(page)).cancels;
+
+  await page.getByRole('button', { name: 'Pause' }).click();
+  await expect.poll(async () => (await readSpeechLog(page)).cancels).toBeGreaterThan(cancelsBeforePause);
+  await expect(page.getByRole('button', { name: 'Read this aloud' })).toBeVisible();
+  expect((await texts()).length).toBe(2);
+
+  // Resume restarts at the start of the current (second) paragraph.
+  await page.getByRole('button', { name: 'Read this aloud' }).click();
+  await expect.poll(async () => (await texts()).length).toBe(3);
+  expect((await texts())[2]).toBe(secondText);
+
+  // Speed change while reading restarts the current paragraph at the new speed.
+  await page.getByRole('combobox', { name: 'Read aloud speed' }).selectOption({ label: '1.25x' });
+  await expect.poll(async () => (await texts()).length).toBe(4);
+  const log = await readSpeechLog(page);
+  expect(log.spoken[3]?.text).toBe(secondText);
+  expect(log.spoken[3]?.rate).toBe(1.25);
+  expect(log.spoken.every((s) => s.localService)).toBe(true);
+});
+
+test('Read aloud bar is hidden on a lesson when Read aloud is off', async ({ page }) => {
+  await installSpeechRecorder(page);
+  await signInAsJade(page);
+  await page.goto('./#/staff/me/display');
+  await flip(page, 'Read aloud');
+  await page.goto('./#/staff/learn');
+  await page
+    .getByRole('link', { name: new RegExp(bank.title) })
+    .first()
+    .click();
+  await page.getByRole('link', { name: /^Start|^Resume/ }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Next paragraph' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Read this aloud' })).toHaveCount(0);
 });
 

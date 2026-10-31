@@ -101,7 +101,9 @@ async function ownModules({ handle, keys }: Ctx): Promise<Module[]> {
   return all.filter((m) => typeof m.owner !== 'string' && 'clientId' in m.owner);
 }
 const fireOf = async (c: Ctx) => need((await ownModules(c)).find((m) => m.status === 'published'));
-const loneOf = async (c: Ctx) => need((await ownModules(c)).find((m) => m.status === 'draft'));
+const loneOf = async (c: Ctx) =>
+  need((await ownModules(c)).find((m) => m.title === 'Lone working at the end of the day'));
+const phoneOf = async (c: Ctx) => need((await ownModules(c)).find((m) => m.title === 'Mobile phone policy'));
 const items = () => screen.findAllByTestId('module-item');
 const itemFor = async (id: string) => {
   const all = await items();
@@ -115,7 +117,8 @@ describe('C6 Module Library', () => {
     const c = await renderRoute('/client/modules', 'client');
     expect((await screen.findByRole('heading', { level: 1 })).textContent).toBe('Training');
     const shown = await items();
-    const stored = await c.handle.store.modules.list(priya(c.keys));
+    // Machine translations are versions of a module, not rows of their own (M5 chunk 7).
+    const stored = (await c.handle.store.modules.list(priya(c.keys))).filter((m) => !m.translatedFrom);
     expect(shown.map((el) => el.getAttribute('data-module-id')).sort()).toEqual(stored.map((m) => m.id).sort());
     const fire = await fireOf(c);
     expect(within(await itemFor(fire.id)).getByText('Own')).toBeTruthy();
@@ -191,7 +194,10 @@ describe('C6 Module Library', () => {
     });
     await user.selectOptions(screen.getByRole('combobox', { name: 'Status' }), 'Draft');
     await waitFor(async () => {
-      expect((await items()).map((el) => el.getAttribute('data-module-id'))).toEqual([(await loneOf(c)).id]);
+      // M5 seed version 9 adds the draft Mobile phone policy beside the Lone working draft.
+      expect((await items()).map((el) => el.getAttribute('data-module-id')).sort()).toEqual(
+        [(await loneOf(c)).id, (await phoneOf(c)).id].sort(),
+      );
     });
     await user.selectOptions(screen.getByRole('combobox', { name: 'Source' }), 'Provider');
     expect(await screen.findByText(/no training matches/i)).toBeTruthy();
@@ -233,7 +239,7 @@ describe('C6 Module Library', () => {
     const c = await renderRoute('/client/modules', 'client');
     const user = userEvent.setup();
     await items();
-    const stored = await c.handle.store.modules.list(priya(c.keys));
+    const stored = (await c.handle.store.modules.list(priya(c.keys))).filter((m) => !m.translatedFrom);
     await user.selectOptions(screen.getByRole('combobox', { name: 'Sort by' }), 'Title');
     const byTitle = [...stored].sort((a, b) => a.title.localeCompare(b.title)).map((m) => m.id);
     await waitFor(async () => {
@@ -345,6 +351,9 @@ describe('C6 Module Library', () => {
         await handle.admin.bulkPut('subscriptions', [{ ...need(sub), packageId: packageIds.essentials }]);
         const client = need((await dump<Client>(handle, 'clients')).find((x) => x.id === clientId));
         await handle.admin.bulkPut('clients', [{ ...client, packageId: packageIds.essentials }]);
+        // Essentials allows three own modules; archive the seeded Mobile phone policy draft (M5) so one more fits.
+        const phone = need((await dump<Module>(handle, 'modules')).find((m) => m.title === 'Mobile phone policy'));
+        await handle.admin.bulkPut('modules', [{ ...phone, status: 'archived' }]);
       },
     });
     const user = userEvent.setup();

@@ -2,6 +2,8 @@
 import 'fake-indexeddb/auto';
 import { createIndexedDbStore } from '../indexeddb/index';
 import { runAuthoringFilesContract } from './authoringFiles';
+import { runAiPracticeContract } from './aiPractice';
+import { runAiDraftContract } from './aiDraft';
 import { runBillingContract } from './billing';
 import { runAdminCountContract } from './adminCount';
 import { runCompetitionsContract } from './competitions';
@@ -24,6 +26,7 @@ import { runProviderTicketsContract } from './providerTickets';
 import { runPackagingOptionContract } from './packagingOption';
 import { runDunningContract } from './dunning';
 import { runLearningContract } from './learning';
+import { runTranslatedModuleContract } from './translatedModule';
 import { runM3FoundationContract } from './m3Foundation';
 import { runExportsRetentionContract } from './exportsRetention';
 import { runLeaderboardsThemesContract } from './leaderboardsThemes';
@@ -38,6 +41,9 @@ runContractSuite('indexeddb adapter', (options) => createIndexedDbStore(options,
 runAdminCountContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
 
 runLearningContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
+runTranslatedModuleContract('indexeddb adapter', (options) =>
+  createIndexedDbStore(options, `contract-${String(counter++)}`),
+);
 
 runEngagementContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
 
@@ -54,6 +60,8 @@ runIdentityOrgContract('indexeddb adapter', (options) =>
 );
 
 runBillingContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
+runAiPracticeContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
+runAiDraftContract('indexeddb adapter', (options) => createIndexedDbStore(options, `contract-${String(counter++)}`));
 
 runAuthoringFilesContract('indexeddb adapter', (options) =>
   createIndexedDbStore(options, `contract-${String(counter++)}`),

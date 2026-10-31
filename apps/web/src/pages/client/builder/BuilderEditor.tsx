@@ -15,10 +15,13 @@ import {
   freshLinkKey,
   inputOf,
   moduleOf,
+  setLesson,
   setLessonLinks,
+  setQuestion,
   setQuestionLinks,
   type Form,
 } from './builderForm';
+import { PolicyDraft } from './PolicyDraft';
 import { LessonsSection } from './LessonsSection';
 import { QuestionsSection } from './QuestionsSection';
 import { SettingsSection } from './SettingsSection';
@@ -142,6 +145,22 @@ export function BuilderEditor({ data, onCreated }: { data: BuilderData; onCreate
     }
   };
 
+  /** Saves the draft first (the checker is stored on the saved copy), then marks the item and shows it as checked. */
+  const markChecked = (kind: 'lesson' | 'question', id: string) =>
+    run(async () => {
+      const saved = await persist();
+      const checked = await store.authoring.markAiChecked(actor, saved.id, { kind, id });
+      setBase(checked);
+      const reviewer = (kind === 'lesson' ? checked.lessons : checked.questions).find((x) => x.id === id)?.aiReviewedBy;
+      update((f) =>
+        kind === 'lesson'
+          ? setLesson(f, id, { aiReviewedBy: reviewer })
+          : setQuestion(f, id, { aiReviewedBy: reviewer }),
+      );
+      return null;
+    });
+  const check = { mark: (kind: 'lesson' | 'question', id: string) => void markChecked(kind, id), busy };
+
   const saveDraft = () =>
     run(async () => {
       await persist();
@@ -212,8 +231,9 @@ export function BuilderEditor({ data, onCreated }: { data: BuilderData; onCreate
             className={`${inputClass} max-w-none py-2`}
           />
         </label>
-        <LessonsSection form={form} update={update} links={links} onShow={setPreviewIndex} />
-        <QuestionsSection form={form} update={update} links={links} />
+        <PolicyDraft update={update} />
+        <LessonsSection form={form} update={update} links={links} onShow={setPreviewIndex} check={check} />
+        <QuestionsSection form={form} update={update} links={links} check={check} />
         <SettingsSection
           form={form}
           quiz={quiz}
@@ -264,7 +284,7 @@ export function BuilderEditor({ data, onCreated }: { data: BuilderData; onCreate
       </div>
       <aside className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-4 lg:self-start">
         <PhonePreview lessons={form.lessons} index={previewIndex} onIndex={setPreviewIndex} />
-        <Checklist items={checklist.items} />
+        <Checklist items={checklist.items} aiUnchecked={checklist.aiUnchecked} />
         {base && (base.status === 'published' || earlier.length > 0) ? (
           <Versions current={base.version} earlier={earlier} />
         ) : null}

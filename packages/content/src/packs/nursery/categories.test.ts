@@ -77,14 +77,14 @@ describe('nursery module to category map', () => {
 });
 
 describe('nursery coming soon cards', () => {
-  it('has five Tier 2 and five Tier 3 topics', () => {
-    expect(nurseryComingSoon.filter((c) => c.tier === 2)).toHaveLength(5);
+  it('has no Tier 2 topics (the modules now exist) and five Tier 3 topics', () => {
+    expect(nurseryComingSoon.filter((c) => c.tier === 2)).toHaveLength(0);
     expect(nurseryComingSoon.filter((c) => c.tier === 3)).toHaveLength(5);
-    expect(nurseryComingSoon).toHaveLength(10);
+    expect(nurseryComingSoon).toHaveLength(5);
   });
 
   it('has unique ids, existing title keys and valid category keys', () => {
-    expect(new Set(nurseryComingSoon.map((c) => c.id)).size).toBe(10);
+    expect(new Set(nurseryComingSoon.map((c) => c.id)).size).toBe(5);
     for (const c of nurseryComingSoon) {
       expect(typeof lang(c.titleKey), c.titleKey).toBe('string');
       expect(
@@ -97,11 +97,6 @@ describe('nursery coming soon cards', () => {
   it('names the brief 7 topics', () => {
     const titles = nurseryComingSoon.map((c) => `${c.tier}|${lang(c.titleKey)}`.toLowerCase()).join('\n');
     for (const [tier, word] of [
-      [2, 'suitable people'],
-      [2, 'ratios'],
-      [2, 'risk assessment'],
-      [2, 'medicines'],
-      [2, 'records'],
       [3, 'learning and development'],
       [3, 'assessment'],
       [3, 'send'],

@@ -39,6 +39,16 @@ Limit to say out loud: in this demo an invitation's client scope is stored and s
 
 Running the automated version: `pnpm build && pnpm exec playwright test e2e/track-b.spec.ts` (desktop viewport; the second page is sized 390 by 844). It pins the clock to 19 October 2026, 09:00 UTC. Each step is its own test.
 
+## Self-guided tours, Polish and offline (M5)
+
+- Guided tours: on the landing page, Client tour and Provider tour are buttons. Each asks "This resets the demo", then resets, and opens step 1 of Track A or Track B in a tour box. Next only moves the box on; Show me goes to the screen. Skip tour hides it. The Demo menu has Restart tour and Resume tour. Shift+Alt+T moves focus to the tour box. The box is hidden on the landing page. A tour needs no presenter: a prospect can run it alone.
+- Track A step 10 (Battle Room) is not in the tour until M7.
+- Polish: the Demo menu has a Language section (English, Polski). Choose Polski, then show a phone as Jade: staff screens, and "Safer sleep" opens the Polish version. The Polish wording is unreviewed by a speaker (docs/review-checklist.md), so say so if asked.
+- Read aloud: on a lesson, Read this aloud highlights each paragraph as it goes, and Pause holds the place.
+- Demo AI (optional, labelled Demo AI): in the module builder, Draft from a policy and Suggest questions; on the phone, Quiz me for practice.
+- Offline: after one online visit the app opens and lessons can be finished in aeroplane mode. When a new version is deployed, installed copies show "A new version is ready" (Update or Later); the Demo menu shows "Update available" until then. Do not rely on this for a live demo until the user has checked it on a real phone.
+- Before any live demo: Reset demo, and use the wifi you will be on.
+
 ## Track C
 
 To be written from build pack section 8 in M1, M4 and M6.

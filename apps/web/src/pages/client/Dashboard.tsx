@@ -128,7 +128,7 @@ export function Dashboard() {
         <SiteComparison data={{ ...q.data.view, assignments: q.data.assignments, events: events.data ?? [] }} />
       ) : null}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2" data-tour="client-dashboard">
           <Section id="c1-needs" title={t('client.dashboard.needs')}>
             {attention.length === 0 ? (
               <p className="m-0">{t('client.dashboard.needsEmpty')}</p>

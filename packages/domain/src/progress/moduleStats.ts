@@ -35,6 +35,8 @@ export type ModuleStatsInput = {
   version?: number;
   /** Snapshots of earlier versions, used to find the questions and lessons of `version`. */
   versions?: ModuleVersion[];
+  /** Language versions of this module. Their attempts, events and assignments count for this module (plan M5, F-5). */
+  translations?: Module[];
 };
 
 /** The module as it was at the chosen version: the snapshot, or the module itself when current or unknown. */
@@ -46,14 +48,17 @@ const shapeOf = ({ module, version, versions }: ModuleStatsInput): Module => {
 /** Assignments, attempts and events narrowed to this module and, when asked, one version. */
 const scoped = (input: ModuleStatsInput) => {
   const { module, version } = input;
-  const inVersion = (v: number | undefined): boolean => version === undefined || v === version;
+  const own = (id: string): boolean => id === module.id;
+  const mine = new Set([module.id, ...(input.translations ?? []).map((m) => m.id)]);
+  // A version filter applies to the module itself; a translation has its own version numbers.
+  const inVersion = (id: string, v: number | undefined): boolean => !own(id) || version === undefined || v === version;
   return {
     shape: shapeOf(input),
     assignments: input.assignments.filter(
-      (a) => 'moduleId' in a.target && a.target.moduleId === module.id && a.status !== 'cancelled',
+      (a) => 'moduleId' in a.target && mine.has(a.target.moduleId) && a.status !== 'cancelled',
     ),
-    attempts: input.attempts.filter((a) => a.moduleId === module.id && inVersion(a.moduleVersion)),
-    events: input.events.filter((e) => e.moduleId === module.id && inVersion(e.moduleVersion)),
+    attempts: input.attempts.filter((a) => mine.has(a.moduleId) && inVersion(a.moduleId, a.moduleVersion)),
+    events: input.events.filter((e) => mine.has(e.moduleId ?? '') && inVersion(e.moduleId ?? '', e.moduleVersion)),
   };
 };
 

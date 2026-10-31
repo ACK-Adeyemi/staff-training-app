@@ -10,6 +10,10 @@ import {
   effectivePermissions,
   entitled,
   explainLesson,
+  practiceQuestions,
+  draftFromPolicy,
+  suggestQuestions,
+  lessonSchema,
   featureAvailability,
   invoiceTotals,
   nextTransition,
@@ -680,39 +684,95 @@ export function createBillingOperations(backend: RawBackend, options: StoreOptio
     return { aiAssistant: ents ? entitled(ents, 'aiAssistant') : false };
   }
 
+  /**
+   * The checks both Demo AI calls share, in order: provider side, account state, kill switch and entitlement, the
+   * module (published), then the usage cap. `find` runs after the module is known. Returns what is needed to count one use.
+   */
+  async function checkAiEntitled(call: Call) {
+    const clientId = call.clientId as string;
+    requireUsageAddOns(call);
+    if ((await killedClientIds(backend)).includes(clientId)) throw new NotEntitledError('aiAssistant');
+    const ents = await clientEntitlements(call, clientId);
+    if (!ents || !entitled(ents, 'aiAssistant')) throw new NotEntitledError('aiAssistant');
+    return clientId;
+  }
+
+  async function beginAi(ctx: ActorContext, moduleId: string) {
+    const call = await beginCall(backend, options, ctx);
+    if (call.side === 'provider') return forbid('permission');
+    const clientId = await checkAiEntitled(call);
+    const module = await moduleFor(call, text(moduleId));
+    if (module.status !== 'published') throw new NotFoundError();
+    return { call, clientId, module };
+  }
+
+  async function countAiUse(call: Call, clientId: string): Promise<void> {
+    const addOn = (await call.all<AddOn>('addOns')).find((a) => a.adds.flags?.includes('aiAssistant'));
+    const sub = addOn ? await addOnSubOf(call, addOn.id) : undefined;
+    if (!addOn || !sub || !isActiveSub(sub, call.actor.now)) throw new NotEntitledError('aiAssistant');
+    if (addOn.pricing.kind === 'usage') {
+      const state = call.actor.accountState;
+      if (
+        state &&
+        featureAvailability(state, 'usageAddOns') === 'withinAllowance' &&
+        sub.usageThisPeriod + 1 > addOn.pricing.includedUnits
+      ) {
+        throw new AccountStateError(state, 'usageAddOns');
+      }
+      if (usageCapReached(sub.usageThisPeriod, addOn.pricing, sub.usageCapPence)) {
+        throw new RuleError('usageCapReached');
+      }
+    }
+    await apply([
+      put('addOnSubscriptions', `${clientId}:${addOn.id}`, { ...sub, usageThisPeriod: sub.usageThisPeriod + 1 }),
+    ]);
+  }
+
+  /** Drafting for the module builder: a client actor with modules.manage, then the shared checks. */
+  async function beginAiDraft(ctx: ActorContext) {
+    const call = await clientCall(ctx, 'modules.manage');
+    const clientId = await checkAiEntitled(call);
+    return { call, clientId };
+  }
+
   const ai: AiService = {
     async explain(ctx, input) {
-      const call = await beginCall(backend, options, ctx);
-      if (call.side === 'provider') return forbid('permission');
-      const clientId = call.clientId as string;
-      requireUsageAddOns(call);
-      if ((await killedClientIds(backend)).includes(clientId)) throw new NotEntitledError('aiAssistant');
-      const ents = await clientEntitlements(call, clientId);
-      if (!ents || !entitled(ents, 'aiAssistant')) throw new NotEntitledError('aiAssistant');
-      const module = await moduleFor(call, text(input.moduleId));
-      if (module.status !== 'published') throw new NotFoundError();
+      const { call, clientId, module } = await beginAi(ctx, input.moduleId);
       const lesson = module.lessons.find((l) => l.id === input.lessonId);
       if (!lesson) throw new NotFoundError();
-      const addOn = (await call.all<AddOn>('addOns')).find((a) => a.adds.flags?.includes('aiAssistant'));
-      const sub = addOn ? await addOnSubOf(call, addOn.id) : undefined;
-      if (!addOn || !sub || !isActiveSub(sub, call.actor.now)) throw new NotEntitledError('aiAssistant');
-      if (addOn.pricing.kind === 'usage') {
-        const state = call.actor.accountState;
-        if (
-          state &&
-          featureAvailability(state, 'usageAddOns') === 'withinAllowance' &&
-          sub.usageThisPeriod + 1 > addOn.pricing.includedUnits
-        ) {
-          throw new AccountStateError(state, 'usageAddOns');
-        }
-        if (usageCapReached(sub.usageThisPeriod, addOn.pricing, sub.usageCapPence)) {
-          throw new RuleError('usageCapReached');
-        }
-      }
-      await apply([
-        put('addOnSubscriptions', `${clientId}:${addOn.id}`, { ...sub, usageThisPeriod: sub.usageThisPeriod + 1 }),
-      ]);
+      await countAiUse(call, clientId);
       return { label: 'Demo AI', text: explainLesson(lesson) };
+    },
+
+    async practice(ctx, input) {
+      const { call, clientId, module } = await beginAi(ctx, input.moduleId);
+      // Drawn before counting so a refused call uses nothing; drawing only reads the module and the seeded rng.
+      const questions = practiceQuestions(module, options.rng, 3);
+      await countAiUse(call, clientId);
+      return { label: 'Demo AI', questions: structuredClone(questions) };
+    },
+
+    async draftFromPolicy(ctx, input) {
+      const { call, clientId } = await beginAiDraft(ctx);
+      const draft = draftFromPolicy(text(input.text));
+      if (!draft.ok) throw new RuleError(draft.reason === 'empty' ? 'policyEmpty' : 'policyTooLong');
+      await countAiUse(call, clientId);
+      return structuredClone({
+        label: 'Demo AI' as const,
+        title: draft.title,
+        lessons: draft.lessons,
+        questions: draft.questions,
+      });
+    },
+
+    async suggestQuestions(ctx, input) {
+      const { call, clientId } = await beginAiDraft(ctx);
+      const parsed = lessonSchema.safeParse(input.lesson);
+      if (!parsed.success) throw new ValidationError(['lesson: not a valid lesson']);
+      const questions = suggestQuestions(parsed.data, options.rng);
+      if (questions.length === 0) throw new ValidationError(['lesson: add some lesson text first']);
+      await countAiUse(call, clientId);
+      return structuredClone({ label: 'Demo AI' as const, questions });
     },
   };
 

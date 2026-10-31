@@ -1,0 +1,350 @@
+{
+  "title": "Records, confidentiality and data protection",
+  "description": "How to keep children's records secure, who can see them and what you must record. Based on section 3 of the EYFS statutory framework.",
+  "estimatedMinutes": 3,
+  "language": "en-GB",
+  "status": "published",
+  "version": 1,
+  "roleTags": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "Looking after children's information",
+      "minutes": 3
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-rc-records",
+      "type": "trueFalse",
+      "prompt": "Providers must maintain records and share relevant, accurate information with parents, carers and other professionals as appropriate. True or false?",
+      "options": [
+        {
+          "id": "q-rc-records-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-rc-records-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. Providers must maintain records and obtain and share relevant and accurate information so the setting is safe and well managed and children’s needs are met.",
+      "sourceRef": "EYFS 3.95",
+      "learnMore": [
+        {
+          "id": "eyfs-3-95-q-rc-records",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=43",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.95, page 43",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["records"]
+    },
+    {
+      "id": "q-rc-access",
+      "type": "mcq",
+      "prompt": "Who should be able to see confidential records about children and staff?",
+      "options": [
+        {
+          "id": "q-rc-access-o1",
+          "text": "Only people who have a right or professional need to see them",
+          "correct": true
+        },
+        {
+          "id": "q-rc-access-o2",
+          "text": "Any member of staff",
+          "correct": false
+        },
+        {
+          "id": "q-rc-access-o3",
+          "text": "Any parent who visits the nursery",
+          "correct": false
+        },
+        {
+          "id": "q-rc-access-o4",
+          "text": "Anyone who asks at the front desk",
+          "correct": false
+        }
+      ],
+      "explanation": "Confidential information and records about staff and children must be held securely and only be accessible to those who have a right or professional need to see them.",
+      "sourceRef": "EYFS 3.96",
+      "learnMore": [
+        {
+          "id": "eyfs-3-96-q-rc-access",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=43",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.96, page 43",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["records"]
+    },
+    {
+      "id": "q-rc-law",
+      "type": "mcq",
+      "prompt": "Which law must providers be aware of when they hold information about children?",
+      "options": [
+        {
+          "id": "q-rc-law-o1",
+          "text": "Data protection legislation",
+          "correct": true
+        },
+        {
+          "id": "q-rc-law-o2",
+          "text": "The Highway Code",
+          "correct": false
+        },
+        {
+          "id": "q-rc-law-o3",
+          "text": "Licensing law",
+          "correct": false
+        },
+        {
+          "id": "q-rc-law-o4",
+          "text": "Health and safety signs regulations only",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers must be aware of their responsibilities under data protection legislation and, where relevant, the Freedom of Information Act 2000.",
+      "sourceRef": "EYFS 3.96",
+      "learnMore": [
+        {
+          "id": "eyfs-3-96-q-rc-law",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=43",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.96, page 43",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["records"]
+    },
+    {
+      "id": "q-rc-parents",
+      "type": "trueFalse",
+      "prompt": "Parents and carers must be given access to all records about their child, unless a relevant exemption applies under the Data Protection Act. True or false?",
+      "options": [
+        {
+          "id": "q-rc-parents-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-rc-parents-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. Parents and carers must be given access to all records about their child, provided no relevant exemption applies to their disclosure.",
+      "sourceRef": "EYFS 3.97",
+      "learnMore": [
+        {
+          "id": "eyfs-3-97-q-rc-parents",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=43",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.97, page 43",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["records"]
+    },
+    {
+      "id": "q-rc-privacy",
+      "type": "mcq",
+      "prompt": "Who needs to understand the need to protect children’s privacy?",
+      "options": [
+        {
+          "id": "q-rc-privacy-o1",
+          "text": "All staff",
+          "correct": true
+        },
+        {
+          "id": "q-rc-privacy-o2",
+          "text": "Only the manager",
+          "correct": false
+        },
+        {
+          "id": "q-rc-privacy-o3",
+          "text": "Only the person who looks after the records",
+          "correct": false
+        },
+        {
+          "id": "q-rc-privacy-o4",
+          "text": "Only staff who have worked there over a year",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers must make sure that all staff understand the need to protect the privacy of the children in their care and the legal requirements on confidentiality.",
+      "sourceRef": "EYFS 3.97",
+      "learnMore": [
+        {
+          "id": "eyfs-3-97-q-rc-privacy",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=43",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.97, page 43",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["records"]
+    },
+    {
+      "id": "q-rc-retain",
+      "type": "trueFalse",
+      "prompt": "Records about a child must be thrown away on the day the child leaves. True or false?",
+      "options": [
+        {
+          "id": "q-rc-retain-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-rc-retain-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. Records relating to individual children must be kept for a reasonable period of time after they have left the provision.",
+      "sourceRef": "EYFS 3.98",
+      "learnMore": [
+        {
+          "id": "eyfs-3-98-q-rc-retain",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=43",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.98, page 43",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["records"]
+    },
+    {
+      "id": "q-rc-emergency",
+      "type": "mcq",
+      "prompt": "How many emergency contact numbers should a setting hold for each child, where possible?",
+      "options": [
+        {
+          "id": "q-rc-emergency-o1",
+          "text": "More than two",
+          "correct": true
+        },
+        {
+          "id": "q-rc-emergency-o2",
+          "text": "One",
+          "correct": false
+        },
+        {
+          "id": "q-rc-emergency-o3",
+          "text": "Exactly two",
+          "correct": false
+        },
+        {
+          "id": "q-rc-emergency-o4",
+          "text": "None, parents’ numbers are enough",
+          "correct": false
+        }
+      ],
+      "explanation": "Emergency contact details for parents and carers must be recorded. Where possible, settings should hold more than two emergency contact numbers for each child.",
+      "sourceRef": "EYFS 3.99",
+      "learnMore": [
+        {
+          "id": "eyfs-3-99-q-rc-emergency",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=44",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.99, page 44",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["records"]
+    },
+    {
+      "id": "q-sc-rc-request",
+      "type": "scenario",
+      "prompt": "A parent you do not know well asks you in the corridor, “Can you tell me what was written in the other family’s incident record about my daughter’s fall?” You are holding the incident folder.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-rc-request-s1",
+            "text": "What do you do?",
+            "choices": [
+              {
+                "id": "q-sc-rc-request-s1-c1",
+                "text": "Keep the folder closed, explain you cannot share other children’s records, and ask your manager to handle the request",
+                "outcome": "best",
+                "feedback": "Right. Records are confidential and shared only with people who have a right or need to see them. Your manager can deal with what the parent is entitled to see."
+              },
+              {
+                "id": "q-sc-rc-request-s1-c2",
+                "text": "Show the parent the page so they can read it",
+                "outcome": "poor",
+                "feedback": "The page may contain other children’s information, which must stay confidential."
+              },
+              {
+                "id": "q-sc-rc-request-s1-c3",
+                "text": "Leave the folder open on the side so the parent can look later",
+                "outcome": "poor",
+                "feedback": "Records must be held securely at all times."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Confidential records must be held securely and only be accessible to people with a right or professional need to see them. Parents can access records about their own child, subject to any exemptions.",
+      "sourceRef": "EYFS 3.96",
+      "learnMore": [
+        {
+          "id": "eyfs-3-96-q-sc-rc-request",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=43",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.96, page 43",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["records"]
+    }
+  ],
+  "quiz": {
+    "mode": "mix",
+    "mixScenarioShare": 0.4,
+    "drawCount": 10,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "passMark": 80,
+    "maxRetakes": null,
+    "feedback": true,
+    "showSourceRef": true,
+    "notesInQuiz": "choice",
+    "learnMoreFor": "all"
+  },
+  "sourceAttribution": "Based on the Early Years Foundation Stage statutory framework for group and school-based providers (Department for Education, September 2026). Contains public sector information licensed under the Open Government Licence v3.0.",
+  "draftContent": true,
+  "verify": [
+    "Draft content: written from the cached September 2026 EYFS PDF; check the wording against the framework, and the page numbers in the Learn more links.",
+    "Open Government Licence attribution wording.",
+    "The lesson does not give a retention period: 3.98 leaves this to the provider; VERIFY whether to add Information Commissioner's Office guidance."
+  ]
+}

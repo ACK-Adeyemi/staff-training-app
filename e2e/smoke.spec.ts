@@ -29,6 +29,7 @@ const m1Routes: Route[] = [
   { hash: `#/staff/module/${moduleId}/lesson/${String(lessonId)}`, name: 'S5 lesson' },
   { hash: `#/staff/module/${moduleId}/quiz`, name: 'S6 quiz' },
   { hash: `#/staff/module/${moduleId}/done`, name: 'S7 results' },
+  { hash: `#/staff/module/${moduleId}/practice`, name: 'practice quiz' },
   { hash: `#/staff/module/${moduleId}/certificate`, name: 'certificate' },
   {
     hash: '',
@@ -80,6 +81,24 @@ const routes: Route[] = [
     hash: '',
     name: 'P3 client detail',
     resolve: async (page) => `#/provider/clients/${await firstId(page, 'clients')}`,
+  },
+  { hash: '#/staff/progress/record', name: 'S8b training record' },
+  { hash: `#/client/modules/${moduleId}/preview`, name: 'C6 module preview' },
+  {
+    hash: '',
+    name: 'C19 invoice print view',
+    resolve: async (page) => {
+      // Invoices belong to several clients, so take the first link the signed-in client's own billing page shows.
+      await page.goto('./#/client/billing');
+      const href = await page.getByRole('region', { name: 'Invoices' }).getByRole('link').first().getAttribute('href');
+      const invoiceId = String(href).split('/invoices/')[1]?.split('/')[0] ?? '';
+      return `#/client/billing/invoices/${invoiceId}/print`;
+    },
+  },
+  {
+    hash: '',
+    name: 'C16 competition edit',
+    resolve: async (page) => `#/client/competitions/${await firstId(page, 'competitions')}/edit`,
   },
   {
     hash: '',
@@ -138,3 +157,76 @@ test('the empty hash opens D1, and an unknown hash shows Not found with a way ba
     .click();
   await expect(page).toHaveURL(/#\/$|staff-training-app\/$/);
 });
+
+// M5 chunk 13 (BP-3): Kasia (Polish) walks the staff routes in light and dark. Each renders one heading and one main, passes
+// axe, and carries <html lang="pl">. The practice quiz is also swept with the AI Assistant on (the sweep above sees the
+// locked state only).
+const polishStaffRoutes: { hash: string; name: string }[] = [
+  { hash: '#/staff', name: 'S2 Home' },
+  { hash: '#/staff/learn', name: 'Learn' },
+  { hash: `#/staff/module/${moduleId}`, name: 'S4 module overview' },
+  { hash: `#/staff/module/${moduleId}/lesson/${String(lessonId)}`, name: 'S5 lesson' },
+  { hash: `#/staff/module/${moduleId}/quiz`, name: 'S6 quiz' },
+  { hash: `#/staff/module/${moduleId}/practice`, name: 'practice quiz' },
+  { hash: '#/staff/progress', name: 'S8 progress' },
+  { hash: '#/staff/compete', name: 'Compete' },
+  { hash: '#/staff/calendar', name: 'S18 calendar' },
+  { hash: '#/staff/notes', name: 'My notes' },
+  { hash: '#/staff/notifications', name: 'Notifications' },
+  { hash: '#/staff/me', name: 'S11 Me' },
+  { hash: '#/staff/me/display', name: 'Display and accessibility' },
+  { hash: '#/staff/help', name: 'Help' },
+  { hash: '#/staff/help/ticket/new', name: 'Raise a ticket' },
+];
+
+for (const colorScheme of ['light', 'dark'] as const) {
+  test.describe(`Polish staff routes, ${colorScheme}`, () => {
+    test.use({ colorScheme });
+    for (const route of polishStaffRoutes) {
+      test(`Kasia: ${route.name} renders a heading and passes axe in Polish`, async ({ page }) => {
+        await page.goto('./#/staff/signin');
+        await page.getByRole('radio', { name: /Kasia/ }).check();
+        await page.getByLabel(/PIN/).fill('1234');
+        await page.getByRole('button', { name: /Sign in|Zaloguj/ }).click();
+        await expect(page).toHaveURL(/#\/staff$/);
+        await page.goto('about:blank');
+        await page.goto(`./${route.hash}`);
+        await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+        await expect(page.getByRole('main')).toHaveCount(1);
+        await expect(page.locator('html')).toHaveAttribute('lang', 'pl');
+        const results = await new AxeBuilder({ page }).analyze();
+        const bad = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
+        expect(bad.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+      });
+    }
+
+    test('the practice quiz passes axe with the AI Assistant on', async ({ page }) => {
+      test.setTimeout(60_000);
+      await page.clock.install({ time: new Date('2026-10-19T09:00:00.000Z') });
+      await page.goto('./');
+      await page.keyboard.press('Shift+Alt+KeyP');
+      const panel = page.getByRole('dialog', { name: 'Presenter panel' });
+      await panel.getByRole('group', { name: 'Jump to persona' }).getByRole('button', { name: /Priya/ }).click();
+      await expect(panel).toBeHidden();
+      await page.goto('./#/client/billing/add-ons');
+      const region = page.getByRole('region', { name: 'AI Assistant' });
+      if (!(await region.innerText()).includes('On')) {
+        await region.getByRole('button', { name: 'Turn on' }).click();
+        await page
+          .getByRole('dialog')
+          .getByRole('button', { name: /confirm/i })
+          .click();
+      }
+      await expect(region).toContainText('On');
+      await page.keyboard.press('Shift+Alt+KeyP');
+      await panel.getByRole('group', { name: 'Jump to persona' }).getByRole('button', { name: /Jade/ }).click();
+      await expect(panel).toBeHidden();
+      await page.goto(`./#/staff/module/${moduleId}/practice`);
+      await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+      await expect(page.getByRole('group').first()).toBeVisible();
+      const results = await new AxeBuilder({ page }).analyze();
+      const bad = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
+      expect(bad.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+    });
+  });
+}

@@ -59,6 +59,11 @@ test('provider screens P1 to P25 have no horizontal scroll at 200% text', async 
 });
 
 // M2 chunk 12 (BP-7): 200% text chosen through the real settings screen, then key screens checked for clipping and overlap.
+const lessonId = (
+  JSON.parse(readFileSync('packages/content/src/packs/nursery/modules/safeguarding/module.json', 'utf8')) as {
+    lessons: { id: string }[];
+  }
+).lessons[0]?.id;
 const bank = JSON.parse(
   readFileSync('packages/content/src/packs/nursery/modules/safeguarding/module.json', 'utf8'),
 ) as { title: string; questions: (QuizQuestion & { prompt: string })[] };
@@ -241,4 +246,121 @@ test('C19 Plan and billing and C20 Add-ons do not clip or overlap at 200% text',
     await scale(page);
     await expectNoClipOrOverlap(page);
   }
+});
+
+// M5 chunk 13 (F-8): the new M5 screens at 200% text on the 390 px phone, with nothing clipped, overlapped or scrolling sideways.
+import { overlay, startTour } from './helpers/tour';
+import { installSpeechRecorder } from './helpers/speech';
+
+const SAFEGUARDING = '01M0C0N7000000000000000201';
+const wide = (page: import('@playwright/test').Page) =>
+  page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+
+async function signInAs(page: import('@playwright/test').Page, who: RegExp) {
+  await page.goto('./#/staff/signin');
+  await page.getByRole('radio', { name: who }).check();
+  await page.getByLabel(/PIN/).fill('1234');
+  await page.getByRole('button', { name: /Sign in|Zaloguj/ }).click();
+  await expect(page).toHaveURL(/#\/staff$/);
+}
+
+test('the expanded tour overlay on C1 and on S2 fits at 200% text and keeps 44px buttons reachable', async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await startTour(page, 'Client tour', 9);
+  await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+  await scale(page);
+  await expect(overlay(page, 1, 9)).toBeVisible();
+  expect(await wide(page), 'no sideways scroll on C1').toBe(true);
+  await expectNoClipOrOverlap(page);
+  for (const name of ['Show me', 'Next', 'Skip tour', 'Collapse tour']) {
+    const b = overlay(page, 1, 9).getByRole('button', { name, exact: false }).first();
+    await b.scrollIntoViewIfNeeded();
+    const box = need(await b.boundingBox());
+    expect(box.x, name).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width, name).toBeLessThanOrEqual(390);
+    expect(box.height, name).toBeGreaterThanOrEqual(43.5);
+  }
+  await page.evaluate(() => {
+    window.location.hash = '#/staff';
+  });
+  await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+  await expect(overlay(page, 1, 9)).toBeVisible();
+  expect(await wide(page), 'no sideways scroll on S2').toBe(true);
+  await expectNoClipOrOverlap(page);
+});
+
+test('S11 Me with the language picker fits at 200% text', async ({ page }) => {
+  await signInAs(page, /Jade/);
+  await page.goto('./#/staff/me');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await scale(page);
+  await page.getByRole('radio', { name: 'Polski' }).click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'pl');
+  expect(await wide(page)).toBe(true);
+  await expectNoClipOrOverlap(page);
+});
+
+test('the practice quiz fits at 200% text', async ({ page }) => {
+  await page.goto(`./#/staff/module/${SAFEGUARDING}/practice`);
+  await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+  await scale(page);
+  expect(await wide(page)).toBe(true);
+  await expectNoClipOrOverlap(page);
+});
+
+test('C7 with AI-drafted items fits at 200% text', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.clock.install({ time: new Date('2026-10-19T09:00:00.000Z') });
+  await page.goto('./');
+  await page.keyboard.press('Shift+Alt+KeyP');
+  const panel = page.getByRole('dialog', { name: 'Presenter panel' });
+  await panel.getByRole('group', { name: 'Jump to persona' }).getByRole('button', { name: /Priya/ }).click();
+  await expect(panel).toBeHidden();
+  await page.goto('./#/client/billing/add-ons');
+  const region = page.getByRole('region', { name: 'AI Assistant' });
+  if (!(await region.innerText()).includes('On')) {
+    await region.getByRole('button', { name: 'Turn on' }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /confirm/i })
+      .click();
+  }
+  await expect(region).toContainText('On');
+  await page.goto('./#/client/modules/new');
+  await page
+    .getByRole('textbox', { name: 'Paste your policy' })
+    .fill('Outings policy\n\n# Before we go\nA named adult counts the children.\n\n# On the way\nChildren hold hands.');
+  await page.getByRole('button', { name: 'Make a draft' }).click();
+  await expect(page.getByTestId('ai-label').first()).toBeVisible();
+  await scale(page);
+  expect(await wide(page)).toBe(true);
+  await expectNoClipOrOverlap(page);
+});
+
+test('S5 with the read-aloud bar fits at 200% text', async ({ page }) => {
+  await installSpeechRecorder(page);
+  await signInAs(page, /Jade/);
+  await page.goto(`./#/staff/module/${SAFEGUARDING}`);
+  await page.getByRole('link', { name: /^Start|^Resume/ }).click();
+  await expect(page.getByRole('button', { name: 'Read this aloud' }).first()).toBeVisible();
+  await scale(page);
+  expect(await wide(page)).toBe(true);
+  await expectNoClipOrOverlap(page);
+  await page.getByRole('button', { name: 'Read this aloud' }).first().click();
+  await expectNoClipOrOverlap(page);
+});
+
+test('Polish S2 Home and S5 lesson fit at 200% text', async ({ page }) => {
+  await signInAs(page, /Kasia/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'pl');
+  await scale(page);
+  expect(await wide(page), 'Home').toBe(true);
+  await expectNoClipOrOverlap(page);
+  await page.goto(`./#/staff/module/${SAFEGUARDING}/lesson/${String(lessonId)}`);
+  await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+  await scale(page);
+  expect(await wide(page), 'lesson').toBe(true);
+  await expectNoClipOrOverlap(page);
 });

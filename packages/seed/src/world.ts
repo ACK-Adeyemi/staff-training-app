@@ -76,6 +76,7 @@ import {
   type UserAccount,
 } from '@sta/domain';
 import { buildHistory } from './history';
+import { buildM5 } from './m5';
 import { buildBilling, buildFeedback, buildM3History, buildSupport } from './m3';
 import { buildM4 } from './m4';
 import { buildTelemetry } from './telemetry';
@@ -137,7 +138,7 @@ export type SeedKeys = {
   requirements: KeyMap<'safeguarding' | 'paediatricFirstAid' | 'foodHygiene' | 'whatChanged' | 'newStarterInduction'>;
   submissions: KeyMap<'ben' | 'ellie' | 'kasia'>;
   /** Little Acorns' own modules (M3). */
-  modules: KeyMap<'fireEvacuation' | 'loneWorking'>;
+  modules: KeyMap<'fireEvacuation' | 'loneWorking'> & { mobilePhonePolicy?: string };
   /** `${clientKey}.${roleKey}`, for example `littleAcorns.accountOwner`, and `provider.owner`. */
   roles: Record<string, string>;
 };
@@ -682,6 +683,8 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
     m4: root.fork('m4'),
     // Added in M4 chunk 8c; its own stream so the m4 records do not move.
     telemetry: root.fork('telemetry'),
+    // Added in M5 chunk 3; its own stream so no earlier record moves.
+    m5: root.fork('m5'),
   };
   const newId = (rng: Rng) => (): string => ulid(clock, rng);
   const ago = (days: number): Date => addDays(today, -days);
@@ -1233,6 +1236,9 @@ export function buildWorld(options: SeedMeta): { data: SeedData; keys: SeedKeys 
   // M4: provider story (price changes, profile changes, link check, Other entries, comms).
   buildM4({ data, keys, today, clock, rng: streams.m4 });
   buildTelemetry({ data, keys, today, clock, rng: streams.telemetry });
+
+  // M5: Little Acorns' draft Mobile phone policy.
+  buildM5({ data, keys, today, clock, rng: streams.m5 });
 
   return { data, keys };
 }

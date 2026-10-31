@@ -53,9 +53,27 @@ export interface MarkdownProps {
   className?: string;
   /** Headings one level lower (## as h3, ### as h4), for text shown under a heading of its own. */
   demote?: boolean;
+  /**
+   * Marks each heading, paragraph and bullet as a numbered unit for Read aloud (data-read-aloud-paragraph).
+   * `current` is the unit being read, or null before reading starts; it gets aria-current and data-reading.
+   */
+  readAloud?: { current: number | null };
 }
 
-export function Markdown({ source, className, demote = false }: MarkdownProps) {
+/** Number of units Read aloud sees in a Markdown source: one per heading, paragraph and bullet. */
+export const countReadAloudUnits = (source: string): number =>
+  parseMarkdown(source).reduce((n, b) => n + (b.kind === 'ul' ? b.items.length : 1), 0);
+
+export function Markdown({ source, className, demote = false, readAloud }: MarkdownProps) {
+  let unit = 0;
+  const mark = (): Record<string, string> => {
+    if (!readAloud) return {};
+    const i = unit++;
+    return {
+      'data-read-aloud-paragraph': String(i),
+      ...(readAloud.current === i ? { 'aria-current': 'true', 'data-reading': 'true' } : {}),
+    };
+  };
   return (
     <div className={['flex flex-col gap-3 leading-relaxed', className].filter(Boolean).join(' ')}>
       {parseMarkdown(source).map((b, i) => {
@@ -63,7 +81,7 @@ export function Markdown({ source, className, demote = false }: MarkdownProps) {
         if (b.kind === 'h') {
           const Tag = demote ? (b.level === 2 ? 'h3' : 'h4') : b.level === 2 ? 'h2' : 'h3';
           return (
-            <Tag key={key} className={b.level === 2 ? 'text-xl font-bold' : 'text-lg font-semibold'}>
+            <Tag key={key} {...mark()} className={b.level === 2 ? 'text-xl font-bold' : 'text-lg font-semibold'}>
               {inline(b.text, key)}
             </Tag>
           );
@@ -72,12 +90,18 @@ export function Markdown({ source, className, demote = false }: MarkdownProps) {
           return (
             <ul key={key} className="list-disc ps-6">
               {b.items.map((it, j) => (
-                <li key={`${key}-${j}`}>{inline(it, `${key}-${j}`)}</li>
+                <li key={`${key}-${j}`} {...mark()}>
+                  {inline(it, `${key}-${j}`)}
+                </li>
               ))}
             </ul>
           );
         }
-        return <p key={key}>{inline(b.text, key)}</p>;
+        return (
+          <p key={key} {...mark()}>
+            {inline(b.text, key)}
+          </p>
+        );
       })}
     </div>
   );

@@ -1,0 +1,360 @@
+{
+  "title": "Medicines",
+  "description": "When you can give a child a medicine, the permission you need and the records you keep. Based on section 3 of the EYFS statutory framework.",
+  "estimatedMinutes": 3,
+  "language": "en-GB",
+  "status": "published",
+  "version": 1,
+  "roleTags": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "Giving medicines safely",
+      "minutes": 3
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-me-written",
+      "type": "mcq",
+      "prompt": "When can you give a child a medicine?",
+      "options": [
+        {
+          "id": "q-me-written-o1",
+          "text": "Only when the child’s parent or carer has given written permission for that particular medicine",
+          "correct": true
+        },
+        {
+          "id": "q-me-written-o2",
+          "text": "When the child asks for it",
+          "correct": false
+        },
+        {
+          "id": "q-me-written-o3",
+          "text": "When another member of staff says it is fine",
+          "correct": false
+        },
+        {
+          "id": "q-me-written-o4",
+          "text": "When the child has a temperature",
+          "correct": false
+        }
+      ],
+      "explanation": "Medicine, both prescription and non-prescription, must only be given where written permission for that particular medicine has been obtained from the child’s parent or carer.",
+      "sourceRef": "EYFS 3.62",
+      "learnMore": [
+        {
+          "id": "eyfs-3-62-q-me-written",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=36",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.62, page 36",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["medicines"]
+    },
+    {
+      "id": "q-me-record",
+      "type": "trueFalse",
+      "prompt": "You must keep a written record each time a medicine is given to a child. True or false?",
+      "options": [
+        {
+          "id": "q-me-record-o1",
+          "text": "True",
+          "correct": true
+        },
+        {
+          "id": "q-me-record-o2",
+          "text": "False",
+          "correct": false
+        }
+      ],
+      "explanation": "True. Providers must keep a written record each time a medicine is administered, and tell the child’s parents or carers on the same day, or as soon as reasonably practicable.",
+      "sourceRef": "EYFS 3.62",
+      "learnMore": [
+        {
+          "id": "eyfs-3-62-q-me-record",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=36",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.62, page 36",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["medicines"]
+    },
+    {
+      "id": "q-me-tell",
+      "type": "mcq",
+      "prompt": "When must parents or carers be told that their child has had a medicine?",
+      "options": [
+        {
+          "id": "q-me-tell-o1",
+          "text": "On the same day, or as soon as reasonably practicable",
+          "correct": true
+        },
+        {
+          "id": "q-me-tell-o2",
+          "text": "At the end of the week",
+          "correct": false
+        },
+        {
+          "id": "q-me-tell-o3",
+          "text": "Only if the child was unwell afterwards",
+          "correct": false
+        },
+        {
+          "id": "q-me-tell-o4",
+          "text": "Only if the parent asks",
+          "correct": false
+        }
+      ],
+      "explanation": "Parents and carers must be told on the same day the medicine has been taken, or as soon as reasonably practicable.",
+      "sourceRef": "EYFS 3.62",
+      "learnMore": [
+        {
+          "id": "eyfs-3-62-q-me-tell",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=36",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.62, page 36",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["medicines"]
+    },
+    {
+      "id": "q-me-nonpres",
+      "type": "trueFalse",
+      "prompt": "Written permission is only needed for prescription medicines, not for things like children’s paracetamol or teething gel. True or false?",
+      "options": [
+        {
+          "id": "q-me-nonpres-o1",
+          "text": "True",
+          "correct": false
+        },
+        {
+          "id": "q-me-nonpres-o2",
+          "text": "False",
+          "correct": true
+        }
+      ],
+      "explanation": "False. The rule covers both prescription and non-prescription medicines. Written permission for that particular medicine is needed in both cases.",
+      "sourceRef": "EYFS 3.62",
+      "learnMore": [
+        {
+          "id": "eyfs-3-62-q-me-nonpres",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=36",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.62, page 36",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["medicines"]
+    },
+    {
+      "id": "q-me-prescribed",
+      "type": "mcq",
+      "prompt": "Which prescription medicines can a setting give?",
+      "options": [
+        {
+          "id": "q-me-prescribed-o1",
+          "text": "Only those prescribed for that child by a doctor, dentist, nurse or pharmacist",
+          "correct": true
+        },
+        {
+          "id": "q-me-prescribed-o2",
+          "text": "Any prescription medicine in the building",
+          "correct": false
+        },
+        {
+          "id": "q-me-prescribed-o3",
+          "text": "A medicine prescribed for a brother or sister",
+          "correct": false
+        },
+        {
+          "id": "q-me-prescribed-o4",
+          "text": "Any medicine a parent hands over",
+          "correct": false
+        }
+      ],
+      "explanation": "Prescription medicines must not be given unless they have been prescribed for the child by a doctor, dentist, nurse or pharmacist. Medicines containing aspirin should only be given if prescribed by a doctor.",
+      "sourceRef": "EYFS 3.61",
+      "learnMore": [
+        {
+          "id": "eyfs-3-61-q-me-prescribed",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=36",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.61, page 36",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["medicines"]
+    },
+    {
+      "id": "q-me-training",
+      "type": "mcq",
+      "prompt": "What must happen if giving a medicine needs medical or technical knowledge?",
+      "options": [
+        {
+          "id": "q-me-training-o1",
+          "text": "Staff must have training first",
+          "correct": true
+        },
+        {
+          "id": "q-me-training-o2",
+          "text": "Any member of staff can do it",
+          "correct": false
+        },
+        {
+          "id": "q-me-training-o3",
+          "text": "The child waits until the parent arrives",
+          "correct": false
+        },
+        {
+          "id": "q-me-training-o4",
+          "text": "The manager signs the form and nothing else is needed",
+          "correct": false
+        }
+      ],
+      "explanation": "Staff must have training if administering the medicine requires medical or technical knowledge. The setting also needs a way to keep each child’s medicine needs up to date.",
+      "sourceRef": "EYFS 3.61",
+      "learnMore": [
+        {
+          "id": "eyfs-3-61-q-me-training",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=36",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.61, page 36",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["medicines"]
+    },
+    {
+      "id": "q-me-ill",
+      "type": "mcq",
+      "prompt": "What must a setting have for children who are ill or infectious?",
+      "options": [
+        {
+          "id": "q-me-ill-o1",
+          "text": "A procedure, discussed with parents and carers, for taking action and preventing the spread of infection",
+          "correct": true
+        },
+        {
+          "id": "q-me-ill-o2",
+          "text": "Nothing, parents decide",
+          "correct": false
+        },
+        {
+          "id": "q-me-ill-o3",
+          "text": "A rule that sick children stay all day",
+          "correct": false
+        },
+        {
+          "id": "q-me-ill-o4",
+          "text": "A notice on the door",
+          "correct": false
+        }
+      ],
+      "explanation": "Providers must have a procedure, discussed with parents and carers, for taking appropriate action if children are ill or infectious. It must also cover the steps needed to prevent infection spreading.",
+      "sourceRef": "EYFS 3.60",
+      "learnMore": [
+        {
+          "id": "eyfs-3-60-q-me-ill",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=36",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.60, page 36",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["medicines"]
+    },
+    {
+      "id": "q-sc-me-bottle",
+      "type": "scenario",
+      "prompt": "A parent hands you a bottle of children’s liquid medicine at drop-off and says, “She might need a dose after lunch.” There is no form and nothing is written down.",
+      "scenario": {
+        "steps": [
+          {
+            "id": "q-sc-me-bottle-s1",
+            "text": "What do you do?",
+            "choices": [
+              {
+                "id": "q-sc-me-bottle-s1-c1",
+                "text": "Tell your manager, and ask the parent to complete written permission for that medicine before it is given",
+                "outcome": "best",
+                "feedback": "Right. Written permission for that particular medicine is needed before any dose, even for non-prescription medicine."
+              },
+              {
+                "id": "q-sc-me-bottle-s1-c2",
+                "text": "Give a dose after lunch, as the parent asked",
+                "outcome": "poor",
+                "feedback": "A spoken request is not written permission."
+              },
+              {
+                "id": "q-sc-me-bottle-s1-c3",
+                "text": "Give a dose and write it down afterwards",
+                "outcome": "poor",
+                "feedback": "The permission must be in writing before the medicine is given, not after."
+              }
+            ]
+          }
+        ]
+      },
+      "explanation": "Medicine, including non-prescription medicine, must only be given with written permission for that particular medicine from the parent or carer. A written record must be kept each time one is given.",
+      "sourceRef": "EYFS 3.62",
+      "learnMore": [
+        {
+          "id": "eyfs-3-62-q-sc-me-bottle",
+          "title": "EYFS statutory framework for group and school-based providers",
+          "url": "https://assets.publishing.service.gov.uk/media/6a5f8e4fb00f3323bf1a23a1/EYFS_group_and_school_based_from_September_2026.pdf#page=36",
+          "publisher": "Department for Education (GOV.UK)",
+          "kind": "official",
+          "locator": "Paragraph 3.62, page 36",
+          "language": "en-GB",
+          "showFor": "all"
+        }
+      ],
+      "tags": ["medicines"]
+    }
+  ],
+  "quiz": {
+    "mode": "mix",
+    "mixScenarioShare": 0.4,
+    "drawCount": 10,
+    "shuffleQuestions": true,
+    "shuffleOptions": true,
+    "passMark": 80,
+    "maxRetakes": null,
+    "feedback": true,
+    "showSourceRef": true,
+    "notesInQuiz": "choice",
+    "learnMoreFor": "all"
+  },
+  "sourceAttribution": "Based on the Early Years Foundation Stage statutory framework for group and school-based providers (Department for Education, September 2026). Contains public sector information licensed under the Open Government Licence v3.0.",
+  "draftContent": true,
+  "verify": [
+    "Draft content: written from the cached September 2026 EYFS PDF; check the wording against the framework, and the page numbers in the Learn more links.",
+    "Open Government Licence attribution wording.",
+    "Check the lesson against your setting's own medicines policy; the lesson gives the national rule only."
+  ]
+}

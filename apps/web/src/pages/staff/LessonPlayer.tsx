@@ -3,11 +3,14 @@ import { useNavigate, useParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button, Markdown, PageHeader, Stepper } from '@sta/ui';
 import type { ContentBlock, Lesson, Module } from '@sta/domain';
+import { EnglishOnly } from '../../app/EnglishOnly';
 import { useActor, useStore, useT } from '../../app/hooks';
 import { ExplainThis } from '../ExplainThis';
 import { LessonThumbs } from './FeedbackWidgets';
 import { LearnMoreGroups } from './LearnMoreList';
-import { ReadAloud } from './ReadAloud';
+import { useDisplayPrefs } from '../../app/display/context';
+import { ReadAloud, ReadAloudSteps, readAloudLang, readAloudUnits } from './ReadAloud';
+import { TranslationLabel } from './TranslationNotice';
 import { LearningFrame } from './LearningFrame';
 import { NoteSheet, NotesButton } from './Notes';
 import { focusLink } from './styles';
@@ -17,17 +20,26 @@ export function Block({
   acknowledged,
   onAcknowledge,
   demoteHeadings = false,
+  reading,
 }: {
   block: ContentBlock;
   acknowledged: boolean;
   onAcknowledge: (value: boolean) => void;
   /** For a lesson shown under an h2 of its own (the builder preview). */
   demoteHeadings?: boolean;
+  /** Set when the read-aloud bar covers this step: the unit being read (null before reading starts). */
+  reading?: number | null;
 }) {
   const t = useT();
   switch (block.kind) {
     case 'text':
-      return <Markdown source={block.markdown} demote={demoteHeadings} />;
+      return (
+        <Markdown
+          source={block.markdown}
+          demote={demoteHeadings}
+          {...(reading !== undefined ? { readAloud: { current: reading } } : {})}
+        />
+      );
     case 'keyPoints':
       return (
         <ul className="list-disc ps-6">
@@ -83,7 +95,17 @@ function blockText(block: ContentBlock | undefined): string {
   }
 }
 
-function Player({ module, lesson, organisationName }: { module: Module; lesson: Lesson; organisationName: string }) {
+function Player({
+  module,
+  lesson,
+  organisationName,
+  translations,
+}: {
+  module: Module;
+  lesson: Lesson;
+  organisationName: string;
+  translations: Module[];
+}) {
   const t = useT();
   const store = useStore();
   const actor = useActor();
@@ -92,12 +114,17 @@ function Player({ module, lesson, organisationName }: { module: Module; lesson: 
   const moduleId = module.id;
   const [adding, setAdding] = useState(false);
   const [step, setStep] = useState(0);
+  const { prefs } = useDisplayPrefs();
+  const [ra, setRa] = useState({ step: -1, index: 0, started: false });
   const [ticked, setTicked] = useState<Record<number, boolean>>({});
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   const total = lesson.blocks.length;
   const block = lesson.blocks[step];
   const last = step >= total - 1;
+  const useBar = prefs.readAloud && block?.kind === 'text';
+  const units = block?.kind === 'text' ? readAloudUnits(block.markdown) : [];
+  const current = ra.step === step && ra.started ? ra.index : null;
   const blocked = block?.kind === 'acknowledge' && !ticked[step];
 
   const finish = async () => {
@@ -116,7 +143,10 @@ function Player({ module, lesson, organisationName }: { module: Module; lesson: 
 
   return (
     <>
-      <PageHeader title={lesson.title} />
+      <EnglishOnly lang={module.language}>
+        <PageHeader title={lesson.title} />
+      </EnglishOnly>
+      <TranslationLabel module={module} versions={translations} />
       <Stepper
         current={step + 1}
         total={total}
@@ -124,17 +154,34 @@ function Player({ module, lesson, organisationName }: { module: Module; lesson: 
         progressLabel={t('staff.lesson.progress')}
       />
       <div className="mt-4">
-        <ReadAloud text={blockText(block)} />
+        {useBar ? (
+          <ReadAloudSteps
+            key={step}
+            units={units}
+            {...readAloudLang(module.language)}
+            onIndexChange={(index) => {
+              setRa((r) => ({ step, index, started: r.step === step && r.started }));
+            }}
+            onPlayingChange={(playing) => {
+              if (playing) setRa((r) => ({ step, index: r.step === step ? r.index : 0, started: true }));
+            }}
+          />
+        ) : (
+          <ReadAloud text={blockText(block)} {...readAloudLang(module.language)} />
+        )}
       </div>
       <div className="my-4 min-h-40">
         {block ? (
-          <Block
-            block={block}
-            acknowledged={ticked[step] === true}
-            onAcknowledge={(v) => {
-              setTicked((s) => ({ ...s, [step]: v }));
-            }}
-          />
+          <EnglishOnly lang={module.language}>
+            <Block
+              block={block}
+              {...(useBar ? { reading: current } : {})}
+              acknowledged={ticked[step] === true}
+              onAcknowledge={(v) => {
+                setTicked((s) => ({ ...s, [step]: v }));
+              }}
+            />
+          </EnglishOnly>
         ) : null}
         {last && lesson.furtherReading ? (
           <LearnMoreGroups
@@ -218,7 +265,7 @@ export function LessonPlayer() {
   const { lessonId } = useParams();
   return (
     <LearningFrame>
-      {({ module, client }) => {
+      {({ module, client, translations }) => {
         const lesson = module.lessons.find((l) => l.id === lessonId);
         if (!lesson) {
           return (
@@ -228,7 +275,15 @@ export function LessonPlayer() {
             </>
           );
         }
-        return <Player key={lesson.id} module={module} lesson={lesson} organisationName={client.displayName} />;
+        return (
+          <Player
+            key={lesson.id}
+            module={module}
+            lesson={lesson}
+            organisationName={client.displayName}
+            translations={translations}
+          />
+        );
       }}
     </LearningFrame>
   );

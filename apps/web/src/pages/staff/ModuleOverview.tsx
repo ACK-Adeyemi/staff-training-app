@@ -3,8 +3,10 @@ import { useT } from '../../app/hooks';
 import { useDisplayPrefs } from '../../app/display/context';
 import { LearningFrame } from './LearningFrame';
 import { NotesButton } from './Notes';
+import { PracticeButton } from './Practice';
 import { useModuleId } from './learningQueries';
 import { focusLink } from './styles';
+import { AlsoIn, TranslationLabel } from './TranslationNotice';
 
 function renewalText(months: number, t: ReturnType<typeof useT>): string {
   const period =
@@ -23,7 +25,7 @@ export function ModuleOverview() {
   const { prefs } = useDisplayPrefs();
   return (
     <LearningFrame>
-      {({ module, doneLessons, allLessonsDone, renewMonths }) => {
+      {({ module, doneLessons, allLessonsDone, renewMonths, translations }) => {
         const firstTodo = module.lessons.find((l) => !doneLessons.has(l.id));
         const base = `#/staff/module/${module.id}`;
         return (
@@ -31,6 +33,8 @@ export function ModuleOverview() {
             <PageHeader title={module.title}>
               {module.draftContent ? <Badge>{t('staff.module.draft')}</Badge> : null}
             </PageHeader>
+            <TranslationLabel module={module} versions={translations} />
+            <AlsoIn versions={translations} />
             {module.description ? <p className="mt-0">{module.description}</p> : null}
             <p className="mt-0">{t('staff.module.minutesTotal', { count: module.estimatedMinutes })}</p>
             {renewMonths !== undefined ? <p className="mt-0">{renewalText(renewMonths, t)}</p> : null}
@@ -49,6 +53,9 @@ export function ModuleOverview() {
             </div>
             <div className="mb-4">
               <NotesButton module={module} />
+            </div>
+            <div className="mb-4">
+              <PracticeButton moduleId={module.id} />
             </div>
             <section aria-labelledby={`lessons-${moduleId}`}>
               <h2 id={`lessons-${moduleId}`} className="text-lg font-bold">

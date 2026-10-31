@@ -1,6 +1,6 @@
 export { productName } from './config';
 export { createT, languages } from './i18n';
-export type { CreateTOptions, LanguageCode, MessageKey, Messages, Params, TFunction } from './i18n';
+export type { CreateTOptions, LanguageCode, MessageKey, Messages, Params, PartialMessages, TFunction } from './i18n';
 export { addOnIds, addOns, floorPackageId, packageIds, packages } from './packages';
 export { moduleIds } from './packs/moduleIds';
 export { firstAidRequirementKey, nurseryDefaultRules, nurseryPack } from './packs/nursery';
@@ -20,3 +20,5 @@ export { themeBases, themePresets } from './themes/presets';
 export type { ThemePreset } from './themes/presets';
 export { faqs, feedbackTags, issueTypes, releaseNotes, supportFeatures } from './support';
 export type { Faq, FeedbackTag, IssueType, ReleaseNote, SupportFeature } from './support';
+export { tours, trackA, trackB, clientNameToken } from './tours';
+export type { Tour, TourStep } from './tours';

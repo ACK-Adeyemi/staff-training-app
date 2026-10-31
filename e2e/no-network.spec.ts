@@ -158,3 +158,87 @@ test('F-5: the QR code on two-step enrolment makes no request outside the origin
   await expect(page.locator('main svg, main img, main canvas').first()).toBeVisible();
   expect(offOrigin(urls)).toEqual([]);
 });
+
+// M5 chunk 13 (F-8): tours, the practice quiz, Draft from a policy, Polish and read-aloud make no request outside the origin.
+test('F-8: both tours, with Show me on every step, make no request outside the origin', async ({ page }) => {
+  test.setTimeout(150_000);
+  const urls: string[] = [];
+  page.on('request', (r) => urls.push(r.url()));
+  for (const [button, steps] of [
+    ['Client tour', 9],
+    ['Provider tour', 7],
+  ] as const) {
+    await page.goto('./');
+    await page.getByRole('button', { name: button }).click();
+    await page
+      .getByRole('dialog', { name: 'Start the tour from the beginning?' })
+      .getByRole('button', { name: 'Confirm' })
+      .click();
+    for (let n = 1; n <= steps; n++) {
+      const box = page.getByRole('complementary', { name: `Tour, step ${String(n)} of ${String(steps)}` });
+      await expect(box).toBeVisible();
+      await box.getByRole('button', { name: 'Show me' }).click();
+      await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+      await box.getByRole('button', { name: /^Next$|^Finish$/ }).click();
+    }
+  }
+  expect(urls.length).toBeGreaterThan(0);
+  expect(offOrigin(urls)).toEqual([]);
+});
+
+test('F-8: Polish staff screens, the practice quiz and read-aloud make no request outside the origin', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await installSpeechRecorder(page);
+  const urls: string[] = [];
+  page.on('request', (r) => urls.push(r.url()));
+  await page.goto('./#/staff/signin');
+  await page.getByRole('radio', { name: /Kasia/ }).check();
+  await page.getByLabel(/PIN/).fill('1234');
+  await page.getByRole('button', { name: /Sign in|Zaloguj/ }).click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'pl');
+  for (const hash of ['#/staff', '#/staff/learn', '#/staff/me', '#/staff/help', '#/staff/progress']) {
+    await page.goto('about:blank');
+    await page.goto(`./${hash}`);
+    await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+  }
+  await page.goto('./#/staff/module/01M0C0N7000000000000000201/practice');
+  await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+  await page.goto('./#/staff/module/01M0C0N7000000000000000201');
+  await page
+    .getByRole('region', { name: /Lekcje|Lessons/ })
+    .getByRole('link')
+    .first()
+    .click();
+  await page.getByRole('button', { name: 'Przeczytaj to na głos' }).first().click();
+  await expect.poll(async () => (await readSpeechLog(page)).spoken.length).toBeGreaterThan(0);
+  expect(offOrigin(urls)).toEqual([]);
+});
+
+test('F-8: Draft from a policy and Quiz me for practice make no request outside the origin', async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.clock.install({ time: PINNED });
+  const urls: string[] = [];
+  page.on('request', (r) => urls.push(r.url()));
+  await page.goto('./');
+  await jump(page, /Priya/);
+  await page.goto('./#/client/billing/add-ons');
+  const region = page.getByRole('region', { name: 'AI Assistant' });
+  await region.getByRole('button', { name: 'Turn on' }).click();
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: /confirm/i })
+    .click();
+  await expect(region).toContainText('On');
+  await page.goto('./#/client/modules/new');
+  await page
+    .getByRole('textbox', { name: 'Paste your policy' })
+    .fill('Outings policy\n\n# Before we go\nA named adult counts the children.\n\n# On the way\nChildren hold hands.');
+  await page.getByRole('button', { name: 'Make a draft' }).click();
+  await expect(page.getByTestId('ai-label').first()).toBeVisible();
+  await jump(page, /Jade/);
+  await page.goto('./#/staff/module/01M0C0N7000000000000000201/practice');
+  await expect(page.getByText('Demo AI').first()).toBeVisible();
+  expect(offOrigin(urls)).toEqual([]);
+});

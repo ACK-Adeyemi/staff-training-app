@@ -1,7 +1,9 @@
-import { Card, LinkButton, PageHeader } from '@sta/ui';
+import { Button, Card, PageHeader } from '@sta/ui';
 import { focusClasses } from '@sta/ui';
 import { useDemo, useT } from '../../app/hooks';
 import { Standalone } from '../../pages/pages';
+import { trackA, trackB } from '@sta/content';
+import { useTourStart } from '../useTourStart';
 
 const exploreLink = `block min-h-[var(--target-min)] rounded-[var(--radius-md)] py-2 text-[var(--color-accent)] underline ${focusClasses}`;
 
@@ -10,6 +12,7 @@ export function Landing() {
   const t = useT();
   const demo = useDemo();
   const industry = demo.state.industry;
+  const starter = useTourStart();
   return (
     <Standalone>
       <PageHeader title={t('demo.chooseSurface')} />
@@ -55,14 +58,27 @@ export function Landing() {
       <h2 className="mb-2 text-lg font-bold">{t('demo.tours')}</h2>
       <div className="mb-6 flex flex-col gap-3">
         <div>
-          <LinkButton href="#/client">{t('demo.clientTour')}</LinkButton>
+          <Button
+            onClick={() => {
+              starter.ask(trackA.id);
+            }}
+          >
+            {t('demo.clientTour')}
+          </Button>
           <p className="mt-1 mb-0 text-sm">{t('demo.clientTourHint')}</p>
         </div>
         <div>
-          <LinkButton href="#/provider">{t('demo.providerTour')}</LinkButton>
+          <Button
+            onClick={() => {
+              starter.ask(trackB.id);
+            }}
+          >
+            {t('demo.providerTour')}
+          </Button>
           <p className="mt-1 mb-0 text-sm">{t('demo.providerTourHint')}</p>
         </div>
       </div>
+      {starter.dialog}
       <section aria-labelledby="explore-freely">
         <Card>
           <h2 id="explore-freely" className="mt-0 mb-2 text-lg font-bold">

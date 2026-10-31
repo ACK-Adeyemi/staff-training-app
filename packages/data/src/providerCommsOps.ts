@@ -165,9 +165,10 @@ export function createProviderCommsOperations(backend: RawBackend, options: Stor
   const latestPerLink = (rows: LinkCheckResult[]): Map<string, LinkCheckResult> => {
     const latest = new Map<string, LinkCheckResult>();
     for (const r of rows) {
-      const cur = latest.get(r.linkId);
-      if (!cur || r.checkedAt > cur.checkedAt || (r.checkedAt === cur.checkedAt && r.id > cur.id))
-        latest.set(r.linkId, r);
+      // A translated module keeps the original's link ids, so a link is identified by module and link together.
+      const key = `${r.moduleId}/${r.linkId}`;
+      const cur = latest.get(key);
+      if (!cur || r.checkedAt > cur.checkedAt || (r.checkedAt === cur.checkedAt && r.id > cur.id)) latest.set(key, r);
     }
     return latest;
   };
@@ -197,7 +198,7 @@ export function createProviderCommsOperations(backend: RawBackend, options: Stor
           linkId: f.linkId,
           moduleId: f.moduleId,
           url: f.url,
-          status: earlier.get(f.linkId)?.status === 'broken' ? 'broken' : 'ok',
+          status: earlier.get(`${f.moduleId}/${f.linkId}`)?.status === 'broken' ? 'broken' : 'ok',
           checkedAt: ctx.now,
         }),
       ) as LinkCheckResult[];

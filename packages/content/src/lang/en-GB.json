@@ -1,4 +1,11 @@
 {
+  "pwa": {
+    "updateReady": "A new version is ready",
+    "update": "Update",
+    "later": "Later",
+    "updateAvailable": "Update available",
+    "offlineReady": "Ready to work offline"
+  },
   "demo": {
     "badge": "Demo",
     "simulatedData": "Simulated data",
@@ -240,6 +247,8 @@
       "stepUpRequired": "Enter a fresh code from your authenticator app to do this.",
       "revokeAccessFirst": "Remove this person’s admin access first, then try again.",
       "usageCapReached": "The spending limit for this add-on has been reached.",
+      "policyEmpty": "Paste your policy first.",
+      "policyTooLong": "The policy is too long. Keep it to 20,000 characters or fewer.",
       "invalidTemplate": "The message can only use {firstName}, {training} and {date}, and must be 1 to 300 characters.",
       "invalidTheme": "Some colours don't have enough contrast. Fix the pairs listed.",
       "invalidScope": "That view is not available to you.",
@@ -1448,6 +1457,10 @@
     "title": "Read aloud",
     "play": "Read this aloud",
     "stop": "Stop reading",
+    "previous": "Previous paragraph",
+    "next": "Next paragraph",
+    "pause": "Pause",
+    "speed": "Read aloud speed",
     "unavailable": "Read aloud is not available on this device"
   },
   "me": {
@@ -1465,7 +1478,11 @@
     "loadError": "We could not load your details. Try again.",
     "displayLink": "Display and accessibility",
     "notificationsLink": "Notifications",
-    "hideHelp": "When this is on, your name does not appear on leaderboards."
+    "hideHelp": "When this is on, your name does not appear on leaderboards.",
+    "languageTitle": "Language",
+    "languageHelp": "Choose the language for menus and buttons. Some training content is only in English.",
+    "languageMachineNote": "Machine translated, not yet checked by a person",
+    "languageSaveError": "We could not save your language. Try again."
   },
   "celebration": {
     "levelUp": "You reached level {level}",
@@ -4035,6 +4052,100 @@
         "belowFloor": "The new price is below the minimum price."
       },
       "noChanges": "There are no price changes yet."
+    }
+  },
+  "translation": {
+    "alsoIn": "Also in: {language}",
+    "openVersion": "Open the {language} version",
+    "machineTranslated": "Machine translated",
+    "englishIsOfficial": "The English version is the official text",
+    "openEnglish": "Read the English version",
+    "languageEn": "English",
+    "languagePl": "Polski"
+  },
+  "aiPractice": {
+    "button": "Quiz me for practice",
+    "label": "Demo AI",
+    "notice": "Practice only: no XP, and it does not count towards your training record or competitions",
+    "intro": "Three questions from this module. Pick an answer to see if it is right.",
+    "correct": "Correct",
+    "notQuite": "Not quite",
+    "summary": "You got {right} of {total} right",
+    "again": "Try three more",
+    "back": "Back to the module",
+    "empty": "This module has no questions to practise yet.",
+    "error": "We could not make a practice quiz right now. Please try again.",
+    "off": "Quiz me for practice is not available right now.",
+    "loading": "Getting your questions",
+    "locked": "Quiz me for practice is an extra feature. Ask someone with billing access to turn it on."
+  },
+  "aiDraft": {
+    "heading": "Draft from a policy",
+    "intro": "Paste a policy and we will turn it into a draft with lessons and questions. You check every item before it can be published.",
+    "pasteLabel": "Paste your policy",
+    "warning": "Do not paste personal data, such as names of children, parents or staff.",
+    "draftButton": "Make a draft",
+    "added": "Draft added. Check each item before publishing.",
+    "tooLong": "The policy is too long. Keep it to 20,000 characters or fewer.",
+    "empty": "Paste your policy first.",
+    "suggestButton": "Suggest questions",
+    "noText": "Add some lesson text first.",
+    "label": "AI-drafted: check before publishing",
+    "checked": "AI-drafted and checked",
+    "markChecked": "Mark as checked",
+    "uncheckedMessage": "Check every AI-drafted lesson and question before publishing. {count} still to check.",
+    "locked": "Draft from a policy and Suggest questions are extra features. Ask someone with billing access to turn them on."
+  },
+  "tour": {
+    "landmark": "Tour, step {n} of {m}",
+    "landmarkDone": "Tour, finished",
+    "stepOf": "Step {n} of {m}",
+    "showMe": "Show me",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "skip": "Skip tour",
+    "restart": "Restart",
+    "collapse": "Collapse tour",
+    "openPill": "Open tour, step {n} of {m}",
+    "closeTour": "Close tour",
+    "shortcutHint": "Shortcut: Shift, Alt and T move focus to this tour.",
+    "resetsDemo": "This resets the demo",
+    "resetsDemoBody": "All demo data goes back to how it started, then the tour begins at step 1.",
+    "confirmTitle": "Start the tour from the beginning?",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "restartTour": "Restart tour",
+    "resumeTour": "Resume tour",
+    "personaMissing": "We could not find that person in the demo. Try Restart, or carry on with Next.",
+    "doneTitle": "That is the tour",
+    "tryNextTitle": "Try this next",
+    "a": {
+      "dashboard": "Priya sees the whole team at a glance: the compliance ring, who needs attention, and the Little Acorns look and feel.",
+      "calendar": "The team calendar shows three safeguarding refreshers expiring in the same week. Select that week and assign the refresher to all three in one go.",
+      "staffJade": "Jade's phone shows what to do next. Open a lesson, add a private note, answer the quiz, and see the celebration and her place among colleagues.",
+      "staffMaureen": "Maureen uses Simple view with large text and can have a lesson read aloud. Same app, set up for her.",
+      "evidence": "A new first aid certificate waits for checking. Compare the photo with the details, approve it, then print the inspector-ready training matrix.",
+      "builder": "Paste a short procedure, split it into lessons, add questions, preview it on the phone frame, publish it and assign it to everyone.",
+      "competition": "Create Mastery Month, suggest a prize, set the dates, switch the live leaderboard on and publish. Staff then see the banner.",
+      "sites": "Fiona looks after several sites. Staff are grouped by site, and the sites board shows which site leads on participation.",
+      "ai": "Optional: Demo AI can explain a lesson in simpler words. It is an extra feature that the organisation turns on for its people.",
+      "tryNext1": "Open any person's record and see their training history.",
+      "tryNext2": "Try the staff phone as a different colleague.",
+      "tryNext3": "Open the reports and print a training matrix.",
+      "tryNext4": "Press Restart to run the tour again from a clean start."
+    },
+    "b": {
+      "overview": "The provider team sees every client by state, with health scores, sites and people. The Simulated data badge is honest: this is a demo.",
+      "client": "Little Acorns in detail: usage by feature, errors, and the audit tab with the actions taken on this device. Check links finds the broken Learn more link.",
+      "support": "Open a Willow Lane ticket, reply with a saved reply, set it In progress and add an internal note. Support settings turns repeat issues into new issue types.",
+      "guardrails": "An account that is Past due moves through staged states. Simulate a failed payment and fast-forward: staff keep training and exports stay available.",
+      "control": "The permission matrix shows who can do what. Create an Account manager role, invite someone with a preset, and see the invitation in the Outbox.",
+      "pricing": "Optional: choose at-risk clients, apply a retention discount, change the notice period, preview the effect and confirm with the demo authenticator code.",
+      "security": "Security and data commitments: two-step sign-in, an audit log, staged account states, exports never held back, and a retention schedule. The demo simulates sign-in, payments and messages.",
+      "tryNext1": "Open another client and compare its health score.",
+      "tryNext2": "Open the Outbox to see the messages the demo has sent.",
+      "tryNext3": "Press Restart to run the tour again from a clean start."
     }
   }
 }

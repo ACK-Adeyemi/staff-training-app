@@ -1,9 +1,12 @@
 import { createContext, useContext, useLayoutEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Outlet } from 'react-router';
+import { SkipLink } from '../shells/SkipLink';
+import { UpdatePrompt } from '../app/UpdatePrompt';
 import { DemoBadge } from './DemoBadge';
 import { DemoMenu } from './DemoMenu';
 import { PresenterPanel } from './PresenterPanel';
+import { TourOverlay } from './TourOverlay';
 import { takeEarlyShortcut } from './earlyShortcut';
 import { useShortcut } from './useShortcut';
 
@@ -44,11 +47,14 @@ export function RootLayout() {
   );
   return (
     <>
+      {slot ? null : <SkipLink />}
       {slot ? null : <div ref={setTop} className="flex justify-end px-4 pt-2" />}
       {createPortal(badge, host)}
       <SlotContext value={setSlot}>
         <Outlet />
       </SlotContext>
+      <UpdatePrompt />
+      <TourOverlay />
       <DemoMenu
         open={open === 'menu'}
         onClose={() => {

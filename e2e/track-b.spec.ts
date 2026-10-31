@@ -1,6 +1,6 @@
 // M4 chunk 18a (BP-13): demo-script Track B, the provider tour (build pack 8.2), as automated steps.
-// Desktop project only. The provider desktop page is the main page; a second page sized 390 by 844 plays the client
-// and staff views the tour shows (Willow Lane). Both pages share one browser context, so they share IndexedDB and
+// M5 chunk 12 (BP-1): runs on the phone and desktop projects. The main page uses the project's viewport; a second page
+// sized 390 by 844 plays the client and staff views the tour shows (Willow Lane). Both pages share one browser context, so they share IndexedDB and
 // talk over BroadcastChannel like two tabs. The clock is fixed at PINNED before the first load.
 // Each tour step is its own test (a fresh context each), so a gap in one step does not hide the others.
 import AxeBuilder from '@axe-core/playwright';
@@ -10,12 +10,10 @@ import { readStore } from './helpers/idb';
 const PINNED = new Date('2026-10-19T09:00:01.000Z');
 const BASE_ORIGIN = 'http://localhost:4173';
 
-test.skip(({ isMobile }) => isMobile, 'desktop project only');
-
 const panel = (page: Page) => page.getByRole('dialog', { name: 'Presenter panel' });
 
 /** Pins the clock and records every request that leaves the app (Learn more targets are stubbed). */
-async function setUp(context: BrowserContext) {
+async function setUp(context: BrowserContext, page: Page) {
   await context.clock.setFixedTime(PINNED);
   const outside: string[] = [];
   await context.route(
@@ -25,6 +23,9 @@ async function setUp(context: BrowserContext) {
       return route.fulfill({ contentType: 'text/html', body: '<title>Stub</title>stub' });
     },
   );
+  // Every test starts from Reset demo.
+  await page.goto('./?reset=1');
+  await expect(page.getByRole('heading', { level: 1, name: 'Choose what to look at' })).toBeVisible();
   return outside;
 }
 
@@ -65,7 +66,7 @@ test.describe('Track B: provider tour', () => {
     context,
   }) => {
     test.setTimeout(120_000);
-    const outside = await setUp(context);
+    const outside = await setUp(context, page);
 
     await openProvider(page, '', 'Overview');
     await expect(page.getByTestId('demo-badge')).toBeVisible();
@@ -122,7 +123,7 @@ test.describe('Track B: provider tour', () => {
 
   test('step 2a: Little Acorns detail shows usage by feature and errors and logs', async ({ page, context }) => {
     test.setTimeout(120_000);
-    const outside = await setUp(context);
+    const outside = await setUp(context, page);
     await openProvider(page, '/clients', 'Clients');
     await page.getByTestId('client-row').filter({ hasText: 'Little Acorns' }).getByRole('link').click();
     await expect(page.getByRole('heading', { level: 1, name: /Little Acorns/ })).toBeVisible();
@@ -142,7 +143,7 @@ test.describe('Track B: provider tour', () => {
 
   test('step 2b: the Audit tab on Little Acorns lists what Priya did on this device', async ({ page, context }) => {
     test.setTimeout(120_000);
-    await setUp(context);
+    await setUp(context, page);
     await page.goto('./#/client/settings');
     await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
     await page.getByRole('checkbox', { name: /Let staff raise support tickets/ }).uncheck();
@@ -160,7 +161,7 @@ test.describe('Track B: provider tour', () => {
     context,
   }) => {
     test.setTimeout(120_000);
-    const outside = await setUp(context);
+    const outside = await setUp(context, page);
     await page.goto('./#/staff');
     await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
     const people = await readStore(page, 'people');
@@ -190,7 +191,7 @@ test.describe('Track B: provider tour', () => {
     context,
   }) => {
     test.setTimeout(180_000);
-    const outside = await setUp(context);
+    const outside = await setUp(context, page);
     await openProvider(page, '/tickets', 'Ticket inbox');
     await page.getByLabel('Client').selectOption({ label: 'Willow Lane Nursery' });
     const row = page.getByTestId('ticket-row').filter({ hasText: 'Cannot download a training certificate' });
@@ -264,7 +265,7 @@ test.describe('Track B: provider tour', () => {
 
   test('step 3b: a Willow Lane ticket opens with its screenshot', async ({ page, context }) => {
     test.setTimeout(120_000);
-    await setUp(context);
+    await setUp(context, page);
     await openProvider(page, '/tickets', 'Ticket inbox');
     await page.getByLabel('Client').selectOption({ label: 'Willow Lane Nursery' });
     await page.getByTestId('ticket-row').filter({ hasText: 'progress bar' }).getByRole('link').click();
@@ -276,7 +277,7 @@ test.describe('Track B: provider tour', () => {
     context,
   }) => {
     test.setTimeout(240_000);
-    const outside = await setUp(context);
+    const outside = await setUp(context, page);
 
     // Provider: Dunning lists Willow Lane as Past due with an amount.
     await openProvider(page, '/dunning', 'Dunning');
@@ -343,7 +344,7 @@ test.describe('Track B: provider tour', () => {
 
   test('step 4c: the provider client list follows Fast-forward to Limited', async ({ page, context }) => {
     test.setTimeout(120_000);
-    await setUp(context);
+    await setUp(context, page);
     await openProvider(page, '/clients', 'Clients');
     await inPanel(page, 'Fast-forward 7 days');
     await expect(page.getByTestId('client-row').filter({ hasText: 'Willow Lane Nursery' })).toContainText('Limited');
@@ -354,7 +355,7 @@ test.describe('Track B: provider tour', () => {
     context,
   }) => {
     test.setTimeout(120_000);
-    await setUp(context);
+    await setUp(context, page);
     await page.goto('./#/client');
     await expect(page.getByTestId('account-banner')).toHaveCount(0);
     await inPanel(page, 'Simulate failed payment');
@@ -370,7 +371,7 @@ test.describe('Track B: provider tour', () => {
     context,
   }) => {
     test.setTimeout(180_000);
-    const outside = await setUp(context);
+    const outside = await setUp(context, page);
     await openProvider(page, '/team', 'Team and roles');
     await expect(page.getByTestId('member-row')).not.toHaveCount(0);
     const roles = page.getByTestId('role-row');
@@ -424,7 +425,7 @@ test.describe('Track B: provider tour', () => {
   // form offers no client choice and every invited person has access to all clients.
   test('step 5b: the invite form offers no client scope', async ({ page, context }) => {
     test.setTimeout(120_000);
-    await setUp(context);
+    await setUp(context, page);
     await openProvider(page, '/team', 'Team and roles');
     const invite = page.getByRole('region', { name: 'Invite someone' });
     await expect(invite.getByRole('radio', { name: 'Selected clients' })).toHaveCount(0);
@@ -443,7 +444,7 @@ test.describe('Track B: provider tour', () => {
     context,
   }) => {
     test.setTimeout(180_000);
-    const outside = await setUp(context);
+    const outside = await setUp(context, page);
     await openProvider(page, '/pricing', 'Price changes');
     await page.getByRole('button', { name: 'New change' }).click();
     await page.getByRole('radio', { name: 'Several clients' }).check();
@@ -499,7 +500,7 @@ test.describe('Track B: provider tour', () => {
 
   test('step 6b: Harbour Cafe Group billing tab shows the end date of the discount', async ({ page, context }) => {
     test.setTimeout(120_000);
-    await setUp(context);
+    await setUp(context, page);
     await openProvider(page, '/pricing', 'Price changes');
     await page.getByRole('button', { name: 'New change' }).click();
     await page.getByRole('combobox', { name: 'Client' }).selectOption({ label: 'Harbour Cafe Group' });
@@ -521,7 +522,7 @@ test.describe('Track B: provider tour', () => {
     context,
   }) => {
     test.setTimeout(120_000);
-    await setUp(context);
+    await setUp(context, page);
     await openProvider(page, '/security', 'Security');
     await expect(page.getByText('Demo only')).toBeVisible();
     await expect(page.getByText(/Two-step sign-in is required for all provider team members/)).toBeVisible();
@@ -533,7 +534,7 @@ test.describe('Track B: provider tour', () => {
 
   test('step 7b: a closing screen lists the commitments and the simulation note', async ({ page, context }) => {
     test.setTimeout(120_000);
-    await setUp(context);
+    await setUp(context, page);
     await openProvider(page, '/security', 'Security');
     const main = page.locator('main');
     await expect(main).toContainText(/audit log/i);
